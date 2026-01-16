@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+frontend/nynth-ecom/node_modules/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+frontend/nynth-ecom/dist/
+frontend/nynth-ecom/build/
+
+# Logs
+*.log
+logs/
+
+# Editor files
+.vscode/
+.idea/
+*.suo
+*.sln
+*.swp
+.DS_Store
+
+# Brain/Task artifacts (optional, usually kept in separate repo or ignored)
+brain/

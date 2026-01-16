@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- HELPER FUNCTIONS ---
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user matches the document ID
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // --- RULES ---
+
+    // Users Collection: 
+    // - Users can read/write their own profile
+    // - Admins can read all profiles
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Products Collection:
+    // - Public read access
+    // - Only admins can create, update, or delete
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders Collection:
+    // - Users can read their own orders
+    // - Users can create orders if they are the owner or it's a guest checkout
+    // - Admins can read/update all orders
+    match /orders/{orderId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    // Lookbooks Collection:
+    // - Public read access
+    // - Only admins can write
+    match /lookbooks/{lookbookId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Subscribers Collection:
+    // - Anyone can subscribe (add email)
+    // - Only admins can read the list
+    match /subscribers/{subscriberId} {
+      allow create: if true;
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    // Settings Collection:
+    // - Public read access (for site-wide settings like shipping fee, contact info)
+    // - Only admins can write
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Contact Messages Collection:
+    // - Anyone can create (submit contact form)
+    // - Only admins can read
+    match /contact_messages/{messageId} {
+      allow create: if true;
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
