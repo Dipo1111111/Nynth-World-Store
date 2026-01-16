@@ -5,6 +5,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { useSettings } from "../context/SettingsContext"; // Added import
 
