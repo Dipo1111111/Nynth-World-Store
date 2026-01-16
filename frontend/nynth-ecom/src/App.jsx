@@ -1,5 +1,5 @@
 // app.jsx - AUTH INTEGRATION
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import React, { lazy, Suspense } from "react";
 import { CartProvider } from "./context/CartContext";
@@ -90,7 +90,7 @@ function App() {
                 <PageTracker />
                 <Routes>
                   {/* Public Routes */}
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<Navigate to="/shop" replace />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/lookbook" element={<Lookbook />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
