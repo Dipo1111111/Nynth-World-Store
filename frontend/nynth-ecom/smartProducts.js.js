@@ -32,12 +32,12 @@ const currentProducts = [
         description: "Signature NYNTH face cap with foam-front texture and adjustable back strap. Minimalist streetwear design for everyday urban style.",
         category: "headwear",
         images: [
-            "/src/assets/truqha9-black.png",    // Will show first
-            "/src/assets/truqha9-blue.png",     // Will show on hover
-            "/src/assets/truqha9-red.png",      // Will show on hover
-            "/src/assets/truqha9-purple.png"    // Will show on hover
+            "/images/truqha9-black.png",    // Will show first
+            "/images/truqha9-blue.png",     // Will show on hover
+            "/images/truqha9-red.png",      // Will show on hover
+            "/images/truqha9-purple.png"    // Will show on hover
         ],
-        thumbnail: "/src/assets/truqha9-black.png",
+        thumbnail: "/images/truqha9-black.png",
         inStock: true,
         stockQuantity: 25,
         availableColors: ["Black", "Blue", "Red", "Purple"],
@@ -55,12 +55,12 @@ const currentProducts = [
         description: "Official NYNTH crewneck t-shirt with minimalist branding. Made from premium cotton with a relaxed fit for all-day comfort.",
         category: "tees",
         images: [
-            "/src/assets/tshirt-black.jpeg",    // Primary image
-            "/src/assets/tshirt-white.png",    // Hover image (different color)
-            // "/src/assets/tshirt-black-back.png", // Could add back view if you have
-            // "/src/assets/tshirt-white-back.png"  // Could add back view if you have
+            "/images/tshirt-black.jpeg",    // Primary image
+            "/images/tshirt-white.png",    // Hover image (different color)
+            // "/images/tshirt-black-back.png", // Could add back view if you have
+            // "/images/tshirt-white-back.png"  // Could add back view if you have
         ],
-        thumbnail: "/src/assets/tshirt-black.png",
+        thumbnail: "/images/tshirt-black.png",
         inStock: true,
         stockQuantity: 67,
         availableSizes: ["XS", "S", "M", "L"],
