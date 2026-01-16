@@ -14,13 +14,13 @@ import { useLocation } from "react-router-dom";
 import { logPageView } from "./utils/monitoring";
 
 // Public Pages
-import Home from "./pages/home.jsx";
-import Shop from "./pages/shop.jsx";
-import Lookbook from "./pages/lookbook.jsx";
+import Home from "./pages/Home.jsx";
+import Shop from "./pages/Shop.jsx";
+import Lookbook from "./pages/Lookbook.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
-import Cart from "./pages/cart.jsx";
-import Checkout from "./pages/checkout.jsx";
-import ThankYou from "./pages/thankyou.jsx";
+import Cart from "./pages/Cart.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import ThankYou from "./pages/ThankYou.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import TermsOfService from "./pages/TermsOfService.jsx";
 import ShippingReturns from "./pages/ShippingReturns.jsx";
