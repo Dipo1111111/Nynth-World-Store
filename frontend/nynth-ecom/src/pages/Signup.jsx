@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Loader2 } from "lucide-react";
@@ -18,6 +18,7 @@ export default function Signup() {
     const [loading, setLoading] = useState(false);
     const { signup, loginWithGoogle } = useAuth(); // Added loginWithGoogle
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,7 +44,8 @@ export default function Signup() {
                 formData.lastName
             );
             toast.success("Account created successfully!");
-            navigate("/");
+            const originBase = location.state?.from?.pathname || "/";
+            navigate(originBase);
         } catch (error) {
             toast.error(getAuthErrorMessage(error.code));
         } finally {
@@ -146,7 +148,8 @@ export default function Signup() {
                                     setLoading(true);
                                     await loginWithGoogle();
                                     toast.success("Account created successfully!");
-                                    navigate("/");
+                                    const originBase = location.state?.from?.pathname || "/";
+                                    navigate(originBase);
                                 } catch (error) {
                                     console.error(error);
                                     toast.error("Google Sign Up Failed");

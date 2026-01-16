@@ -21,7 +21,8 @@ export default function Login() {
             setLoading(true);
             await login(email, password);
             toast.success("Welcome back!");
-            navigate("/shop");
+            const originBase = location.state?.from?.pathname || "/shop";
+            navigate(originBase);
         } catch (error) {
             console.error("Login Error:", error);
             console.error("Login Error Code:", error.code);
@@ -91,7 +92,8 @@ export default function Login() {
                                     setLoading(true);
                                     await loginWithGoogle();
                                     toast.success("Welcome back!");
-                                    navigate(location.state?.from || "/shop");
+                                    const originBase = location.state?.from?.pathname || "/shop";
+                                    navigate(originBase);
                                 } catch (error) {
                                     console.error(error);
                                     toast.error("Google Sign In Failed");
