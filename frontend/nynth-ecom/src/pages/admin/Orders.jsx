@@ -239,9 +239,9 @@ const Orders = () => {
                                                                                         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                                     </div>
                                                                                     <div className="flex-1 min-w-0">
-                                                                                        <p className="font-medium text-sm truncate">{item.title}</p>
+                                                                                        <p className="font-medium text-sm truncate">{item.name || item.title}</p>
                                                                                         <p className="text-xs text-gray-500 mt-1">
-                                                                                            {item.selectedSize} / {item.selectedColor}
+                                                                                            {item.size || item.selectedSize} / {item.color || item.selectedColor}
                                                                                         </p>
                                                                                         <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                                                                                     </div>
@@ -297,7 +297,7 @@ const Orders = () => {
                                                                                 </div>
                                                                                 <div className="flex justify-between text-sm">
                                                                                     <span className="text-gray-600">Shipping</span>
-                                                                                    <span>₦{order.shipping_fee?.toLocaleString()}</span>
+                                                                                    <span>₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
                                                                                 </div>
                                                                                 <div className="flex justify-between font-semibold pt-2 border-t border-gray-100">
                                                                                     <span>Total</span>

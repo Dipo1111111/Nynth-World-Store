@@ -97,10 +97,10 @@ const Checkout = () => {
           orderId,
           items: cartItems.map(item => ({
             id: item.id,
-            title: item.title,
+            name: item.name,
             quantity: item.quantity,
-            size: item.selectedSize,
-            color: item.selectedColor
+            size: item.size,
+            color: item.color
           })),
           customerName: `${form.firstName} ${form.lastName}`,
         },
