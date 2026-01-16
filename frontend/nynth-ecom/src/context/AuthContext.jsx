@@ -171,7 +171,6 @@ export function AuthProvider({ children }) {
         isAdmin,
         signup,
         login,
-        login,
         logout,
         resetPassword,
         loginWithGoogle
