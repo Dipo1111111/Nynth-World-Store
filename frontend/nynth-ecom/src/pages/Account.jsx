@@ -184,9 +184,9 @@ export default function Account() {
                                                         <div className="flex-1 py-1">
                                                             <div className="flex justify-between items-start">
                                                                 <div>
-                                                                    <p className="font-medium text-sm line-clamp-1">{item.title}</p>
+                                                                    <p className="font-medium text-sm line-clamp-1">{item.name || item.title}</p>
                                                                     <p className="text-xs text-gray-500 mt-1">
-                                                                        {item.selectedSize} / {item.selectedColor}
+                                                                        {item.size || item.selectedSize} / {item.color || item.selectedColor}
                                                                     </p>
                                                                 </div>
                                                                 <span className="text-sm font-medium">

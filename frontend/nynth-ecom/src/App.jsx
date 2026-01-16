@@ -37,6 +37,9 @@ import ErrorPage from "./pages/ErrorPage.jsx";
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Orders = lazy(() => import("./pages/admin/Orders"));
+const Products = lazy(() => import("./pages/admin/Products"));
+const Lookbooks = lazy(() => import("./pages/admin/Lookbooks"));
+const Settings = lazy(() => import("./pages/admin/Settings"));
 
 // Admin Loading Fallback
 const AdminLoader = () => (
@@ -137,6 +140,36 @@ function App() {
                       <ProtectedRoute requireAdmin={true}>
                         <Suspense fallback={<AdminLoader />}>
                           <Orders />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/products"
+                    element={
+                      <ProtectedRoute requireAdmin={true}>
+                        <Suspense fallback={<AdminLoader />}>
+                          <Products />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/lookbooks"
+                    element={
+                      <ProtectedRoute requireAdmin={true}>
+                        <Suspense fallback={<AdminLoader />}>
+                          <Lookbooks />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/settings"
+                    element={
+                      <ProtectedRoute requireAdmin={true}>
+                        <Suspense fallback={<AdminLoader />}>
+                          <Settings />
                         </Suspense>
                       </ProtectedRoute>
                     }

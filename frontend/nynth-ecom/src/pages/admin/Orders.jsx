@@ -325,9 +325,8 @@ const Orders = () => {
                         </CardContent>
                     </Card>
                 )}
-            </main>
-        </div>
-    );
+            </AdminLayout>
+            );
 };
 
-export default Orders;
+            export default Orders;
