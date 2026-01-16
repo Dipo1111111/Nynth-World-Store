@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import AdminLayout from "../components/admin/AdminLayout";
-import { fetchLookbooks, uploadImage } from "../api/firebaseFunctions";
-import { db } from "../api/firebase";
+import AdminLayout from "../../components/admin/AdminLayout";
+import { fetchLookbooks, uploadImage } from "../../api/firebaseFunctions";
+import { db } from "../../api/firebase";
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { Loader2, Plus, Trash2, Edit2, Upload, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { compressImage } from "../utils/imageUtils";
+import { compressImage } from "../../utils/imageUtils";
 
 export default function AdminLookbooks() {
     const [lookbooks, setLookbooks] = useState([]);

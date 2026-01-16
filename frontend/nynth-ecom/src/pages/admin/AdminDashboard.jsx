@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import AdminLayout from "../../components/admin/AdminLayout";
 import { getAdminAnalytics, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";

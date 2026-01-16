@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import AdminLayout from "../components/admin/AdminLayout";
-import { fetchSettings, updateSettings } from "../api/firebaseFunctions";
+import AdminLayout from "../../components/admin/AdminLayout";
+import { fetchSettings, updateSettings } from "../../api/firebaseFunctions";
 import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck } from "lucide-react";
 import toast from "react-hot-toast";
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AdminLayout from "../components/admin/AdminLayout";
+import AdminLayout from "../../components/admin/AdminLayout";
 import {
   fetchProducts,
   addProduct,
@@ -7,10 +7,10 @@ import {
   deleteProduct,
   uploadImage,
   uploadMultipleImages
-} from "../api/firebaseFunctions";
+} from "../../api/firebaseFunctions";
 import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
-import { compressImage } from "../utils/imageUtils";
+import { compressImage } from "../../utils/imageUtils";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
