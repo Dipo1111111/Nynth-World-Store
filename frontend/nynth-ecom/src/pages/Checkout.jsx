@@ -12,6 +12,7 @@ import { useSettings } from "../context/SettingsContext";
 import { trackConversion } from "../utils/monitoring";
 
 import logo from "../assets/nynth-logo.png";
+import { LAGOS_SHIPPING_DATA } from "../data/locationData";
 
 const Checkout = () => {
   const { settings } = useSettings();
@@ -26,9 +27,10 @@ const Checkout = () => {
     phone: "",
     address: "",
     city: "",
-    state: "",
+    state: "Lagos",
     zip: "",
   });
+  const [shippingFee, setShippingFee] = useState(0);
 
   const [loading, setLoading] = useState(false);
 
@@ -70,8 +72,17 @@ const Checkout = () => {
     }
   }, [cartItems, navigate, isOrderCompleted]);
 
+  useEffect(() => {
+    if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
+      setShippingFee(LAGOS_SHIPPING_DATA[form.city]);
+    } else {
+      setShippingFee(settings.shipping_fee || 0);
+    }
+  }, [form.city, settings.shipping_fee]);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   };
 
   const payWithPaystack = (orderId, totalToPay) => {
@@ -151,8 +162,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // Shipping Logic (Simple flat rate from settings)
-      const shippingFee = settings.shipping_fee;
+      // Shipping Logic (Dynamic based on city)
       const grandTotal = totalAmount + shippingFee;
 
       // Create order in Firestore
@@ -161,7 +171,7 @@ const Checkout = () => {
         userId: currentUser ? currentUser.uid : null, // Link to user
         items: cartItems,
         subtotal: totalAmount,
-        shippingFee,
+        shippingFee: shippingFee,
         total: grandTotal,
         payment_status: "pending",
         order_status: "pending", // Start as pending until payment confirmed
@@ -186,8 +196,7 @@ const Checkout = () => {
     }
   };
 
-  const shipping = settings.shipping_fee;
-  const grandTotal = totalAmount + shipping;
+  const grandTotal = totalAmount + shippingFee;
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
@@ -274,23 +283,28 @@ const Checkout = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">City</label>
-                <input
+                <label className="text-sm font-medium text-gray-700">City / Area</label>
+                <select
                   name="city"
                   value={form.city}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                  placeholder="Lagos"
-                />
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors bg-white"
+                >
+                  <option value="">Select Area</option>
+                  {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => (
+                    <option key={area} value={area}>
+                      {area}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">State</label>
+                <label className="text-sm font-medium text-gray-700 text-gray-400">State</label>
                 <input
                   name="state"
-                  value={form.state}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                  placeholder="Lagos"
+                  value="Lagos"
+                  disabled
+                  className="w-full px-4 py-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -348,8 +362,8 @@ const Checkout = () => {
               <span>{settings.currency_symbol}{totalAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-gray-600">
-              <span>Shipping</span>
-              <span className="text-black font-medium">{settings.currency_symbol}{shipping.toLocaleString()}</span>
+              <span>Shipping ({form.city || "Select area"})</span>
+              <span className="text-black font-medium">{settings.currency_symbol}{shippingFee.toLocaleString()}</span>
             </div>
           </div>
 
