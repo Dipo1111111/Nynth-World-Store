@@ -356,13 +356,20 @@ export default function AdminProducts() {
                 <label className="text-sm font-medium">Images</label>
 
                 {/* Existing Images */}
-                <div className="flex gap-2 mb-2 overflow-x-auto">
+                <div className="flex gap-2 mb-2 overflow-x-auto no-scrollbar pb-2">
                   {formData.images.map((img, idx) => (
-                    <div key={idx} className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden relative flex-shrink-0">
+                    <div key={idx} className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden relative flex-shrink-0 group/img">
                       <img src={img} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                        {/* Delete logic would go here */}
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImages = formData.images.filter((_, i) => i !== idx);
+                          setFormData({ ...formData, images: newImages });
+                        }}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   ))}
                 </div>

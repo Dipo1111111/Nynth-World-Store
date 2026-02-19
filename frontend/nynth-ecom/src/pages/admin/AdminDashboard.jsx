@@ -19,6 +19,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import Logo from "../../components/common/Logo";
+import AdminPWAPrompt from "../../components/admin/AdminPWAPrompt";
 import { Line, Doughnut } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -98,6 +99,22 @@ const AdminDashboard = () => {
                     if (!seenOrderIds.has(orderId)) {
                         // Mark as seen
                         setSeenOrderIds(prev => new Set([...prev, orderId]));
+
+                        // 🔔 Cha-Ching Logic
+                        try {
+                            const audio = new Audio('/sounds/cha-ching.mp3');
+                            audio.play().catch(e => console.log('Audio playback failed - interaction required', e));
+                        } catch (err) {
+                            console.error('Audio error:', err);
+                        }
+
+                        // 📱 System Notification
+                        if (Notification.permission === 'granted') {
+                            new Notification('NYNTH 💰 New Order!', {
+                                body: `₦${order.total?.toLocaleString()} from ${order.customer?.firstName || 'Customer'}`,
+                                icon: '/favicon.png'
+                            });
+                        }
 
                         // Show toast notification
                         toast.success(
@@ -209,6 +226,7 @@ const AdminDashboard = () => {
 
     return (
         <AdminLayout title="Dashboard">
+            <AdminPWAPrompt />
             {/* Main Content */}
             <header className="mb-6 md:mb-8 sr-only">
                 <h1 className="text-2xl md:text-3xl font-space font-bold mb-2">Dashboard</h1>
