@@ -22,6 +22,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 export const addProduct = async (product) => {
   const docRef = await addDoc(collection(db, "products"), {
     ...product,
+    stockQuantity: Number(product.stockQuantity) || 0,
+    inStock: (Number(product.stockQuantity) || 0) > 0,
     created_at: serverTimestamp(),
   });
   return docRef.id;
@@ -51,10 +53,17 @@ export const fetchSingleProduct = async (id) => {
 export const updateProduct = async (id, updates) => {
   try {
     const docRef = doc(db, "products", id);
-    await updateDoc(docRef, {
+    const finalUpdates = {
       ...updates,
       updated_at: serverTimestamp(),
-    });
+    };
+
+    if (updates.stockQuantity !== undefined) {
+      finalUpdates.stockQuantity = Number(updates.stockQuantity) || 0;
+      finalUpdates.inStock = finalUpdates.stockQuantity > 0;
+    }
+
+    await updateDoc(docRef, finalUpdates);
     return true;
   } catch (error) {
     console.error(`Error updating product ${id}:`, error);
@@ -304,6 +313,20 @@ export const fetchUserOrders = async (userId) => {
 export const verifyOrderPayment = async (orderId, reference) => {
   try {
     const docRef = doc(db, "orders", orderId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      console.error(`Order ${orderId} not found during verification`);
+      return false;
+    }
+
+    const orderData = docSnap.data();
+
+    // Prevent double verification if already paid
+    if (orderData.payment_status === "paid") {
+      console.log(`Order ${orderId} is already marked as paid.`);
+      return true;
+    }
 
     // Update Order
     await updateDoc(docRef, {
@@ -315,14 +338,11 @@ export const verifyOrderPayment = async (orderId, reference) => {
 
     // Send Confirmation Email
     try {
-      const orderSnap = await getDoc(docRef);
-      if (orderSnap.exists()) {
-        const orderData = { id: orderSnap.id, ...orderSnap.data() };
-        await sendOrderConfirmation(orderData);
-      }
+      // Refresh order data after update for email
+      const updatedOrderData = { id: docSnap.id, ...orderData, payment_status: "paid", order_status: "confirmed", payment_reference: reference };
+      await sendOrderConfirmation(updatedOrderData);
     } catch (emailError) {
       console.error("Error sending confirmation email:", emailError);
-      // Don't fail the verification if email fails
     }
 
     return true;
@@ -574,6 +594,12 @@ export const updateOrderStatus = async (orderId, status) => {
       order_status: status,
       updated_at: serverTimestamp()
     });
+
+    // Automatically set payment_status to 'paid' if marked as delivered
+    if (status === 'delivered') {
+      await updateDoc(orderRef, { payment_status: 'paid' });
+    }
+
     return true;
   } catch (error) {
     console.error("Error updating order status: ", error);

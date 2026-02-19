@@ -45,7 +45,7 @@ service cloud.firestore {
     // - Admins can read/update all orders
     match /orders/{orderId} {
       allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow create: if true; // Allow guest checkout
+      allow create: if request.resource.data.userId == (isAuthenticated() ? request.auth.uid : null); 
       allow update, delete: if isAdmin();
     }
 
@@ -59,10 +59,10 @@ service cloud.firestore {
 
     // Subscribers Collection:
     // - Anyone can subscribe (add email)
-    // - Anyone can read (to check if already subscribed)
-    // - Only admins can update or delete
+    // - Only admins can read all subscribers (privacy risk fix)
     match /subscribers/{subscriberId} {
-      allow create, read: if true;
+      allow create: if true;
+      allow read: if isAdmin();
       allow update, delete: if isAdmin();
     }
 
@@ -85,10 +85,11 @@ service cloud.firestore {
 
     // Mail Collection:
     // - Required for the "Trigger Email" extension
-    // - Anyone can create a mail document (to trigger an email)
+    // - Only allow creation if the payload looks valid (basic check)
     // - Only admins can read/delete the queue
     match /mail/{mailId} {
-      allow create: if true;
+      allow create: if request.resource.data.to is string 
+                    && request.resource.data.message.subject is string;
       allow read: if isAdmin();
       allow update, delete: if isAdmin();
     }

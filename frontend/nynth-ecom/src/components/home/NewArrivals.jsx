@@ -88,9 +88,6 @@ export default function NewArrivals() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
-            <span className="font-inter text-sm font-medium text-gray-600 uppercase tracking-wider mb-2 block">
-              Fresh Drops
-            </span>
             <h2 className="font-space text-4xl md:text-5xl font-bold tracking-tight">
               New arrivals
             </h2>

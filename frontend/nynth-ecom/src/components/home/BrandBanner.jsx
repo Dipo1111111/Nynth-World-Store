@@ -6,17 +6,14 @@ export default function BrandBanner() {
     {
       icon: <Award size={24} />,
       title: "Premium Craftsmanship",
-      description: "Every stitch matters"
     },
     {
       icon: <Leaf size={24} />,
       title: "Sustainable Materials",
-      description: "Ethically sourced"
     },
     {
       icon: <Globe size={24} />,
       title: "Global Community",
-      description: "Worldwide countries"
     }
   ];
 
@@ -34,11 +31,10 @@ export default function BrandBanner() {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-12 pt-8 border-t border-white/10">
           <p className="font-space text-2xl md:text-3xl leading-snug max-w-3xl mx-auto">
-            NYNTH WORLD — Minimal streetwear built with intention. Limited drops. 
-            Premium materials. Designed for the urban minimalist.
+            NYNTH WORLD — Limited drops.
           </p>
         </div>
       </div>

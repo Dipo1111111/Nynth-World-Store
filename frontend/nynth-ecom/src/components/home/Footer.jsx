@@ -44,7 +44,7 @@ export default function Footer() {
               <Logo size="default" />
             </Link>
             <p className="font-inter text-gray-400 text-sm mb-6">
-              Minimal streetwear built with craftsmanship. Limited drops. Premium materials.
+              NYNTH WORLD — Limited drops.
             </p>
             <div className="flex gap-4">
               {socialLinks.map((link, index) => (

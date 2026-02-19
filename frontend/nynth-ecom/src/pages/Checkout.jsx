@@ -92,13 +92,6 @@ const Checkout = () => {
     }
 
     try {
-      console.log("Paystack Debug:", {
-        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-        email: form.email,
-        amount: totalToPay * 100,
-        paystackObj: window.PaystackPop
-      });
-
       const handler = window.PaystackPop.setup({
         key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
         email: form.email,

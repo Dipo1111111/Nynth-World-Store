@@ -5,12 +5,14 @@ import logo from "../../assets/nynth-logo.png";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useSettings } from "../../context/SettingsContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { totalItems } = useCart();
   const { currentUser } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,12 +28,11 @@ export default function Header() {
 
   // Updated navLinks to match shop categories
   const navLinks = [
-    { name: "Shop", to: "/shop" },
-    { name: "New Arrivals", to: "/shop?sort=newest" },
-    { name: "Hoodies", to: "/shop?category=hoodies" },
-    { name: "Tees", to: "/shop?category=tees" },
-    { name: "Headwear", to: "/shop?category=headwear" }, // Changed from "Accessories"
-    { name: "Lookbook", to: "/lookbook" },
+    { name: "Explore", to: "/" },
+    { name: "Apparel", to: "/shop?category=hoodies" },
+    { name: "Homeware", to: "/shop?category=homeware" },
+    { name: "Accessories", to: "/shop?category=accessories" },
+    { name: "Drinkware", to: "/shop?category=drinkware" },
   ];
 
   // Helper to check if a nav link is active
@@ -68,7 +69,7 @@ export default function Header() {
           <Link to="/" className="flex items-center">
             <img
               src={logo}
-              alt="NYNTH Logo"
+              alt={`${settings.site_name} Logo`}
               className="h-10 md:h-12 w-auto invert"
             />
           </Link>

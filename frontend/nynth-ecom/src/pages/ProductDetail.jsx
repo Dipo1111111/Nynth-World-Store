@@ -18,11 +18,13 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
+import { useSettings } from "../context/SettingsContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { settings } = useSettings();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -157,7 +159,7 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-white text-black">
       <SEO
         title={`${product.title} | NYNTH`}
-        description={product.description || `Shop ${product.title} at NYNTH. Premium streetwear with craftsmanship.`}
+        description={product.description || `Shop ${product.title} at NYNTH.`}
         image={product.images?.[0] || product.imageUrl}
         type="product"
         url={`/product/${product.id}`}
@@ -205,19 +207,19 @@ export default function ProductDetail() {
         </div>
       )}
 
-      <main className="px-6 md:px-10 lg:px-20 py-6 md:py-10">
-        {/* Breadcrumb Navigation */}
-        <nav className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+      <main className="px-4 md:px-10 lg:px-20 py-4 md:py-10">
+        {/* Breadcrumb Navigation - Scrollable on mobile */}
+        <nav className="mb-6 overflow-x-auto no-scrollbar whitespace-nowrap">
+          <div className="flex items-center gap-2 text-[13px] text-gray-500">
             <Link to="/" className="hover:text-black transition-colors">Home</Link>
-            <ChevronRight size={14} />
+            <ChevronRight size={12} className="flex-shrink-0" />
             <Link to="/shop" className="hover:text-black transition-colors">Shop</Link>
-            <ChevronRight size={14} />
+            <ChevronRight size={12} className="flex-shrink-0" />
             <Link to={`/shop?category=${product.category}`} className="hover:text-black transition-colors capitalize">
               {product.category}
             </Link>
-            <ChevronRight size={14} />
-            <span className="text-black font-medium truncate max-w-[200px]">{product.title}</span>
+            <ChevronRight size={12} className="flex-shrink-0" />
+            <span className="text-black font-semibold truncate max-w-[150px]">{product.title}</span>
           </div>
         </nav>
 
@@ -294,14 +296,14 @@ export default function ProductDetail() {
             </div>
 
             {/* Product Title */}
-            <h1 className="font-space text-3xl md:text-4xl font-bold mb-4">
+            <h1 className="font-space text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
               {product.title}
             </h1>
 
             {/* Price */}
-            <div className="flex items-center gap-4 mb-6">
-              <p className="text-2xl md:text-3xl font-bold">₦{product.price?.toLocaleString()}</p>
-              {product.stockQuantity && product.stockQuantity < 10 && product.inStock && (
+            <div className="flex items-center gap-4 mb-5 md:mb-6">
+              <p className="text-2xl md:text-3xl font-bold">{settings.currency_symbol}{product.price?.toLocaleString()}</p>
+              {product.stockQuantity && product.stockQuantity < 10 && product.stockQuantity > 0 && (
                 <span className="px-3 py-1 bg-red-50 text-red-700 text-sm rounded-full">
                   Only {product.stockQuantity} left
                 </span>

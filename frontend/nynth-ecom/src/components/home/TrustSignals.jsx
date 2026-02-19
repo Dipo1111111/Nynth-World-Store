@@ -6,17 +6,14 @@ export default function TrustSignals() {
     {
       icon: <Truck size={24} />,
       title: "Free Shipping",
-      description: "On orders over ₦50,000",
     },
     {
       icon: <RefreshCw size={24} />,
       title: "Easy Returns",
-      description: "30-day return policy",
     },
     {
       icon: <CreditCard size={24} />,
       title: "Secure Payment",
-      description: "SSL encrypted",
     },
   ];
 

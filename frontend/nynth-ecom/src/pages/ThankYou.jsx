@@ -1,14 +1,7 @@
-// src/pages/thankyou.jsx - PREMIUM REDESIGN
-import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { CheckCircle, ArrowRight, ShoppingBag, Mail } from "lucide-react";
-import confetti from "canvas-confetti";
-import Header from "../components/home/Header";
-import Footer from "../components/home/Footer";
-
-import logo from "../assets/nynth-logo.png";
+import { useAuth } from "../context/AuthContext";
 
 const ThankYou = () => {
+  const { currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const reference = searchParams.get("ref");
   const [mounted, setMounted] = useState(false);
@@ -84,12 +77,14 @@ const ThankYou = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/account"
-              className="px-8 py-4 rounded-xl border border-gray-200 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-            >
-              View Order
-            </Link>
+            {currentUser && (
+              <Link
+                to="/account"
+                className="px-8 py-4 rounded-xl border border-gray-200 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+              >
+                View Order
+              </Link>
+            )}
             <Link
               to="/shop"
               className="px-8 py-4 rounded-xl bg-black text-white font-medium hover:opacity-90 transition-opacity shadow-lg flex items-center justify-center gap-2 group"

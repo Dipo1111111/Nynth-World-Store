@@ -229,25 +229,29 @@ const Orders = () => {
 
                                                                     {/* Order Summary */}
                                                                     <div>
-                                                                        <h4 className="font-semibold mb-4 text-sm md:text-base">Order Summary</h4>
-                                                                        <div className="p-4 bg-white rounded-lg border border-gray-100 space-y-2">
-                                                                            <div className="flex justify-between text-sm">
-                                                                                <span className="text-gray-600">Subtotal</span>
-                                                                                <span>₦{order.subtotal?.toLocaleString()}</span>
+                                                                        <h4 className="font-semibold mb-4 text-sm md:text-base">Order Status & Summary</h4>
+                                                                        <div className="p-4 bg-white rounded-xl border border-gray-100 space-y-3">
+                                                                            <div className="flex justify-between items-center text-sm">
+                                                                                <span className="text-gray-500">Order Status</span>
+                                                                                <StatusDropdown
+                                                                                    orderId={order.id}
+                                                                                    currentStatus={order.order_status || 'pending'}
+                                                                                    onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                                                                                />
                                                                             </div>
-                                                                            <div className="flex justify-between text-sm">
-                                                                                <span className="text-gray-600">Shipping</span>
-                                                                                <span>₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between font-semibold pt-2 border-t border-gray-100">
-                                                                                <span>Total</span>
-                                                                                <span>₦{order.total?.toLocaleString()}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between text-sm pt-2">
-                                                                                <span className="text-gray-600">Payment Status</span>
-                                                                                <span className={`font-medium ${order.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
-                                                                                    {order.payment_status || 'pending'}
-                                                                                </span>
+                                                                            <div className="space-y-2 pt-3 border-t border-gray-50 font-inter">
+                                                                                <div className="flex justify-between text-xs text-gray-500">
+                                                                                    <span>Subtotal</span>
+                                                                                    <span>₦{order.subtotal?.toLocaleString()}</span>
+                                                                                </div>
+                                                                                <div className="flex justify-between text-xs text-gray-500">
+                                                                                    <span>Shipping Fee</span>
+                                                                                    <span>₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                                </div>
+                                                                                <div className="flex justify-between font-space font-bold text-base pt-2 border-t border-gray-100">
+                                                                                    <span>Grand Total</span>
+                                                                                    <span>₦{order.total?.toLocaleString()}</span>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>

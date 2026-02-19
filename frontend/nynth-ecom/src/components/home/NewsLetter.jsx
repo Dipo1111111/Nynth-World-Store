@@ -79,8 +79,7 @@ export default function Newsletter() {
             Stay in the loop
           </h2>
           <p className="font-inter text-gray-600 mb-8 max-w-xl mx-auto">
-            Be the first to know about new drops, exclusive offers, and style guides.
-            Join the NYNTH community.
+            Be the first to know about new drops.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">

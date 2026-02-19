@@ -29,13 +29,6 @@ export default function Cart() {
 
   const handleCheckout = () => {
     if (cartItems.length === 0) return;
-
-    if (!currentUser) {
-      toast.error("Please sign in to continue to checkout");
-      navigate("/login", { state: { from: { pathname: "/checkout" } } });
-      return;
-    }
-
     navigate("/checkout");
   };
 
@@ -127,7 +120,7 @@ export default function Cart() {
                     </div>
 
                     <p className="font-space font-bold text-lg">
-                      ₦{(item.price * item.quantity).toLocaleString()}
+                      {settings?.currency_symbol || "₦"}{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
                 </div>

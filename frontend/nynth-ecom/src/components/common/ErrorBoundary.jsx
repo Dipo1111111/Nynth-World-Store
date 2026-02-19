@@ -13,6 +13,10 @@ class ErrorBoundary extends React.Component {
 
     componentDidCatch(error, errorInfo) {
         console.error("Uncaught error:", error, errorInfo);
+        // Report to Sentry
+        import("@sentry/react").then(Sentry => {
+            Sentry.captureException(error, { extra: errorInfo });
+        });
     }
 
     render() {

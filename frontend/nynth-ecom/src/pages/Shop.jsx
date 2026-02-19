@@ -207,84 +207,53 @@ export default function Shop() {
       />
       <Header />
 
-      <main className="section-pad">
-        {/* Hero Banner */}
-        <div className="mb-12 text-center">
-          <h1 className="font-space text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+      <main className="px-4 md:px-10 lg:px-20 py-6 md:py-10">
+        {/* Simplified Header */}
+        <div className="mb-8 md:mb-12">
+          <h1 className="font-space text-3xl md:text-5xl font-bold tracking-tight mb-6 md:mb-8">
             {selectedCategory === "all" ? "Shop Collection" : selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
           </h1>
-          <p className="font-inter text-gray-600 max-w-2xl mx-auto">
-            {selectedCategory === "all"
-              ? "Explore our curated collection of premium streetwear. Each piece is crafted with attention to detail and designed for the modern minimalist."
-              : `Browse our selection of premium ${selectedCategory}. Each piece is crafted with attention to detail and designed for the modern minimalist.`
-            }
-          </p>
+
+          {/* Category Quick Filters (Matching Hunter Style) */}
+          <div className="flex gap-2.5 mb-8 md:mb-10 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setSelectedCategory(cat.value)}
+                className={`
+                  px-6 md:px-8 py-3 md:py-3.5 rounded-xl text-sm font-medium border transition-all whitespace-nowrap
+                  ${selectedCategory === cat.value
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-black"}
+                `}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Shop Content */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:w-1/4">
-            <FiltersSidebar
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={(category) => {
-                setSelectedCategory(category);
-                setIsMobileFiltersOpen(false);
-              }}
-              priceRange={priceRange}
-              onPriceChange={setPriceRange}
-              sortBy={sortBy}
-              onSortChange={(sort) => {
-                setSortBy(sort);
-                setIsMobileFiltersOpen(false);
-              }}
-              onClearFilters={clearFilters}
-              isMobileFiltersOpen={isMobileFiltersOpen}
-              setIsMobileFiltersOpen={setIsMobileFiltersOpen}
-            />
-          </div>
-
+        <div className="flex flex-col gap-8">
           {/* Products Section */}
-          <div className="lg:w-3/4">
+          <div className="w-full">
             {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-              <div>
-                <p className="font-inter text-gray-600">
-                  Showing <span className="font-semibold text-black">{filteredProducts.length}</span>
-                  {filteredProducts.length === 1 ? " product" : " products"}
-                  {selectedCategory !== "all" && ` in ${selectedCategory}`}
-                  {sortBy === "newest" && " (Newest First)"}
-                </p>
-              </div>
+            <div className="flex justify-between items-center mb-6 md:mb-8">
+              <p className="font-inter text-[13px] md:text-base text-gray-500">
+                Showing <span className="font-semibold text-black">{filteredProducts.length}</span>
+                {filteredProducts.length === 1 ? " product" : " products"}
+              </p>
 
-              <div className="flex items-center gap-4">
-                {/* Mobile Filter Button */}
-                <button
-                  onClick={() => setIsMobileFiltersOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              <div className="flex items-center gap-3">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 md:px-4 py-2 border border-gray-200 rounded-lg text-xs md:text-sm bg-white focus:outline-none focus:border-black"
                 >
-                  <Filter size={16} />
-                  Filters
-                </button>
-
-                {/* View Toggle */}
-                <div className="flex items-center border border-gray-300 rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-gray-100 text-black" : "text-gray-600 hover:bg-gray-50"}`}
-                    aria-label="Grid view"
-                  >
-                    <Grid3x3 size={18} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-2 rounded transition-colors ${viewMode === "list" ? "bg-gray-100 text-black" : "text-gray-600 hover:bg-gray-50"}`}
-                    aria-label="List view"
-                  >
-                    <List size={18} />
-                  </button>
-                </div>
+                  {sortOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -296,28 +265,22 @@ export default function Shop() {
               </div>
             )}
 
-            {/* Error State */}
-            {error && !loading && (
-              <div className="text-center py-20">
-                <p className="text-red-500 mb-4">{error}</p>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-6 py-2 bg-black text-white rounded-full hover:opacity-90 transition-opacity"
-                >
-                  Try Again
-                </button>
+            {/* Products Grid - 2x2 on Mobile */}
+            {!loading && !error && filteredProducts.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                  />
+                ))}
               </div>
             )}
 
             {/* No Products State */}
             {!loading && !error && filteredProducts.length === 0 && (
               <div className="text-center py-20">
-                <p className="text-gray-600 mb-4">
-                  {selectedCategory !== "all"
-                    ? `No ${selectedCategory} found. Try a different category or clear filters.`
-                    : "No products found matching your filters."
-                  }
-                </p>
+                <p className="text-gray-600 mb-4">No products found matching your filters.</p>
                 <button
                   onClick={clearFilters}
                   className="px-6 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors"
@@ -326,77 +289,9 @@ export default function Shop() {
                 </button>
               </div>
             )}
-
-            {/* Products Grid */}
-            {!loading && !error && filteredProducts.length > 0 && (
-              <div className={viewMode === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                : "space-y-6"
-              }>
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    viewMode={viewMode}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination Placeholder */}
-            {filteredProducts.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <div className="flex justify-center items-center gap-2">
-                  <button
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    disabled
-                  >
-                    Previous
-                  </button>
-                  <span className="px-4 py-2 text-gray-600">Page 1 of 1</span>
-                  <button
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    disabled
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </main>
-
-      {/* Trust Signals Section */}
-      <div className="section-pad border-t border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <h3 className="font-space text-2xl font-bold text-center mb-8">
-            Why Shop With NYNTH
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">✓</div>
-              <p className="font-inter font-medium">Premium Quality</p>
-              <p className="text-sm text-gray-600">Heavyweight materials</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">🚚</div>
-              <p className="font-inter font-medium">Fast Shipping</p>
-              <p className="text-sm text-gray-600">2-4 business days</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">↩️</div>
-              <p className="font-inter font-medium">Easy Returns</p>
-              <p className="text-sm text-gray-600">30-day policy</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">🛡️</div>
-              <p className="font-inter font-medium">Secure Payment</p>
-              <p className="text-sm text-gray-600">SSL encrypted</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <Footer />
     </div>

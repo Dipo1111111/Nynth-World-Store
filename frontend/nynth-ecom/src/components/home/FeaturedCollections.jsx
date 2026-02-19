@@ -28,12 +28,7 @@ const CollectionCard = ({ product, category }) => {
   };
 
   const getCategorySubtitle = () => {
-    const subtitles = {
-      hoodies: "Heavyweight, premium cotton.",
-      tees: "Classic fits, bold prints.",
-      headwear: "Caps & beanies built for style."
-    };
-    return subtitles[category] || "Shop collection";
+    return "Shop collection";
   };
 
   return (

@@ -8,7 +8,7 @@ import {
   uploadImage,
   uploadMultipleImages
 } from "../../api/firebaseFunctions";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
 
@@ -28,6 +28,7 @@ export default function AdminProducts() {
     images: [], // Array of URL strings
     sizes: [], // Array of strings e.g. ["S", "M", "L"]
     colors: [], // Array of strings e.g. ["Black", "White"]
+    stockQuantity: 0,
     inStock: true,
     featured: false,
     bestSeller: false,
@@ -73,6 +74,7 @@ export default function AdminProducts() {
       images: product.images || (product.imageUrl ? [product.imageUrl] : []),
       sizes: product.sizes || [],
       colors: product.colors || [],
+      stockQuantity: product.stockQuantity || 0,
       inStock: product.inStock !== false,
       featured: product.featured || false,
       bestSeller: product.bestSeller || false,
@@ -212,9 +214,18 @@ export default function AdminProducts() {
                   <td className="p-4 capitalize text-gray-600">{product.category}</td>
                   <td className="p-4 font-medium">₦{product.price?.toLocaleString()}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${product.inStock ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {product.inStock ? "In Stock" : "Out of Stock"}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit ${product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
+                        product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
+                          "bg-green-50 text-green-600 border border-green-100"
+                        }`}>
+                        {product.stockQuantity <= 0 ? "Out of Stock" :
+                          product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
+                      </span>
+                      <span className="text-xs text-gray-400 font-medium px-2">
+                        {product.stockQuantity} units
+                      </span>
+                    </div>
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -375,37 +386,44 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              {/* Toggles */}
-              <div className="flex gap-6 pt-4 border-t border-gray-100">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.inStock}
-                    onChange={e => setFormData({ ...formData, inStock: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-300"
-                  />
-                  <span className="text-sm font-medium">In Stock</span>
-                </label>
+              {/* Inventory Management */}
+              <div className="flex gap-8 pt-4 border-t border-gray-100">
+                <div className="space-y-2 flex-1">
+                  <label className="text-sm font-medium">Stock Quantity</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      className="w-full border p-3 rounded-lg pl-10"
+                      value={formData.stockQuantity}
+                      onChange={e => setFormData({ ...formData, stockQuantity: parseInt(e.target.value) || 0 })}
+                    />
+                    <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  </div>
+                  <p className="text-[11px] text-gray-400">Updating this will automatically set {formData.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'} status.</p>
+                </div>
 
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.featured}
-                    onChange={e => setFormData({ ...formData, featured: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-300"
-                  />
-                  <span className="text-sm font-medium">Featured</span>
-                </label>
+                <div className="flex flex-col justify-end gap-3 pb-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.featured}
+                      onChange={e => setFormData({ ...formData, featured: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 accent-black"
+                    />
+                    <span className="text-sm font-medium">Featured</span>
+                  </label>
 
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.bestSeller}
-                    onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-300"
-                  />
-                  <span className="text-sm font-medium">Best Seller</span>
-                </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.bestSeller}
+                      onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 accent-black"
+                    />
+                    <span className="text-sm font-medium">Best Seller</span>
+                  </label>
+                </div>
               </div>
 
               <div className="pt-6 flex justify-end gap-3">
