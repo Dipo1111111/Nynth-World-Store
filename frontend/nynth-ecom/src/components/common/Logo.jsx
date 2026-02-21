@@ -4,9 +4,9 @@ import logo from '../../assets/nynth-logo.png';
 export const Logo = ({ className = '', size = 'default' }) => {
     const sizeClasses = {
         sm: 'h-6',
-        default: 'h-8',
-        lg: 'h-10',
-        xl: 'h-12'
+        default: 'h-10',
+        lg: 'h-12 md:h-16',
+        xl: 'h-16 md:h-24'
     };
 
     return (
