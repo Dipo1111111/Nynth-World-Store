@@ -45,6 +45,12 @@ export default function PrivacyPolicy() {
                         Finally, we may also share your Personal Information to comply with applicable laws and regulations, to respond to a subpoena, search warrant or other lawful request for information we receive, or to otherwise protect our rights.
                     </p>
 
+                    <h3 className="text-black text-xl font-bold pt-4">Cookies and Tracking Technologies</h3>
+                    <p>We use cookies and similar tracking technologies to track the activity on our Service and hold certain information. Cookies are files with small amount of data which may include an anonymous unique identifier. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.</p>
+
+                    <h3 className="text-black text-xl font-bold pt-4">Log Files</h3>
+                    <p>NYNTH follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks.</p>
+
                     <h3 className="text-black text-xl font-bold pt-4">Contact Us</h3>
                     <p>
                         For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail at {settings.support_email}.
