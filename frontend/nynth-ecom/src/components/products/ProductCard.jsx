@@ -12,12 +12,12 @@ export default function ProductCard({ product }) {
     <div className="group flex flex-col">
       <Link
         to={`/product/${product.id}`}
-        className="relative aspect-[4/5] bg-[#F2F2F2] overflow-hidden mb-3 block"
+        className="relative aspect-[4/5] bg-[#F2F2F2] overflow-hidden mb-4 block group"
       >
         <img
           src={mainImage}
           alt={product.title}
-          className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-90"
+          className="w-full h-full object-cover transition-all duration-[800ms] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-[1.03] group-hover:opacity-90"
         />
 
         {/* Badges */}

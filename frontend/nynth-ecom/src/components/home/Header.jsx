@@ -53,14 +53,14 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? "bg-white/80 backdrop-blur-md border-b border-gray-100 py-3" : "bg-transparent py-5"
+      className={`sticky top-0 z-50 w-full transition-all duration-[600ms] cubic-bezier(0.16, 1, 0.3, 1) ${isScrolled ? "bg-white/70 backdrop-blur-xl border-b border-gray-100 py-2.5" : "bg-transparent py-6"
         }`}
     >
       <div className="px-4 md:px-10 lg:px-20">
         <div className="relative flex items-center justify-between">
 
           {/* Left: Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => {
               const isActive = isNavLinkActive(link.to);
               return (
@@ -68,11 +68,12 @@ export default function Header() {
                   key={link.name}
                   to={link.to}
                   className={`
-                    font-inter text-[11px] tracking-[0.2em] font-medium hover:text-black transition-colors
-                    ${isActive ? "text-black" : "text-gray-500"}
+                    font-inter text-[10px] tracking-[0.25em] font-bold hover:text-black transition-all duration-500 relative group
+                    ${isActive ? "text-black" : "text-gray-400"}
                   `}
                 >
                   {link.name}
+                  <span className={`absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-500 group-hover:w-full ${isActive ? "w-full" : ""}`} />
                 </NavLink>
               );
             })}

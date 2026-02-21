@@ -20,8 +20,6 @@ export default function Shop() {
   const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get("category") || "all");
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState(() => searchParams.get("sort") || "newest");
-  const [gridCols, setGridCols] = useState(4); // 2 or 4
-  const [showModels, setShowModels] = useState(false);
 
   useEffect(() => {
     setSearchQuery(searchParams.get("search") || "");
@@ -78,43 +76,13 @@ export default function Shop() {
           </div>
         </section>
 
-        {/* Minimal Filter Bar */}
-        <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between px-4 md:px-10 py-3 text-[10px] tracking-[0.2em] font-bold uppercase transition-all">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-400">SICHT</span>
-              <div className="flex items-center gap-1">
-                {[2, 4].map(cols => (
-                  <button
-                    key={cols}
-                    onClick={() => setGridCols(cols)}
-                    className={`w-4 h-1 transition-all ${gridCols === cols ? "bg-black" : "bg-gray-200 hover:bg-gray-300"}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-gray-400">MODELL</span>
-              <button
-                onClick={() => setShowModels(!showModels)}
-                className={`relative w-8 h-4 rounded-full transition-colors flex items-center px-0.5 ${showModels ? "bg-black" : "bg-gray-200"}`}
-              >
-                <div className={`w-3 h-3 bg-white rounded-full transition-transform ${showModels ? "translate-x-4" : "translate-x-0"}`} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Categories Bar */}
-        <div className="flex justify-center gap-8 py-6 md:py-10 border-b border-gray-50 overflow-x-auto no-scrollbar px-4">
+        {/* Categories Bar - Primary Sticky */}
+        <div className="sticky top-16 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex justify-center gap-8 py-4 md:py-6 overflow-x-auto no-scrollbar px-4 transition-all duration-300">
           {["all", "hoodies", "shop-all", "accessories"].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`text-[11px] tracking-[0.2em] font-bold uppercase transition-colors whitespace-nowrap ${selectedCategory === cat ? "text-black underline underline-offset-8" : "text-gray-400 hover:text-black"
+              className={`text-[10px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${selectedCategory === cat ? "text-black underline underline-offset-8" : "text-gray-400 hover:text-black"
                 }`}
             >
               {cat.replace(/-/g, " ")}
@@ -132,8 +100,7 @@ export default function Shop() {
               {error}
             </div>
           ) : (
-            <div className={`grid gap-x-2 gap-y-10 transition-all duration-500 ${gridCols === 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-4"
-              }`}>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-12 transition-all duration-500">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
