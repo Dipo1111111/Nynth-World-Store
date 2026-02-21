@@ -1,23 +1,30 @@
 // src/components/home/Header.jsx
 import React, { useState, useEffect } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { ShoppingBag, Search, Menu, X, User } from "lucide-react";
-import logo from "../../assets/nynth-logo.png";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  Search,
+  User,
+  ShoppingBag,
+  Menu,
+  X,
+  Plus
+} from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
+import Logo from "../common/Logo";
 
 export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { totalItems } = useCart();
   const { currentUser } = useAuth();
   const { settings } = useSettings();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,18 +49,7 @@ export default function Header() {
     { name: "CONTACT", to: "/contact" },
   ];
 
-  const isNavLinkActive = (linkTo) => {
-    if (linkTo === "/shop" && location.pathname === "/shop") {
-      return true;
-    }
-    if (linkTo === "/" && location.pathname === "/") {
-      return true;
-    }
-    if (linkTo === "/contact" && location.pathname === "/contact") {
-      return true;
-    }
-    return false;
-  };
+  const isNavLinkActive = (to) => location.pathname === to;
 
   return (
     <header
@@ -84,7 +80,7 @@ export default function Header() {
 
           {/* Mobile Menu Button (Left on mobile) */}
           <button
-            className="md:hidden p-2 -ml-2"
+            className="md:hidden p-2 -ml-2 text-black"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -94,15 +90,7 @@ export default function Header() {
           {/* Center: Logo */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Link to="/" className="flex items-center">
-              <span className="font-space text-2xl font-bold tracking-[0.1em] uppercase">
-                {settings.site_name || "NYNTH"}
-              </span>
-              {/* If you prefer the image logo, uncomment below and remove the span */}
-              {/* <img
-                src={logo}
-                alt={`${settings.site_name} Logo`}
-                className="h-6 md:h-8 w-auto invert"
-              /> */}
+              <Logo size="lg" className="invert" />
             </Link>
           </div>
 
@@ -126,7 +114,7 @@ export default function Header() {
                   placeholder="SEARCH..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-32 md:w-48 bg-transparent border-b border-black text-[10px] tracking-widest focus:outline-none py-1"
+                  className="w-32 md:w-48 bg-transparent border-b border-black text-[10px] tracking-widest font-inter focus:outline-none py-1"
                 />
                 <button
                   type="button"
@@ -149,11 +137,11 @@ export default function Header() {
             <Link
               to="/cart"
               className="p-2 relative hover:opacity-70 transition-opacity"
-              aria-label="Shopping cart"
+              aria-label="Shopping bag"
             >
               <ShoppingBag size={18} className="text-gray-900" strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[8px] text-white font-bold">
+                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[8px] text-white font-bold font-inter">
                   {totalItems > 99 ? "99" : totalItems}
                 </span>
               )}
@@ -172,7 +160,7 @@ export default function Header() {
                     key={link.name}
                     to={link.to}
                     className={`
-                      text-lg tracking-[0.2em] font-medium
+                      text-lg tracking-[0.2em] font-medium font-inter
                       ${isActive ? "text-black" : "text-gray-400"}
                     `}
                     onClick={() => setIsMenuOpen(false)}

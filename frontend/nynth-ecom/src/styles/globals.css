@@ -6,9 +6,9 @@
   --black: #000000;
   --white: #ffffff;
 
-  /* Define font families as CSS variables */
-  --font-inter: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  --font-space: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  /* Use Inter for all fonts for consistent minimal aesthetic */
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-space: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Apply font families using CSS variables */
