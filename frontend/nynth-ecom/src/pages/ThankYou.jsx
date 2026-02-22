@@ -1,4 +1,10 @@
+import React, { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Check, ArrowRight, ShoppingBag, Mail } from "lucide-react";
+import confetti from "canvas-confetti";
 import { useAuth } from "../context/AuthContext";
+import Header from "../components/home/Header";
+import Footer from "../components/home/Footer";
 
 const ThankYou = () => {
   const { currentUser } = useAuth();
@@ -40,58 +46,37 @@ const ThankYou = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col">
+    <div className="min-h-screen bg-white text-black flex flex-col font-inter">
       <Header />
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative overflow-hidden">
-        {/* Background Decorative Elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-50">
-          <div className="absolute top-[10%] left-[5%] w-64 h-64 bg-gray-50 rounded-full blur-3xl" />
-          <div className="absolute bottom-[10%] right-[5%] w-96 h-96 bg-gray-50 rounded-full blur-3xl" />
-        </div>
-
-        <div className={`max-w-xl w-full text-center relative z-10 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="w-24 h-24 bg-black rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-            <img src={logo} alt="NYNTH" className="h-12 w-auto invert brightness-0 invert" />
+      <main className="flex-1 flex flex-col items-center justify-center section-pad py-20 relative">
+        <div className={`max-w-xl w-full text-center transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <div className="w-20 h-20 bg-black flex items-center justify-center mx-auto mb-12">
+            <Check size={32} className="text-white" strokeWidth={1} />
           </div>
 
-          <h1 className="font-space text-4xl md:text-5xl font-bold mb-6 tracking-tight">
-            Order Confirmed
-          </h1>
+          <h1 className="hero-title text-black mb-6">ORDER CONFIRMED</h1>
 
-          <p className="text-gray-500 font-inter text-lg mb-8 leading-relaxed">
-            Thank you for shopping with NYNTH. Your order has been successfully placed and is now being processed.
+          <p className="text-[12px] tracking-[0.2em] text-gray-400 font-bold uppercase mb-12 leading-relaxed">
+            Thank you for shopping with NYNTH. Your order reference is <span className="text-black">{reference || "NY-000000"}</span>.
+            A confirmation email has been sent to your inbox.
           </p>
 
-          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 mb-10 text-left">
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-                <span className="text-gray-500 text-sm">Order Reference</span>
-                <span className="font-space font-bold text-lg">{reference || "N/A"}</span>
-              </div>
-              <div className="flex items-start gap-3 text-sm text-gray-500">
-                <Mail size={16} className="mt-0.5 shrink-0" />
-                <p>An email confirmation has been sent to your inbox with full order details.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {currentUser && (
               <Link
                 to="/account"
-                className="px-8 py-4 rounded-xl border border-gray-200 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                className="px-12 py-5 border border-black text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all"
               >
-                View Order
+                View Collection
               </Link>
             )}
             <Link
               to="/shop"
-              className="px-8 py-4 rounded-xl bg-black text-white font-medium hover:opacity-90 transition-opacity shadow-lg flex items-center justify-center gap-2 group"
+              className="px-12 py-5 bg-black text-white text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all flex items-center justify-center gap-4"
             >
-              <ShoppingBag size={18} />
               Continue Shopping
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={14} />
             </Link>
           </div>
         </div>

@@ -12,15 +12,15 @@ export default function Signup() {
     const location = useLocation();
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col font-inter">
             <Header />
 
-            <main className="flex-1 flex items-center justify-center section-pad">
-                <div className="w-full max-w-md p-6 sm:p-8">
-                    <div className="text-center mb-10">
-                        <h1 className="font-space text-3xl font-bold mb-2">Join NYNTH</h1>
-                        <p className="font-inter text-gray-600">
-                            Create an account with Google for exclusive drops and faster checkout.
+            <main className="flex-1 flex items-center justify-center section-pad py-20">
+                <div className="w-full max-w-sm">
+                    <div className="text-left mb-16">
+                        <h1 className="hero-title text-black text-left mb-6">SIGN UP</h1>
+                        <p className="text-[12px] tracking-[0.2em] text-gray-400 font-bold uppercase leading-relaxed">
+                            Join the NYNTH community for early access to artifacts and curated experiences.
                         </p>
                     </div>
 
@@ -42,15 +42,15 @@ export default function Signup() {
                                 }
                             }}
                             disabled={loading}
-                            className="w-full border border-gray-300 py-4 rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-gray-50 transition-all hover:scale-[1.02]"
+                            className="w-full border border-black py-5 text-[11px] font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-4 hover:bg-gray-50 transition-all font-inter"
                         >
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
                             Sign up with Google
                         </button>
 
-                        <p className="text-center text-sm text-gray-600">
+                        <p className="text-center text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase mt-8">
                             Already have an account?{" "}
-                            <Link to="/login" className="font-medium text-black hover:underline">
+                            <Link to="/login" className="text-black hover:underline underline-offset-4">
                                 Sign in
                             </Link>
                         </p>

@@ -85,128 +85,117 @@ export default function Contact() {
     };
 
     return (
-        <div className="min-h-screen bg-white text-black flex flex-col">
+        <div className="min-h-screen bg-white text-black flex flex-col font-inter">
             <Header />
-            <main className="flex-1 section-pad">
+            <main className="flex-1 section-pad py-20 md:py-32">
                 <div className="max-w-6xl mx-auto">
-                    <h1 className="font-space text-3xl md:text-5xl font-bold text-center mb-12">Get in Touch</h1>
+                    <h1 className="hero-title text-black text-left mb-20">CONTACT</h1>
 
-                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
+                    <div className="grid lg:grid-cols-2 gap-20 lg:gap-32">
                         {/* Info */}
-                        <div className="space-y-8">
+                        <div className="space-y-12">
                             <div>
-                                <h3 className="text-xl font-bold mb-4">Contact Information</h3>
-                                <p className="text-gray-600 leading-relaxed">
+                                <h3 className="text-[12px] tracking-[0.3em] font-bold uppercase text-gray-400 mb-8 border-b border-gray-100 pb-4 inline-block">Support Hub</h3>
+                                <p className="text-[14px] md:text-[16px] text-gray-600 leading-[1.8] font-medium max-w-md">
                                     Have a question about an order, a collaboration, or just want to say hi?
-                                    Fill out the form or reach out directly.
+                                    Fill out the form or reach out directly to our Lagos studio.
                                 </p>
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900 shrink-0">
-                                        <Mail size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-medium">Email</h4>
-                                        <p className="text-gray-500">{settings.support_email}</p>
-                                    </div>
+                            <div className="space-y-10">
+                                <div className="space-y-2">
+                                    <h4 className="text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase">Email</h4>
+                                    <p className="text-[14px] font-bold tracking-widest">{settings.support_email}</p>
                                 </div>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900 shrink-0">
-                                        <Phone size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-medium">Phone</h4>
-                                        <p className="text-gray-500">{settings.support_phone}</p>
-                                    </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase">Phone</h4>
+                                    <p className="text-[14px] font-bold tracking-widest">{settings.support_phone}</p>
                                 </div>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900 shrink-0">
-                                        <MapPin size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-medium">Office</h4>
-                                        <p className="text-gray-500">{settings.office_address}</p>
-                                    </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase">Studio</h4>
+                                    <p className="text-[14px] font-bold tracking-widest uppercase">{settings.office_address}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Form */}
-                        <div className="bg-gray-50 p-8 rounded-2xl">
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Name</label>
+                        <div className="bg-[#F9F9F9] p-10 md:p-16">
+                            <form onSubmit={handleSubmit} className="space-y-10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-3">
+                                        <label className="text-[9px] tracking-[0.3em] font-bold text-gray-400 uppercase">Full Name</label>
                                         <input
                                             required
-                                            className={`w-full p-3 rounded-lg border transition-colors ${errors.name ? 'border-red-500' : 'border-gray-200 focus:border-black'
+                                            className={`w-full py-4 bg-transparent border-b transition-all outline-none text-[13px] font-medium tracking-wider uppercase ${errors.name ? 'border-red-500' : 'border-gray-200 focus:border-black'
                                                 }`}
                                             value={form.name}
                                             onChange={e => {
                                                 setForm({ ...form, name: e.target.value });
                                                 if (errors.name) setErrors({ ...errors, name: null });
                                             }}
+                                            placeholder="JOHN DOE"
                                         />
-                                        {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+                                        {errors.name && <p className="text-[9px] text-red-500 font-bold tracking-widest uppercase">{errors.name}</p>}
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Email</label>
+                                    <div className="space-y-3">
+                                        <label className="text-[9px] tracking-[0.3em] font-bold text-gray-400 uppercase">Email Address</label>
                                         <input
                                             type="email"
                                             required
-                                            className={`w-full p-3 rounded-lg border transition-colors ${errors.email ? 'border-red-500' : 'border-gray-200 focus:border-black'
+                                            className={`w-full py-4 bg-transparent border-b transition-all outline-none text-[13px] font-medium tracking-wider uppercase ${errors.email ? 'border-red-500' : 'border-gray-200 focus:border-black'
                                                 }`}
                                             value={form.email}
                                             onChange={e => {
                                                 setForm({ ...form, email: e.target.value });
                                                 if (errors.email) setErrors({ ...errors, email: null });
                                             }}
+                                            placeholder="JOHN@EXAMPLE.COM"
                                         />
-                                        {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+                                        {errors.email && <p className="text-[9px] text-red-500 font-bold tracking-widest uppercase">{errors.email}</p>}
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Subject</label>
+                                <div className="space-y-3">
+                                    <label className="text-[9px] tracking-[0.3em] font-bold text-gray-400 uppercase">Subject</label>
                                     <input
                                         required
-                                        className={`w-full p-3 rounded-lg border transition-colors ${errors.subject ? 'border-red-500' : 'border-gray-200 focus:border-black'
+                                        className={`w-full py-4 bg-transparent border-b transition-all outline-none text-[13px] font-medium tracking-wider uppercase ${errors.subject ? 'border-red-500' : 'border-gray-200 focus:border-black'
                                             }`}
                                         value={form.subject}
                                         onChange={e => {
                                             setForm({ ...form, subject: e.target.value });
                                             if (errors.subject) setErrors({ ...errors, subject: null });
                                         }}
+                                        placeholder="ORDER INQUIRY"
                                     />
-                                    {errors.subject && <p className="text-xs text-red-500">{errors.subject}</p>}
+                                    {errors.subject && <p className="text-[9px] text-red-500 font-bold tracking-widest uppercase">{errors.subject}</p>}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Message</label>
+                                <div className="space-y-3">
+                                    <label className="text-[9px] tracking-[0.3em] font-bold text-gray-400 uppercase">Message</label>
                                     <textarea
                                         required
-                                        rows={5}
-                                        className={`w-full p-3 rounded-lg border transition-colors ${errors.message ? 'border-red-500' : 'border-gray-200 focus:border-black'
+                                        rows={4}
+                                        className={`w-full py-4 bg-transparent border-b transition-all outline-none text-[13px] font-medium tracking-wider uppercase resize-none ${errors.message ? 'border-red-500' : 'border-gray-200 focus:border-black'
                                             }`}
                                         value={form.message}
                                         onChange={e => {
                                             setForm({ ...form, message: e.target.value });
                                             if (errors.message) setErrors({ ...errors, message: null });
                                         }}
+                                        placeholder="YOUR MESSAGE..."
                                     />
-                                    {errors.message && <p className="text-xs text-red-500">{errors.message}</p>}
+                                    {errors.message && <p className="text-[9px] text-red-500 font-bold tracking-widest uppercase">{errors.message}</p>}
                                 </div>
 
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-70 transition-all"
+                                    className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center"
                                 >
-                                    {isSubmitting ? "Sending..." : "Send Message"}
+                                    {isSubmitting ? "Processing..." : "Submit Inquiry"}
                                 </button>
                             </form>
                         </div>

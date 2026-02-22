@@ -8,8 +8,8 @@ export default function ShippingReturns() {
     return (
         <div className="min-h-screen bg-white text-black flex flex-col">
             <Header />
-            <main className="flex-1 section-pad max-w-4xl mx-auto w-full">
-                <h1 className="font-space text-3xl md:text-4xl font-bold mb-8">Shipping & Returns</h1>
+            <main className="flex-1 section-pad py-20 max-w-4xl mx-auto w-full">
+                <h1 className="hero-title text-black mb-16 text-left">SHIPPING & RETURNS</h1>
 
                 <div className="prose prose-lg max-w-none text-gray-600 space-y-6">
                     <h3 className="text-black text-xl font-bold pt-4">Shipping Policy</h3>

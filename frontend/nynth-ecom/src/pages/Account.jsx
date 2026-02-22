@@ -63,52 +63,51 @@ export default function Account() {
     if (!currentUser) return null;
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col font-inter">
             <Header />
 
-            <main className="flex-1 section-pad bg-gray-50/50">
+            <main className="flex-1 section-pad bg-white">
                 <div className="max-w-6xl mx-auto">
-                    <div className="flex flex-col items-start gap-2 mb-8">
-                        <h1 className="font-space text-3xl font-bold">My Account</h1>
-                        <p className="text-gray-500">Manage your orders and account settings.</p>
+                    <div className="flex flex-col items-start gap-4 mb-20">
+                        <h1 className="hero-title text-black text-left">ACCOUNT</h1>
+                        <p className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">Manage your profile and artifacts.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
                         {/* Sidebar / Profile Info */}
-                        <div className="md:col-span-4 lg:col-span-3">
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm sticky top-24">
-                                <div className="flex flex-col items-center text-center mb-8 pt-4">
-                                    <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4 shadow-lg shrink-0">
+                        <div className="lg:col-span-3">
+                            <div className="space-y-12 lg:sticky lg:top-32">
+                                <div className="flex flex-col items-start">
+                                    <div className="w-24 h-24 bg-black text-white flex items-center justify-center text-3xl font-bold mb-8 shrink-0">
                                         {currentUser.photoURL ? (
-                                            <img src={currentUser.photoURL} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                                            <img src={currentUser.photoURL} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
-                                            currentUser.displayName?.charAt(0) || <User />
+                                            currentUser.displayName?.charAt(0) || <User size={32} />
                                         )}
                                     </div>
-                                    <h2 className="font-space font-bold text-xl px-2">{currentUser.displayName || "User"}</h2>
-                                    <p className="text-gray-500 text-sm break-all px-2">{currentUser.email}</p>
+                                    <h2 className="text-[16px] tracking-widest font-bold uppercase mb-2">{currentUser.displayName || "User"}</h2>
+                                    <p className="text-[11px] tracking-wider text-gray-400 uppercase font-bold break-all">{currentUser.email}</p>
+
                                     {isAdmin && (
-                                        <div className="mt-2">
-                                            <Badge variant="outline">Admin</Badge>
+                                        <div className="mt-4">
+                                            <span className="text-[9px] tracking-[0.2em] font-bold uppercase bg-black text-white px-3 py-1">Admin Access</span>
                                         </div>
                                     )}
                                 </div>
 
-                                <nav className="space-y-1 mb-8">
-                                    <button className="flex items-center gap-3 w-full p-3 bg-black text-white rounded-xl text-sm font-medium transition-all shadow-md">
-                                        <Package size={18} />
-                                        My Orders
-                                        <ChevronRight size={16} className="ml-auto opacity-70" />
+                                <nav className="flex flex-col gap-4">
+                                    <button className="flex items-center justify-between w-full py-4 border-b border-black text-[11px] font-bold tracking-[0.3em] uppercase transition-all">
+                                        Orders
+                                        <ChevronRight size={14} />
                                     </button>
-                                    {/* Future: Add Address Book, Wishlist etc */}
+                                    {/* Future extensions */}
                                 </nav>
 
-                                <div className="pt-6 border-t border-gray-100">
+                                <div className="pt-8">
                                     <button
                                         onClick={handleLogout}
-                                        className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 w-full p-3 rounded-xl transition-colors text-sm font-medium"
+                                        className="text-[10px] tracking-[0.3em] font-bold text-gray-400 hover:text-black uppercase transition-all"
                                     >
-                                        <LogOut size={18} />
                                         Sign Out
                                     </button>
                                 </div>
@@ -116,94 +115,89 @@ export default function Account() {
                         </div>
 
                         {/* Main Content / Orders */}
-                        <div className="md:col-span-8 lg:col-span-9 space-y-6">
+                        <div className="lg:col-span-9 space-y-12">
                             {isAdmin && (
-                                <div className="bg-black text-white p-6 rounded-2xl shadow-lg flex justify-between items-center bg-[url('/noise.png')]">
-                                    <div>
-                                        <h3 className="font-space font-bold text-lg mb-1">Admin Dashboard</h3>
-                                        <p className="text-gray-400 text-sm">Manage store overview and orders.</p>
+                                <div className="border border-black p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                                    <div className="space-y-2">
+                                        <h3 className="text-[14px] tracking-[0.2em] font-bold uppercase">Control Panel</h3>
+                                        <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold">Comprehensive store management.</p>
                                     </div>
-                                    <Link to="/admin" className="bg-white text-black px-6 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 transition-colors">
-                                        Go to Dashboard
+                                    <Link to="/admin" className="w-full md:w-auto bg-black text-white px-10 py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all text-center">
+                                        Enter Dashboard
                                     </Link>
                                 </div>
                             )}
 
-                            <h2 className="font-space text-lg font-bold flex items-center gap-2">
-                                <Package size={20} />
-                                Recent Orders
-                            </h2>
+                            <div className="space-y-10">
+                                <h2 className="text-[12px] tracking-[0.3em] font-bold text-gray-400 uppercase border-b border-gray-100 pb-4">
+                                    Recent Activity
+                                </h2>
 
-                            {loading ? (
-                                <div className="flex justify-center p-12 bg-white rounded-2xl border border-gray-100">
-                                    <Loader2 className="animate-spin text-gray-400" size={32} />
-                                </div>
-                            ) : orders.length === 0 ? (
-                                <div className="bg-white p-12 rounded-2xl border border-gray-100 text-center shadow-sm">
-                                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
-                                        <ShoppingBag size={24} />
+                                {loading ? (
+                                    <div className="flex justify-center p-20 border border-gray-100">
+                                        <Loader2 className="animate-spin text-black" size={32} />
                                     </div>
-                                    <h3 className="font-space font-bold text-lg mb-2">No orders yet</h3>
-                                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">Looks like you haven't made any purchases yet. Check out our latest drops.</p>
-                                    <Link to="/shop" className="bg-black text-white px-8 py-3 rounded-xl font-medium inline-flex items-center gap-2 hover:opacity-90 transition-opacity">
-                                        Start Shopping <ChevronRight size={16} />
-                                    </Link>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {orders.map((order) => (
-                                        <div key={order.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 pb-6 border-b border-gray-50">
-                                                <div>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <span className="font-space font-bold">Order #{order.id.slice(0, 8)}</span>
-                                                        <Badge variant={getStatusVariant(order.order_status)} className="capitalize">
-                                                            {order.order_status}
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="text-sm text-gray-500">
-                                                        Placed on {new Date(order.created_at?.seconds * 1000).toLocaleDateString(undefined, {
-                                                            year: 'numeric',
-                                                            month: 'long',
-                                                            day: 'numeric'
-                                                        })}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-sm text-gray-500 mb-0.5">Total Amount</p>
-                                                    <p className="font-space font-bold text-lg">₦{order.total?.toLocaleString()}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                {order.items?.map((item, idx) => (
-                                                    <div key={idx} className="flex gap-4 p-2 rounded-lg group-hover:bg-gray-50/50 transition-colors">
-                                                        <div className="w-16 h-20 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
-                                                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                ) : orders.length === 0 ? (
+                                    <div className="border border-gray-100 p-20 text-center">
+                                        <h3 className="text-[14px] tracking-widest font-bold uppercase mb-4">No artifacts discovered</h3>
+                                        <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold mb-10">Your collection is empty.</p>
+                                        <Link to="/shop" className="inline-block bg-black text-white px-12 py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all">
+                                            Explore Collection
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-8">
+                                        {orders.map((order) => (
+                                            <div key={order.id} className="border border-gray-100 p-8 hover:border-black transition-all group">
+                                                <div className="flex flex-col md:flex-row justify-between md:items-start gap-8 mb-10 pb-8 border-b border-gray-100">
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-[13px] tracking-widest font-bold uppercase">ID: {order.id.slice(0, 8)}</span>
+                                                            <span className={`text-[9px] tracking-[0.2em] font-bold uppercase px-3 py-1 ${order.order_status === 'delivered' ? 'bg-green-50 text-green-700' :
+                                                                    order.order_status === 'shipped' ? 'bg-blue-50 text-blue-700' :
+                                                                        'bg-gray-100 text-gray-700'
+                                                                }`}>
+                                                                {order.order_status}
+                                                            </span>
                                                         </div>
-                                                        <div className="flex-1 py-1">
-                                                            <div className="flex justify-between items-start">
-                                                                <div>
-                                                                    <p className="font-medium text-sm line-clamp-1">{item.name || item.title}</p>
-                                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold">
+                                                            Registered {new Date(order.created_at?.seconds * 1000).toLocaleDateString(undefined, {
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric'
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                    <div className="md:text-right space-y-2">
+                                                        <p className="text-[10px] tracking-[0.2em] text-gray-400 font-bold uppercase">Transaction Total</p>
+                                                        <p className="text-[18px] tracking-widest font-bold">₦{order.total?.toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-6">
+                                                    {order.items?.map((item, idx) => (
+                                                        <div key={idx} className="flex gap-6 items-center">
+                                                            <div className="w-16 h-20 bg-gray-50 flex-shrink-0">
+                                                                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
+                                                                <div className="col-span-2">
+                                                                    <p className="text-[12px] tracking-widest font-bold uppercase truncate">{item.name || item.title}</p>
+                                                                    <p className="text-[10px] text-gray-400 tracking-wider uppercase font-bold mt-1">
                                                                         {item.size || item.selectedSize} / {item.color || item.selectedColor}
                                                                     </p>
                                                                 </div>
-                                                                <span className="text-sm font-medium">
-                                                                    ₦{(item.price * item.quantity).toLocaleString()}
-                                                                </span>
+                                                                <p className="text-[11px] font-bold tracking-widest text-center">QTY: {item.quantity}</p>
+                                                                <p className="text-[11px] font-bold tracking-widest text-right">₦{(item.price * item.quantity).toLocaleString()}</p>
                                                             </div>
-                                                            <p className="text-xs text-gray-400 mt-2">Qty: {item.quantity}</p>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
-
-                                            {/* Order Footer - e.g. Tracking info could go here */}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

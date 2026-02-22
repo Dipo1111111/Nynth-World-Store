@@ -12,19 +12,19 @@ export default function Login() {
     const location = useLocation(); // Initialize location
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col font-inter">
             <Header />
 
-            <main className="flex-1 flex items-center justify-center section-pad">
-                <div className="w-full max-w-md p-6 sm:p-8">
-                    <div className="text-center mb-8">
-                        <h1 className="font-space text-3xl font-bold mb-2">Welcome</h1>
-                        <p className="font-inter text-gray-600">
-                            Sign in with Google to save your orders, or continue as a guest.
+            <main className="flex-1 flex items-center justify-center section-pad py-20">
+                <div className="w-full max-w-sm">
+                    <div className="text-left mb-16">
+                        <h1 className="hero-title text-black text-left mb-6">WELCOME</h1>
+                        <p className="text-[12px] tracking-[0.2em] text-gray-400 font-bold uppercase leading-relaxed">
+                            Sign in to access your curated collection and order status.
                         </p>
                     </div>
 
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-6">
                         <button
                             type="button"
                             onClick={async () => {
@@ -42,18 +42,18 @@ export default function Login() {
                                 }
                             }}
                             disabled={loading}
-                            className="w-full border border-gray-300 py-4 rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-gray-50 transition-all hover:scale-[1.02]"
+                            className="w-full border border-black py-5 text-[11px] font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-4 hover:bg-gray-50 transition-all"
                         >
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
                             Sign in with Google
                         </button>
 
-                        <div className="relative my-4">
+                        <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
                                 <span className="w-full border-t border-gray-100"></span>
                             </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-white px-2 text-gray-400">Or</span>
+                            <div className="relative flex justify-center text-[9px] uppercase tracking-[0.3em] font-bold">
+                                <span className="bg-white px-4 text-gray-300">Or</span>
                             </div>
                         </div>
 
@@ -63,10 +63,14 @@ export default function Login() {
                                 const originBase = location.state?.from?.pathname || "/checkout";
                                 navigate(originBase);
                             }}
-                            className="w-full bg-black text-white py-4 rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-all hover:scale-[1.02]"
+                            className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all"
                         >
                             Continue as Guest
                         </button>
+
+                        <p className="text-center text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase mt-8">
+                            New to NYNTH? <Link to="/signup" className="text-black hover:underline underline-offset-4">Create Account</Link>
+                        </p>
                     </div>
                 </div>
             </main>

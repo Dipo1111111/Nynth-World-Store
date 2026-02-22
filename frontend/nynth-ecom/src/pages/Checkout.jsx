@@ -192,127 +192,127 @@ const Checkout = () => {
   const grandTotal = totalAmount + shippingFee;
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col">
+    <div className="min-h-screen bg-white text-black flex flex-col font-inter">
       {/* Simplified Header for Checkout */}
-      <header className="py-6 px-6 md:px-10 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-50">
-        <div className="flex items-center gap-4">
+      <header className="py-6 px-4 md:px-10 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white/90 backdrop-blur-md z-50">
+        <div className="flex items-center gap-6">
           <button
             onClick={() => navigate("/cart")}
-            className="text-gray-500 hover:text-black transition-colors"
+            className="text-gray-400 hover:text-black transition-colors"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} />
           </button>
-          <img src={logo} alt="NYNTH" className="h-8 md:h-10 w-auto invert" />
+          <Logo size="default" className="invert" />
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Lock size={14} />
-          <span>Secure Checkout</span>
+        <div className="flex items-center gap-2 text-[10px] tracking-widest uppercase font-bold text-gray-400">
+          <Lock size={12} />
+          <span>Secure</span>
         </div>
       </header>
 
       <main className="flex-1 max-w-7xl mx-auto w-full grid lg:grid-cols-2">
         {/* Left Column: Form */}
         <div className="p-6 md:p-10 lg:p-16 lg:border-r border-gray-100">
-          <h1 className="font-space text-2xl md:text-3xl font-bold mb-8">Shipping Information</h1>
+          <h1 className="text-[12px] tracking-[0.3em] font-bold uppercase mb-12 text-gray-400">Shipping Details</h1>
 
-          <form onSubmit={handleCheckout} className="space-y-6">
+          <form onSubmit={handleCheckout} className="space-y-8">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">First Name</label>
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">First Name</label>
                 <input
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                  placeholder="John"
+                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                  placeholder="JOHN"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Last Name</label>
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Last Name</label>
                 <input
                   name="lastName"
                   value={form.lastName}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                  placeholder="Doe"
+                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                  placeholder="DOE"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Email Address</label>
+              <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Email Address</label>
               <input
                 name="email"
                 type="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                placeholder="john@example.com"
+                className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                placeholder="JOHN@EXAMPLE.COM"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Phone</label>
+              <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Phone</label>
               <input
                 name="phone"
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
                 placeholder="+234..."
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Address</label>
+              <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Delivery Address</label>
               <input
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                placeholder="123 Street Name"
+                className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                placeholder="123 STREET NAME"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">City / Area</label>
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">City / Area</label>
                 <select
                   name="city"
                   value={form.city}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors bg-white"
+                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
                 >
-                  <option value="">Select Area</option>
+                  <option value="">SELECT AREA</option>
                   {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => (
                     <option key={area} value={area}>
-                      {area}
+                      {area.toUpperCase()}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 text-gray-400">State</label>
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
                 <input
                   name="state"
-                  value="Lagos"
+                  value="LAGOS"
                   disabled
-                  className="w-full px-4 py-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
+                  className="w-full px-4 py-3 border-b border-gray-100 text-[#CCCCCC] text-[13px] tracking-widest font-medium bg-transparent cursor-not-allowed uppercase"
                 />
               </div>
             </div>
 
-            <div className="pt-8">
+            <div className="pt-12">
               <button
                 type="submit"
                 disabled={loading || !paystackLoaded}
-                className="w-full bg-black text-white py-4 rounded-xl font-medium text-lg hover:opacity-90 disabled:opacity-70 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-4"
               >
                 {loading ? (
-                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <CreditCard size={20} />
+                    <CreditCard size={18} />
                     Pay {settings.currency_symbol}{grandTotal.toLocaleString()}
                   </>
                 )}
@@ -322,67 +322,49 @@ const Checkout = () => {
         </div>
 
         {/* Right Column: Summary */}
-        <div className="bg-gray-50 p-6 md:p-10 lg:p-16 h-full border-l border-gray-100 hidden lg:block">
-          <h2 className="font-space text-2xl font-bold mb-8">Order Summary</h2>
+        <div className="bg-[#F9F9F9] p-6 md:p-10 lg:p-16 h-full border-l border-gray-100">
+          <h2 className="text-[12px] tracking-[0.3em] font-bold uppercase mb-12 text-gray-400">Order Summary</h2>
 
-          <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-8 mb-12 max-h-[500px] overflow-y-auto pr-4 no-scrollbar">
             {cartItems.map((item) => (
-              <div key={`${item.id}-${item.selectedSize}`} className="flex gap-4">
-                <div className="w-20 h-24 bg-white rounded-lg overflow-hidden border border-gray-200 relative">
+              <div key={`${item.id}-${item.selectedSize}`} className="flex gap-6">
+                <div className="w-20 h-28 bg-white overflow-hidden border border-gray-100 relative flex-shrink-0">
                   <img
                     src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover"
                   />
-                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-gray-500 text-white text-xs flex items-center justify-center rounded-full">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-black text-white text-[9px] flex items-center justify-center font-bold">
                     {item.quantity}
                   </span>
                 </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">{item.title}</h3>
-                  <p className="text-sm text-gray-500">
+                <div className="py-1">
+                  <h3 className="text-[13px] tracking-widest font-bold uppercase mb-2">{item.title}</h3>
+                  <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-4">
                     {item.selectedSize} / {item.selectedColor}
                   </p>
-                  <p className="text-sm font-medium mt-1">₦{item.price.toLocaleString()}</p>
+                  <p className="text-[12px] font-bold">{settings.currency_symbol}{item.price.toLocaleString()}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="space-y-4 pt-6 border-t border-gray-200">
-            <div className="flex justify-between text-gray-600">
-              <span>Subtotal</span>
-              <span>{settings.currency_symbol}{totalAmount.toLocaleString()}</span>
+          <div className="space-y-6 pt-8 border-t border-gray-200">
+            <div className="flex justify-between text-[11px] tracking-widest uppercase">
+              <span className="text-gray-400">Subtotal</span>
+              <span className="font-bold">{settings.currency_symbol}{totalAmount.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Shipping ({form.city || "Select area"})</span>
-              <span className="text-black font-medium">{settings.currency_symbol}{shippingFee.toLocaleString()}</span>
+            <div className="flex justify-between text-[11px] tracking-widest uppercase">
+              <span className="text-gray-400">Shipping</span>
+              <span className="text-black font-bold uppercase">
+                {form.city ? `${form.city} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
+              </span>
             </div>
           </div>
 
-          <div className="flex justify-between font-space font-bold text-2xl mt-6 pt-6 border-t border-gray-200">
+          <div className="flex justify-between text-[18px] tracking-[0.1em] font-bold uppercase mt-10 pt-10 border-t border-gray-200">
             <span>Total</span>
             <span>{settings.currency_symbol}{grandTotal.toLocaleString()}</span>
-          </div>
-        </div>
-
-        {/* Summary for Mobile (Accordion style or bottom sheet could go here) */}
-        <div className="lg:hidden p-6 bg-gray-50 border-t border-gray-200">
-          <div className="flex justify-between font-space font-bold text-xl mb-4">
-            <span>Total</span>
-            <span>{settings.currency_symbol}{grandTotal.toLocaleString()}</span>
-          </div>
-          <div className="text-sm text-gray-500 mb-4">
-            {cartItems.length} items in cart
-          </div>
-
-          <div className="space-y-4">
-            {cartItems.map((item) => (
-              <div key={`${item.id}-${item.selectedSize}`} className="flex justify-between text-sm">
-                <span className="text-gray-600">{item.quantity}x {item.title}</span>
-                <span>₦{(item.price * item.quantity).toLocaleString()}</span>
-              </div>
-            ))}
           </div>
         </div>
       </main>

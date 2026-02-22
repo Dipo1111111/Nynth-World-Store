@@ -10,8 +10,8 @@ export default function Sustainability() {
     return (
         <div className="min-h-screen bg-white">
             <Header />
-            <main className="section-pad max-w-4xl mx-auto">
-                <h1 className="font-space text-5xl md:text-7xl font-bold mb-12 tracking-tighter">Sustainability</h1>
+            <main className="section-pad py-20 max-w-4xl mx-auto">
+                <h1 className="hero-title text-black mb-16 text-left">SUSTAINABILITY</h1>
 
                 <div className="space-y-12 font-inter text-lg text-gray-800 leading-relaxed">
                     <section>
@@ -22,15 +22,15 @@ export default function Sustainability() {
                     </section>
 
                     <div className="grid md:grid-cols-2 gap-8 py-8">
-                        <div className="border border-gray-100 p-8 rounded-2xl">
-                            <h3 className="font-space text-xl font-bold mb-3">Premium Materials</h3>
-                            <p className="text-sm text-gray-600">
+                        <div className="border border-gray-100 p-8">
+                            <h3 className="text-[12px] font-bold tracking-[0.2em] mb-3 uppercase">Premium Materials</h3>
+                            <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold leading-relaxed">
                                 We source only the highest grade cottons and synthetics designed to last years, not seasons. Longevity is the most effective form of sustainability.
                             </p>
                         </div>
-                        <div className="border border-gray-100 p-8 rounded-2xl">
-                            <h3 className="font-space text-xl font-bold mb-3">Ethical Production</h3>
-                            <p className="text-sm text-gray-600">
+                        <div className="border border-gray-100 p-8">
+                            <h3 className="text-[12px] font-bold tracking-[0.2em] mb-3 uppercase">Ethical Production</h3>
+                            <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold leading-relaxed">
                                 Our manufacturing partners are chosen based on their commitment to fair wages and safe working conditions. We visit our shops regularly to ensure these standards are met.
                             </p>
                         </div>

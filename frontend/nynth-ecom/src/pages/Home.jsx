@@ -53,10 +53,23 @@ export default function Home() {
     <div className="bg-white min-h-screen">
       <SEO />
       <Header />
+      <SEO />
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
-        {/* Category Filters */}
-        <div className="flex gap-2.5 mb-8 md:mb-12 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4">
+      <main className="flex-1 w-full bg-[#FCFCFC]">
+        {/* Simplified Luxury Hero / Featured Section */}
+        <section className="bg-white border-b border-gray-100">
+          <div className="section-pad py-16 md:py-24 text-center">
+            <span className="font-inter text-[9px] md:text-[10px] tracking-[0.4em] text-gray-400 uppercase mb-4 block animate-fadeIn">
+              Collection 001 / NYNTH
+            </span>
+            <h1 className="hero-title text-black mb-8 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+              {activeCategory === "Explore" ? "FEATURED" : activeCategory}
+            </h1>
+          </div>
+        </section>
+
+        {/* Categories Bar - Sticky to match Shop */}
+        <div className="sticky top-16 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex justify-center gap-8 py-4 md:py-6 overflow-x-auto no-scrollbar px-4 transition-all duration-300">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -64,92 +77,83 @@ export default function Home() {
                 setActiveCategory(cat);
                 setCurrentPage(1);
               }}
-              className={`
-                px-8 py-3.5 rounded-xl text-sm font-medium border transition-all whitespace-nowrap
-                ${activeCategory === cat
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-black"}
-              `}
+              className={`text-[10px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${activeCategory === cat ? "text-black underline underline-offset-8" : "text-gray-400 hover:text-black"
+                }`}
             >
-              {cat}
+              {cat === "Explore" ? "ALL" : cat}
             </button>
           ))}
         </div>
 
-        {/* Dynamic Heading */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-10 gap-2">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-space font-bold tracking-tight">
-              {activeCategory === "Explore" ? "Featured Products" : `${activeCategory} Collection`}
-            </h1>
+        <div className="section-pad py-10 md:py-16 min-h-[60vh]">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <p className="text-gray-400 font-inter text-[10px] tracking-widest uppercase">
+              Showing {currentProducts.length} of {filteredProducts.length} artifacts
+            </p>
           </div>
-          <p className="text-gray-400 font-inter text-[13px] md:text-sm">
-            Showing {currentProducts.length} of {filteredProducts.length} products
-          </p>
-        </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-[4/5] bg-gray-100 rounded-xl mb-4"></div>
-                <div className="h-4 bg-gray-100 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-100 rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
-        ) : filteredProducts.length > 0 ? (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mb-16">
-              {currentProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
+          {loading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-12">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-[4/5] bg-gray-100 mb-4 h-full"></div>
+                  <div className="h-3 bg-gray-100 w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-100 w-1/4"></div>
+                </div>
               ))}
             </div>
-
-            {/* Pagination UI */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-8 pb-10">
-                <button
-                  onClick={() => paginate(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 border border-gray-200 rounded-full hover:border-black disabled:opacity-30 disabled:hover:border-gray-200 transition-all"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-
-                <div className="flex gap-2">
-                  {[...Array(totalPages)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => paginate(i + 1)}
-                      className={`
-                        w-10 h-10 rounded-full text-sm font-medium transition-all
-                        ${currentPage === i + 1
-                          ? "bg-black text-white"
-                          : "bg-white text-gray-600 border border-gray-200 hover:border-black"}
-                      `}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 border border-gray-200 rounded-full hover:border-black disabled:opacity-30 disabled:hover:border-gray-200 transition-all"
-                >
-                  <ChevronRight size={20} />
-                </button>
+          ) : filteredProducts.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-12 mb-20 animate-fadeIn">
+                {currentProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-20 bg-gray-50 rounded-3xl">
-            <h3 className="text-xl font-bold mb-2">No products found</h3>
-            <p className="text-gray-500">We're updating this collection soon.</p>
-          </div>
-        )}
+
+              {/* Pagination UI - Minimal */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-6 mt-8 pb-10">
+                  <button
+                    onClick={() => paginate(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="p-3 text-black disabled:opacity-30 transition-all hover:-translate-x-1"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  <div className="flex gap-4">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => paginate(i + 1)}
+                        className={`
+                          text-[11px] font-bold tracking-widest transition-all
+                          ${currentPage === i + 1
+                            ? "text-black underline underline-offset-4"
+                            : "text-gray-300 hover:text-black"}
+                        `}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-3 text-black disabled:opacity-30 transition-all hover:translate-x-1"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-32 border border-dashed border-gray-100 rounded-xl">
+              <h3 className="text-[11px] tracking-[0.3em] font-bold uppercase text-gray-400">Inventory Empty</h3>
+            </div>
+          )}
+        </div>
       </main>
       <Footer />
     </div>

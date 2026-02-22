@@ -75,7 +75,7 @@ export default function Lookbook() {
   }, [featuredLooks.length]);
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black font-inter">
       <SEO
         title="Lookbook | NYNTH"
         description="Explore our latest collections and style inspiration. Minimal streetwear lookbook."
@@ -83,7 +83,7 @@ export default function Lookbook() {
       />
       <Header />
 
-      {/* Hero Section - Simplified */}
+      {/* Hero Section */}
       <section className="relative h-[60vh] md:h-[70vh] overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -91,124 +91,108 @@ export default function Lookbook() {
             alt="Lookbook Hero"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-black/30" />
         </div>
 
-        <div className="relative h-full flex items-end section-pad">
+        <div className="relative h-full flex items-end section-pad pb-20">
           <div className="max-w-4xl">
-            <span className="font-inter text-sm font-medium tracking-wider text-white/90 uppercase mb-4 block">
+            <span className="text-[10px] tracking-[0.4em] text-white uppercase mb-6 block font-bold">
               Editorial Collection
             </span>
-            <h1 className="font-space text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight">
-              The NYNTH<br />Lookbook
+            <h1 className="hero-title text-white text-left mb-8">
+              THE NYNTH<br />LOOKBOOK
             </h1>
-            <p className="font-inter text-base md:text-lg text-white/90 max-w-2xl">
-              Explore curated style narratives. See how minimalism meets streetwear in everyday contexts.
+            <p className="text-[14px] md:text-[16px] text-white/90 max-w-2xl tracking-wider uppercase font-medium">
+              Explore curated style narratives. Minimalism meets streetwear.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Featured Looks Carousel - FIXED & RESPONSIVE */}
-      <section className="section-pad bg-white">
+      {/* Featured Looks Carousel */}
+      <section className="section-pad py-24 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-10">
-            <div>
-              <span className="font-inter text-sm font-medium text-gray-600 uppercase tracking-wider mb-2 block">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+            <div className="space-y-4">
+              <span className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">
                 Featured Stories
               </span>
-              <h2 className="font-space text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+              <h2 className="text-[24px] md:text-[32px] tracking-widest font-bold uppercase">
                 Editor's Picks
               </h2>
             </div>
 
             {featuredLooks.length > 1 && (
-              <div className="flex items-center gap-3 mt-4 md:mt-0">
+              <div className="flex items-center gap-6 mt-8 md:mt-0">
                 <button
                   onClick={prevSlide}
-                  className="p-2 md:p-3 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                  className="hover:opacity-50 transition-opacity"
                   aria-label="Previous slide"
                 >
-                  <ChevronLeft size={18} className="md:w-5 md:h-5" />
+                  <ChevronLeft size={24} strokeWidth={1} />
                 </button>
                 <button
                   onClick={nextSlide}
-                  className="p-2 md:p-3 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                  className="hover:opacity-50 transition-opacity"
                   aria-label="Next slide"
                 >
-                  <ChevronRight size={18} className="md:w-5 md:h-5" />
+                  <ChevronRight size={24} strokeWidth={1} />
                 </button>
               </div>
             )}
           </div>
 
-          {/* Carousel Container - FIXED RESPONSIVENESS */}
           {loading ? (
-            <div className="min-h-[400px] md:min-h-[500px] bg-gray-100 rounded-2xl animate-pulse"></div>
+            <div className="min-h-[500px] bg-gray-50 animate-pulse"></div>
           ) : featuredLooks.length === 0 ? (
-            <div className="min-h-[400px] md:min-h-[500px] bg-gray-50 rounded-2xl flex items-center justify-center p-8">
-              <p className="text-gray-600 text-center">
-                No featured lookbooks yet. Add some with "featured: true" in the lookbooks collection.
+            <div className="min-h-[500px] bg-gray-50 flex items-center justify-center p-8 border border-gray-100">
+              <p className="text-[11px] tracking-[0.2em] font-bold text-gray-400 uppercase text-center">
+                Collection pending discovery.
               </p>
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-2xl border border-gray-200">
+            <div className="relative overflow-hidden border border-gray-100">
               <div
-                className="flex transition-transform duration-500 ease-out"
+                className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${activeSlide * 100}%)` }}
               >
                 {featuredLooks.map((look) => (
                   <div key={look.id} className="w-full flex-shrink-0">
-                    <div className="flex flex-col md:flex-row min-h-[400px] md:min-h-[500px]">
-                      {/* Image Side - RESPONSIVE */}
-                      <div className="relative w-full md:w-1/2 h-64 md:h-auto bg-gray-100">
+                    <div className="flex flex-col md:flex-row min-h-[500px] md:min-h-[600px]">
+                      <div className="w-full md:w-1/2 h-[400px] md:h-auto bg-gray-50">
                         <img
                           src={look.image}
                           alt={look.title}
-                          className="absolute inset-0 w-full h-full object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
 
-                      {/* Content Side - RESPONSIVE PADDING */}
-                      <div className="w-full md:w-1/2 p-6 md:p-8 lg:p-12 flex flex-col justify-center bg-white">
+                      <div className="w-full md:w-1/2 p-10 md:p-16 lg:p-24 flex flex-col justify-center bg-white">
                         {look.season && (
-                          <span className="font-inter text-sm font-medium tracking-wider text-gray-600 uppercase mb-2">
+                          <span className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-4">
                             {look.season}
                           </span>
                         )}
-                        <h3 className="font-space text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
+                        <h3 className="text-[20px] md:text-[28px] tracking-widest font-bold mb-6 uppercase">
                           {look.title}
                         </h3>
-                        <p className="font-inter text-gray-600 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">
+                        <p className="text-[13px] md:text-[14px] text-gray-600 mb-8 leading-relaxed tracking-wider uppercase font-medium">
                           {look.description}
                         </p>
 
                         {look.colorPalette && (
-                          <div className="mb-4 md:mb-6">
-                            <span className="font-inter text-sm font-medium text-gray-900">Color Palette: </span>
-                            <span className="ml-2 font-inter text-gray-600">{look.colorPalette}</span>
-                          </div>
-                        )}
-
-                        {look.products && look.products.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
-                            {look.products.map((product, index) => (
-                              <span
-                                key={index}
-                                className="px-3 py-1 bg-gray-100 text-gray-700 text-xs md:text-sm rounded-full font-inter"
-                              >
-                                {product}
-                              </span>
-                            ))}
+                          <div className="mb-8">
+                            <span className="text-[10px] tracking-[0.2em] font-bold uppercase text-black">Palette: </span>
+                            <span className="ml-2 text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400">{look.colorPalette}</span>
                           </div>
                         )}
 
                         <Link
                           to="/shop"
-                          className="inline-flex items-center gap-2 font-inter text-sm font-medium border-b border-black pb-1 hover:opacity-70 transition-opacity w-fit group"
+                          className="inline-flex items-center gap-4 text-[11px] tracking-[0.3em] font-bold uppercase border-b border-black pb-2 hover:opacity-50 transition-opacity w-fit"
                         >
-                          Shop this look
-                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                          Shop Artifacts
+                          <ArrowRight size={14} />
                         </Link>
                       </div>
                     </div>
@@ -216,17 +200,13 @@ export default function Lookbook() {
                 ))}
               </div>
 
-              {/* Carousel Dots - BETTER STYLING */}
               {featuredLooks.length > 1 && (
-                <div className="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+                <div className="absolute bottom-8 left-10 md:left-auto md:right-10 flex gap-4">
                   {featuredLooks.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveSlide(index)}
-                      className={`transition-all duration-300 ${index === activeSlide
-                        ? "bg-black w-6 md:w-8 h-2 scale-100"
-                        : "bg-gray-300 hover:bg-gray-400 w-2 h-2"
-                        } rounded-full`}
+                      className={`h-[2px] transition-all duration-500 ${index === activeSlide ? "bg-black w-12" : "bg-gray-200 w-6"}`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
@@ -237,50 +217,40 @@ export default function Lookbook() {
         </div>
       </section>
 
-      {/* Grid Gallery - IMPROVED */}
-      <section className="section-pad bg-white">
+      {/* Grid Gallery */}
+      <section className="section-pad py-24 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8 md:mb-12">
-            <span className="font-inter text-sm font-medium text-gray-600 uppercase tracking-wider mb-2 block">
-              Visual Stories
+          <div className="text-left mb-16 space-y-4">
+            <span className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">
+              Visual Narrative
             </span>
-            <h2 className="font-space text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+            <h2 className="text-[24px] md:text-[32px] tracking-widest font-bold uppercase mb-4">
               Style Gallery
             </h2>
-            <p className="font-inter text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
-              A collection of moments where NYNTH pieces come to life.
-            </p>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="aspect-[3/4] bg-gray-100 rounded-xl animate-pulse"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="aspect-[3/4] bg-gray-50 animate-pulse"></div>
               ))}
             </div>
-          ) : lookbooks.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">No lookbook items yet.</p>
-            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {lookbooks.map((look) => (
-                <div key={look.id} className="group">
-                  <div className="relative overflow-hidden rounded-xl aspect-[3/4] mb-3 md:mb-4">
+                <div key={look.id} className="group cursor-pointer">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 mb-6">
                     <img
                       src={look.image}
                       alt={look.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      {look.category && (
-                        <span className="font-inter text-xs md:text-sm font-medium tracking-wider text-white/90">
-                          {look.category}
-                        </span>
-                      )}
-                      <h3 className="font-space text-lg md:text-xl font-bold mt-1">{look.title}</h3>
-                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[9px] tracking-[0.25em] font-bold text-gray-400 uppercase">
+                      {look.category || "General"}
+                    </span>
+                    <h3 className="text-[14px] tracking-widest font-bold uppercase">{look.title}</h3>
                   </div>
                 </div>
               ))}
@@ -288,157 +258,50 @@ export default function Lookbook() {
           )}
 
           {/* CTA Section */}
-          <div className="text-center mt-12 md:mt-16 pt-8 md:pt-12 border-t border-gray-100">
-            <h3 className="font-space text-2xl md:text-3xl font-bold mb-3 md:mb-4">
-              Inspired by what you see?
+          <div className="mt-32 pt-20 border-t border-gray-100 text-center">
+            <h3 className="text-[20px] md:text-[28px] tracking-widest font-bold uppercase mb-8">
+              Defined by Details
             </h3>
-            <p className="font-inter text-gray-600 mb-6 md:mb-8 max-w-xl mx-auto text-sm md:text-base">
-              Every look featured is built with NYNTH pieces. Shop the collection to create your own story.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link
                 to="/shop"
-                className="btn-primary px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium tracking-wide inline-flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+                className="px-12 py-5 bg-black text-white text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all"
               >
-                <ShoppingBag size={16} className="md:w-5 md:h-5" />
                 Shop Collection
-              </Link>
-              <Link
-                to="/shop?category=hoodies"
-                className="px-6 md:px-8 py-3 md:py-4 border-2 border-black rounded-full text-black font-inter text-sm md:text-base font-medium hover:bg-black hover:text-white transition-all"
-              >
-                Shop Hoodies
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Shop by Style - FETCHES FROM DATABASE */}
-      <section className="section-pad bg-gray-50">
+      <section className="section-pad py-24 bg-gray-50 border-y border-gray-100">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8 md:mb-12">
-            <h2 className="font-space text-3xl md:text-4xl font-bold tracking-tight mb-3 md:mb-4">
-              Shop by Style
-            </h2>
-            <p className="font-inter text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
-              Find your signature look from our curated style categories
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {/* Tees */}
-            <Link
-              to={shopProducts.tees ? `/product/${shopProducts.tees.id}` : "/shop?category=tees"}
-              className="group block"
-            >
-              <div className="relative overflow-hidden rounded-xl aspect-[4/5] mb-4">
-                {loading ? (
-                  <div className="w-full h-full bg-gray-200 animate-pulse"></div>
-                ) : shopProducts.tees ? (
-                  <img
-                    src={shopProducts.tees.images?.[0] || shopProducts.tees.thumbnail || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2070"}
-                    alt={shopProducts.tees.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <img
-                    src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2070&auto=format&fit=crop"
-                    alt="Tees"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
-                  <span className="font-inter text-sm font-medium tracking-wider text-white/90 uppercase">
-                    Tees
-                  </span>
-                  <h3 className="font-space text-xl md:text-2xl font-bold mb-2 mt-1">
-                    {shopProducts.tees?.title || "Essential Tees"}
-                  </h3>
-                  <p className="font-inter text-white/90 text-sm md:text-base">
-                    {shopProducts.tees?.shortDescription || "Classic fits, bold prints."}
-                  </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {['TEES', 'HOODIES', 'HEADWEAR'].map((cat) => (
+              <Link
+                key={cat}
+                to={`/shop?category=${cat.toLowerCase()}`}
+                className="group block"
+              >
+                <div className="space-y-6">
+                  <div className="aspect-[4/5] bg-white overflow-hidden border border-gray-200">
+                    <img
+                      src={cat === 'TEES' ? "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2070" : cat === 'HOODIES' ? "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2070" : "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2070"}
+                      alt={cat}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-[14px] tracking-[0.25em] font-bold uppercase">{cat}</h3>
+                    <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </Link>
-
-            {/* Hoodies */}
-            <Link
-              to={shopProducts.hoodies ? `/product/${shopProducts.hoodies.id}` : "/shop?category=hoodies"}
-              className="group block"
-            >
-              <div className="relative overflow-hidden rounded-xl aspect-[4/5] mb-4">
-                {loading ? (
-                  <div className="w-full h-full bg-gray-200 animate-pulse"></div>
-                ) : shopProducts.hoodies ? (
-                  <img
-                    src={shopProducts.hoodies.images?.[0] || shopProducts.hoodies.thumbnail || "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2070"}
-                    alt={shopProducts.hoodies.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <img
-                    src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2070&auto=format&fit=crop"
-                    alt="Hoodies"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
-                  <span className="font-inter text-sm font-medium tracking-wider text-white/90 uppercase">
-                    Hoodies
-                  </span>
-                  <h3 className="font-space text-xl md:text-2xl font-bold mb-2 mt-1">
-                    {shopProducts.hoodies?.title || "Signature Hoodies"}
-                  </h3>
-                  <p className="font-inter text-white/90 text-sm md:text-base">
-                    {shopProducts.hoodies?.shortDescription || "Heavyweight, premium cotton."}
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            {/* Headwear */}
-            <Link
-              to={shopProducts.headwear ? `/product/${shopProducts.headwear.id}` : "/shop?category=headwear"}
-              className="group block"
-            >
-              <div className="relative overflow-hidden rounded-xl aspect-[4/5] mb-4">
-                {loading ? (
-                  <div className="w-full h-full bg-gray-200 animate-pulse"></div>
-                ) : shopProducts.headwear ? (
-                  <img
-                    src={shopProducts.headwear.images?.[0] || shopProducts.headwear.thumbnail || "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2070"}
-                    alt={shopProducts.headwear.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <img
-                    src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2070&auto=format&fit=crop"
-                    alt="Headwear"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
-                  <span className="font-inter text-sm font-medium tracking-wider text-white/90 uppercase">
-                    Headwear
-                  </span>
-                  <h3 className="font-space text-xl md:text-2xl font-bold mb-2 mt-1">
-                    {shopProducts.headwear?.title || "NYNTH Headwear"}
-                  </h3>
-                  <p className="font-inter text-white/90 text-sm md:text-base">
-                    {shopProducts.headwear?.shortDescription || "Caps & beanies built for style."}
-                  </p>
-                </div>
-              </div>
-            </Link>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* <NewsLetter /> */}
       <Footer />
     </div>
   );

@@ -33,6 +33,7 @@ import Account from "./pages/Account.jsx";
 import OurStory from "./pages/OurStory.jsx";
 import Sustainability from "./pages/Sustainability.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
+import UpdateDB from "./pages/UpdateDB.jsx";
 
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -68,7 +69,6 @@ import { Toaster } from "react-hot-toast"; // Added import
 function App() {
   console.log("🚀 App.jsx: Component rendering...");
   const isOffline = useOffline();
-
   useEffect(() => {
     document.title = "Nynth World Store";
   }, []);
@@ -95,6 +95,7 @@ function App() {
                   <Route path="/lookbook" element={<Lookbook />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
                   <Route path="/cart" element={<Cart />} />
+                  <Route path="/update-db" element={<UpdateDB />} />
 
                   {/* Auth Routes */}
                   <Route path="/login" element={<Login />} />
