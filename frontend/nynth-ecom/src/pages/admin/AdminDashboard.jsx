@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { getAdminAnalytics, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
@@ -32,6 +32,7 @@ import {
     Tooltip,
     Legend,
     ArcElement,
+    Filler
 } from 'chart.js';
 import toast from "react-hot-toast";
 
@@ -44,7 +45,8 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    ArcElement
+    ArcElement,
+    Filler
 );
 
 const AdminDashboard = () => {
@@ -173,37 +175,30 @@ const AdminDashboard = () => {
         return days;
     };
 
-    const revenueChartData = (canvas) => {
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    const revenueChartData = useMemo(() => ({
+        labels: getLast7Days().map(date => {
+            const d = new Date(date);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }),
+        datasets: [
+            {
+                label: 'Revenue',
+                data: getLast7Days().map(date => analytics?.revenueByDate?.[date] || 0),
+                borderColor: '#000000',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: '#000000',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6,
+            },
+        ],
+    }), [analytics]);
 
-        return {
-            labels: getLast7Days().map(date => {
-                const d = new Date(date);
-                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            }),
-            datasets: [
-                {
-                    label: 'Revenue',
-                    data: getLast7Days().map(date => analytics?.revenueByDate?.[date] || 0),
-                    borderColor: '#000000',
-                    backgroundColor: gradient,
-                    tension: 0.4,
-                    fill: true,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#000000',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 6,
-                },
-            ],
-        };
-    };
-
-    const statusChartData = {
+    const statusChartData = useMemo(() => ({
         labels: ['Pending', 'Packaging', 'Shipped', 'Delivered'],
         datasets: [
             {
@@ -223,7 +218,7 @@ const AdminDashboard = () => {
                 borderWidth: 0,
             },
         ],
-    };
+    }), [analytics]);
 
     const chartOptions = {
         responsive: true,
@@ -362,7 +357,10 @@ const AdminDashboard = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="h-64">
-                                    <Line data={revenueChartData} options={chartOptions} />
+                                    <Line
+                                        data={revenueChartData}
+                                        options={chartOptions}
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
