@@ -1,6 +1,10 @@
-const { onRequest, onCall } = require("firebase-functions/v2/https");
+const { onCall, onRequest } = require("firebase-functions/v2/https");
+const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
+
+// Set global options to ensure region alignment
+setGlobalOptions({ region: "us-central1" });
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -96,7 +100,10 @@ exports.paystackWebhook = onRequest(
 
 // 3. Initialize Payment (Redirect Flow)
 exports.initializePayment = onCall(
-    { secrets: ["PAYSTACK_SECRET_KEY"] },
+    {
+        secrets: ["PAYSTACK_SECRET_KEY"],
+        cors: true // Explicitly enable CORS for local development
+    },
     async (request) => {
         const secret = process.env.PAYSTACK_SECRET_KEY;
         const { amount, email, metadata } = request.data;

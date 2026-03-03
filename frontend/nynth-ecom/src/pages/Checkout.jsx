@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { addOrder, verifyOrderPayment, initializePayment } from "../api/firebaseFunctions";
+import { addOrder } from "../api/firebaseFunctions";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -75,42 +75,49 @@ const Checkout = () => {
     setForm({ ...form, [name]: value });
   };
 
-  const payWithPaystack = async (orderId, totalToPay) => {
-    setLoading(true);
-    try {
-      const result = await initializePayment({
-        amount: totalToPay,
-        email: form.email,
-        metadata: {
-          orderId,
-          customerName: `${form.firstName} ${form.lastName}`,
-          items: cartItems.map(item => ({
-            id: item.id,
-            name: item.title, // Fixed to use title to match cart items
-            quantity: item.quantity,
-            size: item.selectedSize,
-            color: item.selectedColor
-          })),
-        }
-      });
+  const payWithPaystack = (orderId, totalToPay) => {
+    const handler = window.PaystackPop.setup({
+      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+      email: form.email,
+      amount: Math.round(totalToPay * 100), // convert to kobo
+      metadata: {
+        orderId,
+        customerName: `${form.firstName} ${form.lastName}`,
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.title,
+          quantity: item.quantity,
+          size: item.selectedSize,
+          color: item.selectedColor
+        })),
+      },
+      onClose: () => {
+        setLoading(false);
+        toast.error("Payment window closed.");
+      },
+      callback: (response) => {
+        console.log("Paystack Success:", response);
+        setIsOrderCompleted(true); // 🛡️ Prevent the "empty cart" redirect to /cart
 
-      if (result && result.authorization_url) {
-        // Track the initiation
-        trackConversion("initiate_checkout", {
+        // Track success
+        trackConversion("purchase", {
           order_id: orderId,
-          amount: totalToPay
+          amount: totalToPay,
+          reference: response.reference
         });
 
-        // 🚀 REDIRECT to Paystack
-        window.location.href = result.authorization_url;
-      } else {
-        throw new Error("Failed to get payment URL");
+        clearCart();
+        navigate(`/thank-you?reference=${response.reference}&orderId=${orderId}`);
+      },
+      onSuccess: (response) => {
+        console.log("Paystack Success (onSuccess):", response);
+        setIsOrderCompleted(true);
+        clearCart();
+        navigate(`/thank-you?reference=${response.reference}&orderId=${orderId}`);
       }
-    } catch (error) {
-      console.error("Paystack redirect error:", error);
-      toast.error(`Payment Error: ${error.message}`);
-      setLoading(false);
-    }
+    });
+
+    handler.openIframe();
   };
 
   const handleCheckout = async (e) => {
