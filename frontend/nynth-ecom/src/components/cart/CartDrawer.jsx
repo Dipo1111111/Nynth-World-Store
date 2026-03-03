@@ -83,7 +83,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                         <Link
                                             to={`/product/${item.id}`}
                                             onClick={onClose}
-                                            className="w-16 h-20 bg-white overflow-hidden flex-shrink-0"
+                                            className="w-16 h-20 bg-white border border-gray-100 overflow-hidden flex-shrink-0"
                                         >
                                             <img
                                                 src={item.image}
@@ -150,8 +150,8 @@ export default function CartDrawer({ isOpen, onClose }) {
                                 <div className="grid grid-cols-3 gap-2">
                                     {[1, 2, 3].map((i) => (
                                         <div key={i} className="group cursor-pointer">
-                                            <div className="aspect-[4/5] bg-white relative overflow-hidden mb-2">
-                                                <div className="w-[70%] h-[70%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-200 animate-pulse"></div>
+                                            <div className="aspect-[4/5] bg-white border border-gray-100 relative overflow-hidden mb-2">
+                                                <div className="w-[70%] h-[70%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-50 animate-pulse"></div>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-[8px] font-bold tracking-widest">

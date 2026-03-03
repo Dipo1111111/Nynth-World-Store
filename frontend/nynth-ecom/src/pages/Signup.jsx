@@ -20,7 +20,7 @@ export default function Signup() {
                     <div className="text-left mb-16">
                         <h1 className="hero-title text-black text-left mb-6">SIGN UP</h1>
                         <p className="text-[12px] tracking-[0.2em] text-gray-400 font-bold uppercase leading-relaxed">
-                            Join the NYNTH community for early access to artifacts and curated experiences.
+                            Join the NYNTH community to access exclusive Pieces and track your orders.
                         </p>
                     </div>
 

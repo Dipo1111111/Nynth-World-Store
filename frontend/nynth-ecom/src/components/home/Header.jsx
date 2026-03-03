@@ -56,12 +56,13 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 z-50 w-full transition-colors duration-300 py-4 ${isScrolled ? "bg-white border-b border-gray-100" : "bg-transparent border-transparent"}`}
-      >      <div className="px-4 md:px-10 lg:px-20">
-          <div className="relative flex items-center justify-between">
+        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
+      >
+        <div className="w-full px-6 md:px-10">
+          <div className="flex items-center justify-between h-10">
 
-            {/* Left: Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-10">
+            {/* Left: Navigation (Far Left) */}
+            <nav className="flex-1 flex items-center justify-start gap-8">
               {navLinks.map((link) => {
                 const isActive = isNavLinkActive(link.to);
                 return (
@@ -69,122 +70,114 @@ export default function Header() {
                     key={link.name}
                     to={link.to}
                     className={`
-                    font-inter text-[10px] tracking-[0.25em] font-bold hover:text-black transition-all duration-500 relative group
-                    ${isActive ? "text-black" : "text-gray-400"}
-                  `}
+                      hidden md:block font-inter text-[9px] tracking-[0.3em] font-bold hover:text-black transition-all duration-300
+                      ${isActive ? "text-black" : "text-gray-400"}
+                    `}
                   >
                     {link.name}
-                    <span className={`absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-500 group-hover:w-full ${isActive ? "w-full" : ""}`} />
                   </NavLink>
                 );
               })}
+
+              {/* Mobile Menu Button - Visible on Mobile */}
+              <button
+                className="md:hidden p-1 text-black"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
             </nav>
 
-            {/* Mobile Menu Button (Left on mobile) */}
-            <button
-              className="md:hidden p-2 -ml-2 text-black"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-
-            {/* Center: Logo */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Link to="/" className="flex items-center">
-                <Logo size="lg" className="invert" />
+            {/* Center: Logo (Absolutely Centered) */}
+            <div className="flex-shrink-0">
+              <Link to="/" className="flex items-center justify-center">
+                <Logo size="default" className="h-8 md:h-10" />
               </Link>
             </div>
 
-            {/* Right: Icons */}
-            <div className="flex items-center gap-1 md:gap-2">
+            {/* Right: Icons (Far Right) */}
+            <div className="flex-1 flex items-center justify-end gap-1 md:gap-3">
               {!isSearchOpen && (
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="p-2 hover:opacity-70 transition-opacity"
-                  aria-label="Search"
+                  className="p-1.5 hover:opacity-50 transition-opacity"
                 >
-                  <Search size={18} className="text-gray-900" strokeWidth={1.5} />
+                  <Search size={16} className="text-black" strokeWidth={2} />
                 </button>
               )}
 
               {isSearchOpen && (
-                <form onSubmit={handleSearch} className="absolute right-0 top-full mt-4 flex items-center animate-fadeIn bg-white/90 backdrop-blur-md p-2 border border-gray-100 md:relative md:top-auto md:mt-0 md:mr-4 md:bg-transparent md:border-0 md:p-0">
+                <form onSubmit={handleSearch} className="flex items-center">
                   <input
                     autoFocus
                     type="text"
-                    placeholder="SEARCH..."
+                    placeholder="SEARCH"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-48 md:w-48 bg-transparent border-b border-black text-[10px] tracking-widest font-inter focus:outline-none py-1 uppercase font-bold"
+                    className="w-24 md:w-32 bg-transparent text-[8px] tracking-[0.2em] font-inter focus:outline-none border-b border-black pb-0.5 uppercase font-bold"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchOpen(false)}
-                    className="ml-2"
-                  >
-                    <X size={14} />
+                  <button type="button" onClick={() => setIsSearchOpen(false)} className="ml-1">
+                    <X size={12} />
                   </button>
                 </form>
               )}
 
               <Link
                 to={currentUser ? "/account" : "/login"}
-                className="p-2 hover:opacity-70 transition-opacity"
-                aria-label="Account"
+                className="p-1.5 hover:opacity-50 transition-opacity hidden md:flex"
               >
-                <User size={18} className="text-gray-900" strokeWidth={1.5} />
+                <User size={16} className="text-black" strokeWidth={2} />
               </Link>
 
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="p-2 relative hover:opacity-70 transition-opacity"
-                aria-label="Shopping bag"
+                className="p-1.5 relative hover:opacity-50 transition-opacity"
               >
-                <ShoppingBag size={18} className="text-gray-900" strokeWidth={1.5} />
+                <ShoppingBag size={16} className="text-black" strokeWidth={2} />
                 {totalItems > 0 && (
-                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[8px] text-white font-bold font-inter">
-                    {totalItems > 99 ? "99" : totalItems}
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center bg-black text-[7px] text-white font-bold rounded-full">
+                    {totalItems}
                   </span>
                 )}
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Mobile Navigation Dropdown */}
-          {isMenuOpen && (
-            <div className="md:hidden pt-12 pb-10 animate-fadeIn bg-white/95 backdrop-blur-xl absolute top-full left-0 w-full h-screen px-4 z-[60]">
-              <div className="flex flex-col gap-0">
-                {navLinks.map((link) => {
-                  const isActive = isNavLinkActive(link.to);
-                  return (
-                    <NavLink
-                      key={link.name}
-                      to={link.to}
-                      className={`
+        {/* Mobile Navigation Dropdown */}
+        {isMenuOpen && (
+          <div className="md:hidden pt-12 pb-10 animate-fadeIn bg-white/95 backdrop-blur-xl absolute top-full left-0 w-full h-screen px-4 z-[60]">
+            <div className="flex flex-col gap-0">
+              {navLinks.map((link) => {
+                const isActive = isNavLinkActive(link.to);
+                return (
+                  <NavLink
+                    key={link.name}
+                    to={link.to}
+                    className={`
                       py-6 border-b border-gray-50 text-[11px] tracking-[0.3em] font-bold uppercase transition-all duration-300
                       ${isActive ? "text-black" : "text-gray-400"}
                     `}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {link.name}
-                    </NavLink>
-                  );
-                })}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </NavLink>
+                );
+              })}
 
-                <div className="mt-12 space-y-8">
-                  <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between text-[11px] tracking-[0.3em] font-bold uppercase text-black">
-                    <span>Bag</span>
-                    <span className="bg-black text-white px-2 py-0.5 text-[9px]">{totalItems}</span>
-                  </Link>
-                  <Link to={currentUser ? "/account" : "/login"} onClick={() => setIsMenuOpen(false)} className="block text-[11px] tracking-[0.3em] font-bold uppercase text-black">
-                    {currentUser ? "Account" : "Login"}
-                  </Link>
-                </div>
+              <div className="mt-12 space-y-8">
+                <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between text-[11px] tracking-[0.3em] font-bold uppercase text-black">
+                  <span>Bag</span>
+                  <span className="bg-black text-white px-2 py-0.5 text-[9px]">{totalItems}</span>
+                </Link>
+                <Link to={currentUser ? "/account" : "/login"} onClick={() => setIsMenuOpen(false)} className="block text-[11px] tracking-[0.3em] font-bold uppercase text-black">
+                  {currentUser ? "Account" : "Login"}
+                </Link>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </header>
 
       {/* Cart Drawer */}

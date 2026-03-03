@@ -311,45 +311,14 @@ export const fetchUserOrders = async (userId) => {
 
 
 export const verifyOrderPayment = async (orderId, reference) => {
+  console.warn("⚠️ verifyOrderPayment is deprecated. Payments are now verified securely via Webhooks.");
+  return true; // Return true to allow frontend navigation while webhook processes
+  /* OLD INSECURE LOGIC:
   try {
     const docRef = doc(db, "orders", orderId);
-    const docSnap = await getDoc(docRef);
-
-    if (!docSnap.exists()) {
-      console.error(`Order ${orderId} not found during verification`);
-      return false;
-    }
-
-    const orderData = docSnap.data();
-
-    // Prevent double verification if already paid
-    if (orderData.payment_status === "paid") {
-      console.log(`Order ${orderId} is already marked as paid.`);
-      return true;
-    }
-
-    // Update Order
-    await updateDoc(docRef, {
-      payment_status: "paid",
-      order_status: "confirmed",
-      payment_reference: reference,
-      updated_at: serverTimestamp(),
-    });
-
-    // Send Confirmation Email
-    try {
-      // Refresh order data after update for email
-      const updatedOrderData = { id: docSnap.id, ...orderData, payment_status: "paid", order_status: "confirmed", payment_reference: reference };
-      await sendOrderConfirmation(updatedOrderData);
-    } catch (emailError) {
-      console.error("Error sending confirmation email:", emailError);
-    }
-
-    return true;
-  } catch (error) {
-    console.error(`Error verifying payment for order ${orderId}:`, error);
-    return false;
-  }
+    ...
+  } catch (error) { ... }
+  */
 };
 
 // --- ANALYTICS & STATS ---

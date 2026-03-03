@@ -88,7 +88,7 @@ export default function Home() {
         <div className="section-pad py-10 md:py-16 min-h-[60vh]">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <p className="text-gray-400 font-inter text-[10px] tracking-widest uppercase">
-              Showing {currentProducts.length} of {filteredProducts.length} artifacts
+              Showing {currentProducts.length} of {filteredProducts.length} Pieces
             </p>
           </div>
 
@@ -150,7 +150,7 @@ export default function Home() {
             </>
           ) : (
             <div className="text-center py-32 border border-dashed border-gray-100 rounded-xl">
-              <h3 className="text-[11px] tracking-[0.3em] font-bold uppercase text-gray-400">Inventory Empty</h3>
+              <h3 className="text-[11px] tracking-[0.3em] font-bold uppercase text-gray-400">Piece List Empty</h3>
             </div>
           )}
         </div>

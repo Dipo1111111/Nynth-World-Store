@@ -1,54 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import { fetchProducts, updateProduct } from '../api/firebaseFunctions';
+import React, { useState } from 'react';
+import { db } from "../api/firebase";
+import { collection, getDocs, deleteDoc, doc, writeBatch } from 'firebase/firestore';
 
 export default function UpdateDB() {
-    const [log, setLog] = useState("Running update...");
+    const [status, setStatus] = useState("Idle. Use with caution!");
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const doUpdate = async () => {
-            try {
-                const products = await fetchProducts();
+    const wipeCollection = async (collectionName) => {
+        const colRef = collection(db, collectionName);
+        const snapshot = await getDocs(colRef);
+        const batch = writeBatch(db);
 
-                // Find by 'pink', or 'hoodie', or just take the first one if we only have a few
-                let target = products.find(p => p.title?.toLowerCase().includes('pink') || p.name?.toLowerCase().includes('pink'));
+        snapshot.docs.forEach((d) => {
+            batch.delete(d.ref);
+        });
 
-                if (!target) {
-                    target = products.find(p => p.title?.toLowerCase().includes('nynth') && p.title?.toLowerCase().includes('hoodie'));
-                }
+        await batch.commit();
+        return snapshot.size;
+    };
 
-                if (!target && products.length > 0) {
-                    target = products[0]; // fallback to first product if nothing matches
-                }
+    const runReset = async () => {
+        if (!window.confirm("CRITICAL: This will delete ALL users, orders, and messages. This cannot be undone. Proceed?")) return;
 
-                if (target) {
-                    setLog(`Found target: ${target.title} (${target.id}). Updating...`);
-                    await updateProduct(target.id, {
-                        title: "NYNTH BLACK HOODIE",
-                        name: "NYNTH BLACK HOODIE",
-                        category: "hoodies",
-                        availableColors: ["Black"],
-                        images: [
-                            "/images/black nynth hoodie- front.jpeg",
-                            "/images/black nynth-hoodie-back.jpeg",
-                            "/images/black nynth-hoodie-model-front.jpeg",
-                            "/images/black nynth-hoodie-model-back.jpeg"
-                        ]
-                    });
-                    setLog(`SUCCESS: Updated ${target.title} to NYNTH BLACK HOODIE!`);
-                } else {
-                    setLog("FAILED: No products found in database.");
-                }
-            } catch (e) {
-                setLog(`ERROR: ${e.message}`);
+        setLoading(true);
+        setStatus("Wiping data...");
+
+        try {
+            const collections = ['orders', 'users', 'contact_messages', 'cart', 'newsletter_subscriptions'];
+            let totalDeleted = 0;
+
+            for (const col of collections) {
+                const count = await wipeCollection(col);
+                totalDeleted += count;
+                console.log(`Deleted ${count} documents from ${col}`);
             }
-        };
-        doUpdate();
-    }, []);
+
+            setStatus(`SUCCESS: Deleted ${totalDeleted} documents across ${collections.length} collections.`);
+        } catch (e) {
+            console.error(e);
+            setStatus(`ERROR: ${e.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div style={{ padding: '50px', fontFamily: 'monospace', fontSize: '18px' }}>
-            <h1>DB Update Tool</h1>
-            <p>{log}</p>
+        <div style={{ padding: '50px', fontFamily: 'Inter, sans-serif' }}>
+            <h1 style={{ color: 'red' }}>⚠️ Production Database Cleanup</h1>
+            <p>Current Status: <strong>{status}</strong></p>
+            <button
+                onClick={runReset}
+                disabled={loading}
+                style={{
+                    backgroundColor: 'black',
+                    color: 'white',
+                    padding: '15px 30px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    opacity: loading ? 0.5 : 1
+                }}
+            >
+                {loading ? "WIPING..." : "WIPE TEST DATA"}
+            </button>
+            <div style={{ marginTop: '40px' }}>
+                <a href="/shop" style={{ color: 'black', fontWeight: 'bold', textDecoration: 'underline' }}>Back to Shop</a>
+            </div>
+
+            <p style={{ marginTop: '20px', color: '#666', fontSize: '12px' }}>
+                Note: This only deletes Firestore documents. To delete Auth Users, you must use the Firebase Console.
+            </p>
         </div>
     );
 }

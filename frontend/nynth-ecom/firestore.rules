@@ -28,7 +28,9 @@ service cloud.firestore {
     // - Admins can read all profiles
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && request.resource.data.role == 'user';
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // Products Collection:
@@ -45,7 +47,9 @@ service cloud.firestore {
     // - Admins can read/update all orders
     match /orders/{orderId} {
       allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow create: if request.resource.data.userId == (isAuthenticated() ? request.auth.uid : null); 
+      allow create: if (request.resource.data.userId == (isAuthenticated() ? request.auth.uid : null))
+                    && request.resource.data.payment_status == 'pending'
+                    && request.resource.data.order_status == 'pending';
       allow update, delete: if isAdmin();
     }
 

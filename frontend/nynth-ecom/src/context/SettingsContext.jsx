@@ -13,6 +13,7 @@ export function SettingsProvider({ children }) {
         site_name: import.meta.env.VITE_SITE_NAME || "NYNTH",
         support_email: import.meta.env.VITE_SUPPORT_EMAIL || "support@nynth.com",
         support_phone: import.meta.env.VITE_SUPPORT_PHONE || "+234 123 456 7890",
+        support_whatsapp: import.meta.env.VITE_SUPPORT_WHATSAPP || "+234 123 456 7890",
         office_address: import.meta.env.VITE_OFFICE_ADDRESS || "123 Fashion Street, Lagos, Nigeria",
         instagram_url: import.meta.env.VITE_INSTAGRAM_URL || "https://instagram.com/nynth",
         twitter_url: import.meta.env.VITE_TWITTER_URL || "https://twitter.com/nynth",

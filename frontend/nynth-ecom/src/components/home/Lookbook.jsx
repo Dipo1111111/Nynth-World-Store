@@ -173,6 +173,9 @@ export default function Lookbook() {
                             {look.season}
                           </span>
                         )}
+                        <p className="font-inter text-[10px] md:text-[11px] tracking-[0.3em] font-bold uppercase text-gray-400 mb-8">
+                          The definitive lookbook for Piece 01.
+                        </p>
                         <h3 className="text-[20px] md:text-[28px] tracking-widest font-bold mb-6 uppercase">
                           {look.title}
                         </h3>

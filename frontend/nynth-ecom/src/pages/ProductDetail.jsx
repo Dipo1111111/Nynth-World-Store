@@ -89,25 +89,27 @@ export default function ProductDetail() {
       )}
 
       {/* ====== DESKTOP: Two-Column Layout (lg+) ====== */}
-      <main className="hidden lg:grid lg:grid-cols-2 min-h-screen pt-[68px]">
-        {/* Left: Sticky Image */}
-        <div className="bg-white relative lg:min-h-[calc(100vh-68px)] flex flex-col items-center justify-center p-10">
-          <div className="lg:sticky lg:top-32 w-full h-full flex flex-col items-center justify-center">
-            <div className="w-[85%] aspect-[4/5] relative">
+      <main className="hidden lg:grid lg:grid-cols-2 min-h-screen pt-[60px]">
+        {/* Left: Edge-to-Edge Image Half */}
+        <div className="bg-white relative h-[calc(100vh-60px)] flex flex-col items-center justify-center sticky top-[60px]">
+          <div className="w-full h-full flex flex-col items-center justify-center p-20 xl:p-32">
+            <div className="w-full h-full relative flex items-center justify-center">
               <img
                 src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
                 alt={product.title}
-                className="w-full h-full object-contain absolute inset-0"
+                loading="lazy"
+                className="w-full h-full object-cover transition-opacity duration-500"
               />
             </div>
-            {/* Thumbnail Navigation */}
+
+            {/* Thumbnail Navigation - Floating at bottom of grey half */}
             {product.images?.length > 1 && (
-              <div className="flex gap-2 mt-8 overflow-x-auto no-scrollbar max-w-[85%]">
+              <div className="absolute bottom-20 flex gap-1.5 overflow-x-auto no-scrollbar max-w-[80%]">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedImage(i)}
-                    className={`h-16 w-12 flex-shrink-0 transition-all border-2 ${selectedImage === i ? "border-black opacity-100" : "border-transparent opacity-40 hover:opacity-100"}`}
+                    className={`h-14 w-11 flex-shrink-0 transition-opacity border ${selectedImage === i ? "border-black opacity-100" : "border-transparent opacity-30 hover:opacity-100"}`}
                   >
                     <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
                   </button>
@@ -117,38 +119,37 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Right: Product Info */}
-        <div className="bg-white flex flex-col px-12 xl:px-24 py-24">
-          <div className="max-w-xl w-full mx-auto">
-            <p className="text-[9px] tracking-[0.2em] font-bold text-gray-400 uppercase mb-2">NYNTH</p>
-            <div className="flex justify-between items-start gap-4 mb-10">
-              <h1 className="text-[13px] font-bold tracking-[0.15em] uppercase leading-tight">
+        {/* Right: Product Info Half */}
+        <div className="bg-white flex flex-col p-16 xl:p-32 min-h-screen overflow-y-auto">
+          <div className="max-w-xl w-full">
+            <p className="text-[8px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-2">NYNTH WORLD</p>
+            <div className="flex justify-between items-start gap-4 mb-12">
+              <h1 className="text-[11px] font-bold tracking-[0.15em] uppercase leading-tight">
                 {product.title}
               </h1>
-              <span className="text-[12px] font-bold tracking-widest whitespace-nowrap">
+              <span className="text-[10px] font-bold tracking-[0.2em] whitespace-nowrap">
                 {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
 
-            {/* Color Selection */}
+            {/* Color Selection - Exact Suvene Style Boxes */}
             {product.availableColors?.length > 0 && (
-              <div className="mb-8">
-                <p className="text-[9px] tracking-[0.2em] font-bold uppercase mb-4 text-gray-500">CHOOSE COLOR:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="mb-10">
+                <p className="text-[8px] tracking-[0.25em] font-bold uppercase mb-4 text-black">CHOOSE COLOR:</p>
+                <div className="flex flex-wrap gap-1.5">
                   {product.availableColors.map((color, idx) => (
                     <button
                       key={color}
                       onClick={() => {
                         setSelectedColor(color);
-                        // Switch to the image for this color if available
                         if (product.images?.[idx]) setSelectedImage(idx);
                       }}
-                      className={`w-14 h-16 bg-white overflow-hidden flex items-center justify-center transition-all border-2 ${selectedColor === color ? "border-black" : "border-transparent hover:border-gray-300"}`}
+                      className={`w-12 h-14 bg-white flex items-center justify-center transition-all border ${selectedColor === color ? "border-black border-[1.5px]" : "border-transparent hover:border-black/20"}`}
                     >
                       {product.images?.[idx] ? (
                         <img src={product.images[idx]} alt={color} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-7 h-7 rounded-full border border-gray-200" style={{ backgroundColor: color.toLowerCase() }} />
+                        <div className="w-5 h-5 border border-black/10" style={{ backgroundColor: color.toLowerCase() }} />
                       )}
                     </button>
                   ))}
@@ -156,21 +157,21 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Size Selection */}
+            {/* Size Selection - Exact Suvene Style Boxes */}
             {product.availableSizes?.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-10">
                 <div className="flex justify-between items-center mb-4">
-                  <p className="text-[9px] tracking-[0.2em] font-bold uppercase text-gray-500">
-                    SIZE: <span className="text-black">{selectedSize}</span>
+                  <p className="text-[8px] tracking-[0.25em] font-bold uppercase text-black">
+                    SIZE: <span className="font-normal text-gray-400 ml-1">{selectedSize}</span>
                   </p>
-                  <button className="text-[9px] tracking-widest uppercase underline underline-offset-4 font-bold text-gray-500 hover:text-black">SIZECHART</button>
+                  <button className="text-[8px] tracking-[0.2em] uppercase underline underline-offset-8 font-bold text-black hover:opacity-50 transition-opacity">SIZECHART</button>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {product.availableSizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`min-w-[52px] py-2.5 px-3 text-[10px] font-bold tracking-widest text-center transition-all border ${selectedSize === size ? "border-black text-black border-2" : "border-gray-300 text-gray-500 hover:border-gray-500"}`}
+                      className={`flex-1 min-w-[50px] py-1 text-[9px] font-bold tracking-[0.2em] text-center transition-all border ${selectedSize === size ? "border-black bg-black text-white" : "border-black/10 text-black hover:border-black"}`}
                     >
                       {size}
                     </button>
@@ -179,49 +180,49 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Add to Cart Button */}
+            {/* Add to Cart Button - Suvene Grey Button */}
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock || addingToCart}
-              className="w-full bg-black text-white py-4 text-[11px] tracking-[0.2em] font-bold uppercase hover:bg-gray-900 transition-colors disabled:opacity-50 mb-8"
+              className="w-full bg-[#999999] text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black transition-all duration-500 disabled:opacity-50 mb-10"
             >
-              {addingToCart ? "ADDING..." : product.inStock ? "ADD TO CART" : "OUT OF STOCK"}
+              {addingToCart ? "ADDING..." : product.inStock ? "SELECT OPTION" : "OUT OF STOCK"}
             </button>
 
-            {/* Shipping Badges */}
-            <div className="space-y-3 mb-12">
-              <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
-                <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 3-5 DAYS SHIPPING
+            {/* Shipping Badges - Simple minimalist */}
+            <div className="space-y-3 mb-16">
+              <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
+                <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 3-5 DAYS SHIPPING
               </div>
-              <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
-                <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 14 DAYS RETURN POLICY
+              <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
+                <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 14 DAYS RETURN POLICY
               </div>
             </div>
 
-            {/* Accordions */}
-            <div className="border-t border-gray-200">
+            {/* Accordions - Simple borders */}
+            <div className="border-t border-black/5">
               <button
                 onClick={() => setIsOpenDescription(!isOpenDescription)}
-                className="w-full flex justify-between items-center py-5 text-[10px] tracking-[0.2em] font-bold uppercase hover:opacity-70 transition-opacity"
+                className="w-full flex justify-between items-center py-7 text-[9px] tracking-[0.25em] font-bold uppercase hover:opacity-50 transition-all"
               >
                 <span>DESCRIPTION</span>
-                {isOpenDescription ? <Minus size={14} /> : <Plus size={14} />}
+                <Plus size={14} className={`transition-transform duration-500 ${isOpenDescription ? "rotate-45" : ""}`} />
               </button>
               {isOpenDescription && (
-                <div className="pb-6 text-[11px] leading-[1.8] text-gray-500 tracking-wide">
+                <div className="pb-10 text-[10px] leading-[2] text-gray-500 tracking-wide pr-10">
                   {product.description}
                 </div>
               )}
 
               <button
                 onClick={() => setIsOpenShipping(!isOpenShipping)}
-                className="w-full flex justify-between items-center py-5 border-t border-gray-200 text-[10px] tracking-[0.2em] font-bold uppercase hover:opacity-70 transition-opacity"
+                className="w-full flex justify-between items-center py-7 border-t border-black/5 text-[9px] tracking-[0.25em] font-bold uppercase hover:opacity-50 transition-all"
               >
                 <span>SHIPPING & RETURNS</span>
-                {isOpenShipping ? <Minus size={14} /> : <Plus size={14} />}
+                <Plus size={14} className={`transition-transform duration-500 ${isOpenShipping ? "rotate-45" : ""}`} />
               </button>
               {isOpenShipping && (
-                <div className="pb-6 text-[11px] leading-[1.8] text-gray-500 tracking-wide">
+                <div className="pb-10 text-[10px] leading-[2] text-gray-500 tracking-wide pr-10">
                   Orders are typically processed within 1-3 business days. We ship worldwide with tracking provided via email. Returns are accepted within 14 days of delivery.
                 </div>
               )}
@@ -237,7 +238,7 @@ export default function ProductDetail() {
           <img
             src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
             alt={product.title}
-            className="w-[80%] h-[80%] object-contain"
+            className="w-[85%] h-[85%] object-contain"
           />
         </div>
 

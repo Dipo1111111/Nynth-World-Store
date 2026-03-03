@@ -70,7 +70,7 @@ export default function Account() {
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col items-start gap-4 mb-20">
                         <h1 className="hero-title text-black text-left">ACCOUNT</h1>
-                        <p className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">Manage your profile and artifacts.</p>
+                        <p className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">Manage your profile and Pieces.</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
@@ -139,7 +139,7 @@ export default function Account() {
                                     </div>
                                 ) : orders.length === 0 ? (
                                     <div className="border border-gray-100 p-20 text-center">
-                                        <h3 className="text-[14px] tracking-widest font-bold uppercase mb-4">No artifacts discovered</h3>
+                                        <h3 className="text-[14px] tracking-widest font-bold uppercase mb-4">No Pieces discovered</h3>
                                         <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold mb-10">Your collection is empty.</p>
                                         <Link to="/shop" className="inline-block bg-black text-white px-12 py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all">
                                             Explore Collection
@@ -154,8 +154,8 @@ export default function Account() {
                                                         <div className="flex items-center gap-4">
                                                             <span className="text-[13px] tracking-widest font-bold uppercase">ID: {order.id.slice(0, 8)}</span>
                                                             <span className={`text-[9px] tracking-[0.2em] font-bold uppercase px-3 py-1 ${order.order_status === 'delivered' ? 'bg-green-50 text-green-700' :
-                                                                    order.order_status === 'shipped' ? 'bg-blue-50 text-blue-700' :
-                                                                        'bg-gray-100 text-gray-700'
+                                                                order.order_status === 'shipped' ? 'bg-blue-50 text-blue-700' :
+                                                                    'bg-gray-100 text-gray-700'
                                                                 }`}>
                                                                 {order.order_status}
                                                             </span>
@@ -169,6 +169,9 @@ export default function Account() {
                                                         </p>
                                                     </div>
                                                     <div className="md:text-right space-y-2">
+                                                        <p className="text-[10px] tracking-[0.2em] text-gray-400 font-bold uppercase mb-8">
+                                                            Viewing your curated Pieces and order history.
+                                                        </p>
                                                         <p className="text-[10px] tracking-[0.2em] text-gray-400 font-bold uppercase">Transaction Total</p>
                                                         <p className="text-[18px] tracking-widest font-bold">₦{order.total?.toLocaleString()}</p>
                                                     </div>

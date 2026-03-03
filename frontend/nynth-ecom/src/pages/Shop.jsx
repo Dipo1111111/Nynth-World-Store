@@ -61,43 +61,53 @@ export default function Shop() {
   }, [products, selectedCategory, searchQuery, sortBy]);
 
   return (
-    <div className="min-h-screen bg-white text-black font-inter">
+    <div className="min-h-screen bg-white text-black font-inter flex flex-col">
       <SEO title="Shop Collection | NYNTH" description="Premium Minimal Streetwear" url="/shop" />
       <Header />
 
-      <main className="w-full">
-        {/* Full-width Hero Section Placeholder for the aesthetic */}
-        <section className="relative w-full aspect-[21/9] md:aspect-[21/7] bg-[#F2F2F2] overflow-hidden">
+      <main className="w-full pt-[68px]">
+        {/* Full-width Hero Section - Edge to Edge */}
+        <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2070"
+            src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2600"
             alt="Collection Hero"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/5 flex flex-col items-center justify-center">
-            {/* Optional text or logo can go here */}
-          </div>
         </section>
 
-        {/* Categories Bar - Primary Sticky */}
-        <div className="sticky top-[68px] z-40 w-full max-w-full bg-white border-b border-gray-100 flex justify-between items-center py-4 px-6 transition-all duration-300">
+        {/* Categories Bar - Primary Sticky - Edge to Edge */}
+        <div className="sticky top-[68px] z-40 w-full bg-white border-b border-black/5 flex justify-between items-center py-5 px-6 md:px-10 transition-all duration-300">
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setDisplayMode(displayMode === 'model' ? 'view' : 'model')}
-              className="flex items-center gap-2 focus:outline-none focus:ring-0 outline-none"
-            >
-              <span className={`text-[9px] uppercase tracking-widest font-bold transition-opacity ${displayMode === 'model' ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}>MODELL</span>
-              <div className={`w-8 h-4 rounded-full border border-black flex items-center px-[2px] transition-colors ${displayMode === 'model' ? 'bg-black' : 'bg-transparent'}`}>
-                <div className={`w-3 h-3 rounded-full transition-transform ${displayMode === 'model' ? 'translate-x-[14px] bg-white' : 'translate-x-0 bg-black'}`}></div>
+            <div className="flex items-center gap-3">
+              <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'view' ? 'opacity-100' : 'opacity-30'}`}>SICHT</span>
+              <div className="flex items-center gap-[2px]">
+                <div className="w-[1.5px] h-3 bg-black opacity-20"></div>
+                <div className="flex gap-[1px]">
+                  <div className="w-[1.5px] h-3 bg-black"></div>
+                  <div className="w-[1.5px] h-3 bg-black"></div>
+                  <div className="w-[1.5px] h-3 bg-black"></div>
+                  <div className="w-[1.5px] h-3 bg-black"></div>
+                </div>
+                <div className="w-[1.5px] h-3 bg-black opacity-20 ml-1"></div>
               </div>
-            </button>
+              <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'model' ? 'opacity-100' : 'opacity-30'}`}>MODELL</span>
+              <button
+                onClick={() => setDisplayMode(displayMode === 'model' ? 'view' : 'model')}
+                className="ml-2 focus:outline-none"
+              >
+                <div className={`w-8 h-4 rounded-full border border-black flex items-center px-[2px] transition-colors ${displayMode === 'model' ? 'bg-black' : 'bg-transparent'}`}>
+                  <div className={`w-3 h-3 rounded-full transition-transform ${displayMode === 'model' ? 'translate-x-[14px] bg-white' : 'translate-x-0 bg-black'}`}></div>
+                </div>
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
+          <div className="hidden md:flex items-center gap-8">
             {["all", "hoodies", "headwear", "tees"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`flex-shrink-0 text-[9px] tracking-[0.2em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${selectedCategory === cat ? "text-black underline underline-offset-8" : "text-gray-400 hover:text-black"
+                className={`text-[9px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${selectedCategory === cat ? "text-black underline underline-offset-[10px]" : "text-gray-300 hover:text-black"
                   }`}
               >
                 {cat}
@@ -106,26 +116,32 @@ export default function Shop() {
           </div>
         </div>
 
+        {/* Grid Layer - 100% Full Width, 0 Padding, 1px Gaps */}
         <div className="w-full bg-white min-h-[60vh]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white h-full w-full">
+            <div className="flex flex-col items-center justify-center py-20 bg-white h-screen w-full">
               <Loader2 className="h-6 w-6 animate-spin text-black mb-4" />
             </div>
-          ) : error ? (
-            <div className="text-center py-20 uppercase tracking-widest text-[11px] text-gray-400 bg-white h-full w-full">
-              {error}
-            </div>
           ) : (
-            <div className="grid grid-cols-2 gap-y-0 gap-x-[1px] md:gap-x-[2px] bg-white w-full overflow-hidden">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} displayMode={displayMode} />
-              ))}
-            </div>
+            <section className="w-full px-0">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-[1px] bg-black/10">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} displayMode={displayMode} />
+                ))}
+
+                {/* Fill all empty slots in the last row to maintain 1px grid lines */}
+                {filteredProducts.length > 0 && Array.from({
+                  length: (4 - (filteredProducts.length % 4)) % 4
+                }).map((_, i) => (
+                  <div key={`empty-${i}`} className="bg-white w-full h-full min-h-[400px]"></div>
+                ))}
+              </div>
+            </section>
           )}
 
           {!loading && filteredProducts.length === 0 && (
-            <div className="text-center py-20 uppercase tracking-widest text-[11px] text-gray-400 bg-white h-full w-full">
-              No products found.
+            <div className="text-center py-40 uppercase tracking-[0.3em] text-[10px] text-gray-400 bg-white h-full w-full">
+              NO PRODUCTS FOUND
             </div>
           )}
         </div>

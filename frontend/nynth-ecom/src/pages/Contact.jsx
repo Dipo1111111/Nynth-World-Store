@@ -114,6 +114,19 @@ export default function Contact() {
                                 </div>
 
                                 <div className="space-y-2">
+                                    <h4 className="text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase">WhatsApp</h4>
+                                    <p className="text-[14px] font-bold tracking-widest">{settings.support_whatsapp}</p>
+                                    <a
+                                        href={`https://wa.me/${settings.support_whatsapp?.replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block mt-2 px-6 py-2 border border-black text-[9px] font-bold tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all"
+                                    >
+                                        Chat Now
+                                    </a>
+                                </div>
+
+                                <div className="space-y-2">
                                     <h4 className="text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase">Studio</h4>
                                     <p className="text-[14px] font-bold tracking-widest uppercase">{settings.office_address}</p>
                                 </div>

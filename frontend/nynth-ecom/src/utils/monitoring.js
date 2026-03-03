@@ -5,7 +5,8 @@ import * as Sentry from "@sentry/react";
  * Initializes Analytics and Monitoring services.
  */
 export const initMonitoring = () => {
-    // 1. Initialize Sentry
+    // 1. Sentry Disabled per user request
+    /*
     const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
     if (sentryDsn && sentryDsn !== "https://your-sentry-dsn.com") {
         Sentry.init({
@@ -14,15 +15,15 @@ export const initMonitoring = () => {
                 Sentry.browserTracingIntegration(),
                 Sentry.replayIntegration(),
             ],
-            // Performance Monitoring
             tracesSampleRate: 1.0,
-            // Session Replay
             replaysSessionSampleRate: 0.1,
             replaysOnErrorSampleRate: 1.0,
             environment: import.meta.env.MODE,
+            sendDefaultPii: true,
         });
         console.log("Sentry monitoring initialized.");
     }
+    */
 
     // 2. Initialize Google Analytics
     const gaId = import.meta.env.VITE_GA_MEASUREMENT_ID;

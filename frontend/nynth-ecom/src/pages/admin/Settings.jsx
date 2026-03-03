@@ -138,6 +138,19 @@ export default function AdminSettings() {
                                 />
                             </div>
                         </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Support WhatsApp</label>
+                            <div className="relative">
+                                <Share2 size={16} className="absolute left-3 top-3 text-gray-400" />
+                                <input
+                                    name="support_whatsapp"
+                                    value={settings.support_whatsapp}
+                                    onChange={handleChange}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="+234..."
+                                />
+                            </div>
+                        </div>
                         <div className="space-y-2 md:col-span-2">
                             <label className="text-sm font-medium text-gray-700">Office Address</label>
                             <div className="relative">

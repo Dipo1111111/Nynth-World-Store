@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
 import { trackConversion } from "../utils/monitoring";
 
-import logo from "../assets/nynth-logo.png";
+import Logo from "../components/common/Logo";
 import { LAGOS_SHIPPING_DATA } from "../data/locationData";
 
 const Checkout = () => {
@@ -110,10 +110,11 @@ const Checkout = () => {
         },
         callback: (response) => {
           const handleSuccess = async () => {
-            setIsOrderCompleted(true); // Flag order as complete so we don't redirect to cart
+            setIsOrderCompleted(true);
+            toast.success("Payment successful! Processing your order...", { duration: 5000 });
 
-            // 1. Verify payment in DB (Client-side trigger)
-            await verifyOrderPayment(orderId, response.reference);
+            // 1. Verify payment in DB (Client-side trigger - now handled by Webhook)
+            // await verifyOrderPayment(orderId, response.reference);
 
             // 2. Track the conversion
             trackConversion("purchase", {
@@ -124,8 +125,6 @@ const Checkout = () => {
 
             // 3. Clear cart and redirect
             clearCart();
-            // We use setTimeout to ensure state updates (like clearCart) have processed 
-            // and the redirect effect has run (and was skipped due to flag)
             setTimeout(() => {
               navigate(`/thank-you?ref=${response.reference}`);
             }, 100);

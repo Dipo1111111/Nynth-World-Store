@@ -13,7 +13,7 @@ export const Logo = ({ className = '', size = 'default' }) => {
         <img
             src={logo}
             alt="NYNTH"
-            className={`${sizeClasses[size] || sizeClasses.default} ${className}`}
+            className={`${sizeClasses[size] || sizeClasses.default} ${className} brightness-0`}
         />
     );
 };
