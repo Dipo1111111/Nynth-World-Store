@@ -50,15 +50,6 @@ export default function CartDrawer({ isOpen, onClose }) {
 
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto">
-                    {/* Free Shipping Progress */}
-                    <div className="px-6 py-4 bg-gray-50">
-                        <div className="text-[9px] tracking-widest font-bold uppercase mb-2">
-                            You have unlocked free shipping!
-                        </div>
-                        <div className="w-full h-[2px] bg-gray-200">
-                            <div className="h-full bg-black w-full"></div>
-                        </div>
-                    </div>
 
                     {cartItems.length === 0 ? (
                         <div className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center">
@@ -144,25 +135,6 @@ export default function CartDrawer({ isOpen, onClose }) {
                                 ))}
                             </div>
 
-                            {/* Cross-sell Section */}
-                            <div className="px-6 py-4 border-t border-gray-100">
-                                <h3 className="text-[9px] font-bold tracking-[0.2em] uppercase mb-4 text-black">YOU MIGHT ALSO LIKE</h3>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {[1, 2, 3].map((i) => (
-                                        <div key={i} className="group cursor-pointer">
-                                            <div className="aspect-[4/5] bg-white border border-gray-100 relative overflow-hidden mb-2">
-                                                <div className="w-[70%] h-[70%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-50 animate-pulse"></div>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-[8px] font-bold tracking-widest">
-                                                    {settings?.currency_symbol || "₦"}0.00
-                                                </span>
-                                                <Plus size={10} className="text-gray-400 group-hover:text-black transition-colors" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </>
                     )}
                 </div>
@@ -192,12 +164,6 @@ export default function CartDrawer({ isOpen, onClose }) {
                             SAFE CHECK OUT
                         </button>
 
-                        <div className="mt-3 flex justify-center gap-2 opacity-40">
-                            <span className="text-[8px] tracking-wider">💳</span>
-                            <span className="text-[8px] tracking-wider">Apple Pay</span>
-                            <span className="text-[8px] tracking-wider">G Pay</span>
-                            <span className="text-[8px] tracking-wider">Visa</span>
-                        </div>
                     </div>
                 )}
             </div>

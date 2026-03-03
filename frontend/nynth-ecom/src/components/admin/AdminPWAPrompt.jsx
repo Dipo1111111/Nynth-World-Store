@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Smartphone, ArrowBigDown, Share } from 'lucide-react';
+import { X, Smartphone, ArrowBigDown, Share, Plus } from 'lucide-react';
 
 const AdminPWAPrompt = () => {
     const [show, setShow] = useState(false);

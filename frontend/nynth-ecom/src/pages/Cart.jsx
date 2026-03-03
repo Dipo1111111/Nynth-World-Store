@@ -63,15 +63,6 @@ export default function Cart() {
           <h1 className="text-[11px] font-bold tracking-[0.2em] uppercase">YOUR CART ({cartItems.length})</h1>
         </div>
 
-        {/* Free Shipping Progress */}
-        <div className="mb-10">
-          <div className="flex justify-between text-[10px] tracking-widest font-bold uppercase mb-3">
-            <span>You have unlocked free shipping!</span>
-          </div>
-          <div className="w-full h-[2px] bg-gray-200">
-            <div className="h-full bg-black w-full"></div>
-          </div>
-        </div>
 
         {/* Cart Items List */}
         <div className="flex-1 flex flex-col gap-6 mb-16">
@@ -136,24 +127,6 @@ export default function Cart() {
           ))}
         </div>
 
-        {/* Cross Sell Section */}
-        <div className="mb-12">
-          <h3 className="text-[9px] font-bold tracking-[0.2em] uppercase mb-6 text-black border-t border-gray-100 pt-6">YOU MIGHT ALSO LIKE</h3>
-          <div className="grid grid-cols-3 gap-1">
-            {/* Mock items for aesthetic */}
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white group cursor-pointer border border-transparent hover:border-gray-200">
-                <div className="aspect-[4/5] bg-[#eaeaea] relative overflow-hidden mb-3">
-                  <div className="w-[80%] h-[80%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-300 animate-pulse"></div>
-                </div>
-                <div className="flex justify-between items-center px-1 pb-2">
-                  <span className="text-[8px] font-bold uppercase tracking-widest">N126,200</span>
-                  <Plus size={10} className="text-gray-400 group-hover:text-black" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Order Summary & Checkout strictly at bottom */}
         <div className="mt-auto border-t border-gray-100 pt-6">
@@ -176,13 +149,6 @@ export default function Cart() {
             SAFE CHECK OUT
           </button>
 
-          <div className="mt-4 flex justify-center gap-2 opacity-50 flex-wrap">
-            {/* Stubbing out payment icons */}
-            <div className="h-4 w-6 bg-gray-200 rounded-sm"></div>
-            <div className="h-4 w-6 bg-gray-200 rounded-sm"></div>
-            <div className="h-4 w-6 bg-gray-200 rounded-sm"></div>
-            <div className="h-4 w-6 bg-gray-200 rounded-sm"></div>
-          </div>
         </div>
       </main>      <Footer />
     </div>

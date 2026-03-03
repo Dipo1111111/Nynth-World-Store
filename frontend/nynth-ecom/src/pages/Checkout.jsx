@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { addOrder, verifyOrderPayment } from "../api/firebaseFunctions";
+import { addOrder, verifyOrderPayment, initializePayment } from "../api/firebaseFunctions";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -50,19 +50,9 @@ const Checkout = () => {
   const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [isOrderCompleted, setIsOrderCompleted] = useState(false); // New state to prevent redirect loop
 
-  // Load Paystack script
+  // Paystack Inline script loading REMOVED (using redirect flow)
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://js.paystack.co/v1/inline.js";
-    script.async = true;
-    script.onload = () => setPaystackLoaded(true); // Set state on load
-    script.onerror = () => toast.error("Failed to load payment system");
-    document.body.appendChild(script);
-
-    // Cleanup to prevent multiple scripts if revisited
-    return () => {
-      document.body.removeChild(script);
-    };
+    setPaystackLoaded(true);
   }, []);
 
   // Redirect if cart is empty, ONLY if order is not completed
@@ -85,61 +75,41 @@ const Checkout = () => {
     setForm({ ...form, [name]: value });
   };
 
-  const payWithPaystack = (orderId, totalToPay) => {
-    if (!window.PaystackPop) {
-      toast.error("Payment system not loaded yet. Please refresh.");
-      return;
-    }
-
+  const payWithPaystack = async (orderId, totalToPay) => {
+    setLoading(true);
     try {
-      const handler = window.PaystackPop.setup({
-        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+      const result = await initializePayment({
+        amount: totalToPay,
         email: form.email,
-        amount: totalToPay * 100, // kobo
-        currency: "NGN",
         metadata: {
           orderId,
+          customerName: `${form.firstName} ${form.lastName}`,
           items: cartItems.map(item => ({
             id: item.id,
-            name: item.name,
+            name: item.title, // Fixed to use title to match cart items
             quantity: item.quantity,
-            size: item.size,
-            color: item.color
+            size: item.selectedSize,
+            color: item.selectedColor
           })),
-          customerName: `${form.firstName} ${form.lastName}`,
-        },
-        callback: (response) => {
-          const handleSuccess = async () => {
-            setIsOrderCompleted(true);
-            toast.success("Payment successful! Processing your order...", { duration: 5000 });
-
-            // 1. Verify payment in DB (Client-side trigger - now handled by Webhook)
-            // await verifyOrderPayment(orderId, response.reference);
-
-            // 2. Track the conversion
-            trackConversion("purchase", {
-              order_id: orderId,
-              amount: totalToPay,
-              reference: response.reference
-            });
-
-            // 3. Clear cart and redirect
-            clearCart();
-            setTimeout(() => {
-              navigate(`/thank-you?ref=${response.reference}`);
-            }, 100);
-          };
-          handleSuccess();
-        },
-        onClose: () => {
-          toast("Payment window closed.");
-        },
+        }
       });
 
-      handler.openIframe();
+      if (result && result.authorization_url) {
+        // Track the initiation
+        trackConversion("initiate_checkout", {
+          order_id: orderId,
+          amount: totalToPay
+        });
+
+        // 🚀 REDIRECT to Paystack
+        window.location.href = result.authorization_url;
+      } else {
+        throw new Error("Failed to get payment URL");
+      }
     } catch (error) {
-      console.error("Paystack initialization error:", error);
+      console.error("Paystack redirect error:", error);
       toast.error(`Payment Error: ${error.message}`);
+      setLoading(false);
     }
   };
 

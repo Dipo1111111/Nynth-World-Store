@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Check, ArrowRight, ShoppingBag, Mail } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 
@@ -10,6 +11,7 @@ const ThankYou = () => {
   const { currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const reference = searchParams.get("ref");
+  const { clearCart } = useCart();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -42,8 +44,12 @@ const ThankYou = () => {
       });
     }, 250);
 
+    if (reference) {
+      clearCart();
+    }
+
     return () => clearInterval(interval);
-  }, []);
+  }, [reference, clearCart]);
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col font-inter">

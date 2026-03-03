@@ -1,4 +1,4 @@
-const { onRequest } = require("firebase-functions/v2/https");
+const { onRequest, onCall } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
 
@@ -91,5 +91,50 @@ exports.paystackWebhook = onRequest(
 
         // Return 200 for other events to acknowledge receipt
         res.status(200).send("Event acknowledged");
+    }
+);
+
+// 3. Initialize Payment (Redirect Flow)
+exports.initializePayment = onCall(
+    { secrets: ["PAYSTACK_SECRET_KEY"] },
+    async (request) => {
+        const secret = process.env.PAYSTACK_SECRET_KEY;
+        const { amount, email, metadata } = request.data;
+
+        if (!amount || !email) {
+            throw new Error("Missing required payment details (amount or email)");
+        }
+
+        try {
+            const response = await fetch("https://api.paystack.co/transaction/initialize", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${secret}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    amount: Math.round(amount * 100), // convert to kobo
+                    email,
+                    metadata,
+                    // Paystack will use the callback_url from settings or you can pass it here
+                    callback_url: `${request.rawRequest?.headers?.origin || 'https://nynth.com'}/thank-you`,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!data.status) {
+                console.error("Paystack Init Error:", data.message);
+                throw new Error(data.message || "Failed to initialize payment");
+            }
+
+            return {
+                authorization_url: data.data.authorization_url,
+                reference: data.data.reference,
+            };
+        } catch (error) {
+            console.error("Initialize Payment Error:", error);
+            throw new Error(error.message || "Internal server error during payment initialization");
+        }
     }
 );

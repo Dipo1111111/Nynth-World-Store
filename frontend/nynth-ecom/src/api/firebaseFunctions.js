@@ -243,6 +243,20 @@ export const uploadMultipleImages = async (files) => {
 // --- ORDERS ---
 import { runTransaction } from "firebase/firestore";
 
+import { functions } from "./firebase";
+import { httpsCallable } from "firebase/functions";
+
+export const initializePayment = async (paymentData) => {
+  try {
+    const initPayment = httpsCallable(functions, "initializePayment");
+    const result = await initPayment(paymentData);
+    return result.data;
+  } catch (error) {
+    console.error("Error initializing payment:", error);
+    throw error;
+  }
+};
+
 export const addOrder = async (order) => {
   try {
     const orderId = await runTransaction(db, async (transaction) => {
