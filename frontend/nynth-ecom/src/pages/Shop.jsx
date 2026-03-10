@@ -21,7 +21,7 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState(() => searchParams.get("sort") || "newest");
 
-  const [displayMode, setDisplayMode] = useState("view");
+  const [displayMode, setDisplayMode] = useState("model");
 
   useEffect(() => {
     setSearchQuery(searchParams.get("search") || "");

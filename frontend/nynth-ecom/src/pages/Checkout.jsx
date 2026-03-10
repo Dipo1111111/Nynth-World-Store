@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { addOrder } from "../api/firebaseFunctions";
+import { addOrder, verifyOrderPayment } from "../api/firebaseFunctions";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -95,9 +95,16 @@ const Checkout = () => {
         setLoading(false);
         toast.error("Payment window closed.");
       },
-      callback: (response) => {
+      callback: async (response) => {
         console.log("Paystack Success:", response);
         setIsOrderCompleted(true); // 🛡️ Prevent the "empty cart" redirect to /cart
+
+        // ✅ Mark order as PAID in Firestore so revenue counts on dashboard
+        try {
+          await verifyOrderPayment(orderId, response.reference);
+        } catch (err) {
+          console.error('Payment verification error:', err);
+        }
 
         // Track success
         trackConversion("purchase", {
@@ -107,13 +114,18 @@ const Checkout = () => {
         });
 
         clearCart();
-        navigate(`/thank-you?reference=${response.reference}&orderId=${orderId}`);
+        navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
       },
-      onSuccess: (response) => {
+      onSuccess: async (response) => {
         console.log("Paystack Success (onSuccess):", response);
         setIsOrderCompleted(true);
+        try {
+          await verifyOrderPayment(orderId, response.reference);
+        } catch (err) {
+          console.error('Payment verification error (onSuccess):', err);
+        }
         clearCart();
-        navigate(`/thank-you?reference=${response.reference}&orderId=${orderId}`);
+        navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
       }
     });
 

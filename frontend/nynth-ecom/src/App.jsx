@@ -141,6 +141,7 @@ function App() {
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Navigate to="/shop" replace />} />
+                  <Route path="/home" element={<Navigate to="/shop" replace />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/lookbook" element={<Lookbook />} />
                   <Route path="/product/:id" element={<ProductDetail />} />

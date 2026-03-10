@@ -5,12 +5,13 @@ import { ChevronLeft, ChevronRight, ShoppingBag, ArrowRight } from "lucide-react
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import NewsLetter from "./NewsLetter.jsx";
-import { fetchLookbooks, fetchProductsByCategory } from "../../api/firebaseFunctions";
+import { fetchLookbooks, fetchProductsByCategory, fetchProducts } from "../../api/firebaseFunctions";
 import SEO from "../SEO";
 
 export default function Lookbook() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [lookbooks, setLookbooks] = useState([]);
+  const [fallbackProducts, setFallbackProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shopProducts, setShopProducts] = useState({
     hoodies: null,
@@ -38,6 +39,12 @@ export default function Lookbook() {
           tees: tees[0] || null,
           headwear: headwear[0] || null
         });
+
+        // Fallback: load all products for editorial grid if no lookbooks
+        if (lookbookData.length === 0) {
+          const allProducts = await fetchProducts();
+          setFallbackProducts(allProducts.slice(0, 6));
+        }
 
       } catch (error) {
         console.error("Error loading data:", error);
@@ -145,11 +152,28 @@ export default function Lookbook() {
           {loading ? (
             <div className="min-h-[500px] bg-gray-50 animate-pulse"></div>
           ) : featuredLooks.length === 0 ? (
-            <div className="min-h-[500px] bg-gray-50 flex items-center justify-center p-8 border border-gray-100">
-              <p className="text-[11px] tracking-[0.2em] font-bold text-gray-400 uppercase text-center">
-                Collection pending discovery.
-              </p>
-            </div>
+            fallbackProducts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {fallbackProducts.map((product) => (
+                  <Link key={product.id} to={`/product/${product.id}`} className="group block">
+                    <div className="aspect-[4/5] overflow-hidden bg-gray-50 mb-4">
+                      <img
+                        src={product.images?.[0] || product.imageUrl}
+                        alt={product.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                    <h3 className="text-[11px] tracking-[0.2em] font-bold uppercase">{product.title}</h3>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="min-h-[500px] bg-gray-50 flex items-center justify-center p-8 border border-gray-100">
+                <p className="text-[11px] tracking-[0.2em] font-bold text-gray-400 uppercase text-center">
+                  Collection pending discovery.
+                </p>
+              </div>
+            )
           ) : (
             <div className="relative overflow-hidden border border-gray-100">
               <div

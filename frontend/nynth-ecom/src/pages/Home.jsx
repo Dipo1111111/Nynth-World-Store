@@ -17,7 +17,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = 16;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -106,7 +106,7 @@ export default function Home() {
             <>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-12 mb-20 animate-fadeIn">
                 {currentProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} displayMode="model" />
                 ))}
               </div>
 

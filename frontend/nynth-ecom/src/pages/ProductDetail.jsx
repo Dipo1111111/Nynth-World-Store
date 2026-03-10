@@ -8,6 +8,7 @@ import { Plus, Minus, Check, ShieldCheck } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
+import SizeGuideModal from "../components/products/SizeGuideModal";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -23,6 +24,7 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState("");
   const [addingToCart, setAddingToCart] = useState(false);
   const [showCartNotification, setShowCartNotification] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   // Accordion states
   const [isOpenDescription, setIsOpenDescription] = useState(false);
@@ -79,6 +81,9 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-white text-black font-inter">
       <SEO title={`${product.title} | NYNTH`} description={product.description} url={`/product/${product.id}`} />
       <Header />
+
+      {/* Size Guide Modal */}
+      {showSizeGuide && <SizeGuideModal onClose={() => setShowSizeGuide(false)} />}
 
       {/* Added to Cart Notification */}
       {showCartNotification && (
@@ -164,7 +169,7 @@ export default function ProductDetail() {
                   <p className="text-[8px] tracking-[0.25em] font-bold uppercase text-black">
                     SIZE: <span className="font-normal text-gray-400 ml-1">{selectedSize}</span>
                   </p>
-                  <button className="text-[8px] tracking-[0.2em] uppercase underline underline-offset-8 font-bold text-black hover:opacity-50 transition-opacity">SIZECHART</button>
+                  <button onClick={() => setShowSizeGuide(true)} className="text-[8px] tracking-[0.2em] uppercase underline underline-offset-8 font-bold text-black hover:opacity-50 transition-opacity">SIZECHART</button>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {product.availableSizes.map((size) => (

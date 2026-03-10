@@ -6,7 +6,7 @@ import { Plus, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 import { incrementCounter } from "../../api/firebaseFunctions";
 
-export default function ProductCard({ product, displayMode = 'view' }) {
+export default function ProductCard({ product, displayMode = 'model' }) {
   const { settings } = useSettings();
   const { addToCart } = useCart();
   const [selectedColor, setSelectedColor] = useState(product.availableColors?.[0] || "");
