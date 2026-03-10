@@ -56,12 +56,12 @@ const AdminLoader = () => (
   </div>
 );
 
-// Generate or retrieve a stable session ID for this browser tab
+// Generate or retrieve a stable session ID for this browser
 const SESSION_ID = (() => {
-  let id = sessionStorage.getItem('nynth_session_id');
+  let id = localStorage.getItem('nynth_session_id');
   if (!id) {
     id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    sessionStorage.setItem('nynth_session_id', id);
+    localStorage.setItem('nynth_session_id', id);
   }
   return id;
 })();
