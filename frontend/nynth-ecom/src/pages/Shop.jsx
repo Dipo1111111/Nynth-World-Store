@@ -67,12 +67,23 @@ export default function Shop() {
 
       <main className="w-full pt-[68px]">
         {/* Full-width Hero Section - Edge to Edge */}
-        <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden">
+        <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img
             src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2600"
             alt="Collection Hero"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />
+          <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
+            <button
+              onClick={() => {
+                const grid = document.getElementById('product-grid');
+                if (grid) grid.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-white/90 backdrop-blur-md text-black px-10 py-3 rounded-full text-[10px] tracking-[0.4em] font-bold uppercase hover:bg-black hover:text-white transition-all duration-500 shadow-2xl scale-90 md:scale-100 hover:scale-110"
+            >
+              SHOP NOW
+            </button>
+          </div>
         </section>
 
         {/* Categories Bar - Primary Sticky - Edge to Edge */}
@@ -117,23 +128,23 @@ export default function Shop() {
         </div>
 
         {/* Grid Layer - 100% Full Width, 0 Padding, 1px Gaps */}
-        <div className="w-full bg-white min-h-[60vh]">
+        <div id="product-grid" className="w-full bg-white min-h-[60vh] scroll-mt-[130px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 bg-white h-screen w-full">
               <Loader2 className="h-6 w-6 animate-spin text-black mb-4" />
             </div>
           ) : (
             <section className="w-full px-0">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-[1px] bg-black/10">
+              <div className={displayMode === 'view' ? "flex flex-col gap-10 md:gap-20 bg-white" : "grid grid-cols-2 lg:grid-cols-4 gap-[1px] bg-black/10"}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} displayMode={displayMode} />
                 ))}
 
-                {/* Fill all empty slots in the last row to maintain 1px grid lines */}
-                {filteredProducts.length > 0 && Array.from({
+                {/* Fill all empty slots in the last row to maintain 1px grid lines (only in model mode) */}
+                {displayMode !== 'view' && filteredProducts.length > 0 && Array.from({
                   length: (4 - (filteredProducts.length % 4)) % 4
                 }).map((_, i) => (
-                  <div key={`empty-${i}`} className="bg-white w-full h-full min-h-[400px]"></div>
+                  <div key={`empty-${i}`} className="bg-white w-full h-full min-h-[300px]"></div>
                 ))}
               </div>
             </section>

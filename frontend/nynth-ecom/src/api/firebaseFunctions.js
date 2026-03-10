@@ -590,18 +590,45 @@ export const updateOrderStatus = async (orderId, status) => {
   }
 };
 
+// --- ANALYTICS COUNTERS ---
+import { increment } from "firebase/firestore";
+
+export const incrementCounter = async (type) => {
+  try {
+    const docRef = doc(db, "analytics", "counters");
+    await setDoc(docRef, {
+      [type]: increment(1),
+      last_updated: serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error(`Error incrementing ${type} counter:`, error);
+  }
+};
+
+export const fetchAnalyticsCounters = async () => {
+  try {
+    const docRef = doc(db, "analytics", "counters");
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    return { visits: 0, clicks: 0 };
+  } catch (error) {
+    console.error("Error fetching analytics counters:", error);
+    return { visits: 0, clicks: 0 };
+  }
+};
+
 // Admin Analytics
 export const getAdminAnalytics = async () => {
   try {
     const orders = await getAllOrders();
+    const counters = await fetchAnalyticsCounters();
 
     // Calculate total revenue (only paid/success orders)
     const paidOrders = orders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success');
-    console.log('Analytics - Total Paid Orders:', paidOrders.length);
-    console.log('Analytics - Sample Paid Order:', paidOrders[0]);
 
     const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-    console.log('Analytics - Calculated Revenue:', totalRevenue);
 
     // Status breakdown
     const statusBreakdown = orders.reduce((acc, o) => {
@@ -634,7 +661,9 @@ export const getAdminAnalytics = async () => {
       pendingOrders: orders.filter(o => o.order_status !== 'delivered').length,
       completedOrders: orders.filter(o => o.order_status === 'delivered').length,
       statusBreakdown,
-      revenueByDate
+      revenueByDate,
+      visits: counters.visits || 0,
+      clicks: counters.clicks || 0
     };
   } catch (error) {
     console.error("Error getting admin analytics: ", error);

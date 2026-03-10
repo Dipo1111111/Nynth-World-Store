@@ -12,6 +12,10 @@ import { WifiOff, Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { logPageView } from "./utils/monitoring";
+import { incrementCounter } from "./api/firebaseFunctions";
+import { db } from "./api/firebase";
+import { doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+
 
 // Public Pages
 import Home from "./pages/Home.jsx";
@@ -52,13 +56,59 @@ const AdminLoader = () => (
   </div>
 );
 
-// Component to handle side effects on route change
+// Generate or retrieve a stable session ID for this browser tab
+const SESSION_ID = (() => {
+  let id = sessionStorage.getItem('nynth_session_id');
+  if (!id) {
+    id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    sessionStorage.setItem('nynth_session_id', id);
+  }
+  return id;
+})();
+
+// Component to handle side effects on route change + presence tracking
 function PageTracker() {
   const { pathname } = useLocation();
 
+  // Presence tracking — runs once on mount
+  useEffect(() => {
+    const presenceRef = doc(db, 'presence', SESSION_ID);
+
+    const writePresence = () => {
+      setDoc(presenceRef, {
+        session: SESSION_ID,
+        page: window.location.pathname,
+        last_seen: serverTimestamp(),
+      }, { merge: true }).catch(() => { });
+    };
+
+    const removePresence = () => {
+      deleteDoc(presenceRef).catch(() => { });
+    };
+
+    writePresence();
+    // Heartbeat every 30 seconds to keep the session alive
+    const heartbeat = setInterval(writePresence, 30000);
+
+    // Clean up when tab closes
+    window.addEventListener('beforeunload', removePresence);
+
+    return () => {
+      clearInterval(heartbeat);
+      window.removeEventListener('beforeunload', removePresence);
+      removePresence();
+    };
+  }, []);
+
+  // Page view tracking
   useEffect(() => {
     window.scrollTo(0, 0);
     logPageView();
+    incrementCounter('visits');
+
+    // Update presence page when route changes
+    const presenceRef = doc(db, 'presence', SESSION_ID);
+    setDoc(presenceRef, { page: pathname, last_seen: serverTimestamp() }, { merge: true }).catch(() => { });
   }, [pathname]);
 
   return null;
@@ -118,6 +168,7 @@ function App() {
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/shipping" element={<ShippingReturns />} />
+                  <Route path="/returns" element={<ShippingReturns />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/about" element={<OurStory />} />
                   <Route path="/sustainability" element={<Sustainability />} />

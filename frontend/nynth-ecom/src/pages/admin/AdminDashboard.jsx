@@ -4,7 +4,7 @@ import { getAdminAnalytics, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { db } from "../../api/firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, limit, onSnapshot, getDocs, deleteDoc, doc } from "firebase/firestore";
 import {
     LayoutDashboard,
     Package,
@@ -15,7 +15,8 @@ import {
     CheckCircle2,
     Menu,
     X,
-    BellRing
+    BellRing,
+    ShoppingBag
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -58,10 +59,33 @@ const AdminDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [seenOrderIds, setSeenOrderIds] = useState(new Set());
     const [sessionStartTime] = useState(Date.now());
+    const [liveVisitors, setLiveVisitors] = useState(0);
 
     useEffect(() => {
         document.title = "Nynth World Store Admin";
         fetchDashboardData();
+    }, []);
+
+    // Real-time live visitors from Firestore presence collection
+    useEffect(() => {
+        const TWO_MINUTES = 2 * 60 * 1000;
+        const presenceRef = collection(db, 'presence');
+
+        const unsubscribe = onSnapshot(presenceRef, (snapshot) => {
+            const now = Date.now();
+            let active = 0;
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const lastSeen = data.last_seen?.toMillis?.() || 0;
+                // Count sessions active within last 2 minutes
+                if ((now - lastSeen) < TWO_MINUTES) {
+                    active++;
+                }
+            });
+            setLiveVisitors(active);
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const fetchDashboardData = async () => {
@@ -331,7 +355,7 @@ const AdminDashboard = () => {
                             { title: "Total Revenue", value: `₦${analytics?.totalRevenue?.toLocaleString() || 0}`, icon: TrendingUp, desc: "From paid orders", color: "text-emerald-500", bg: "bg-emerald-50" },
                             { title: "Total Orders", value: analytics?.totalOrders || 0, icon: Package, desc: "All time", color: "text-blue-500", bg: "bg-blue-50" },
                             { title: "Pending Orders", value: analytics?.pendingOrders || 0, icon: Truck, desc: "Awaiting fulfillment", color: "text-amber-500", bg: "bg-amber-50" },
-                            { title: "Completed", value: analytics?.completedOrders || 0, icon: CheckCircle2, desc: "Delivered orders", color: "text-purple-500", bg: "bg-purple-50" },
+                            { title: "Live Visitors", value: liveVisitors, icon: BellRing, desc: "Active right now", color: "text-rose-500", bg: "bg-rose-50" },
                         ].map((stat, i) => (
                             <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group cursor-default overflow-hidden relative">
                                 <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity ${stat.color}`}>
@@ -347,6 +371,28 @@ const AdminDashboard = () => {
                                 </CardContent>
                             </Card>
                         ))}
+                    </div>
+
+                    {/* Secondary Stats (Visits/Clicks) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                        <Card className="border-none shadow-sm bg-black text-white p-6 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Total Store Visits</p>
+                                <h3 className="text-4xl font-bold font-space">{analytics?.visits?.toLocaleString() || 0}</h3>
+                            </div>
+                            <div className="p-4 bg-white/10 rounded-full">
+                                <TrendingUp className="h-8 w-8 text-white" />
+                            </div>
+                        </Card>
+                        <Card className="border-none shadow-sm bg-white border border-black/5 p-6 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Product Interactions</p>
+                                <h3 className="text-4xl font-bold font-space">{analytics?.clicks?.toLocaleString() || 0}</h3>
+                            </div>
+                            <div className="p-4 bg-black/5 rounded-full">
+                                <ShoppingBag className="h-8 w-8 text-black" />
+                            </div>
+                        </Card>
                     </div>
 
                     {/* Charts */}
