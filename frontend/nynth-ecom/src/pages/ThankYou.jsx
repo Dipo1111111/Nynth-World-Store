@@ -74,7 +74,7 @@ const ThankYou = () => {
                 to="/account"
                 className="px-12 py-5 border border-black text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all"
               >
-                View Collection
+                View Orders
               </Link>
             )}
             <Link

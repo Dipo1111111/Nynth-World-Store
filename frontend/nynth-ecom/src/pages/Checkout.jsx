@@ -95,37 +95,41 @@ const Checkout = () => {
         setLoading(false);
         toast.error("Payment window closed.");
       },
-      callback: async (response) => {
-        console.log("Paystack Success:", response);
-        setIsOrderCompleted(true); // 🛡️ Prevent the "empty cart" redirect to /cart
+      callback: function (response) {
+        (async () => {
+          console.log("Paystack Success:", response);
+          setIsOrderCompleted(true); // 🛡️ Prevent the "empty cart" redirect to /cart
 
-        // ✅ Mark order as PAID in Firestore so revenue counts on dashboard
-        try {
-          await verifyOrderPayment(orderId, response.reference);
-        } catch (err) {
-          console.error('Payment verification error:', err);
-        }
+          // ✅ Mark order as PAID in Firestore so revenue counts on dashboard
+          try {
+            await verifyOrderPayment(orderId, response.reference);
+          } catch (err) {
+            console.error('Payment verification error:', err);
+          }
 
-        // Track success
-        trackConversion("purchase", {
-          order_id: orderId,
-          amount: totalToPay,
-          reference: response.reference
-        });
+          // Track success
+          trackConversion("purchase", {
+            order_id: orderId,
+            amount: totalToPay,
+            reference: response.reference
+          });
 
-        clearCart();
-        navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
+          clearCart();
+          navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
+        })();
       },
-      onSuccess: async (response) => {
-        console.log("Paystack Success (onSuccess):", response);
-        setIsOrderCompleted(true);
-        try {
-          await verifyOrderPayment(orderId, response.reference);
-        } catch (err) {
-          console.error('Payment verification error (onSuccess):', err);
-        }
-        clearCart();
-        navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
+      onSuccess: function (response) {
+        (async () => {
+          console.log("Paystack Success (onSuccess):", response);
+          setIsOrderCompleted(true);
+          try {
+            await verifyOrderPayment(orderId, response.reference);
+          } catch (err) {
+            console.error('Payment verification error (onSuccess):', err);
+          }
+          clearCart();
+          navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
+        })();
       }
     });
 

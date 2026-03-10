@@ -104,7 +104,7 @@ export default function Home() {
             </div>
           ) : filteredProducts.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-12 mb-20 animate-fadeIn">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-2 gap-y-12 mb-20 animate-fadeIn">
                 {currentProducts.map(product => (
                   <ProductCard key={product.id} product={product} displayMode="model" />
                 ))}

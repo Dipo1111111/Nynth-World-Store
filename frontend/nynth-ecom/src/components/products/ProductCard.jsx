@@ -45,14 +45,14 @@ export default function ProductCard({ product, displayMode = 'model' }) {
     if (product.images?.[index]) setSelectedImageIndex(index);
   };
 
-  // ===== SIGHT MODE (single column) =====
+  // ===== SIGHT MODE (4x4 Grid but Richer Info) =====
   if (isSightMode) {
     return (
-      <div className="group flex flex-col md:flex-row w-full bg-white border-b border-black/5">
+      <div className="group flex flex-col w-full bg-white mb-8">
         {/* Image */}
         <Link
           to={`/product/${product.id}`}
-          className="relative w-full md:w-1/2 aspect-square overflow-hidden block bg-[#f5f5f5] flex-shrink-0"
+          className="relative w-full aspect-[4/5] overflow-hidden block bg-[#f5f5f5]"
         >
           <img
             src={mainImage}
@@ -61,43 +61,41 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           {isOutOfStock && (
-            <span className="absolute top-4 left-4 bg-white text-black text-[8px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
+            <span className="absolute top-3 left-3 bg-white text-black text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
               Sold Out
             </span>
           )}
           {!isOutOfStock && product.newArrival && (
-            <span className="absolute top-4 left-4 bg-black text-white text-[8px] font-bold tracking-[0.2em] px-2 py-1 uppercase">
+            <span className="absolute top-3 left-3 bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase">
               New
             </span>
           )}
         </Link>
 
         {/* Info */}
-        <div className="flex flex-col justify-between px-8 py-8 md:px-16 md:py-16 md:w-1/2">
-          <div>
-            <Link to={`/product/${product.id}`}>
-              <h3 className="text-[14px] md:text-[18px] font-bold tracking-[0.2em] uppercase text-black mb-4 hover:opacity-60 transition-opacity">
-                {product.title}
-              </h3>
-            </Link>
-            <p className="text-[14px] md:text-[18px] font-bold tracking-[0.2em] uppercase text-black mb-8">
-              {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
+        <div className="flex flex-col pt-4 px-2">
+          <Link to={`/product/${product.id}`}>
+            <h3 className="text-[9px] md:text-[10px] font-bold tracking-[0.15em] uppercase text-black line-clamp-1 mb-1 hover:opacity-60 transition-opacity">
+              {product.title}
+            </h3>
+          </Link>
+          <p className="text-[9px] md:text-[10px] font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">
+            {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
 
           {/* Swatches */}
           {product.availableColors?.length > 0 && (
-            <div className="flex gap-2 mb-8">
-              {product.availableColors.slice(0, 8).map((color, i) => (
+            <div className="flex gap-1.5 mb-4">
+              {product.availableColors.slice(0, 5).map((color, i) => (
                 <button
                   key={i}
                   onClick={(e) => handleColorSelect(e, color, i)}
-                  className={`w-8 h-10 border transition-all ${selectedColor === color ? 'border-black' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                  className={`w-6 h-8 border transition-all ${selectedColor === color ? 'border-black' : 'border-transparent opacity-50 hover:opacity-100'}`}
                 >
                   {product.images?.[i] ? (
                     <img src={product.images[i]} alt={color} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full" style={{ backgroundColor: color.toLowerCase() }} />
+                    <div className="w-full h-full border border-black/10" style={{ backgroundColor: color.toLowerCase() }} />
                   )}
                 </button>
               ))}
@@ -107,7 +105,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className="w-full md:w-auto px-8 py-4 bg-black text-white text-[9px] tracking-[0.3em] font-bold uppercase transition-all hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            className="w-full py-3 min-h-[40px] bg-black text-white text-[8px] tracking-[0.2em] font-bold uppercase transition-all hover:bg-black/80 disabled:opacity-30 flex items-center justify-center gap-2"
           >
             <ShoppingBag size={12} />
             {isOutOfStock ? "SOLD OUT" : "ADD TO BAG"}
@@ -116,6 +114,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
       </div>
     );
   }
+
 
   // ===== MODEL GRID MODE =====
   return (

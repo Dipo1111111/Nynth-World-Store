@@ -135,7 +135,7 @@ export default function Shop() {
             </div>
           ) : (
             <section className="w-full px-0">
-              <div className={displayMode === 'view' ? "flex flex-col gap-10 md:gap-20 bg-white" : "grid grid-cols-2 lg:grid-cols-4 gap-[1px] bg-black/10"}>
+              <div className={displayMode === 'view' ? "grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10" : "grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-black/10"}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} displayMode={displayMode} />
                 ))}
