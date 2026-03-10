@@ -60,6 +60,47 @@ const AdminDashboard = () => {
     const [seenOrderIds, setSeenOrderIds] = useState(new Set());
     const [sessionStartTime] = useState(Date.now());
     const [liveVisitors, setLiveVisitors] = useState(0);
+    const [timeFilter, setTimeFilter] = useState("all");
+
+    const calculateFilteredCount = (dataByDate, filter) => {
+        if (!dataByDate || typeof dataByDate !== 'object') return 0;
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        let total = 0;
+
+        Object.entries(dataByDate).forEach(([dateStr, count]) => {
+            if (filter === 'today' && dateStr === todayStr) total += count;
+            else if (filter === 'yesterday' && dateStr === yesterdayStr) total += count;
+            else if (filter === '7d') {
+                const dateObj = new Date(dateStr);
+                const diffTime = Math.abs(now - dateObj);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays <= 7) total += count;
+            }
+            else if (filter === '30d') {
+                const dateObj = new Date(dateStr);
+                const diffTime = Math.abs(now - dateObj);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays <= 30) total += count;
+            }
+            else if (filter === '2m') {
+                const dateObj = new Date(dateStr);
+                const diffTime = Math.abs(now - dateObj);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays <= 60) total += count;
+            }
+            else if (filter === 'all') {
+                total += count;
+            }
+        });
+
+        return total;
+    };
 
     useEffect(() => {
         document.title = "Nynth World Store Admin";
@@ -375,22 +416,50 @@ const AdminDashboard = () => {
 
                     {/* Secondary Stats (Visits/Clicks) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-                        <Card className="border-none shadow-sm bg-black text-white p-6 flex items-center justify-between">
-                            <div>
-                                <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Total Store Visits</p>
-                                <h3 className="text-4xl font-bold font-space">{analytics?.visits?.toLocaleString() || 0}</h3>
+                        <Card className="border-none shadow-sm bg-black text-white p-6 flex flex-col justify-between relative">
+                            <div className="flex items-start justify-between mb-4">
+                                <div>
+                                    <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Total Store Visits</p>
+                                    <h3 className="text-4xl font-bold font-space">
+                                        {timeFilter === 'all'
+                                            ? (analytics?.visits?.toLocaleString() || 0)
+                                            : calculateFilteredCount(analytics?.visitsByDate, timeFilter).toLocaleString()}
+                                    </h3>
+                                </div>
+                                <div className="p-4 bg-white/10 rounded-full">
+                                    <TrendingUp className="h-8 w-8 text-white" />
+                                </div>
                             </div>
-                            <div className="p-4 bg-white/10 rounded-full">
-                                <TrendingUp className="h-8 w-8 text-white" />
-                            </div>
+
+                            <select
+                                value={timeFilter}
+                                onChange={(e) => setTimeFilter(e.target.value)}
+                                className="w-full mt-4 bg-transparent border-t border-white/20 pt-4 text-[10px] tracking-widest font-bold uppercase text-gray-300 focus:outline-none appearance-none cursor-pointer"
+                            >
+                                <option value="all">All Time</option>
+                                <option value="today" className="text-black">Today</option>
+                                <option value="yesterday" className="text-black">Yesterday</option>
+                                <option value="7d" className="text-black">Last 7 Days</option>
+                                <option value="30d" className="text-black">Last 30 Days</option>
+                                <option value="2m" className="text-black">Last 2 Months</option>
+                            </select>
                         </Card>
-                        <Card className="border-none shadow-sm bg-white border border-black/5 p-6 flex items-center justify-between">
-                            <div>
-                                <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Product Interactions</p>
-                                <h3 className="text-4xl font-bold font-space">{analytics?.clicks?.toLocaleString() || 0}</h3>
+                        <Card className="border-none shadow-sm bg-white border border-black/5 p-6 flex flex-col justify-between relative">
+                            <div className="flex items-start justify-between mb-4">
+                                <div>
+                                    <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Product Interactions</p>
+                                    <h3 className="text-4xl font-bold font-space">
+                                        {timeFilter === 'all'
+                                            ? (analytics?.clicks?.toLocaleString() || 0)
+                                            : calculateFilteredCount(analytics?.clicksByDate, timeFilter).toLocaleString()}
+                                    </h3>
+                                </div>
+                                <div className="p-4 bg-black/5 rounded-full">
+                                    <ShoppingBag className="h-8 w-8 text-black" />
+                                </div>
                             </div>
-                            <div className="p-4 bg-black/5 rounded-full">
-                                <ShoppingBag className="h-8 w-8 text-black" />
+                            <div className="w-full mt-4 border-t border-black/5 pt-4 text-[10px] tracking-widest font-bold uppercase text-gray-400">
+                                Filtering aligned with visits
                             </div>
                         </Card>
                     </div>

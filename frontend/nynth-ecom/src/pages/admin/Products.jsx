@@ -46,7 +46,11 @@ export default function AdminProducts() {
   ];
 
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
-  const availableColors = ["Black", "White", "Grey", "Navy", "Beige", "Red"];
+  const availableColors = [
+    "Black", "White", "Grey", "Navy", "Beige", "Red",
+    "Blue", "Green", "Olive", "Brown", "Burgundy",
+    "Pink", "Yellow", "Purple"
+  ];
 
   const loadProducts = async () => {
     try {
