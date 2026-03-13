@@ -83,24 +83,6 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
 
-          {/* Swatches */}
-          {product.availableColors?.length > 0 && (
-            <div className="flex gap-1.5 mb-4">
-              {product.availableColors.slice(0, 5).map((color, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => handleColorSelect(e, color, i)}
-                  className={`w-6 h-8 border transition-all ${selectedColor === color ? 'border-black' : 'border-transparent opacity-50 hover:opacity-100'}`}
-                >
-                  {product.images?.[i] ? (
-                    <img src={product.images[i]} alt={color} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full border border-black/10" style={{ backgroundColor: color.toLowerCase() }} />
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
 
           <button
             onClick={handleAddToCart}
@@ -163,25 +145,6 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           </span>
         </div>
 
-        {/* Color swatches (tiny) */}
-        {product.availableColors?.length > 0 && (
-          <div className="flex gap-1 mt-2">
-            {product.availableColors.slice(0, 5).map((color, i) => (
-              <button
-                key={i}
-                onClick={(e) => handleColorSelect(e, color, i)}
-                title={color}
-                className={`w-3 h-4 border transition-all ${selectedColor === color ? 'border-black' : 'border-transparent opacity-50 hover:opacity-100'}`}
-              >
-                {product.images?.[i] ? (
-                  <img src={product.images[i]} alt={color} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full" style={{ backgroundColor: color.toLowerCase() }} />
-                )}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
