@@ -98,6 +98,25 @@ export default function Header() {
 
             {/* Right: Icons (Far Right) */}
             <div className="flex-1 flex items-center justify-end gap-1 md:gap-3">
+              <Link
+                to={currentUser ? "/account" : "/login"}
+                className="p-1.5 hover:opacity-50 transition-opacity hidden md:flex"
+              >
+                <User size={16} className="text-black" strokeWidth={2} />
+              </Link>
+
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="p-1.5 relative hover:opacity-50 transition-opacity"
+              >
+                <ShoppingBag size={16} className="text-black" strokeWidth={2} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center bg-black text-[7px] text-white font-bold rounded-full">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+
               {!isSearchOpen && (
                 <button
                   onClick={() => setIsSearchOpen(true)}
@@ -122,25 +141,6 @@ export default function Header() {
                   </button>
                 </form>
               )}
-
-              <Link
-                to={currentUser ? "/account" : "/login"}
-                className="p-1.5 hover:opacity-50 transition-opacity hidden md:flex"
-              >
-                <User size={16} className="text-black" strokeWidth={2} />
-              </Link>
-
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="p-1.5 relative hover:opacity-50 transition-opacity"
-              >
-                <ShoppingBag size={16} className="text-black" strokeWidth={2} />
-                {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center bg-black text-[7px] text-white font-bold rounded-full">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
             </div>
           </div>
         </div>

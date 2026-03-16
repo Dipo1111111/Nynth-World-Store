@@ -100,7 +100,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
 
   // ===== MODEL GRID MODE =====
   return (
-    <div className="group flex flex-col w-full bg-white border-r border-b border-black/5">
+    <div className="group flex flex-col w-full bg-white">
       <Link
         to={`/product/${product.id}`}
         className="relative aspect-[4/5] w-full overflow-hidden block bg-white"

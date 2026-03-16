@@ -38,6 +38,7 @@ import OurStory from "./pages/OurStory.jsx";
 import Sustainability from "./pages/Sustainability.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import UpdateDB from "./pages/UpdateDB.jsx";
+import LockPage from "./pages/LockPage.jsx";
 
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -119,9 +120,22 @@ import { Toaster } from "react-hot-toast"; // Added import
 function App() {
   console.log("🚀 App.jsx: Component rendering...");
   const isOffline = useOffline();
+  const [isSiteUnlocked, setIsSiteUnlocked] = React.useState(() => {
+    return localStorage.getItem('nynth_site_unlocked') === 'true';
+  });
+
   useEffect(() => {
     document.title = "Nynth World Store";
   }, []);
+
+  if (!isSiteUnlocked) {
+    return (
+      <HelmetProvider>
+        <Toaster position="top-center" />
+        <LockPage onUnlock={() => setIsSiteUnlocked(true)} />
+      </HelmetProvider>
+    );
+  }
 
   return (
     <HelmetProvider>

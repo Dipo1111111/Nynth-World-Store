@@ -135,7 +135,7 @@ export default function Shop() {
             </div>
           ) : (
             <section className="w-full px-0">
-              <div className={displayMode === 'view' ? "grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10" : "grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-black/10"}>
+              <div className={displayMode === 'view' ? "grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10" : "grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10"}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} displayMode={displayMode} />
                 ))}
@@ -144,7 +144,7 @@ export default function Shop() {
                 {displayMode !== 'view' && filteredProducts.length > 0 && Array.from({
                   length: (4 - (filteredProducts.length % 4)) % 4
                 }).map((_, i) => (
-                  <div key={`empty-${i}`} className="bg-white w-full h-full min-h-[300px]"></div>
+                  <div key={`empty-${i}`} className="w-full h-full min-h-[300px]"></div>
                 ))}
               </div>
             </section>
