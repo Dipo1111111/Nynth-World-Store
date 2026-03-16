@@ -55,7 +55,7 @@ export default function LockPage({ onUnlock }) {
 
                 <div className="text-center mb-12 space-y-2">
                     <h2 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black">
-                        FOR WINNERS BY WINNERS
+                        BY WINNERS FOR WINNERS
                     </h2>
                     <h2 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black/40">
                         STAY ABOVE

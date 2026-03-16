@@ -19,10 +19,9 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { totalItems } = useCart();
+  const { totalItems, isCartOpen, setIsCartOpen } = useCart();
   const { currentUser } = useAuth();
   const { settings } = useSettings();
   const location = useLocation();

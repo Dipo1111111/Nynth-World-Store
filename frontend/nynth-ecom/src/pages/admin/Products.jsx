@@ -113,31 +113,50 @@ export default function AdminProducts() {
       // Upload new images if any
       let newImageUrls = [];
       if (uploadFiles.length > 0) {
-        toast.loading("Compressing images...", { id: "upload-status" });
+        const totalFiles = uploadFiles.length;
+        toast.loading(`Compressing ${totalFiles} image${totalFiles > 1 ? 's' : ''}...`, { id: "upload-status" });
+        
+        // Parallel compression is much faster
         const compressedFiles = await Promise.all(
           uploadFiles.map(file => compressImage(file))
         );
-        toast.loading("Uploading images...", { id: "upload-status" });
-        newImageUrls = await uploadMultipleImages(compressedFiles);
-        toast.success("Images uploaded", { id: "upload-status" });
+        
+        // Upload one by one with individual progress updates
+        for (let i = 0; i < compressedFiles.length; i++) {
+          toast.loading(`Uploading image ${i + 1} of ${totalFiles}...`, { id: "upload-status" });
+          try {
+            const url = await uploadImage(compressedFiles[i]);
+            newImageUrls.push(url);
+          } catch (uploadErr) {
+            console.error(`Failed to upload image ${i + 1}:`, uploadErr);
+            toast.error(`Failed to upload image ${i + 1}. Continuing...`, { id: `err-${i}` });
+          }
+        }
+        
+        if (newImageUrls.length === 0 && formData.images.length === 0) {
+          toast.error("All image uploads failed.", { id: "upload-status" });
+          setIsSubmitting(false);
+          return;
+        }
+        
+        toast.success(`${newImageUrls.length} image(s) ready`, { id: "upload-status" });
       }
 
-      // Combine existing images (that verify user didn't delete) and new ones
-      // For now, simple append. Ideally manage deletions too.
+      // Combine existing images and successfully uploaded new ones
       const finalImages = [...formData.images, ...newImageUrls];
 
-      // If no images at all, use placeholder (or require one)
       if (finalImages.length === 0) {
-        toast.error("At least one image is required");
+        toast.error("At least one image is required", { id: "upload-status" });
         setIsSubmitting(false);
         return;
       }
+
+      toast.loading(editingId ? "Saving changes..." : "Creating product...", { id: "upload-status" });
 
       const payload = {
         ...formData,
         price: parseFloat(formData.price),
         images: finalImages,
-        // Helper field for old code that expects imageUrl
         imageUrl: finalImages[0],
         updated_at: new Date()
       };
@@ -153,8 +172,11 @@ export default function AdminProducts() {
       setIsModalOpen(false);
       loadProducts();
     } catch (error) {
-      console.error(error);
-      toast.error("Operation failed");
+      console.error("Product submission error:", error);
+      toast.error(`Operation failed: ${error.message || "Unknown error"}`, { 
+        id: "upload-status",
+        duration: 5000 
+      });
     } finally {
       setIsSubmitting(false);
     }
