@@ -78,7 +78,7 @@ const ThankYou = () => {
               </Link>
             )}
             <Link
-              to="/shop"
+              to="/"
               className="px-12 py-5 bg-black text-white text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all flex items-center justify-center gap-4"
             >
               Continue Shopping
