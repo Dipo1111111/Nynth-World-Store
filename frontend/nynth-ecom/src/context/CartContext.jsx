@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { trackConversion } from "../utils/monitoring";
 
 const CartContext = createContext();
@@ -24,21 +24,29 @@ export const CartProvider = ({ children }) => {
 
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Clear cart
+  const clearCart = useCallback(() => {
+    setCartItems([]);
+    localStorage.removeItem("nynth_cart");
+  }, []);
+
   // Add item to cart
-  const addToCart = (product, quantity = 1, selectedSize = null, selectedColor = null) => {
+  const addToCart = useCallback((product, quantity = 1, selectedSize = null, selectedColor = null) => {
     setCartItems((prevItems) => {
-      // ... same logic
+      const size = selectedSize || product.selectedSize || product.size || "M";
+      const color = selectedColor || product.selectedColor || product.color || "Black";
+      
       const existingItemIndex = prevItems.findIndex(
         (item) =>
           item.id === product.id &&
-          item.size === (selectedSize || product.selectedSize || product.size) &&
-          item.color === (selectedColor || product.selectedColor || product.color)
+          item.size === size &&
+          item.color === color
       );
 
       // Track the conversion
       trackConversion("add_to_cart", {
         product_id: product.id,
-        title: product.title,
+        title: product.title || product.name,
         price: product.price,
         quantity
       });
@@ -58,17 +66,17 @@ export const CartProvider = ({ children }) => {
             name: product.title || product.name,
             price: product.price,
             quantity,
-            size: selectedSize || product.selectedSize || product.size || "M",
-            color: selectedColor || product.selectedColor || product.color || "Black",
+            size: size,
+            color: color,
             image: product.image || (product.images && product.images[0]) || product.imageUrl || product.thumbnail || "/placeholder.jpg",
           },
         ];
       }
     });
-  };
+  }, []);
 
   // Remove item from cart
-  const removeFromCart = (itemToRemove) => {
+  const removeFromCart = useCallback((itemToRemove) => {
     setCartItems((prevItems) =>
       prevItems.filter(
         (item) =>
@@ -79,10 +87,10 @@ export const CartProvider = ({ children }) => {
           )
       )
     );
-  };
+  }, []);
 
   // Update quantity
-  const updateQuantity = (itemToUpdate, newQuantity) => {
+  const updateQuantity = useCallback((itemToUpdate, newQuantity) => {
     if (newQuantity < 1) {
       removeFromCart(itemToUpdate);
       return;
@@ -97,10 +105,10 @@ export const CartProvider = ({ children }) => {
           : item
       )
     );
-  };
+  }, [removeFromCart]);
 
   // Update item options (size/color)
-  const updateItemOptions = (itemToUpdate, newSize, newColor, newImage) => {
+  const updateItemOptions = useCallback((itemToUpdate, newSize, newColor, newImage) => {
     setCartItems((prevItems) => {
       // Find the item being modified
       const itemIndex = prevItems.findIndex(
@@ -141,9 +149,7 @@ export const CartProvider = ({ children }) => {
 
       return updatedCart;
     });
-  };
-  // Clear cart
-  const clearCart = () => setCartItems([]);
+  }, []);
 
   // Calculate total
   const totalAmount = cartItems.reduce(

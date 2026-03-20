@@ -13,6 +13,7 @@ const ThankYou = () => {
   const reference = searchParams.get("ref");
   const { clearCart } = useCart();
   const [mounted, setMounted] = useState(false);
+  const [cartCleared, setCartCleared] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -72,14 +73,14 @@ const ThankYou = () => {
             {currentUser && (
               <Link
                 to="/account"
-                className="px-12 py-5 border border-black text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all"
+                className="px-12 py-5 border border-black text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all text-center"
               >
                 View Orders
               </Link>
             )}
             <Link
-              to="/"
-              className="px-12 py-5 bg-black text-white text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all flex items-center justify-center gap-4"
+              to="/shop"
+              className="px-12 py-5 bg-black text-white text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all flex items-center justify-center gap-4 text-center"
             >
               Continue Shopping
               <ArrowRight size={14} />

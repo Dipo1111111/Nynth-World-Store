@@ -85,10 +85,10 @@ const Checkout = () => {
         customerName: `${form.firstName} ${form.lastName}`,
         items: cartItems.map(item => ({
           id: item.id,
-          name: item.title,
+          name: item.name,
           quantity: item.quantity,
-          size: item.selectedSize,
-          color: item.selectedColor
+          size: item.size,
+          color: item.color
         })),
       },
       onClose: () => {
@@ -319,7 +319,7 @@ const Checkout = () => {
 
           <div className="space-y-8 mb-12 max-h-[500px] overflow-y-auto pr-4 no-scrollbar">
             {cartItems.map((item) => (
-              <div key={`${item.id}-${item.selectedSize}`} className="flex gap-6">
+              <div key={`${item.id}-${item.size}-${item.color}`} className="flex gap-6">
                 <div className="w-20 h-28 bg-white overflow-hidden border border-gray-100 relative flex-shrink-0">
                   <img
                     src={item.image}
@@ -331,9 +331,9 @@ const Checkout = () => {
                   </span>
                 </div>
                 <div className="py-1">
-                  <h3 className="text-[13px] tracking-widest font-bold uppercase mb-2">{item.title}</h3>
+                  <h3 className="text-[13px] tracking-widest font-bold uppercase mb-2">{item.name || item.title}</h3>
                   <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-4">
-                    {item.selectedSize} / {item.selectedColor}
+                    {item.size} / {item.color}
                   </p>
                   <p className="text-[12px] font-bold">{settings.currency_symbol}{item.price.toLocaleString()}</p>
                 </div>
