@@ -192,6 +192,15 @@ export default function AdminSettings() {
                                 placeholder="https://twitter.com/..."
                             />
                         </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Facebook URL</label>
+                            <input
+                                name="facebook_url"
+                                value={settings.facebook_url}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="https://facebook.com/..."
+                            />
                         </div>
                     </div>
                 </div>
