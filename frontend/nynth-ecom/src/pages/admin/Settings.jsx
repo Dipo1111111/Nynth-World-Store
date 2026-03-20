@@ -14,7 +14,8 @@ export default function AdminSettings() {
         twitter_url: "",
         facebook_url: "",
         shipping_fee: 0,
-        currency_symbol: "₦"
+        currency_symbol: "₦",
+        ga_property_id: ""
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -191,15 +192,27 @@ export default function AdminSettings() {
                                 placeholder="https://twitter.com/..."
                             />
                         </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Google Analytics Settings */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
+                    <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Facebook URL</label>
+                            <label className="text-sm font-medium text-gray-700">GA4 Property ID</label>
                             <input
-                                name="facebook_url"
-                                value={settings.facebook_url}
+                                name="ga_property_id"
+                                value={settings.ga_property_id || ""}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="https://facebook.com/..."
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-sm"
+                                placeholder="e.g. 123456789"
                             />
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                                Required for the Admin Dashboard to pull real-time metrics. <br/>
+                                Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
+                            </p>
                         </div>
                     </div>
                 </div>

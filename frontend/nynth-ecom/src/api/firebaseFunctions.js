@@ -1,5 +1,5 @@
 // src/api/firebaseFunctions.js - COMPLETE VERSION
-import { db, auth, storage } from "./firebase";
+import { db, auth, storage, functions } from "./firebase";
 import {
   collection,
   addDoc,
@@ -14,8 +14,10 @@ import {
   where,
   orderBy,
   limit,
+  increment,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { httpsCallable } from "firebase/functions";
 
 // --- PRODUCTS CRUD ---
 
@@ -242,9 +244,6 @@ export const uploadMultipleImages = async (files) => {
 
 // --- ORDERS ---
 import { runTransaction } from "firebase/firestore";
-
-import { functions } from "./firebase";
-import { httpsCallable } from "firebase/functions";
 
 export const initializePayment = async (paymentData) => {
   try {
@@ -602,7 +601,6 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 
 // --- ANALYTICS COUNTERS ---
-import { increment } from "firebase/firestore";
 
 export const incrementCounter = async (type) => {
   try {
@@ -638,6 +636,17 @@ export const fetchAnalyticsCounters = async () => {
   } catch (error) {
     console.error("Error fetching analytics counters:", error);
     return { visits: 0, clicks: 0, visitsByDate: {}, clicksByDate: {} };
+  }
+};
+
+export const fetchGA4Analytics = async (propertyId = null) => {
+  try {
+    const getGA4Analytics = httpsCallable(functions, "getGA4Analytics");
+    const result = await getGA4Analytics({ propertyId });
+    return result.data;
+  } catch (error) {
+    console.error("Error calling getGA4Analytics:", error);
+    return { status: "error", message: error.message };
   }
 };
 
@@ -707,5 +716,6 @@ export default {
   fetchUserOrders,
   getAllOrders,
   updateOrderStatus,
-  getAdminAnalytics
+  getAdminAnalytics,
+  fetchGA4Analytics
 };

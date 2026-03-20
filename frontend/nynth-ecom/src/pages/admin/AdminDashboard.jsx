@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { getAdminAnalytics, getAllOrders } from "../../api/firebaseFunctions";
+import { getAdminAnalytics, getAllOrders, fetchGA4Analytics, fetchSettings } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { db } from "../../api/firebase";
@@ -54,6 +54,7 @@ const AdminDashboard = () => {
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
     const [analytics, setAnalytics] = useState(null);
+    const [gaAnalytics, setGaAnalytics] = useState(null);
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -132,14 +133,25 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            const [analyticsData, orders] = await Promise.all([
+            // Fetch everything needed for the dashboard
+            const [analyticsData, orders, siteSettings] = await Promise.all([
                 getAdminAnalytics(),
-                getAllOrders()
+                getAllOrders(),
+                fetchSettings()
             ]);
 
             console.log('Dashboard - Analytics:', analyticsData);
             setAnalytics(analyticsData);
             setRecentOrders(orders.slice(0, 5));
+
+            // Now fetch GA4 data using the Property ID from settings
+            const gaPropId = siteSettings?.ga_property_id;
+            const gaData = await fetchGA4Analytics(gaPropId);
+            
+            console.log('Dashboard - GA4 Analytics:', gaData);
+            if (gaData?.status === 'success') {
+                setGaAnalytics(gaData);
+            }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             toast.error('Failed to load dashboard data');
@@ -393,10 +405,38 @@ const AdminDashboard = () => {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
                         {[
-                            { title: "Total Revenue", value: `₦${analytics?.totalRevenue?.toLocaleString() || 0}`, icon: TrendingUp, desc: "From paid orders", color: "text-emerald-500", bg: "bg-emerald-50" },
-                            { title: "Total Orders", value: analytics?.totalOrders || 0, icon: Package, desc: "All time", color: "text-blue-500", bg: "bg-blue-50" },
-                            { title: "Pending Orders", value: analytics?.pendingOrders || 0, icon: Truck, desc: "Awaiting fulfillment", color: "text-amber-500", bg: "bg-amber-50" },
-                            { title: "Live Visitors", value: liveVisitors, icon: BellRing, desc: "Active right now", color: "text-rose-500", bg: "bg-rose-50" },
+                            { 
+                                title: "Total Revenue", 
+                                value: `₦${analytics?.totalRevenue?.toLocaleString() || 0}`, 
+                                icon: TrendingUp, 
+                                desc: "From paid orders", 
+                                color: "text-emerald-500", 
+                                bg: "bg-emerald-50" 
+                            },
+                            { 
+                                title: "Total Orders", 
+                                value: analytics?.totalOrders || 0, 
+                                icon: Package, 
+                                desc: "All time", 
+                                color: "text-blue-500", 
+                                bg: "bg-blue-50" 
+                            },
+                            { 
+                                title: "Pending Orders", 
+                                value: analytics?.pendingOrders || 0, 
+                                icon: Truck, 
+                                desc: "Awaiting fulfillment", 
+                                color: "text-amber-500", 
+                                bg: "bg-amber-50" 
+                            },
+                            { 
+                                title: "Live Visitors (GA4)", 
+                                value: gaAnalytics?.totalVisits || liveVisitors, 
+                                icon: BellRing, 
+                                desc: gaAnalytics ? "Real-time Users (Last 30m)" : "Internal Session Count", 
+                                color: gaAnalytics ? "text-emerald-500" : "text-rose-500", 
+                                bg: "bg-rose-50" 
+                            },
                         ].map((stat, i) => (
                             <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group cursor-default overflow-hidden relative">
                                 <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity ${stat.color}`}>
@@ -418,13 +458,24 @@ const AdminDashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
                         <Card className="border-none shadow-sm bg-black text-white p-6 flex flex-col justify-between relative">
                             <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">Total Store Visits</p>
+                                <div className="flex-1">
+                                    <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-1">
+                                        {gaAnalytics ? "GA4 Total Store Visits" : "Total Store Visits (Internal)"}
+                                    </p>
                                     <h3 className="text-4xl font-bold font-space">
-                                        {timeFilter === 'all'
-                                            ? (analytics?.visits?.toLocaleString() || 0)
-                                            : calculateFilteredCount(analytics?.visitsByDate, timeFilter).toLocaleString()}
+                                        {gaAnalytics 
+                                            ? gaAnalytics.totalVisits?.toLocaleString() 
+                                            : (timeFilter === 'all'
+                                                ? (analytics?.visits?.toLocaleString() || 0)
+                                                : calculateFilteredCount(analytics?.visitsByDate, timeFilter).toLocaleString())
+                                        }
                                     </h3>
+                                    {gaAnalytics && (
+                                        <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[8px] font-bold uppercase tracking-wider">
+                                            <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
+                                            GA4 Active
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="p-4 bg-white/10 rounded-full">
                                     <TrendingUp className="h-8 w-8 text-white" />

@@ -145,3 +145,90 @@ exports.initializePayment = onCall(
         }
     }
 );
+
+// 4. Google Analytics 4 Data API Integration
+const { BetaAnalyticsDataClient } = require('@google-analytics/data');
+
+/**
+ * Fetches analytics data from Google Analytics 4
+ * Requires: GA_PROPERTY_ID and GA_SERVICE_ACCOUNT_KEY (base64 encoded JSON) in environment
+ */
+exports.getGA4Analytics = onCall(
+    { cors: true },
+    async (request) => {
+        // Only allow admins to fetch analytics
+        if (!request.auth || !request.auth.token.email) {
+            throw new Error("Unauthorized access to analytics");
+        }
+
+        // Check if user is an admin in Firestore
+        const userDoc = await db.collection("users").doc(request.auth.uid).get();
+        if (!userDoc.exists || userDoc.data().role !== 'admin') {
+            throw new Error("Forbidden: Admin access required");
+        }
+
+        const propertyId = process.env.VITE_GA_PROPERTY_ID || request.data.propertyId;
+        const serviceAccountKeyB64 = process.env.GA_SERVICE_ACCOUNT_KEY;
+
+        if (!propertyId || !serviceAccountKeyB64) {
+            console.warn("GA4 Analytics not configured. Returning empty data.");
+            return {
+                status: 'unconfigured',
+                message: 'Google Analytics Property ID or Service Account Key is missing.',
+                metrics: {}
+            };
+        }
+
+        try {
+            const serviceAccountKey = JSON.parse(Buffer.from(serviceAccountKeyB64, 'base64').toString());
+            const analyticsDataClient = new BetaAnalyticsDataClient({
+                credentials: serviceAccountKey,
+            });
+
+            const [response] = await analyticsDataClient.runReport({
+                property: `properties/${propertyId}`,
+                dateRanges: [
+                    { startDate: '30daysAgo', endDate: 'today' },
+                ],
+                dimensions: [
+                    { name: 'date' },
+                ],
+                metrics: [
+                    { name: 'activeUsers' },
+                    { name: 'screenPageViews' },
+                    { name: 'sessions' },
+                ],
+            });
+
+            // Process results into a more frontend-friendly format
+            const metricsByDate = {};
+            let totalVisits = 0;
+            let totalViews = 0;
+
+            response.rows.forEach(row => {
+                const date = row.dimensionValues[0].value; // YYYYMMDD
+                const formattedDate = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`;
+                
+                metricsByDate[formattedDate] = {
+                    users: parseInt(row.metricValues[0].value),
+                    views: parseInt(row.metricValues[1].value),
+                    sessions: parseInt(row.metricValues[2].value)
+                };
+
+                totalVisits += parseInt(row.metricValues[0].value);
+                totalViews += parseInt(row.metricValues[1].value);
+            });
+
+            return {
+                status: 'success',
+                totalVisits,
+                totalViews,
+                metricsByDate,
+                rawResponse: response // For debugging if needed
+            };
+        } catch (error) {
+            console.error("GA4 Analytics Fetch Error:", error);
+            throw new Error(`Failed to fetch GA4 analytics: ${error.message}`);
+        }
+    }
+);
