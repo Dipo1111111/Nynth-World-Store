@@ -17,7 +17,7 @@ export default function WaitlistConfirmation() {
 
                 <div className="text-center mb-12 space-y-6">
                     <div className="flex justify-center">
-                        <CheckCircle size={40} className="text-black/20" strokeWidth={1} />
+                        <CheckCircle size={40} className="text-emerald-500" strokeWidth={1} />
                     </div>
                     
                     <div className="space-y-4">
@@ -25,7 +25,7 @@ export default function WaitlistConfirmation() {
                             OFFICIALLY ADDED
                         </h2>
                         <p className="text-[10px] tracking-[0.2em] uppercase text-black/60 leading-relaxed font-bold">
-                            YOU HAVE BEEN OFFICIALLY ADDED TO THE NYNTH WORLD LIST.
+                            WELCOME TO NYNTH WORLD
                         </p>
                         <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 leading-relaxed font-bold">
                             WE WILL NOTIFY YOU THE MOMENT WE GO LIVE.
