@@ -38,7 +38,21 @@ export default function LockPage({ onUnlock }) {
         try {
             const result = await addSubscriber(waitlistEmail, 'waitlist');
             if (result.success) {
-                navigate('/waitlist-confirmation');
+                if (result.message === 'ALREADY_ADDED') {
+                    toast('YOU ARE ALREADY ON THE WAITLIST', {
+                        icon: 'ℹ️',
+                        style: {
+                            borderRadius: '0px',
+                            background: '#000',
+                            color: '#fff',
+                            fontSize: '10px',
+                            letterSpacing: '0.2em',
+                            fontWeight: 'bold',
+                        },
+                    });
+                } else {
+                    navigate('/waitlist-confirmation');
+                }
                 setWaitlistEmail('');
             } else {
                 toast.error(result.message.toUpperCase(), {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, Package, Image as ImageIcon, Settings, LogOut, Home, Menu, X } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Package, Image as ImageIcon, Settings, LogOut, Home, Menu, X, Users } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminLayout({ children, title }) {
@@ -13,6 +13,7 @@ export default function AdminLayout({ children, title }) {
         { label: "Products", href: "/admin/products", icon: ShoppingBag },
         { label: "Orders", href: "/admin/orders", icon: Package },
         { label: "Lookbooks", href: "/admin/lookbooks", icon: ImageIcon },
+        { label: "Subscribers", href: "/admin/subscribers", icon: Users },
         { label: "Settings", href: "/admin/settings", icon: Settings },
     ];
 

@@ -46,6 +46,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Orders = lazy(() => import("./pages/admin/Orders"));
 const Products = lazy(() => import("./pages/admin/Products"));
 const Lookbooks = lazy(() => import("./pages/admin/Lookbooks"));
+const Subscribers = lazy(() => import("./pages/admin/Subscribers"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 
 // Admin Loading Fallback
@@ -233,6 +234,16 @@ function App() {
                       <ProtectedRoute requireAdmin={true}>
                         <Suspense fallback={<AdminLoader />}>
                           <Lookbooks />
+                        </Suspense>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/subscribers"
+                    element={
+                      <ProtectedRoute requireAdmin={true}>
+                        <Suspense fallback={<AdminLoader />}>
+                          <Subscribers />
                         </Suspense>
                       </ProtectedRoute>
                     }

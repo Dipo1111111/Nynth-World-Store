@@ -1,0 +1,189 @@
+import React, { useState, useEffect } from "react";
+import AdminLayout from "../../components/admin/AdminLayout";
+import { fetchSubscribers } from "../../api/firebaseFunctions";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import {
+    Users,
+    Mail,
+    Search,
+    Filter,
+    Calendar,
+    ArrowRight
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import toast from "react-hot-toast";
+
+const Subscribers = () => {
+    const { currentUser, logout } = useAuth();
+    const navigate = useNavigate();
+    const [subscribers, setSubscribers] = useState([]);
+    const [filteredSubscribers, setFilteredSubscribers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeFilter, setActiveFilter] = useState("all");
+
+    useEffect(() => {
+        document.title = "Nynth World Store Admin | Subscribers";
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const data = await fetchSubscribers();
+            setSubscribers(data);
+            setFilteredSubscribers(data);
+        } catch (error) {
+            console.error('Error fetching subscribers:', error);
+            toast.error('Failed to load subscribers');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        let results = subscribers;
+        
+        // Filter by source
+        if (activeFilter !== "all") {
+            results = results.filter(sub => sub.source === activeFilter);
+        }
+        
+        // Filter by search term
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            results = results.filter(sub => 
+                sub.email?.toLowerCase().includes(term) ||
+                sub.id?.toLowerCase().includes(term)
+            );
+        }
+        
+        setFilteredSubscribers(results);
+    }, [searchTerm, activeFilter, subscribers]);
+
+    const formatDate = (timestamp) => {
+        if (!timestamp || !timestamp.seconds) return 'N/A';
+        return new Date(timestamp.seconds * 1000).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    return (
+        <AdminLayout title="Subscribers">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+                {/* Search Bar */}
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder="Search emails..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                    />
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                    {["all", "waitlist", "newsletter"].map((f) => (
+                        <button
+                            key={f}
+                            onClick={() => setActiveFilter(f)}
+                            className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                                activeFilter === f 
+                                    ? "bg-white text-black shadow-sm" 
+                                    : "text-gray-500 hover:text-black"
+                            }`}
+                        >
+                            {f}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+                        <p className="text-gray-500 font-space text-sm">Loading subscribers...</p>
+                    </div>
+                </div>
+            ) : filteredSubscribers.length === 0 ? (
+                <Card className="border-gray-100 shadow-sm">
+                    <CardContent className="flex flex-col items-center justify-center py-16">
+                        <Users className="h-16 w-16 text-gray-300 mb-4" />
+                        <h3 className="text-lg font-medium mb-2 font-space">No subscribers found</h3>
+                        <p className="text-gray-500 text-sm">Signups from the website will appear here.</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <Card className="border-gray-100 shadow-sm overflow-hidden">
+                    <CardHeader className="border-b border-gray-50">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-base font-space">
+                                {activeFilter === 'all' ? 'All Subscribers' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
+                                <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-sans tracking-normal">
+                                    {filteredSubscribers.length}
+                                </span>
+                            </CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email</th>
+                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Source</th>
+                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                                        <th className="px-4 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Signed Up</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 bg-white">
+                                    {filteredSubscribers.map((sub) => (
+                                        <tr key={sub.id} className="hover:bg-gray-50 transition-colors group">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition-all">
+                                                        <Mail size={14} />
+                                                    </div>
+                                                    <span className="text-sm font-medium text-gray-900 font-inter">{sub.email}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                                    sub.source === 'waitlist' 
+                                                        ? "bg-black text-white" 
+                                                        : "bg-gray-100 text-gray-600"
+                                                }`}>
+                                                    {sub.source || 'newsletter'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${sub.status === 'active' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                                    <span className="text-xs text-gray-600 capitalize">{sub.status || 'active'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-right">
+                                                <span className="text-xs text-gray-500 font-inter">{formatDate(sub.subscribed_at)}</span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+        </AdminLayout>
+    );
+};
+
+export default Subscribers;

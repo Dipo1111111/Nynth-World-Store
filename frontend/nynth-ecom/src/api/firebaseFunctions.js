@@ -435,12 +435,18 @@ export const deleteMultipleProducts = async (productIds) => {
 export const addSubscriber = async (email, source = 'newsletter') => {
   try {
     // Add new subscriber
-    // Note: We skip the existence check to avoid requiring public read permissions on this collection
-    await addDoc(collection(db, "subscribers"), {
-      email,
-      source,
+    const docRef = doc(db, "subscribers", email.toLowerCase());
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { success: true, message: 'ALREADY_ADDED' };
+    }
+
+    await setDoc(docRef, {
+      email: email.toLowerCase(),
       subscribed_at: serverTimestamp(),
-      status: "active"
+      status: 'active',
+      source: source
     });
 
     // Send Welcome Email
@@ -450,14 +456,25 @@ export const addSubscriber = async (email, source = 'newsletter') => {
       `<h1>Welcome to the Family</h1><p>You're now on the list. Expect exclusive drops and early access.</p>`
     );
 
-    return { success: true, message: "Successfully subscribed!" };
+    return { success: true, message: 'Subscribed successfully' };
   } catch (error) {
     console.error("Error adding subscriber:", error);
-    return { success: false, message: "Subscription failed. Please try again." };
+    return { success: false, message: error.message };
   }
 };
 
 // --- EMAIL NOTIFICATIONS (via Trigger Email Extension) ---
+
+export const fetchSubscribers = async () => {
+  try {
+    const q = query(collection(db, "subscribers"), orderBy("subscribed_at", "desc"));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching subscribers:", error);
+    return [];
+  }
+};
 
 export const sendTriggerEmail = async (to, subject, html) => {
   try {
@@ -684,6 +701,7 @@ export default {
   fetchLookbooks,
   fetchSettings,
   addSubscriber,
+  fetchSubscribers,
   addOrder,
   verifyOrderPayment,
   fetchUserOrders,
