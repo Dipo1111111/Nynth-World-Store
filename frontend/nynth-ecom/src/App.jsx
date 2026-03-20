@@ -39,6 +39,7 @@ import Sustainability from "./pages/Sustainability.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import UpdateDB from "./pages/UpdateDB.jsx";
 import LockPage from "./pages/LockPage.jsx";
+import WaitlistConfirmation from "./pages/WaitlistConfirmation.jsx";
 
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -132,7 +133,12 @@ function App() {
     return (
       <HelmetProvider>
         <Toaster position="top-center" />
-        <LockPage onUnlock={() => setIsSiteUnlocked(true)} />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
+            <Route path="*" element={<LockPage onUnlock={() => setIsSiteUnlocked(true)} />} />
+          </Routes>
+        </BrowserRouter>
       </HelmetProvider>
     );
   }

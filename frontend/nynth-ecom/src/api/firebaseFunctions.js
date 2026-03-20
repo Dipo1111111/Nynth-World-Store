@@ -432,19 +432,13 @@ export const deleteMultipleProducts = async (productIds) => {
 
 // --- NEWSLETTER SUBSCRIPTIONS ---
 
-export const addSubscriber = async (email) => {
+export const addSubscriber = async (email, source = 'newsletter') => {
   try {
-    // Check if email already exists
-    const q = query(collection(db, "subscribers"), where("email", "==", email));
-    const snapshot = await getDocs(q);
-
-    if (!snapshot.empty) {
-      return { success: false, message: "Email already subscribed" };
-    }
-
     // Add new subscriber
+    // Note: We skip the existence check to avoid requiring public read permissions on this collection
     await addDoc(collection(db, "subscribers"), {
       email,
+      source,
       subscribed_at: serverTimestamp(),
       status: "active"
     });
