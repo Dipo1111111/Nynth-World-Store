@@ -162,7 +162,7 @@ export default function AdminLookbooks() {
                         <h2 className="text-2xl font-bold mb-6">Add Lookbook Entry</h2>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Title</label>
                                     <input
@@ -217,7 +217,7 @@ export default function AdminLookbooks() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Color Palette</label>
                                     <input

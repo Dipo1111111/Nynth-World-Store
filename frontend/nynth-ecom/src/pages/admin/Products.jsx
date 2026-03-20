@@ -208,12 +208,13 @@ export default function AdminProducts() {
             <Loader2 className="animate-spin text-gray-400" size={32} />
           </div>
         ) : (
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="p-4 font-medium text-gray-500">Product</th>
-                <th className="p-4 font-medium text-gray-500">Category</th>
-                <th className="p-4 font-medium text-gray-500">Price</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="p-4 font-medium text-gray-500 min-w-[200px]">Product</th>
+                  <th className="p-4 font-medium text-gray-500 whitespace-nowrap">Category</th>
+                  <th className="p-4 font-medium text-gray-500 whitespace-nowrap">Price</th>
                 <th className="p-4 font-medium text-gray-500">Stock</th>
                 <th className="p-4 font-medium text-gray-500 text-right">Actions</th>
               </tr>
@@ -273,6 +274,7 @@ export default function AdminProducts() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
@@ -291,7 +293,7 @@ export default function AdminProducts() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Title</label>
                   <input
@@ -420,7 +422,7 @@ export default function AdminProducts() {
               </div>
 
               {/* Inventory Management */}
-              <div className="flex gap-8 pt-4 border-t border-gray-100">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4 border-t border-gray-100">
                 <div className="space-y-2 flex-1">
                   <label className="text-sm font-medium">Stock Quantity</label>
                   <div className="relative">
