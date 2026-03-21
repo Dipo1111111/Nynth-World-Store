@@ -80,7 +80,7 @@ const AdminPWAPrompt = () => {
                 </div>
 
                 <div className="space-y-3">
-                    {Notification.permission !== 'granted' && (
+                    {('Notification' in window) && Notification.permission !== 'granted' && (
                         <button
                             onClick={() => Notification.requestPermission()}
                             className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all mb-2"

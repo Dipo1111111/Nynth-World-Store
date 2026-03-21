@@ -214,7 +214,7 @@ const AdminDashboard = () => {
         }
 
         // 📱 System Notification
-        if (Notification.permission === 'granted') {
+        if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('NYNTH 💰 New Order!', {
                 body: order
                     ? `₦${order.total?.toLocaleString()} from ${order.customer?.firstName || 'Customer'}`
