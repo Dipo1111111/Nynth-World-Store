@@ -170,9 +170,10 @@ const Subscribers = () => {
                                 size="sm" 
                                 onClick={handleMerge}
                                 disabled={isMerging}
-                                className="text-[10px] tracking-widest font-bold uppercase border-black/10 hover:bg-black hover:text-white transition-all h-8"
+                                className="text-[10px] tracking-widest font-bold uppercase border-black/10 hover:bg-black hover:text-white transition-all h-8 px-2 sm:px-3 shrink-0 ml-2"
                             >
-                                {isMerging ? "Merging..." : "Clean Duplicates"}
+                                <span className="hidden sm:inline">{isMerging ? "Merging..." : "Clean Duplicates"}</span>
+                                <span className="sm:hidden">{isMerging ? "..." : "Clean"}</span>
                             </Button>
                         </div>
                     </CardHeader>
@@ -181,16 +182,16 @@ const Subscribers = () => {
                         <div className="sm:hidden divide-y divide-gray-50">
                             {filteredSubscribers.map((sub) => (
                                 <div key={sub.id} className="p-4 bg-white flex flex-col gap-3">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0 flex-1">
+                                            <div className="w-8 h-8 rounded-full bg-black text-white hidden sm:flex items-center justify-center flex-shrink-0">
                                                 <Mail size={12} />
                                             </div>
-                                            <span className="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">
+                                            <span className="text-xs font-bold text-gray-900 break-all uppercase tracking-tight">
                                                 {sub.email}
                                             </span>
                                         </div>
-                                        <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
+                                        <span className={`shrink-0 px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
                                             sub.source === 'waitlist' 
                                                 ? "bg-black text-white" 
                                                 : "bg-gray-100 text-gray-600"

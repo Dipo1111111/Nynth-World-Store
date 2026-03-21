@@ -194,8 +194,7 @@ export default function AdminProducts() {
 
   return (
     <AdminLayout title="Products">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-space font-bold sm:hidden">Products</h1>
+      <div className="flex justify-end mb-6">
         <button
           onClick={handleCreate}
           className="btn-primary flex items-center gap-2 text-xs sm:text-sm py-2 px-4 sm:py-3 sm:px-6"
@@ -215,54 +214,56 @@ export default function AdminProducts() {
             {/* Mobile Card View */}
             <div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
               {products.map(product => (
-                <div key={product.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-4 relative group">
-                  <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
-                    {(product.images?.[0] || product.imageUrl) ? (
-                      <img
-                        src={product.images?.[0] || product.imageUrl}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <ImageIcon className="w-full h-full p-4 text-gray-300" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight">
-                        {product.title || product.name}
-                      </h3>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                        {product.category}
-                      </p>
+                <div key={product.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-3 group">
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
+                      {(product.images?.[0] || product.imageUrl) ? (
+                        <img
+                          src={product.images?.[0] || product.imageUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon className="w-full h-full p-4 text-gray-300" />
+                      )}
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                       <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
-                       <div className="flex items-center gap-1">
-                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${
-                            product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
-                            product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
-                            "bg-green-50 text-green-600 border border-green-100"
-                          }`}>
-                            {product.stockQuantity <= 0 ? "Out" : product.stockQuantity <= 5 ? "Low" : "In Stock"}
-                          </span>
-                       </div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight">
+                          {product.title || product.name}
+                        </h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                          {product.category}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                         <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
+                         <div className="flex items-center gap-1">
+                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${
+                              product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
+                              product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
+                              "bg-green-50 text-green-600 border border-green-100"
+                            }`}>
+                              {product.stockQuantity <= 0 ? "Out" : `${product.stockQuantity} Left`}
+                            </span>
+                         </div>
+                      </div>
                     </div>
                   </div>
                   
-                  {/* Floating Actions for Mobile */}
-                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                  {/* Actions for Mobile */}
+                  <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
                     <button
                       onClick={() => handleEdit(product)}
-                      className="p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5"
+                      className="flex-1 flex items-center justify-center gap-2 p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5 text-[10px] font-bold uppercase tracking-wider"
                     >
-                      <Edit2 size={14} />
+                      <Edit2 size={14} /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="p-2 bg-red-50 text-red-500 rounded-lg border border-red-100"
+                      className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-50 text-red-500 rounded-lg border border-red-100 text-[10px] font-bold uppercase tracking-wider"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={14} /> Delete
                     </button>
                   </div>
                 </div>

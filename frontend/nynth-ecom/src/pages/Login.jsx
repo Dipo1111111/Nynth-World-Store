@@ -60,7 +60,11 @@ export default function Login() {
                         <button
                             type="button"
                             onClick={() => {
-                                const originBase = location.state?.from?.pathname || "/checkout";
+                                let originBase = location.state?.from?.pathname || "/checkout";
+                                // Prevent unauthenticated guests from looping back to protected routes
+                                if (originBase.startsWith("/admin") || originBase === "/account") {
+                                    originBase = "/shop";
+                                }
                                 navigate(originBase);
                             }}
                             className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all"

@@ -125,6 +125,33 @@ export default function AdminLookbooks() {
                 <div className="flex justify-center p-12">
                     <Loader2 className="animate-spin text-gray-400" size={32} />
                 </div>
+            ) : lookbooks.length === 0 ? (
+                <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                        <Upload className="w-8 h-8 text-gray-300" />
+                    </div>
+                    <h3 className="text-xl font-space font-bold mb-2">No Lookbooks Found</h3>
+                    <p className="text-gray-500 max-w-md mb-8 text-sm leading-relaxed">
+                        You haven't created any lookbooks yet. Click the "Add New Look" button to create your first lookbook collection so your customers can get inspired.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="btn-primary flex items-center justify-center gap-2 px-6 py-3"
+                        >
+                            <Plus size={18} />
+                            Add New Look
+                        </button>
+                        <a 
+                            href="/lookbook" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="px-6 py-3 border border-gray-200 text-black font-bold text-sm tracking-widest uppercase rounded-full hover:bg-gray-50 transition-all flex items-center justify-center"
+                        >
+                            View Live Page
+                        </a>
+                    </div>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {lookbooks.map((look) => (

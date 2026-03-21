@@ -105,7 +105,118 @@ const Orders = () => {
                         <CardTitle className="text-base md:text-lg font-space">All Orders ({orders.length})</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <div className="overflow-x-auto">
+                        {/* Mobile Card View */}
+                        <div className="md:hidden divide-y divide-gray-50">
+                            {orders.map((order) => {
+                                const isExpanded = expandedOrders.has(order.id);
+                                return (
+                                    <div key={order.id} className="p-4 bg-white flex flex-col gap-3">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                <button
+                                                    onClick={() => toggleOrderExpansion(order.id)}
+                                                    className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors shrink-0"
+                                                >
+                                                    {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                                </button>
+                                                <div className="min-w-0 flex-1">
+                                                    <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
+                                                        {order.customer?.firstName} • {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
+                                                <span className="font-bold text-sm leading-none mt-1">₦{order.total?.toLocaleString()}</span>
+                                                <div className="scale-[0.8] origin-right -mr-2">
+                                                    <StatusDropdown
+                                                        orderId={order.id}
+                                                        currentStatus={order.order_status || 'pending'}
+                                                        onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Expanded Row Content for Mobile */}
+                                        {isExpanded && (
+                                            <div className="mt-2 pt-3 border-t border-gray-50">
+                                                <div className="grid grid-cols-1 gap-6">
+                                                    {/* Order Items */}
+                                                    <div>
+                                                        <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                                            <Package size={14} />
+                                                            Order Items
+                                                        </h4>
+                                                        <div className="space-y-2">
+                                                            {order.items?.map((item, idx) => (
+                                                                <div key={idx} className="flex gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                                    <div className="w-14 h-16 bg-white rounded overflow-hidden flex-shrink-0 border border-black/5">
+                                                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="font-bold text-[11px] truncate uppercase">{item.name || item.title}</p>
+                                                                        <p className="text-[9px] text-gray-500 mt-1 uppercase tracking-widest font-bold">
+                                                                            {item.size || item.selectedSize} / {item.color || item.selectedColor}
+                                                                        </p>
+                                                                        <p className="text-[10px] text-gray-500 font-medium mt-1">Qty: {item.quantity}</p>
+                                                                    </div>
+                                                                    <div className="text-right pt-1 flex flex-col justify-between">
+                                                                        <p className="font-bold text-xs">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Contact & Shipping */}
+                                                    <div className="space-y-5">
+                                                        <div>
+                                                            <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                                                <MapPin size={14} /> Shipping
+                                                            </h4>
+                                                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 space-y-2">
+                                                                <p className="font-bold text-xs truncate uppercase">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                                                <p className="text-[11px] text-gray-600 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
+                                                                <p className="text-[11px] text-gray-600 uppercase">{order.customer?.city}, {order.customer?.state}</p>
+                                                                <div className="flex items-center gap-2 text-[11px] text-gray-600 pt-1 border-t border-gray-200 mt-2">
+                                                                    <Phone size={12} className="text-gray-400" />
+                                                                    <span>{order.customer?.phone}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Order Summary */}
+                                                        <div>
+                                                            <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
+                                                                <LayoutDashboard size={14}/> Summary
+                                                            </h4>
+                                                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 space-y-3 font-inter">
+                                                                <div className="flex justify-between text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+                                                                    <span>Subtotal</span>
+                                                                    <span className="text-right">₦{order.subtotal?.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+                                                                    <span>Shipping</span>
+                                                                    <span className="text-right">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="flex justify-between font-space font-bold text-sm pt-3 border-t border-gray-200 uppercase">
+                                                                    <span>Total</span>
+                                                                    <span className="text-right">₦{order.total?.toLocaleString()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
                             <table className="w-full">
                                 <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
