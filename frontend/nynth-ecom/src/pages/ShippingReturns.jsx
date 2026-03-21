@@ -14,37 +14,38 @@ export default function ShippingReturns() {
                 <div className="prose prose-lg max-w-none text-gray-600 space-y-6">
                     <h3 className="text-black text-xl font-bold pt-4">Shipping Policy</h3>
                     <p>
-                        We ship to most locations worldwide. Orders are typically processed within 1-3 business days.
+                        We currently ship within Nigeria. Orders are processed within 1–5 business days.
                     </p>
+
+                    <h3 className="text-black text-xl font-bold pt-4">Delivery Timelines</h3>
                     <ul className="list-disc pl-5 space-y-2">
-                        <li><strong>Domestic Shipping:</strong> Usually takes 3-5 business days.</li>
-                        <li><strong>International Shipping:</strong> Can take 7-14 business days depending on location and customs processing.</li>
+                        <li>Lagos Deliveries: 2–3 business days</li>
+                        <li>Nationwide Deliveries (Outside Lagos): 3–7 business days</li>
                     </ul>
                     <p>
-                        Once your order ships, you will receive a tracking number via email.
+                        International shipping is not available at this time.
                     </p>
 
                     <h3 className="text-black text-xl font-bold pt-4">Return Policy</h3>
                     <p>
-                        We have a 14-day return policy, which means you have 14 days after receiving your item to request a return.
+                        We operate a 4-day return policy. This means you have 4 days after receiving your item to request a return.
                     </p>
                     <p>
-                        To be eligible for a return, your item must be in the same condition that you received it, unworn or unused, with tags, and in its original packaging. You’ll also need the receipt or proof of purchase.
+                        To be eligible, items must be returned in the same condition they were received — unworn, unused, with all tags intact and in original packaging. Proof of purchase is required.
+                    </p>
+                    <p>
+                        Returns are only accepted in cases of incorrect items or verified defects. All requests are subject to approval.
                     </p>
 
                     <h3 className="text-black text-xl font-bold pt-4">Damages and Issues</h3>
                     <p>
-                        Please inspect your order upon reception and contact us immediately if the item is defective, damaged or if you receive the wrong item, so that we can evaluate the issue and make it right.
+                        Please inspect your order upon delivery and contact us immediately if your item is defective, damaged, or if you receive the wrong item. This allows us to review the issue and resolve it accordingly.
                     </p>
 
-                    <h3 className="text-black text-xl font-bold pt-4">Exchanges</h3>
-                    <p>
-                        The fastest way to ensure you get what you want is to return the item you have, and once the return is accepted, make a separate purchase for the new item.
-                    </p>
 
                     <h3 className="text-black text-xl font-bold pt-4">Need Help?</h3>
                     <p>
-                        If you have any questions concerning our shipping or return policies, please contact us at {settings.support_email}.
+                        For any questions regarding shipping or returns, please contact us at nynthworld@gmail.com.
                     </p>
                 </div>
             </main>

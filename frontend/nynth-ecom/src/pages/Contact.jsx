@@ -22,7 +22,7 @@ export default function Contact() {
                             <p className="text-[14px] md:text-[16px] text-gray-600 leading-[1.8] font-medium">
                                 For all inquiries regarding orders, collaborations, or general questions, 
                                 please reach out directly via WhatsApp or Email. Our team is available 
-                                to assist you Monday through Friday.
+                                to assist you Monday to Friday.
                             </p>
                         </div>
 
