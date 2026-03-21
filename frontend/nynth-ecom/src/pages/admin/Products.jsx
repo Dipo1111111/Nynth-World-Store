@@ -194,89 +194,170 @@ export default function AdminProducts() {
 
   return (
     <AdminLayout title="Products">
-      <div className="flex justify-end mb-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-xl font-space font-bold sm:hidden">Products</h1>
         <button
           onClick={handleCreate}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary flex items-center gap-2 text-xs sm:text-sm py-2 px-4 sm:py-3 sm:px-6"
         >
-          <Plus size={20} />
-          Add Product
+          <Plus size={18} />
+          <span>Add Product</span>
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-transparent sm:bg-white sm:rounded-xl sm:border sm:border-gray-200 overflow-hidden">
         {loading ? (
-          <div className="p-12 flex justify-center">
+          <div className="p-12 flex justify-center bg-white rounded-xl border border-gray-200">
             <Loader2 className="animate-spin text-gray-400" size={32} />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="p-4 font-medium text-gray-500 min-w-[200px]">Product</th>
-                  <th className="p-4 font-medium text-gray-500 whitespace-nowrap">Category</th>
-                  <th className="p-4 font-medium text-gray-500 whitespace-nowrap">Price</th>
-                <th className="p-4 font-medium text-gray-500">Stock</th>
-                <th className="p-4 font-medium text-gray-500 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
+          <>
+            {/* Mobile Card View */}
+            <div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
               {products.map(product => (
-                <tr key={product.id} className="hover:bg-gray-50 group">
-                  <td className="p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
-                        {(product.images?.[0] || product.imageUrl) ? (
-                          <img
-                            src={product.images?.[0] || product.imageUrl}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <ImageIcon className="w-full h-full p-3 text-gray-300" />
-                        )}
-                      </div>
-                      <span className="font-medium text-gray-900">{product.title || product.name}</span>
+                <div key={product.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-4 relative group">
+                  <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
+                    {(product.images?.[0] || product.imageUrl) ? (
+                      <img
+                        src={product.images?.[0] || product.imageUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ImageIcon className="w-full h-full p-4 text-gray-300" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight">
+                        {product.title || product.name}
+                      </h3>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                        {product.category}
+                      </p>
                     </div>
-                  </td>
-                  <td className="p-4 capitalize text-gray-600">{product.category}</td>
-                  <td className="p-4 font-medium">₦{product.price?.toLocaleString()}</td>
-                  <td className="p-4">
-                    <div className="flex flex-col gap-1">
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit ${product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
-                        product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
-                          "bg-green-50 text-green-600 border border-green-100"
-                        }`}>
-                        {product.stockQuantity <= 0 ? "Out of Stock" :
-                          product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
-                      </span>
-                      <span className="text-xs text-gray-400 font-medium px-2">
-                        {product.stockQuantity} units
-                      </span>
+                    <div className="flex items-center justify-between mt-2">
+                       <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
+                       <div className="flex items-center gap-1">
+                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${
+                            product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
+                            product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
+                            "bg-green-50 text-green-600 border border-green-100"
+                          }`}>
+                            {product.stockQuantity <= 0 ? "Out" : product.stockQuantity <= 5 ? "Low" : "In Stock"}
+                          </span>
+                       </div>
                     </div>
-                  </td>
-                  <td className="p-4 text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                  </div>
+                  
+                  {/* Floating Actions for Mobile */}
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="p-2 bg-red-50 text-red-500 rounded-lg border border-red-100"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-          </div>
+              {products.length === 0 && (
+                <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-200">
+                  <Package className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                  <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Product</th>
+                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Category</th>
+                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Price</th>
+                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Stock</th>
+                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {products.map(product => (
+                    <tr key={product.id} className="hover:bg-gray-50 group transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden border border-black/5">
+                            {(product.images?.[0] || product.imageUrl) ? (
+                              <img
+                                src={product.images?.[0] || product.imageUrl}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <ImageIcon className="w-full h-full p-3 text-gray-300" />
+                            )}
+                          </div>
+                          <div>
+                            <span className="font-bold text-gray-900 text-sm uppercase tracking-tight block">
+                              {product.title || product.name}
+                            </span>
+                            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 capitalize text-gray-600 text-sm font-medium">{product.category}</td>
+                      <td className="p-4 font-bold text-sm">₦{product.price?.toLocaleString()}</td>
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1">
+                          <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider w-fit border ${
+                            product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border-red-100" :
+                            product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border-orange-100" :
+                              "bg-green-50 text-green-600 border-green-100"
+                            }`}>
+                            {product.stockQuantity <= 0 ? "Out of Stock" :
+                              product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-bold px-1 uppercase tracking-tighter">
+                            {product.stockQuantity} UNITS
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg border border-transparent hover:border-black/5"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {products.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="p-12 text-center">
+                        <Package className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

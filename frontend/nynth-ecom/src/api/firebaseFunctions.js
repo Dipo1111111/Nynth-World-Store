@@ -88,56 +88,54 @@ export const deleteProduct = async (id) => {
 
 export const fetchFeaturedProducts = async (max = 6) => {
   try {
-    const snapshot = await getDocs(collection(db, "products"));
-    const allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // Filter products with "featured" tag or bestSeller/featured flags
-    const featuredProducts = allProducts.filter(product =>
-      product.featured === true ||
-      product.bestSeller === true ||
-      (product.tags && product.tags.includes("featured"))
+    // 1. Try to fetch explicitly featured items
+    const q = query(
+      collection(db, "products"), 
+      where("featured", "==", true), 
+      limit(max)
     );
+    const snapshot = await getDocs(q);
+    let featuredProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // If not enough featured, get latest products
-    if (featuredProducts.length < 3) {
-      const latestProducts = allProducts
-        .sort((a, b) => {
-          const timeA = a.created_at?.seconds || 0;
-          const timeB = b.created_at?.seconds || 0;
-          return timeB - timeA;
-        })
-        .slice(0, max);
-      return latestProducts;
+    // 2. If not enough, fetch best sellers
+    if (featuredProducts.length < max) {
+      const qBS = query(
+        collection(db, "products"), 
+        where("bestSeller", "==", true), 
+        limit(max - featuredProducts.length)
+      );
+      const bsSnapshot = await getDocs(qBS);
+      const bsProducts = bsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      featuredProducts = [...featuredProducts, ...bsProducts];
     }
 
-    return featuredProducts.slice(0, max);
+    // 3. Fallback to newest if still not enough
+    if (featuredProducts.length < 3) {
+      const latestQ = query(
+        collection(db, "products"),
+        orderBy("created_at", "desc"),
+        limit(max)
+      );
+      const latestSnapshot = await getDocs(latestQ);
+      return latestSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    return featuredProducts;
   } catch (error) {
     console.error("Error fetching featured products:", error);
     return [];
   }
 };
 
-export const fetchProductsByCategory = async (category, max = 10) => {
+export const fetchProductsByCategory = async (category, max = 15) => {
   try {
-    const snapshot = await getDocs(collection(db, "products"));
-    const allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    const filtered = allProducts.filter(product =>
-      product.category?.toLowerCase() === category.toLowerCase()
+    const q = query(
+      collection(db, "products"),
+      where("category", "==", category.toLowerCase()),
+      limit(max)
     );
-
-    // Sort by featured/bestSeller first, then by newest
-    const sorted = filtered.sort((a, b) => {
-      const aScore = (a.featured ? 2 : 0) + (a.bestSeller ? 1 : 0);
-      const bScore = (b.featured ? 2 : 0) + (b.bestSeller ? 1 : 0);
-      if (bScore !== aScore) return bScore - aScore;
-
-      const timeA = a.created_at?.seconds || 0;
-      const timeB = b.created_at?.seconds || 0;
-      return timeB - timeA;
-    });
-
-    return sorted.slice(0, max);
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error(`Error fetching ${category} products:`, error);
     return [];
@@ -146,12 +144,13 @@ export const fetchProductsByCategory = async (category, max = 10) => {
 
 export const fetchProductsByTag = async (tag, max = 10) => {
   try {
-    const snapshot = await getDocs(collection(db, "products"));
-    const allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    return allProducts
-      .filter(product => product.tags && product.tags.includes(tag))
-      .slice(0, max);
+    const q = query(
+      collection(db, "products"),
+      where("tags", "array-contains", tag),
+      limit(max)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error(`Error fetching products by tag ${tag}:`, error);
     return [];
@@ -160,14 +159,15 @@ export const fetchProductsByTag = async (tag, max = 10) => {
 
 export const fetchRelatedProducts = async (category, excludeId, max = 4) => {
   try {
-    const snapshot = await getDocs(collection(db, "products"));
-    const allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    return allProducts
-      .filter(product =>
-        product.id !== excludeId &&
-        product.category === category
-      )
+    const q = query(
+      collection(db, "products"),
+      where("category", "==", category),
+      limit(max + 1)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(p => p.id !== excludeId)
       .slice(0, max);
   } catch (error) {
     console.error("Error fetching related products:", error);
@@ -177,17 +177,13 @@ export const fetchRelatedProducts = async (category, excludeId, max = 4) => {
 
 export const fetchNewArrivals = async (max = 8) => {
   try {
-    const snapshot = await getDocs(collection(db, "products"));
-    const allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // Sort by created_at (newest first)
-    const sorted = allProducts.sort((a, b) => {
-      const timeA = a.created_at?.seconds || 0;
-      const timeB = b.created_at?.seconds || 0;
-      return timeB - timeA;
-    });
-
-    return sorted.slice(0, max);
+    const q = query(
+      collection(db, "products"),
+      orderBy("created_at", "desc"),
+      limit(max)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Error fetching new arrivals:", error);
     return [];
@@ -208,10 +204,9 @@ export const fetchLookbooks = async () => {
 
 export const fetchFeaturedLookbooks = async () => {
   try {
-    const snapshot = await getDocs(collection(db, "lookbooks"));
-    const allLookbooks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    return allLookbooks.filter(lookbook => lookbook.featured === true);
+    const q = query(collection(db, "lookbooks"), where("featured", "==", true));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Error fetching featured lookbooks:", error);
     return [];
@@ -757,7 +752,8 @@ export const getAdminAnalytics = async () => {
       visits: counters.visits,
       clicks: counters.clicks,
       visitsByDate: counters.visitsByDate,
-      clicksByDate: counters.clicksByDate
+      clicksByDate: counters.clicksByDate,
+      rawOrders: orders // Return for UI reuse
     };
   } catch (error) {
     console.error("Error getting admin analytics: ", error);

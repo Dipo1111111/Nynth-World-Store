@@ -133,16 +133,20 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            // Fetch everything needed for the dashboard
-            const [analyticsData, orders, siteSettings] = await Promise.all([
+            // Fetch all required data in parallel to avoid load waterfalls
+            // getAdminAnalytics already fetches all orders, so we don't need to call getAllOrders separately
+            const [analyticsData, siteSettings] = await Promise.all([
                 getAdminAnalytics(),
-                getAllOrders(),
                 fetchSettings()
             ]);
 
             console.log('Dashboard - Analytics:', analyticsData);
             setAnalytics(analyticsData);
-            setRecentOrders(orders.slice(0, 5));
+            
+            // Re-use orders from analytics data for the recent list
+            if (analyticsData?.rawOrders) {
+                setRecentOrders(analyticsData.rawOrders.slice(0, 5));
+            }
 
             // Now fetch GA4 data using the Property ID from settings
             const gaPropId = siteSettings?.ga_property_id;
@@ -375,10 +379,10 @@ const AdminDashboard = () => {
         <AdminLayout>
             <AdminPWAPrompt />
             {/* Main Content */}
-            <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <header className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-4xl font-space font-bold mb-2 tracking-tight">Dashboard</h1>
-                    <p className="text-gray-500 text-sm md:text-base">Welcome! You're currently monitoring live sales.</p>
+                    <h1 className="text-3xl md:text-5xl font-space font-bold mb-2 tracking-tight uppercase">Dashboard</h1>
+                    <p className="text-gray-400 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">Monitoring live store activity</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
@@ -438,17 +442,17 @@ const AdminDashboard = () => {
                                 bg: "bg-rose-50" 
                             },
                         ].map((stat, i) => (
-                            <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group cursor-default overflow-hidden relative">
-                                <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity ${stat.color}`}>
-                                    <stat.icon size={80} strokeWidth={1} />
+                            <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all duration-500 group cursor-default overflow-hidden relative bg-white">
+                                <div className={`absolute -bottom-2 -right-2 p-0 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity ${stat.color} rotate-12`}>
+                                    <stat.icon size={100} strokeWidth={1} />
                                 </div>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-[10px] tracking-[0.1em] font-bold uppercase text-gray-400">{stat.title}</CardTitle>
-                                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                                    <CardTitle className="text-[9px] tracking-[0.2em] font-bold uppercase text-gray-400">{stat.title}</CardTitle>
+                                    <stat.icon size={14} className={stat.color} />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-3xl font-bold font-space tracking-tight">{stat.value}</div>
-                                    <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{stat.desc}</p>
+                                    <div className="text-2xl md:text-3xl font-bold font-space tracking-tight">{stat.value}</div>
+                                    <p className="text-[8px] text-gray-400 mt-1 uppercase tracking-[0.15em] font-medium">{stat.desc}</p>
                                 </CardContent>
                             </Card>
                         ))}
@@ -560,19 +564,21 @@ const AdminDashboard = () => {
                                     <p>No orders yet</p>
                                 </div>
                             ) : (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {recentOrders.map((order) => (
-                                        <div key={order.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <div key={order.id} className="flex items-center justify-between p-3 border border-gray-50 rounded-xl hover:bg-gray-50 transition-all group">
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-medium truncate">#{order.id.slice(0, 8)}</p>
-                                                <p className="text-sm text-gray-500 truncate">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                                <p className="font-bold text-xs tracking-tight uppercase">#{order.id.slice(0, 8)}</p>
+                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider truncate">
+                                                    {order.customer?.firstName} • {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
+                                                </p>
                                             </div>
                                             <div className="text-right ml-4">
-                                                <p className="font-medium">₦{order.total?.toLocaleString()}</p>
-                                                <p className="text-xs text-gray-500">
-                                                    {order.created_at?.seconds
-                                                        ? new Date(order.created_at.seconds * 1000).toLocaleDateString()
-                                                        : 'N/A'}
+                                                <p className="font-bold text-xs uppercase">₦{order.total?.toLocaleString()}</p>
+                                                <p className={`text-[8px] font-bold uppercase tracking-widest mt-0.5 ${
+                                                    order.payment_status === 'paid' ? 'text-emerald-500' : 'text-amber-500'
+                                                }`}>
+                                                    {order.payment_status}
                                                 </p>
                                             </div>
                                         </div>

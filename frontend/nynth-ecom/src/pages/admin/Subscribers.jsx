@@ -109,26 +109,26 @@ const Subscribers = () => {
 
     return (
         <AdminLayout title="Subscribers">
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 {/* Search Bar */}
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input
                         type="text"
                         placeholder="Search emails..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                        className="w-full pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-lg focus:outline-none focus:border-black transition-colors text-sm"
                     />
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex bg-gray-100 p-1 rounded-lg">
+                <div className="flex bg-gray-100 p-1 rounded-lg self-start sm:self-auto overflow-x-auto no-scrollbar max-w-full">
                     {["all", "waitlist", "newsletter"].map((f) => (
                         <button
                             key={f}
                             onClick={() => setActiveFilter(f)}
-                            className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                            className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                                 activeFilter === f 
                                     ? "bg-white text-black shadow-sm" 
                                     : "text-gray-500 hover:text-black"
@@ -177,7 +177,42 @@ const Subscribers = () => {
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <div className="overflow-x-auto">
+                        {/* Mobile Card View */}
+                        <div className="sm:hidden divide-y divide-gray-50">
+                            {filteredSubscribers.map((sub) => (
+                                <div key={sub.id} className="p-4 bg-white flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
+                                                <Mail size={12} />
+                                            </div>
+                                            <span className="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">
+                                                {sub.email}
+                                            </span>
+                                        </div>
+                                        <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
+                                            sub.source === 'waitlist' 
+                                                ? "bg-black text-white" 
+                                                : "bg-gray-100 text-gray-600"
+                                        }`}>
+                                            {sub.source || 'newsletter'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-[10px]">
+                                        <div className="flex items-center gap-1.5">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${sub.status === 'active' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                            <span className="text-gray-500 font-bold uppercase tracking-widest">{sub.status || 'active'}</span>
+                                        </div>
+                                        <span className="text-gray-400 font-bold uppercase tracking-widest">
+                                            {formatDate(sub.subscribed_at).split(',')[0]}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Desktop Table View */}
+                        <div className="hidden sm:block overflow-x-auto">
                             <table className="w-full">
                                 <thead className="bg-gray-50">
                                     <tr>

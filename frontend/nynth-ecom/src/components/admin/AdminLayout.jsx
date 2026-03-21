@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, ShoppingBag, Package, Image as ImageIcon, Settings, LogOut, Home, Menu, X, Users } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import Logo from "../common/Logo";
 
 export default function AdminLayout({ children, title }) {
     const location = useLocation();
@@ -33,12 +34,15 @@ export default function AdminLayout({ children, title }) {
                 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
                 flex flex-col
             `}>
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2">
-                        <span className="font-space font-bold text-xl tracking-tighter">NYNTH</span>
-                        <span className="text-xs bg-black text-white px-2 py-0.5 rounded-full">ADMIN</span>
+                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                    <Link to="/" className="flex items-center gap-2 group">
+                        <Logo size="sm" />
+                        <span className="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold tracking-widest ml-1">ADMIN</span>
                     </Link>
-                    <button onClick={toggleMobileMenu} className="md:hidden p-2 text-gray-500">
+                    <button 
+                        onClick={toggleMobileMenu} 
+                        className="md:hidden p-2 text-black hover:bg-gray-50 rounded-lg transition-all"
+                    >
                         <X size={20} />
                     </button>
                 </div>
@@ -89,10 +93,17 @@ export default function AdminLayout({ children, title }) {
             {/* Main Content */}
             <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
                 {/* Mobile Header */}
-                <header className="bg-white border-b border-gray-200 p-4 md:hidden flex items-center justify-between sticky top-0 z-20">
-                    <span className="font-space font-bold text-lg">NYNTH ADMIN</span>
-                    <button onClick={toggleMobileMenu} className="p-2 text-gray-600">
-                        <Menu size={24} />
+                <header className="bg-white border-b border-gray-100 p-4 md:hidden flex items-center justify-between sticky top-0 z-30 shadow-sm">
+                    <Link to="/" className="flex items-center gap-2">
+                        <Logo size="xs" />
+                        <span className="text-[8px] bg-black text-white px-1.5 py-0.5 rounded-full font-bold tracking-widest">ADMIN</span>
+                    </Link>
+                    <button 
+                        onClick={toggleMobileMenu} 
+                        className="p-2 text-black hover:bg-gray-50 rounded-lg transition-all border border-black/5"
+                        aria-label="Toggle Menu"
+                    >
+                        <Menu size={20} />
                     </button>
                 </header>
 
