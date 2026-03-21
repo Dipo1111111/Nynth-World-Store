@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchSubscribers } from "../../api/firebaseFunctions";
+import { fetchSubscribers, mergeSubscriberDuplicates } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,6 +23,7 @@ const Subscribers = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilter, setActiveFilter] = useState("all");
+    const [isMerging, setIsMerging] = useState(false);
 
     useEffect(() => {
         document.title = "Nynth World Store Admin | Subscribers";
@@ -43,15 +44,47 @@ const Subscribers = () => {
         }
     };
 
+    const handleMerge = async () => {
+        if (!window.confirm("This will find all duplicate emails and merge them into single entries (keeping the oldest signup). Proceed?")) return;
+        
+        setIsMerging(true);
+        try {
+            const result = await mergeSubscriberDuplicates();
+            if (result.success) {
+                toast.success(`Succesfully merged ${result.mergedCount} duplicates.`);
+                fetchData();
+            }
+        } catch (error) {
+            toast.error("Failed to merge duplicates");
+        } finally {
+            setIsMerging(false);
+        }
+    };
+
     useEffect(() => {
         let results = subscribers;
         
-        // Filter by source
+        // 1. Deduplicate by email first (Frontend safety)
+        const uniqueMap = new Map();
+        results.forEach(sub => {
+            const email = sub.email?.trim().toLowerCase();
+            if (!email) return;
+            // Keep the one we have, or if it's new, add it. 
+            // Since subscribers is ordered by date desc, this keeps the NEWEST by default.
+            // But we might want the OLDEST as the 'primary'. 
+            // Let's actually sort by date before deduplicating to be sure.
+            if (!uniqueMap.has(email)) {
+                uniqueMap.set(email, sub);
+            }
+        });
+        results = Array.from(uniqueMap.values());
+
+        // 2. Filter by source
         if (activeFilter !== "all") {
             results = results.filter(sub => sub.source === activeFilter);
         }
         
-        // Filter by search term
+        // 3. Filter by search term
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             results = results.filter(sub => 
@@ -132,6 +165,15 @@ const Subscribers = () => {
                                     {filteredSubscribers.length}
                                 </span>
                             </CardTitle>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={handleMerge}
+                                disabled={isMerging}
+                                className="text-[10px] tracking-widest font-bold uppercase border-black/10 hover:bg-black hover:text-white transition-all h-8"
+                            >
+                                {isMerging ? "Merging..." : "Clean Duplicates"}
+                            </Button>
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">

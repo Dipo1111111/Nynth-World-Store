@@ -15,6 +15,7 @@ import {
   orderBy,
   limit,
   increment,
+  writeBatch
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { httpsCallable } from "firebase/functions";
@@ -433,16 +434,25 @@ export const deleteMultipleProducts = async (productIds) => {
 
 export const addSubscriber = async (email, source = 'newsletter') => {
   try {
-    // Add new subscriber
-    const docRef = doc(db, "subscribers", email.toLowerCase());
+    const formattedEmail = email.trim().toLowerCase();
+    
+    // 1. Check by Document ID (Most efficient)
+    const docRef = doc(db, "subscribers", formattedEmail);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       return { success: true, message: 'ALREADY_ADDED' };
     }
 
+    // 2. Secondary check by email field (for legacy entries with random IDs)
+    const q = query(collection(db, "subscribers"), where("email", "==", formattedEmail));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      return { success: true, message: 'ALREADY_ADDED' };
+    }
+
     await setDoc(docRef, {
-      email: email.toLowerCase(),
+      email: formattedEmail,
       subscribed_at: serverTimestamp(),
       status: 'active',
       source: source
@@ -472,6 +482,57 @@ export const fetchSubscribers = async () => {
   } catch (error) {
     console.error("Error fetching subscribers:", error);
     return [];
+  }
+};
+
+/**
+ * Merges duplicate subscribers by email.
+ * Preserves the oldest entry and deletes others.
+ */
+export const mergeSubscriberDuplicates = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, "subscribers"));
+    const allSubs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    const emailGroups = {};
+    allSubs.forEach(sub => {
+      const email = sub.email?.trim().toLowerCase();
+      if (!email) return;
+      if (!emailGroups[email]) emailGroups[email] = [];
+      emailGroups[email].push(sub);
+    });
+
+    let mergedCount = 0;
+    const batch = writeBatch(db);
+
+    Object.values(emailGroups).forEach(group => {
+      if (group.length > 1) {
+        // Sort by date (oldest first)
+        group.sort((a, b) => {
+          const timeA = a.subscribed_at?.seconds || 0;
+          const timeB = b.subscribed_at?.seconds || 0;
+          return timeA - timeB;
+        });
+
+        // Keep the first (oldest), delete the rest
+        const toKeep = group[0];
+        const toDelete = group.slice(1);
+
+        toDelete.forEach(sub => {
+          batch.delete(doc(db, "subscribers", sub.id));
+          mergedCount++;
+        });
+      }
+    });
+
+    if (mergedCount > 0) {
+      await batch.commit();
+    }
+
+    return { success: true, mergedCount };
+  } catch (error) {
+    console.error("Error merging duplicates:", error);
+    throw error;
   }
 };
 
@@ -717,5 +778,6 @@ export default {
   getAllOrders,
   updateOrderStatus,
   getAdminAnalytics,
-  fetchGA4Analytics
+  fetchGA4Analytics,
+  mergeSubscriberDuplicates
 };
