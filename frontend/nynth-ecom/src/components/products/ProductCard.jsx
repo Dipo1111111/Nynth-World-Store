@@ -58,6 +58,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             src={mainImage}
             alt={product.title}
             loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           {isOutOfStock && (
@@ -109,6 +110,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           src={mainImage}
           alt={product.title}
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
 

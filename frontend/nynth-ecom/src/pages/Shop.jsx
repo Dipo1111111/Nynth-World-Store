@@ -71,6 +71,8 @@ export default function Shop() {
           <img
             src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2600"
             alt="Collection Hero"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-black/5 flex items-center justify-center">

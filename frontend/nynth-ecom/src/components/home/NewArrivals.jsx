@@ -29,6 +29,8 @@ function ProductCard({ product }) {
           <img
             src={image}
             alt={product.title}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">

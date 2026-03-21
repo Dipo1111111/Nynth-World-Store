@@ -96,6 +96,7 @@ export default function Lookbook() {
           <img
             src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop"
             alt="Lookbook Hero"
+            fetchPriority="high"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/30" />
@@ -160,6 +161,8 @@ export default function Lookbook() {
                       <img
                         src={product.images?.[0] || product.imageUrl}
                         alt={product.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     </div>
@@ -187,6 +190,8 @@ export default function Lookbook() {
                         <img
                           src={look.image}
                           alt={look.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -270,6 +275,8 @@ export default function Lookbook() {
                     <img
                       src={look.image}
                       alt={look.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
                   </div>
@@ -315,6 +322,8 @@ export default function Lookbook() {
                     <img
                       src={cat === 'TEES' ? "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2070" : cat === 'HOODIES' ? "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2070" : "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2070"}
                       alt={cat}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                   </div>

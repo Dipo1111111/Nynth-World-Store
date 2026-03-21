@@ -221,6 +221,8 @@ export default function AdminProducts() {
                         <img
                           src={product.images?.[0] || product.imageUrl}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -298,6 +300,8 @@ export default function AdminProducts() {
                               <img
                                 src={product.images?.[0] || product.imageUrl}
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover"
                               />
                             ) : (
