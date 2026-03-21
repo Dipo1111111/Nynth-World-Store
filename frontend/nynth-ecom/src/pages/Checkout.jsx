@@ -12,7 +12,7 @@ import { useSettings } from "../context/SettingsContext";
 import { trackConversion } from "../utils/monitoring";
 
 import Logo from "../components/common/Logo";
-import { LAGOS_SHIPPING_DATA } from "../data/locationData";
+import { LAGOS_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../data/locationData";
 
 const Checkout = () => {
   const { settings } = useSettings();
@@ -29,6 +29,7 @@ const Checkout = () => {
     city: "",
     state: "Lagos",
     zip: "",
+    deliveryMethod: "home", // New: home or park
   });
   const [shippingFee, setShippingFee] = useState(0);
 
@@ -62,13 +63,34 @@ const Checkout = () => {
     }
   }, [cartItems, navigate, isOrderCompleted]);
 
+  // Calculate total weight (default 0.5kg per item if weight not specified)
+  const totalWeight = cartItems.reduce((acc, item) => {
+    const itemWeight = item.weight || 0.5;
+    return acc + (itemWeight * item.quantity);
+  }, 0);
+
   useEffect(() => {
-    if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
-      setShippingFee(LAGOS_SHIPPING_DATA[form.city]);
+    if (form.state === "Lagos") {
+      if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
+        setShippingFee(LAGOS_SHIPPING_DATA[form.city]);
+      } else {
+        setShippingFee(settings.shipping_fee || 0);
+      }
+    } else if (INTERSTATE_SHIPPING_DATA[form.state]) {
+      const stateData = INTERSTATE_SHIPPING_DATA[form.state];
+      // South West only has home delivery
+      const method = stateData.park === stateData.home ? "home" : form.deliveryMethod;
+      const basePrice = stateData[method] || stateData.home;
+      
+      // Weight logic: 0-3kg is base price, each extra kg is +1500
+      const excessWeight = Math.max(0, Math.ceil(totalWeight - 3));
+      const weightSurcharge = excessWeight * 1500;
+      
+      setShippingFee(basePrice + weightSurcharge);
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
-  }, [form.city, settings.shipping_fee]);
+  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -269,30 +291,83 @@ const Checkout = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">City / Area</label>
+                {form.state === "Lagos" ? (
+                  <select
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                  >
+                    <option value="">SELECT AREA</option>
+                    {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => (
+                      <option key={area} value={area}>
+                        {area.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent"
+                    placeholder="ENTER CITY"
+                  />
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
                 <select
-                  name="city"
-                  value={form.city}
+                  name="state"
+                  value={form.state}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
                 >
-                  <option value="">SELECT AREA</option>
-                  {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => (
-                    <option key={area} value={area}>
-                      {area.toUpperCase()}
+                  <option value="Lagos">LAGOS</option>
+                  {Object.keys(INTERSTATE_SHIPPING_DATA).sort().map((s) => (
+                    <option key={s} value={s}>
+                      {s.toUpperCase()}
                     </option>
                   ))}
                 </select>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
-                <input
-                  name="state"
-                  value="LAGOS"
-                  disabled
-                  className="w-full px-4 py-3 border-b border-gray-100 text-[#CCCCCC] text-[13px] tracking-widest font-medium bg-transparent cursor-not-allowed uppercase"
-                />
-              </div>
             </div>
+
+            {form.state !== "Lagos" && (
+              <div className="space-y-4 pt-4">
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Delivery Method</label>
+                <div className="flex gap-8">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="deliveryMethod"
+                      value="home"
+                      checked={form.deliveryMethod === "home"}
+                      onChange={handleChange}
+                      className="w-4 h-4 accent-black"
+                    />
+                    <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Home Delivery</span>
+                  </label>
+                  
+                  {INTERSTATE_SHIPPING_DATA[form.state]?.park !== INTERSTATE_SHIPPING_DATA[form.state]?.home && (
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="park"
+                        checked={form.deliveryMethod === "park"}
+                        onChange={handleChange}
+                        className="w-4 h-4 accent-black"
+                      />
+                      <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Park Pick-up</span>
+                    </label>
+                  )}
+                </div>
+                {INTERSTATE_SHIPPING_DATA[form.state]?.park === INTERSTATE_SHIPPING_DATA[form.state]?.home && (
+                  <p className="text-[9px] text-gray-400 uppercase tracking-widest">Only Home Delivery is available for this state.</p>
+                )}
+              </div>
+            )}
 
             <div className="pt-12">
               <button
@@ -348,9 +423,17 @@ const Checkout = () => {
             </div>
             <div className="flex justify-between text-[11px] tracking-widest uppercase">
               <span className="text-gray-400">Shipping</span>
-              <span className="text-black font-bold uppercase">
-                {form.city ? `${form.city} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
-              </span>
+              <div className="text-right">
+                <span className="text-black font-bold uppercase block">
+                  {form.city ? `${form.city} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
+                </span>
+                {form.state !== "Lagos" && (
+                  <span className="text-[9px] text-gray-400 block mt-1 uppercase">
+                    {totalWeight.toFixed(1)}kg Total Weight 
+                    {totalWeight > 3 && ` (${Math.ceil(totalWeight - 3)}kg excess)`}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

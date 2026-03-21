@@ -29,6 +29,7 @@ export default function AdminProducts() {
     sizes: [], // Array of strings e.g. ["S", "M", "L"]
     colors: [], // Array of strings e.g. ["Black", "White"]
     stockQuantity: 0,
+    weight: 0,
     inStock: true,
     featured: false,
     bestSeller: false,
@@ -79,6 +80,7 @@ export default function AdminProducts() {
       sizes: product.sizes || [],
       colors: product.colors || [],
       stockQuantity: product.stockQuantity || 0,
+      weight: product.weight || 0,
       inStock: product.inStock !== false,
       featured: product.featured || false,
       bestSeller: product.bestSeller || false,
@@ -436,6 +438,22 @@ export default function AdminProducts() {
                     <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                   </div>
                   <p className="text-[11px] text-gray-400">Updating this will automatically set {formData.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'} status.</p>
+                </div>
+
+                <div className="space-y-2 flex-1">
+                  <label className="text-sm font-medium">Weight (kg)</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      className="w-full border p-3 rounded-lg pl-10"
+                      value={formData.weight}
+                      onChange={e => setFormData({ ...formData, weight: parseFloat(e.target.value) || 0 })}
+                    />
+                    <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  </div>
+                  <p className="text-[11px] text-gray-400">Used for interstate shipping calculations (₦1,500/kg above 3kg).</p>
                 </div>
 
                 <div className="flex flex-col justify-end gap-3 pb-2">
