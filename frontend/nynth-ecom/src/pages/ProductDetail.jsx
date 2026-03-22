@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { fetchSingleProduct } from "../api/firebaseFunctions";
-import { Plus, Minus, Check, ShieldCheck } from "lucide-react";
+import { Plus, Minus, Check, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
@@ -42,6 +42,41 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+
+  const timerRef = React.useRef(null);
+
+  const startAutoScroll = React.useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setSelectedImage(prev => {
+        return product?.images?.length > 1 ? (prev + 1) % product.images.length : prev;
+      });
+    }, 4000); // 4 seconds for slower, smoother feel
+  }, [product?.images]);
+
+  useEffect(() => {
+    if (product?.images?.length > 1) {
+      startAutoScroll();
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [product, startAutoScroll]);
+
+  const handleManualImageChange = (newIndex) => {
+    setSelectedImage(newIndex);
+    startAutoScroll(); // Clear and restart timer to prevent buggy jumps
+  };
+
+  const nextImage = () => {
+    if (!product?.images) return;
+    handleManualImageChange((selectedImage + 1) % product.images.length);
+  };
+
+  const prevImage = () => {
+    if (!product?.images) return;
+    handleManualImageChange(selectedImage === 0 ? product.images.length - 1 : selectedImage - 1);
+  };
   const [addingToCart, setAddingToCart] = useState(false);
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
@@ -133,7 +168,7 @@ export default function ProductDetail() {
                 {product.images.map((img, i) => (
                   <button
                     key={i}
-                    onClick={() => setSelectedImage(i)}
+                    onClick={() => handleManualImageChange(i)}
                     className={`h-14 w-11 flex-shrink-0 transition-opacity border ${selectedImage === i ? "border-black opacity-100" : "border-transparent opacity-30 hover:opacity-100"}`}
                   >
                     <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
@@ -253,13 +288,43 @@ export default function ProductDetail() {
 
       {/* ====== MOBILE: Single Column Layout (<lg) ====== */}
       <main className="lg:hidden pt-[68px] pb-24">
-        {/* Product Image */}
-        <div className="w-full bg-white aspect-square flex items-center justify-center">
+        {/* Product Image Mobile Carousel */}
+        <div className="w-full bg-white relative aspect-square flex items-center justify-center overflow-hidden group">
           <img
             src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
             alt={product.title}
-            className="w-[85%] h-[85%] object-contain"
+            className="w-[85%] h-[85%] object-contain transition-opacity duration-300"
           />
+          
+          {product.images?.length > 1 && (
+            <>
+              {/* Arrows */}
+              <button 
+                onClick={prevImage}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 rounded-full shadow-sm text-black opacity-80 hover:opacity-100"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button 
+                onClick={nextImage}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 rounded-full shadow-sm text-black opacity-80 hover:opacity-100"
+              >
+                <ChevronRight size={18} />
+              </button>
+
+              {/* Dots */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-white/50 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                {product.images.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleManualImageChange(i)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${i === selectedImage ? "bg-black w-4" : "bg-black/30 w-1.5"}`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Product Info */}
