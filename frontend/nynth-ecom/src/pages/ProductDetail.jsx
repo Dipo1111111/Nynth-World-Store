@@ -147,15 +147,10 @@ export default function ProductDetail() {
                       key={color}
                       onClick={() => {
                         setSelectedColor(color);
-                        if (product.images?.[idx]) setSelectedImage(idx);
                       }}
                       className={`w-12 h-14 bg-white flex items-center justify-center transition-all border ${selectedColor === color ? "border-black border-[1.5px]" : "border-transparent hover:border-black/20"}`}
                     >
-                      {product.images?.[idx] ? (
-                        <img src={product.images[idx]} alt={color} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-5 h-5 border border-black/10" style={{ backgroundColor: color.toLowerCase() }} />
-                      )}
+                      <div className="w-5 h-5 border border-black/10" style={{ backgroundColor: color.toLowerCase() }} />
                     </button>
                   ))}
                 </div>
@@ -269,15 +264,10 @@ export default function ProductDetail() {
                     key={color}
                     onClick={() => {
                       setSelectedColor(color);
-                      if (product.images?.[idx]) setSelectedImage(idx);
                     }}
-                    className={`w-12 h-14 bg-[#f0f0f0] overflow-hidden flex items-center justify-center transition-all border-2 ${selectedColor === color ? "border-black" : "border-transparent hover:border-gray-300"}`}
+                    className={`w-12 h-14 bg-[#f0f0f0] flex items-center justify-center transition-all border-2 ${selectedColor === color ? "border-black" : "border-transparent hover:border-gray-300"}`}
                   >
-                    {product.images?.[idx] ? (
-                      <img src={product.images[idx]} alt={color} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full border border-gray-200" style={{ backgroundColor: color.toLowerCase() }} />
-                    )}
+                    <div className="w-6 h-6 rounded-full border border-gray-200" style={{ backgroundColor: color.toLowerCase() }} />
                   </button>
                 ))}
               </div>

@@ -4,11 +4,10 @@ import {
   fetchProducts,
   addProduct,
   updateProduct,
-  deleteProduct,
-  uploadImage,
-  uploadMultipleImages
+  deleteProduct
 } from "../../api/firebaseFunctions";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package } from "lucide-react";
+import { uploadImageToCloudinary } from "../../api/cloudinary";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
 
@@ -77,8 +76,8 @@ export default function AdminProducts() {
       description: product.description || "",
       category: product.category || "tees",
       images: product.images || (product.imageUrl ? [product.imageUrl] : []),
-      sizes: product.sizes || [],
-      colors: product.colors || [],
+      sizes: product.availableSizes || product.sizes || [],
+      colors: product.availableColors || product.colors || [],
       stockQuantity: product.stockQuantity || 0,
       weight: product.weight || 0,
       inStock: product.inStock !== false,
@@ -127,7 +126,7 @@ export default function AdminProducts() {
         for (let i = 0; i < compressedFiles.length; i++) {
           toast.loading(`Uploading image ${i + 1} of ${totalFiles}...`, { id: "upload-status" });
           try {
-            const url = await uploadImage(compressedFiles[i]);
+            const url = await uploadImageToCloudinary(compressedFiles[i]);
             newImageUrls.push(url);
           } catch (uploadErr) {
             console.error(`Failed to upload image ${i + 1}:`, uploadErr);
@@ -157,6 +156,8 @@ export default function AdminProducts() {
 
       const payload = {
         ...formData,
+        availableSizes: formData.sizes,
+        availableColors: formData.colors,
         price: parseFloat(formData.price),
         images: finalImages,
         imageUrl: finalImages[0],
@@ -165,10 +166,10 @@ export default function AdminProducts() {
 
       if (editingId) {
         await updateProduct(editingId, payload);
-        toast.success("Product updated successfully");
+        toast.success("Product updated successfully", { id: "upload-status" });
       } else {
         await addProduct(payload);
-        toast.success("Product created successfully");
+        toast.success("Product created successfully", { id: "upload-status" });
       }
 
       setIsModalOpen(false);
@@ -476,16 +477,56 @@ export default function AdminProducts() {
                   {formData.images.map((img, idx) => (
                     <div key={idx} className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden relative flex-shrink-0 group/img">
                       <img src={img} className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newImages = formData.images.filter((_, i) => i !== idx);
-                          setFormData({ ...formData, images: newImages });
-                        }}
-                        className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      {idx === 0 && (
+                        <div className="absolute top-1 left-1 bg-black text-white text-[8px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider shadow-sm z-10 pointer-events-none">
+                          Primary
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-1 z-20">
+                        {idx > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = [...formData.images];
+                              const temp = newImages[idx - 1];
+                              newImages[idx - 1] = newImages[idx];
+                              newImages[idx] = temp;
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="bg-white text-black p-1.5 rounded-full hover:scale-110 transition-transform shadow-md"
+                            title="Move Left"
+                          >
+                            <ChevronLeft size={12} strokeWidth={3} />
+                          </button>
+                        )}
+                        {idx < formData.images.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = [...formData.images];
+                              const temp = newImages[idx + 1];
+                              newImages[idx + 1] = newImages[idx];
+                              newImages[idx] = temp;
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="bg-white text-black p-1.5 rounded-full hover:scale-110 transition-transform shadow-md"
+                            title="Move Right"
+                          >
+                            <ChevronRight size={12} strokeWidth={3} />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = formData.images.filter((_, i) => i !== idx);
+                            setFormData({ ...formData, images: newImages });
+                          }}
+                          className="bg-red-500 text-white p-1.5 rounded-full hover:scale-110 transition-transform shadow-md"
+                          title="Delete Image"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

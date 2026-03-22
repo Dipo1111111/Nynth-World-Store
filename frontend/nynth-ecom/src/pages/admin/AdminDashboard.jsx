@@ -148,14 +148,9 @@ const AdminDashboard = () => {
                 setRecentOrders(analyticsData.rawOrders.slice(0, 5));
             }
 
-            // Now fetch GA4 data using the Property ID from settings
-            const gaPropId = siteSettings?.ga_property_id;
-            const gaData = await fetchGA4Analytics(gaPropId);
-            
-            console.log('Dashboard - GA4 Analytics:', gaData);
-            if (gaData?.status === 'success') {
-                setGaAnalytics(gaData);
-            }
+            // Firebase Cloud Functions are disabled to prevent Blaze plan requirements.
+            // Using internal tracking (presence/visits) as fallback.
+            setGaAnalytics(null);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             toast.error('Failed to load dashboard data');
