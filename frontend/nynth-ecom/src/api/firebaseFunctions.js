@@ -439,12 +439,6 @@ export const addSubscriber = async (email, source = 'newsletter') => {
       return { success: true, message: 'ALREADY_ADDED' };
     }
 
-    // 2. Secondary check by email field (for legacy entries with random IDs)
-    const q = query(collection(db, "subscribers"), where("email", "==", formattedEmail));
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty) {
-      return { success: true, message: 'ALREADY_ADDED' };
-    }
 
     await setDoc(docRef, {
       email: formattedEmail,
