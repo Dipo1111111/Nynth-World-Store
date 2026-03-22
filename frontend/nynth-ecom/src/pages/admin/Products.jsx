@@ -27,6 +27,7 @@ export default function AdminProducts() {
     images: [], // Array of URL strings
     sizes: [], // Array of strings e.g. ["S", "M", "L"]
     colors: [], // Array of strings e.g. ["Black", "White"]
+    tags: [], // E.g. ["New", "Best Seller"]
     stockQuantity: 0,
     weight: 0,
     inStock: true,
@@ -51,6 +52,7 @@ export default function AdminProducts() {
     "Blue", "Green", "Olive", "Brown", "Burgundy",
     "Pink", "Yellow", "Purple"
   ];
+  const availableTags = ["New", "Best Seller", "Essential", "Limited Edition", "Sale", "Restocked"];
 
   const loadProducts = async () => {
     try {
@@ -78,6 +80,7 @@ export default function AdminProducts() {
       images: product.images || (product.imageUrl ? [product.imageUrl] : []),
       sizes: product.availableSizes || product.sizes || [],
       colors: product.availableColors || product.colors || [],
+      tags: product.tags || [],
       stockQuantity: product.stockQuantity || 0,
       weight: product.weight || 0,
       inStock: product.inStock !== false,
@@ -158,6 +161,7 @@ export default function AdminProducts() {
         ...formData,
         availableSizes: formData.sizes,
         availableColors: formData.colors,
+        tags: formData.tags,
         price: parseFloat(formData.price),
         images: finalImages,
         imageUrl: finalImages[0],
@@ -462,6 +466,25 @@ export default function AdminProducts() {
                           }`}
                       >
                         {color}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tags</label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags.map(tag => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleSelection("tags", tag)}
+                        className={`px-3 py-1 rounded-full border text-sm font-medium transition-all ${formData.tags.includes(tag)
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-black"
+                          }`}
+                      >
+                        {tag}
                       </button>
                     ))}
                   </div>

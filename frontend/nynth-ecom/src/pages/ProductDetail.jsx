@@ -10,6 +10,26 @@ import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
 import SizeGuideModal from "../components/products/SizeGuideModal";
 
+const getColorHex = (colorName) => {
+  const map = {
+    black: "#000000",
+    white: "#FFFFFF",
+    grey: "#808080",
+    navy: "#000080",
+    beige: "#F5F5DC",
+    red: "#FF0000",
+    blue: "#0000FF",
+    green: "#008000",
+    olive: "#808000",
+    brown: "#654321",
+    burgundy: "#800020",
+    pink: "#FFC0CB",
+    yellow: "#FFFF00",
+    purple: "#800080"
+  };
+  return map[colorName.toLowerCase()] || colorName.toLowerCase();
+};
+
 export default function ProductDetail() {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -150,7 +170,7 @@ export default function ProductDetail() {
                       }}
                       className={`w-12 h-14 bg-white flex items-center justify-center transition-all border ${selectedColor === color ? "border-black border-[1.5px]" : "border-transparent hover:border-black/20"}`}
                     >
-                      <div className="w-5 h-5 border border-black/10" style={{ backgroundColor: color.toLowerCase() }} />
+                      <div className="w-5 h-5 border border-black/10" style={{ backgroundColor: getColorHex(color) }} />
                     </button>
                   ))}
                 </div>
@@ -267,7 +287,7 @@ export default function ProductDetail() {
                     }}
                     className={`w-12 h-14 bg-[#f0f0f0] flex items-center justify-center transition-all border-2 ${selectedColor === color ? "border-black" : "border-transparent hover:border-gray-300"}`}
                   >
-                    <div className="w-6 h-6 rounded-full border border-gray-200" style={{ backgroundColor: color.toLowerCase() }} />
+                    <div className="w-6 h-6 rounded-full border border-gray-200" style={{ backgroundColor: getColorHex(color) }} />
                   </button>
                 ))}
               </div>

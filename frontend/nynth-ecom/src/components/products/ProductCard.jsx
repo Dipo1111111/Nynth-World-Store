@@ -21,6 +21,22 @@ export default function ProductCard({ product, displayMode = 'model' }) {
 
   const isOutOfStock = product.stockQuantity <= 0;
 
+  // Filter allowed visual tags (ignores hidden SEO tags like 'cotton', 't-shirt')
+  const allowedTags = ["new", "best seller", "essential", "limited edition", "sale", "restocked"];
+  let activeTags = [];
+  if (product.newArrival) activeTags.push("New");
+  if (product.tags) {
+    product.tags
+      .filter(t => allowedTags.includes(t.toLowerCase()))
+      .forEach(t => {
+        if (!activeTags.some(at => at.toLowerCase() === t.toLowerCase())) {
+          activeTags.push(t);
+        }
+      });
+  }
+  // User prefers max 1 or 2
+  const tagsToShow = activeTags.slice(0, 2);
+
   const handleAddToCart = (e) => {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     if (isOutOfStock) return;
@@ -61,16 +77,22 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          {isOutOfStock && (
-            <span className="absolute top-3 left-3 bg-white text-black text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
-              Sold Out
-            </span>
-          )}
-          {!isOutOfStock && product.newArrival && (
-            <span className="absolute top-3 left-3 bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase">
-              New
-            </span>
-          )}
+          {/* Badges */}
+          <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1 pointer-events-none">
+            {isOutOfStock ? (
+              <span className="bg-white text-black text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
+                Sold Out
+              </span>
+            ) : (
+              <>
+                {tagsToShow.map((tag, i) => (
+                  <span key={i} className="bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase shadow-sm">
+                    {tag}
+                  </span>
+                ))}
+              </>
+            )}
+          </div>
         </Link>
 
         {/* Info */}
@@ -123,16 +145,20 @@ export default function ProductCard({ product, displayMode = 'model' }) {
         </button>
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1 pointer-events-none">
+        <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1 pointer-events-none">
           {isOutOfStock ? (
             <span className="bg-white text-black text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
               Sold Out
             </span>
-          ) : product.newArrival ? (
-            <span className="bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase">
-              New
-            </span>
-          ) : null}
+          ) : (
+            <>
+              {tagsToShow.map((tag, i) => (
+                <span key={i} className="bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase shadow-sm">
+                  {tag}
+                </span>
+              ))}
+            </>
+          )}
         </div>
       </Link>
 
