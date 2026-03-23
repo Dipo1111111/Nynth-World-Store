@@ -36,7 +36,7 @@ export default function AdminProducts() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const [uploadFiles, setUploadFiles] = useState([]); // Files to upload
+  const [isUploading, setIsUploading] = useState(false); // Track active uploads
 
   const categories = [
     { value: "tees", label: "Tees" },
@@ -94,8 +94,51 @@ export default function AdminProducts() {
   const handleCreate = () => {
     setEditingId(null);
     setFormData(initialFormState);
-    setUploadFiles([]);
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      setIsUploading(true);
+      const totalFiles = files.length;
+      toast.loading(`Compressing ${totalFiles} image${totalFiles > 1 ? 's' : ''}...`, { id: "upload-status" });
+      
+      const compressedFiles = await Promise.all(
+        files.map(file => compressImage(file))
+      );
+      
+      let uploadedUrls = [];
+      for (let i = 0; i < compressedFiles.length; i++) {
+        toast.loading(`Uploading image ${i + 1} of ${totalFiles}...`, { id: "upload-status" });
+        try {
+          const url = await uploadImageToCloudinary(compressedFiles[i]);
+          uploadedUrls.push(url);
+        } catch (uploadErr) {
+          console.error(`Failed to upload image ${i + 1}:`, uploadErr);
+          toast.error(`Failed to upload image ${i + 1}.`, { id: `err-${i}` });
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, ...uploadedUrls]
+        }));
+        toast.success(`Added ${uploadedUrls.length} image(s)`, { id: "upload-status" });
+      } else {
+        toast.dismiss("upload-status");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("An error occurred during upload", { id: "upload-status" });
+    } finally {
+      setIsUploading(false);
+      // Clear input so same file can be selected again if needed
+      e.target.value = "";
+    }
   };
 
   const toggleSelection = (field, value) => {
@@ -111,46 +154,18 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isUploading) {
+      toast.error("Please wait for images to finish uploading");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
-      // Upload new images if any
-      let newImageUrls = [];
-      if (uploadFiles.length > 0) {
-        const totalFiles = uploadFiles.length;
-        toast.loading(`Compressing ${totalFiles} image${totalFiles > 1 ? 's' : ''}...`, { id: "upload-status" });
-        
-        // Parallel compression is much faster
-        const compressedFiles = await Promise.all(
-          uploadFiles.map(file => compressImage(file))
-        );
-        
-        // Upload one by one with individual progress updates
-        for (let i = 0; i < compressedFiles.length; i++) {
-          toast.loading(`Uploading image ${i + 1} of ${totalFiles}...`, { id: "upload-status" });
-          try {
-            const url = await uploadImageToCloudinary(compressedFiles[i]);
-            newImageUrls.push(url);
-          } catch (uploadErr) {
-            console.error(`Failed to upload image ${i + 1}:`, uploadErr);
-            toast.error(`Failed to upload image ${i + 1}. Continuing...`, { id: `err-${i}` });
-          }
-        }
-        
-        if (newImageUrls.length === 0 && formData.images.length === 0) {
-          toast.error("All image uploads failed.", { id: "upload-status" });
-          setIsSubmitting(false);
-          return;
-        }
-        
-        toast.success(`${newImageUrls.length} image(s) ready`, { id: "upload-status" });
-      }
-
-      // Combine existing images and successfully uploaded new ones
-      const finalImages = [...formData.images, ...newImageUrls];
+      const finalImages = formData.images;
 
       if (finalImages.length === 0) {
-        toast.error("At least one image is required", { id: "upload-status" });
+        toast.error("At least one image is required");
         setIsSubmitting(false);
         return;
       }
@@ -560,13 +575,14 @@ export default function AdminProducts() {
                     multiple
                     accept="image/*"
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    onChange={e => setUploadFiles(Array.from(e.target.files))}
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
                   />
                   <div className="flex flex-col items-center text-gray-400">
                     <Upload size={24} className="mb-1" />
                     <span className="text-sm">
-                      {uploadFiles.length > 0
-                        ? `${uploadFiles.length} files selected`
+                      {isUploading
+                        ? "Uploading images..."
                         : "Click to upload images"}
                     </span>
                   </div>
@@ -634,16 +650,16 @@ export default function AdminProducts() {
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-2 bg-black text-white rounded-lg hover:opacity-90 flex items-center gap-2"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploading}
                 >
-                  {isSubmitting && <Loader2 className="animate-spin" size={16} />}
+                  {(isSubmitting || isUploading) && <Loader2 className="animate-spin" size={16} />}
                   {editingId ? "Save Changes" : "Create Product"}
                 </button>
               </div>
