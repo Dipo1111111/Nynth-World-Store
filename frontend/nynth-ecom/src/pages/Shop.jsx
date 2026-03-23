@@ -7,7 +7,7 @@ import ProductCard from "../components/products/ProductCard";
 import { fetchProducts } from "../api/firebaseFunctions";
 import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
-import headerBanner from "../assets/header.png";
+import headerBanner from "../assets/header.webp";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,8 +56,13 @@ export default function Shop() {
     if (selectedCategory !== "all") {
       result = result.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase());
     }
-    // Sorting Newest
-    result.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
+    // Sorting default: Respect displayOrder first, then newest
+    result.sort((a, b) => {
+      const orderA = a.displayOrder !== undefined ? Number(a.displayOrder) : 999;
+      const orderB = b.displayOrder !== undefined ? Number(b.displayOrder) : 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
+    });
     setFilteredProducts(result);
   }, [products, selectedCategory, searchQuery, sortBy]);
 
@@ -72,7 +77,7 @@ export default function Shop() {
           <img
             src={headerBanner}
             alt="Collection Hero"
-            fetchpriority="high"
+            fetchPriority="high"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />
@@ -117,7 +122,7 @@ export default function Shop() {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            {["all", "hoodies", "headwear", "tees"].map((cat) => (
+            {["all", "hoodies", "headwear", "tees", "polo"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}

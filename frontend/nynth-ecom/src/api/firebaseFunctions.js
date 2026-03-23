@@ -84,6 +84,21 @@ export const deleteProduct = async (id) => {
   }
 };
 
+export const updateProductOrderBatch = async (productsArray) => {
+  try {
+    const batch = writeBatch(db);
+    productsArray.forEach((product, index) => {
+      const docRef = doc(db, "products", product.id);
+      batch.update(docRef, { displayOrder: index });
+    });
+    await batch.commit();
+    return true;
+  } catch (error) {
+    console.error("Batch update error:", error);
+    return false;
+  }
+};
+
 // --- PRODUCT FILTERING & QUERIES ---
 
 export const fetchFeaturedProducts = async (max = 6) => {

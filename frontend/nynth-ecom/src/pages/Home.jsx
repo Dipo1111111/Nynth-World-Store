@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 import ProductCard from "../components/products/ProductCard";
 
-const categories = ["Explore", "Apparel", "Homeware", "Accessories", "Drinkware"];
+const categories = ["Explore", "Apparel", "Homeware", "Accessories", "Drinkware", "Polo"];
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("Explore");
@@ -34,9 +34,17 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  const filteredProducts = activeCategory === "Explore"
-    ? products
+  let filteredProducts = activeCategory === "Explore"
+    ? [...products]
     : products.filter(p => p.category?.toLowerCase() === activeCategory.toLowerCase());
+
+  // Respect manual display order first, then newest
+  filteredProducts.sort((a, b) => {
+      const orderA = a.displayOrder !== undefined ? Number(a.displayOrder) : 999;
+      const orderB = b.displayOrder !== undefined ? Number(b.displayOrder) : 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
+  });
 
   // Pagination logic
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -63,7 +71,7 @@ export default function Home() {
               Collection 001 / NYNTH
             </span>
             <h1 className="hero-title text-black mb-8 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-              {activeCategory === "Explore" ? "FEATURED" : activeCategory}
+              {activeCategory === "Explore" ? "FEATURED" : activeCategory.toUpperCase()}
             </h1>
           </div>
         </section>
@@ -80,7 +88,7 @@ export default function Home() {
               className={`text-[10px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${activeCategory === cat ? "text-black underline underline-offset-8" : "text-gray-400 hover:text-black"
                 }`}
             >
-              {cat === "Explore" ? "ALL" : cat}
+              {cat === "Explore" ? "ALL" : cat.toUpperCase()}
             </button>
           ))}
         </div>

@@ -4,12 +4,117 @@ import {
   fetchProducts,
   addProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  updateProductOrderBatch
 } from "../../api/firebaseFunctions";
 import { uploadImageToCloudinary } from "../../api/cloudinary";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical } from "lucide-react";
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
+
+
+const SortableMobileCard = ({ product, handleEdit, handleDelete }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`bg-white p-4 rounded-xl border ${isDragging ? "border-black shadow-lg opacity-80" : "border-gray-100 shadow-sm"} flex flex-col gap-3 group`}>
+      <div className="flex gap-4">
+        <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
+          {(product.images?.[0] || product.imageUrl) ? (
+            <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          ) : (
+            <ImageIcon className="w-full h-full p-4 text-gray-300" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight">{product.title || product.name}</h3>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{product.category}</p>
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
+            <div className="flex items-center gap-1">
+              <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${
+                product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
+                product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
+                "bg-green-50 text-green-600 border border-green-100"
+              }`}>
+                {product.stockQuantity <= 0 ? "Out" : `${product.stockQuantity} Left`}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
+        <button {...attributes} {...listeners} className="flex items-center justify-center p-2 bg-gray-50 text-gray-400 hover:text-black rounded-lg border border-transparent touch-none active:cursor-grabbing">
+          <GripVertical size={16} />
+        </button>
+        <button onClick={() => handleEdit(product)} className="flex-1 flex items-center justify-center gap-2 p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5 text-[10px] font-bold uppercase tracking-wider">
+          <Edit2 size={14} /> Edit
+        </button>
+        <button onClick={() => handleDelete(product.id)} className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-50 text-red-500 rounded-lg border border-red-100 text-[10px] font-bold uppercase tracking-wider">
+          <Trash2 size={14} /> Delete
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const SortableDesktopRow = ({ product, handleEdit, handleDelete }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
+
+  return (
+    <tr ref={setNodeRef} style={style} className={`group transition-colors ${isDragging ? "bg-gray-50 shadow-lg ring-1 ring-black/5 opacity-80" : "hover:bg-gray-50"}`}>
+      <td className="p-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden border border-black/5">
+            {(product.images?.[0] || product.imageUrl) ? (
+              <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            ) : (
+              <ImageIcon className="w-full h-full p-3 text-gray-300" />
+            )}
+          </div>
+          <div>
+            <span className="font-bold text-gray-900 text-sm uppercase tracking-tight block">{product.title || product.name}</span>
+            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
+          </div>
+        </div>
+      </td>
+      <td className="p-4 capitalize text-gray-600 text-sm font-medium">{product.category}</td>
+      <td className="p-4 font-bold text-sm">₦{product.price?.toLocaleString()}</td>
+      <td className="p-4">
+        <div className="flex flex-col gap-1">
+          <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider w-fit border ${
+            product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border-red-100" :
+            product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border-orange-100" :
+            "bg-green-50 text-green-600 border-green-100"
+          }`}>
+            {product.stockQuantity <= 0 ? "Out of Stock" : product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
+          </span>
+          <span className="text-[10px] text-gray-400 font-bold px-1 uppercase tracking-tighter">{product.stockQuantity} UNITS</span>
+        </div>
+      </td>
+      <td className="p-4 text-right">
+        <div className="flex justify-end items-center gap-2 transition-all">
+          <button {...attributes} {...listeners} className="p-2 text-gray-400 hover:text-black cursor-grab active:cursor-grabbing touch-none">
+            <GripVertical size={16} />
+          </button>
+          <button onClick={() => handleEdit(product)} className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg border border-transparent hover:border-black/5">
+            <Edit2 size={16} />
+          </button>
+          <button onClick={() => handleDelete(product.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+};
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -40,14 +145,15 @@ export default function AdminProducts() {
   const [isUploading, setIsUploading] = useState(false); // Track active uploads
 
   const categories = [
-    { value: "tees", label: "Tees" },
-    { value: "hoodies", label: "Hoodies" },
-    { value: "headwear", label: "Headwear" },
-    { value: "accessories", label: "Accessories" },
-    { value: "pants", label: "Pants" },
+    { value: "tees", label: "TEES" },
+    { value: "hoodies", label: "HOODIES" },
+    { value: "headwear", label: "HEADWEAR" },
+    { value: "accessories", label: "ACCESSORIES" },
+    { value: "pants", label: "PANTS" },
+    { value: "polo", label: "POLO" },
   ];
 
-  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   const availableColors = [
     "Black", "White", "Grey", "Navy", "Beige", "Red",
     "Blue", "Green", "Olive", "Brown", "Burgundy",
@@ -55,10 +161,40 @@ export default function AdminProducts() {
   ];
   const availableTags = ["New", "Best Seller", "Essential", "Limited Edition", "Sale", "Restocked"];
 
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+  );
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (active && over && active.id !== over.id) {
+      setProducts((items) => {
+        const oldIndex = items.findIndex((p) => p.id === active.id);
+        const newIndex = items.findIndex((p) => p.id === over.id);
+        const newArray = arrayMove(items, oldIndex, newIndex);
+        
+        toast.promise(
+          updateProductOrderBatch(newArray),
+          { loading: 'Saving new order...', success: 'Order updated successfully', error: 'Failed to update order' },
+          { id: 'order-update' }
+        );
+        return newArray;
+      });
+    }
+  };
+
   const loadProducts = async () => {
     try {
       setLoading(true);
       const data = await fetchProducts();
+      data.sort((a, b) => {
+        const orderA = a.displayOrder !== undefined ? Number(a.displayOrder) : 999;
+        const orderB = b.displayOrder !== undefined ? Number(b.displayOrder) : 999;
+        if (orderA !== orderB) return orderA - orderB;
+        return (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
+      });
       setProducts(data);
     } catch (error) {
       toast.error("Failed to load products");
@@ -179,6 +315,7 @@ export default function AdminProducts() {
         availableColors: formData.colors,
         tags: formData.tags,
         price: parseFloat(formData.price),
+        displayOrder: formData.displayOrder !== undefined ? formData.displayOrder : 999,
         images: finalImages,
         imageUrl: finalImages[0],
         modelImage: formData.modelImage || (finalImages.length > 0 ? finalImages[0] : null),
@@ -234,63 +371,12 @@ export default function AdminProducts() {
         ) : (
           <>
             {/* Mobile Card View */}
-            <div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
+            
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
+<div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
               {products.map(product => (
-                <div key={product.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-3 group">
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
-                      {(product.images?.[0] || product.imageUrl) ? (
-                        <img
-                          src={product.images?.[0] || product.imageUrl}
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <ImageIcon className="w-full h-full p-4 text-gray-300" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                      <div>
-                        <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight">
-                          {product.title || product.name}
-                        </h3>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                          {product.category}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between mt-2">
-                         <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
-                         <div className="flex items-center gap-1">
-                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${
-                              product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border border-red-100" :
-                              product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border border-orange-100" :
-                              "bg-green-50 text-green-600 border border-green-100"
-                            }`}>
-                              {product.stockQuantity <= 0 ? "Out" : `${product.stockQuantity} Left`}
-                            </span>
-                         </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Actions for Mobile */}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="flex-1 flex items-center justify-center gap-2 p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5 text-[10px] font-bold uppercase tracking-wider"
-                    >
-                      <Edit2 size={14} /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-50 text-red-500 rounded-lg border border-red-100 text-[10px] font-bold uppercase tracking-wider"
-                    >
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
-                </div>
+                <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} />
               ))}
               {products.length === 0 && (
                 <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-200">
@@ -299,6 +385,8 @@ export default function AdminProducts() {
                 </div>
               )}
             </div>
+              </SortableContext>
+            </DndContext>
 
             {/* Desktop Table View */}
             <div className="hidden sm:block overflow-x-auto">
@@ -312,66 +400,11 @@ export default function AdminProducts() {
                     <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
+                    <tbody className="divide-y divide-gray-100">
                   {products.map(product => (
-                    <tr key={product.id} className="hover:bg-gray-50 group transition-colors">
-                      <td className="p-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden border border-black/5">
-                            {(product.images?.[0] || product.imageUrl) ? (
-                              <img
-                                src={product.images?.[0] || product.imageUrl}
-                                alt=""
-                                loading="lazy"
-                                decoding="async"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <ImageIcon className="w-full h-full p-3 text-gray-300" />
-                            )}
-                          </div>
-                          <div>
-                            <span className="font-bold text-gray-900 text-sm uppercase tracking-tight block">
-                              {product.title || product.name}
-                            </span>
-                            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 capitalize text-gray-600 text-sm font-medium">{product.category}</td>
-                      <td className="p-4 font-bold text-sm">₦{product.price?.toLocaleString()}</td>
-                      <td className="p-4">
-                        <div className="flex flex-col gap-1">
-                          <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider w-fit border ${
-                            product.stockQuantity <= 0 ? "bg-red-50 text-red-600 border-red-100" :
-                            product.stockQuantity <= 5 ? "bg-orange-50 text-orange-600 border-orange-100" :
-                              "bg-green-50 text-green-600 border-green-100"
-                            }`}>
-                            {product.stockQuantity <= 0 ? "Out of Stock" :
-                              product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
-                          </span>
-                          <span className="text-[10px] text-gray-400 font-bold px-1 uppercase tracking-tighter">
-                            {product.stockQuantity} UNITS
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex justify-end gap-2 transition-all">
-                          <button
-                            onClick={() => handleEdit(product)}
-                            className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg border border-transparent hover:border-black/5"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} />
                   ))}
                   {products.length === 0 && (
                     <tr>
@@ -382,6 +415,8 @@ export default function AdminProducts() {
                     </tr>
                   )}
                 </tbody>
+                  </SortableContext>
+                </DndContext>
               </table>
             </div>
           </>
@@ -423,6 +458,7 @@ export default function AdminProducts() {
                     onChange={e => setFormData({ ...formData, price: e.target.value })}
                   />
                 </div>
+
               </div>
 
               <div className="space-y-2">
