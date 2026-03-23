@@ -7,6 +7,7 @@ import ProductCard from "../components/products/ProductCard";
 import { fetchProducts } from "../api/firebaseFunctions";
 import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
+import headerBanner from "../assets/header.png";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,7 +70,7 @@ export default function Shop() {
         {/* Full-width Hero Section - Edge to Edge */}
         <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img
-            src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2600"
+            src={headerBanner}
             alt="Collection Hero"
             fetchpriority="high"
             decoding="async"
