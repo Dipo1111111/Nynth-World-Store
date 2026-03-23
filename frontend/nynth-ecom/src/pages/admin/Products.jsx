@@ -7,7 +7,7 @@ import {
   deleteProduct
 } from "../../api/firebaseFunctions";
 import { uploadImageToCloudinary } from "../../api/cloudinary";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
 
@@ -33,6 +33,7 @@ export default function AdminProducts() {
     inStock: true,
     featured: false,
     bestSeller: false,
+    modelImage: null, // Image for the storefront model toggle
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -86,6 +87,7 @@ export default function AdminProducts() {
       inStock: product.inStock !== false,
       featured: product.featured || false,
       bestSeller: product.bestSeller || false,
+      modelImage: product.modelImage || product.modalImage || null,
     });
     setIsModalOpen(true);
   };
@@ -179,6 +181,7 @@ export default function AdminProducts() {
         price: parseFloat(formData.price),
         images: finalImages,
         imageUrl: finalImages[0],
+        modelImage: formData.modelImage || (finalImages.length > 0 ? finalImages[0] : null),
         updated_at: new Date()
       };
 
@@ -353,7 +356,7 @@ export default function AdminProducts() {
                         </div>
                       </td>
                       <td className="p-4 text-right">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                        <div className="flex justify-end gap-2 transition-all">
                           <button
                             onClick={() => handleEdit(product)}
                             className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg border border-transparent hover:border-black/5"
@@ -510,58 +513,83 @@ export default function AdminProducts() {
                 <label className="text-sm font-medium">Images</label>
 
                 {/* Existing Images */}
-                <div className="flex gap-2 mb-2 overflow-x-auto no-scrollbar pb-2">
+                <div className="flex gap-4 mb-2 overflow-x-auto no-scrollbar pb-4 snap-x">
                   {formData.images.map((img, idx) => (
-                    <div key={idx} className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden relative flex-shrink-0 group/img">
-                      <img src={img} className="w-full h-full object-cover" />
-                      {idx === 0 && (
-                        <div className="absolute top-1 left-1 bg-black text-white text-[8px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider shadow-sm z-10 pointer-events-none">
-                          Primary
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-1 z-20">
-                        {idx > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newImages = [...formData.images];
-                              const temp = newImages[idx - 1];
-                              newImages[idx - 1] = newImages[idx];
-                              newImages[idx] = temp;
-                              setFormData({ ...formData, images: newImages });
-                            }}
-                            className="bg-white text-black p-1.5 rounded-full hover:scale-110 transition-transform shadow-md"
-                            title="Move Left"
-                          >
-                            <ChevronLeft size={12} strokeWidth={3} />
-                          </button>
+                    <div key={idx} className="flex flex-col gap-2 flex-shrink-0 snap-start">
+                      <div className="w-28 h-28 rounded-lg border border-gray-200 overflow-hidden relative">
+                        <img src={img} className="w-full h-full object-cover" />
+                        {idx === 0 && (
+                          <div className="absolute top-1 left-1 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider shadow-sm z-10 pointer-events-none">
+                            Primary
+                          </div>
                         )}
-                        {idx < formData.images.length - 1 && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newImages = [...formData.images];
-                              const temp = newImages[idx + 1];
-                              newImages[idx + 1] = newImages[idx];
-                              newImages[idx] = temp;
-                              setFormData({ ...formData, images: newImages });
-                            }}
-                            className="bg-white text-black p-1.5 rounded-full hover:scale-110 transition-transform shadow-md"
-                            title="Move Right"
-                          >
-                            <ChevronRight size={12} strokeWidth={3} />
-                          </button>
+                        {formData.modelImage === img && (
+                          <div className="absolute bottom-1 left-1 bg-yellow-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider shadow-sm z-10 pointer-events-none">
+                            Model
+                          </div>
                         )}
+                      </div>
+                      
+                      {/* Action Bar (Always visible, below the image) */}
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (idx === 0) return;
+                            const newImages = [...formData.images];
+                            const temp = newImages[idx - 1];
+                            newImages[idx - 1] = newImages[idx];
+                            newImages[idx] = temp;
+                            setFormData({ ...formData, images: newImages });
+                          }}
+                          disabled={idx === 0}
+                          className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          title="Move Left"
+                        >
+                          <ChevronLeft size={16} strokeWidth={2.5} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, modelImage: formData.modelImage === img ? null : img })}
+                          className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${formData.modelImage === img ? 'text-yellow-500 bg-yellow-50' : 'text-gray-600'}`}
+                          title="Toggle Model Image"
+                        >
+                          <Star size={14} fill={formData.modelImage === img ? "currentColor" : "none"} />
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => {
                             const newImages = formData.images.filter((_, i) => i !== idx);
-                            setFormData({ ...formData, images: newImages });
+                            // Also clear model image if deleted
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              images: newImages,
+                              modelImage: prev.modelImage === img ? null : prev.modelImage 
+                            }));
                           }}
-                          className="bg-red-500 text-white p-1.5 rounded-full hover:scale-110 transition-transform shadow-md"
+                          className="p-1.5 rounded-md hover:bg-red-50 text-red-500 transition-colors"
                           title="Delete Image"
                         >
-                          <Trash2 size={12} />
+                          <Trash2 size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (idx === formData.images.length - 1) return;
+                            const newImages = [...formData.images];
+                            const temp = newImages[idx + 1];
+                            newImages[idx + 1] = newImages[idx];
+                            newImages[idx] = temp;
+                            setFormData({ ...formData, images: newImages });
+                          }}
+                          disabled={idx === formData.images.length - 1}
+                          className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          title="Move Right"
+                        >
+                          <ChevronRight size={16} strokeWidth={2.5} />
                         </button>
                       </div>
                     </div>

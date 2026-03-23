@@ -14,10 +14,10 @@ export default function ProductCard({ product, displayMode = 'model' }) {
 
   const isSightMode = displayMode === 'view';
 
-  // In model mode, prefer 2nd image for visual variety. Otherwise use selected.
-  const mainImage = !isSightMode && product.images?.length > 1
-    ? product.images[1]
-    : product.images?.[selectedImageIndex] || product.images?.[0] || product.thumbnail || "/placeholder.jpg";
+  // In model mode, prefer explicit modelImage, then 2nd image. Otherwise use selected.
+  const mainImage = !isSightMode 
+    ? (product.modelImage || (product.images?.length > 1 ? product.images[1] : (product.images?.[selectedImageIndex] || product.images?.[0] || "/placeholder.jpg")))
+    : (product.images?.[selectedImageIndex] || product.images?.[0] || product.thumbnail || "/placeholder.jpg");
 
   const isOutOfStock = product.stockQuantity <= 0;
 

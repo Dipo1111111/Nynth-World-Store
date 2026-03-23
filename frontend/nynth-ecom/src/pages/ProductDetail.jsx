@@ -366,7 +366,12 @@ export default function ProductDetail() {
                 <p className="text-[9px] tracking-[0.2em] font-bold uppercase text-gray-500">
                   SIZE: <span className="text-black">{selectedSize}</span>
                 </p>
-                <button className="text-[9px] tracking-widest uppercase underline underline-offset-4 font-bold text-gray-500 hover:text-black">SIZECHART</button>
+                <button 
+                  onClick={() => setShowSizeGuide(true)}
+                  className="text-[9px] tracking-widest uppercase underline underline-offset-4 font-bold text-gray-500 hover:text-black"
+                >
+                  SIZECHART
+                </button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.availableSizes.map((size) => (
@@ -433,6 +438,10 @@ export default function ProductDetail() {
       </main>
 
       <Footer />
+
+      {showSizeGuide && (
+        <SizeGuideModal onClose={() => setShowSizeGuide(false)} />
+      )}
     </div>
   );
 }
