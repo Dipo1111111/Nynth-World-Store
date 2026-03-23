@@ -87,7 +87,6 @@ export default function AdminProducts() {
       featured: product.featured || false,
       bestSeller: product.bestSeller || false,
     });
-    setUploadFiles([]);
     setIsModalOpen(true);
   };
 
