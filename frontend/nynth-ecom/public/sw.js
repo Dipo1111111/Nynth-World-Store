@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nynth-cache-v2';
+const CACHE_NAME = 'nynth-cache-v3';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -6,7 +6,6 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-    // Skip waiting to force the new service worker to activate immediately
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -15,7 +14,6 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-    // Clear old caches
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
@@ -26,7 +24,20 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // Basic network-first strategy for navigation requests and API calls
+    const url = new URL(event.request.url);
+
+    // CRITICAL FIX: Bypass Service Worker entirely for Firebase, Firestore, Cloudinary, and external APIs
+    // Firestore uses long-polling/WebSockets that SW cannot intercept safely without simulating offline disconnects.
+    if (
+        url.hostname.includes('googleapis.com') ||
+        url.hostname.includes('firebaseio.com') ||
+        url.hostname.includes('cloudfunctions.net') ||
+        url.hostname.includes('cloudinary.com') ||
+        url.pathname.startsWith('/__/')
+    ) {
+        return; // Early return delegates request natively back to the browser.
+    }
+
     if (event.request.mode === 'navigate') {
         event.respondWith(
             fetch(event.request).catch(() => caches.match('/index.html'))
@@ -35,14 +46,12 @@ self.addEventListener('fetch', event => {
     }
 
     event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) return response;
-                return fetch(event.request).catch(error => {
-                    console.error('Fetch failed for:', event.request.url, error);
-                    // Return a 404 or generic fallback
-                    return new Response('Not found', { status: 404, statusText: 'Not found' });
-                });
-            })
+        caches.match(event.request).then(response => {
+            if (response) return response;
+            return fetch(event.request).catch(error => {
+                console.error('Fetch failed for:', event.request.url, error);
+                return new Response('Offline Content', { status: 503, statusText: 'Service Unavailable' });
+            });
+        })
     );
 });
