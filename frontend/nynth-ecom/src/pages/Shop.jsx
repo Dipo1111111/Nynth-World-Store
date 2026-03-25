@@ -98,7 +98,7 @@ export default function Shop() {
         <div className="sticky top-[68px] z-40 w-full bg-white border-b border-black/5 flex justify-between items-center py-5 px-6 md:px-10 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'view' ? 'opacity-100' : 'opacity-30'}`}>SICHT</span>
+              <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'view' ? 'opacity-100' : 'opacity-30'}`}>VIEW</span>
               <div className="flex items-center gap-[2px]">
                 <div className="w-[1.5px] h-3 bg-black opacity-20"></div>
                 <div className="flex gap-[1px]">
@@ -109,7 +109,7 @@ export default function Shop() {
                 </div>
                 <div className="w-[1.5px] h-3 bg-black opacity-20 ml-1"></div>
               </div>
-              <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'model' ? 'opacity-100' : 'opacity-30'}`}>MODELL</span>
+              <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'model' ? 'opacity-100' : 'opacity-30'}`}>MODEL</span>
               <button
                 onClick={() => setDisplayMode(displayMode === 'model' ? 'view' : 'model')}
                 className="ml-2 focus:outline-none"

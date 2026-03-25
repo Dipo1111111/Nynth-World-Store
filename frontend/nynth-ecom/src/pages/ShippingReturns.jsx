@@ -14,13 +14,13 @@ export default function ShippingReturns() {
                 <div className="prose prose-lg max-w-none text-gray-600 space-y-6">
                     <h3 className="text-black text-xl font-bold pt-4">Shipping Policy</h3>
                     <p>
-                        We currently ship within Nigeria. Orders are processed within 1–5 business days.
+                        We currently ship within Nigeria. Orders are processed within 3–10 business days.
                     </p>
 
                     <h3 className="text-black text-xl font-bold pt-4">Delivery Timelines</h3>
                     <ul className="list-disc pl-5 space-y-2">
-                        <li>Lagos Deliveries: 2–3 business days</li>
-                        <li>Nationwide Deliveries (Outside Lagos): 3–7 business days</li>
+                        <li>Lagos Deliveries: 3–5 business days</li>
+                        <li>Nationwide Deliveries (Outside Lagos): 5–10 business days</li>
                     </ul>
                     <p>
                         International shipping is not available at this time.
