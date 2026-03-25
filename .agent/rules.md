@@ -9,6 +9,13 @@ Before doing ANYTHING — writing code, giving advice, or planning — you MUST:
 
 This applies to EVERY request, no exceptions. Do not skip this step even for small tasks.
 
+## ⚡ MANDATORY: Always Display Skills Used
+At the START of every single response, before anything else, display a line in this exact format:
+
+**🧠 Skills applied:** `[skill-name]`, `[skill-name]` — or — `None applicable`
+
+This must appear even for simple questions. It must list every skill consulted or applied. Never skip this line.
+
 ---
 
 ## Before Modifying Anything

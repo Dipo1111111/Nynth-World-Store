@@ -89,9 +89,8 @@ export default function Footer() {
       {/* Newsletter Section */}
       <div className="section-pad py-16 border-b border-black/5">
         <div className="max-w-md mx-auto text-center">
-          <p className="text-[9px] tracking-[0.4em] font-bold text-gray-400 uppercase mb-2">Stay in the Loop</p>
           <h3 className="text-[11px] tracking-[0.3em] font-bold uppercase text-black mb-8">
-            Sign up to our Newsletter
+            SIGN UP FOR EARLY ACCESS
           </h3>
           <form onSubmit={handleSubscribe} className="flex gap-2">
             <input
