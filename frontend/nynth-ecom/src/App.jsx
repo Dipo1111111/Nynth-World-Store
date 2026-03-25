@@ -187,12 +187,12 @@ function App() {
                   <Route path="/thank-you" element={<ThankYou />} />
 
                   {/* Legal & Support Routes */}
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/shipping" element={<ShippingReturns />} />
                   <Route path="/returns" element={<ShippingReturns />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/about" element={<OurStory />} />
+                  <Route path="/our-story" element={<OurStory />} />
                   <Route path="/sustainability" element={<Sustainability />} />
                   <Route path="/403" element={<ErrorPage status={403} />} />
                   <Route path="/500" element={<ErrorPage status={500} />} />

@@ -183,13 +183,13 @@ export default function AdminSettings() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Twitter URL</label>
+                            <label className="text-sm font-medium text-gray-700">X (Twitter) URL</label>
                             <input
                                 name="twitter_url"
                                 value={settings.twitter_url}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="https://twitter.com/..."
+                                placeholder="https://x.com/..."
                             />
                         </div>
                         <div className="space-y-2">

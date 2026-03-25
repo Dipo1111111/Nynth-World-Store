@@ -16,7 +16,7 @@ export function SettingsProvider({ children }) {
         support_whatsapp: import.meta.env.VITE_SUPPORT_WHATSAPP || "+234 123 456 7890",
         office_address: import.meta.env.VITE_OFFICE_ADDRESS || "123 Fashion Street, Lagos, Nigeria",
         instagram_url: import.meta.env.VITE_INSTAGRAM_URL || "https://instagram.com/nynth",
-        twitter_url: import.meta.env.VITE_TWITTER_URL || "https://twitter.com/nynth",
+        twitter_url: import.meta.env.VITE_TWITTER_URL || "https://x.com/nynth",
         facebook_url: import.meta.env.VITE_FACEBOOK_URL || "https://facebook.com/nynth",
         shipping_fee: Number(import.meta.env.VITE_DEFAULT_SHIPPING_FEE) || 2500,
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦"
