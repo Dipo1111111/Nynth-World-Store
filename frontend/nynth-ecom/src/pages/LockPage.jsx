@@ -86,8 +86,8 @@ export default function LockPage({ onUnlock }) {
         e.preventDefault();
         setLoading(true);
 
-        // Required Password: NYNTH-WORLD-IS-BOSS
-        if (password.toUpperCase() === 'NYNTH-WORLD-IS-BOSS') {
+        // Required Password: WINNERSONLY
+        if (password.toUpperCase() === 'WINNERSONLY') {
             setTimeout(() => {
                 localStorage.setItem('nynth_site_unlocked', 'true');
                 onUnlock();
