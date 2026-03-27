@@ -156,7 +156,6 @@ export default function Footer() {
             <ul className="space-y-4">
               {[
                 { name: "OUR STORY", to: "/our-story" },
-                { name: "SUSTAINABILITY", to: "/sustainability" },
                 { name: "PRIVACY POLICY", to: "/privacy-policy" },
                 { name: "TERMS OF SERVICE", to: "/terms-of-service" },
               ].map((link) => (
