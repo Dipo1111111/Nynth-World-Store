@@ -13,6 +13,7 @@ export default function AdminSettings() {
         instagram_url: "",
         twitter_url: "",
         facebook_url: "",
+        tiktok_url: "",
         shipping_fee: 0,
         currency_symbol: "₦",
         ga_property_id: ""
@@ -200,6 +201,16 @@ export default function AdminSettings() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
                                 placeholder="https://facebook.com/..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">TikTok URL</label>
+                            <input
+                                name="tiktok_url"
+                                value={settings.tiktok_url || ""}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="https://tiktok.com/..."
                             />
                         </div>
                     </div>
