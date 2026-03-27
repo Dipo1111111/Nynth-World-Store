@@ -191,7 +191,7 @@ export default function LockPage({ onUnlock }) {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="ENTER PASSWORD"
+                            placeholder="ENTER USING PASSWORD"
                             className="w-full bg-transparent border-b border-black/10 focus:border-black py-4 pl-8 text-[10px] tracking-[0.3em] font-bold uppercase outline-none transition-all placeholder:text-black/20"
                             autoFocus
                         />
