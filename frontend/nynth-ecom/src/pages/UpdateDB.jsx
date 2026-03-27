@@ -125,11 +125,44 @@ export default function UpdateDB() {
         }
     };
 
+    const runWipeOrdersOnly = async () => {
+        if (!window.confirm("This will delete ALL orders. Proceed?")) return;
+
+        setLoading(true);
+        setStatus("Wiping orders...");
+
+        try {
+            const count = await wipeCollection('orders');
+            setStatus(`SUCCESS: Deleted ${count} orders.`);
+        } catch (e) {
+            console.error(e);
+            setStatus(`ERROR: ${e.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div style={{ padding: '50px', fontFamily: 'Inter, sans-serif' }}>
             <h1 style={{ color: 'red' }}>⚠️ Production Database Cleanup</h1>
             <p>Current Status: <strong>{status}</strong></p>
-            <div style={{ display: 'flex', gap: '20px' }}>
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                <button
+                    onClick={runWipeOrdersOnly}
+                    disabled={loading}
+                    style={{
+                        backgroundColor: '#FF8800',
+                        color: 'white',
+                        padding: '15px 30px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        opacity: loading ? 0.5 : 1
+                    }}
+                >
+                    {loading ? "PROCESSING..." : "WIPE ONLY ORDERS"}
+                </button>
+
                 <button
                     onClick={runReset}
                     disabled={loading}
