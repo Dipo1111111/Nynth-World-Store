@@ -87,7 +87,7 @@ export default function LockPage({ onUnlock }) {
         setLoading(true);
 
         // Required Password: WINNERSONLY
-        if (password.toUpperCase() === 'WINNERSONLY') {
+        if (password.trim().toUpperCase() === 'WINNERSONLY') {
             setTimeout(() => {
                 localStorage.setItem('nynth_site_unlocked', 'true');
                 onUnlock();
