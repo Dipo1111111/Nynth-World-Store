@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ShoppingBag, ArrowRight } from "lucide-react";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
-import NewsLetter from "./NewsLetter.jsx";
 import { fetchLookbooks, fetchProductsByCategory, fetchProducts } from "../../api/firebaseFunctions";
 import SEO from "../SEO";
 
