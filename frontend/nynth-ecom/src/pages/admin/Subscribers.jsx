@@ -7,9 +7,10 @@ import {
     Users,
     Mail,
     Search,
-    Filter,
-    Calendar,
-    ArrowRight
+    CheckSquare,
+    Square,
+    Send,
+    X
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -24,6 +25,8 @@ const Subscribers = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilter, setActiveFilter] = useState("all");
     const [isMerging, setIsMerging] = useState(false);
+    const [selectedEmails, setSelectedEmails] = useState(new Set());
+    const [showEmailModal, setShowEmailModal] = useState(false);
 
     useEffect(() => {
         document.title = "Nynth World Store Admin | Subscribers";
@@ -59,6 +62,33 @@ const Subscribers = () => {
         } finally {
             setIsMerging(false);
         }
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedEmails.size === filteredSubscribers.length) {
+            setSelectedEmails(new Set());
+        } else {
+            setSelectedEmails(new Set(filteredSubscribers.map(sub => sub.email)));
+        }
+    };
+
+    const toggleEmail = (email) => {
+        const newSelected = new Set(selectedEmails);
+        if (newSelected.has(email)) {
+            newSelected.delete(email);
+        } else {
+            newSelected.add(email);
+        }
+        setSelectedEmails(newSelected);
+    };
+
+    const handleSendEmail = () => {
+        const emails = Array.from(selectedEmails).join(',');
+        const mailtoUrl = `mailto:?bcc=${encodeURIComponent(emails)}`;
+        window.location.href = mailtoUrl;
+        setShowEmailModal(false);
+        setSelectedEmails(new Set());
+        toast.success("Opening email client...");
     };
 
     useEffect(() => {
@@ -127,7 +157,7 @@ const Subscribers = () => {
                     {["all", "waitlist", "newsletter"].map((f) => (
                         <button
                             key={f}
-                            onClick={() => setActiveFilter(f)}
+                            onClick={() => { setActiveFilter(f); setSelectedEmails(new Set()); }}
                             className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                                 activeFilter === f 
                                     ? "bg-white text-black shadow-sm" 
@@ -138,6 +168,17 @@ const Subscribers = () => {
                         </button>
                     ))}
                 </div>
+
+                {/* Send Email Button */}
+                {selectedEmails.size > 0 && (
+                    <Button 
+                        onClick={() => setShowEmailModal(true)}
+                        className="bg-black text-white hover:bg-gray-800 text-[10px] tracking-widest font-bold uppercase h-9 px-4 shrink-0"
+                    >
+                        <Send size={14} className="mr-2" />
+                        Email {selectedEmails.size}
+                    </Button>
+                )}
             </div>
 
             {loading ? (
@@ -183,13 +224,22 @@ const Subscribers = () => {
                             {filteredSubscribers.map((sub) => (
                                 <div key={sub.id} className="p-4 bg-white flex flex-col gap-3">
                                     <div className="flex items-start justify-between gap-2">
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0 flex-1">
-                                            <div className="w-8 h-8 rounded-full bg-black text-white hidden sm:flex items-center justify-center flex-shrink-0">
-                                                <Mail size={12} />
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                            <button onClick={() => toggleEmail(sub.email)} className="focus:outline-none shrink-0">
+                                                {selectedEmails.has(sub.email) ? (
+                                                    <CheckSquare size={18} className="text-black" />
+                                                ) : (
+                                                    <Square size={18} className="text-gray-300" />
+                                                )}
+                                            </button>
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0 flex-1">
+                                                <div className="w-8 h-8 rounded-full bg-black text-white hidden sm:flex items-center justify-center flex-shrink-0">
+                                                    <Mail size={12} />
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-900 break-all uppercase tracking-tight">
+                                                    {sub.email}
+                                                </span>
                                             </div>
-                                            <span className="text-xs font-bold text-gray-900 break-all uppercase tracking-tight">
-                                                {sub.email}
-                                            </span>
                                         </div>
                                         <span className={`shrink-0 px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
                                             sub.source === 'waitlist' 
@@ -217,7 +267,16 @@ const Subscribers = () => {
                             <table className="w-full">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email</th>
+                                        <th className="px-4 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest w-10">
+                                            <button onClick={toggleSelectAll}>
+                                                {selectedEmails.size === filteredSubscribers.length && filteredSubscribers.length > 0 ? (
+                                                    <CheckSquare size={16} className="text-black" />
+                                                ) : (
+                                                    <Square size={16} className="text-gray-400" />
+                                                )}
+                                            </button>
+                                        </th>
+                                        <th className="px-4 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email</th>
                                         <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Source</th>
                                         <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
                                         <th className="px-4 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Signed Up</th>
@@ -226,7 +285,16 @@ const Subscribers = () => {
                                 <tbody className="divide-y divide-gray-100 bg-white">
                                     {filteredSubscribers.map((sub) => (
                                         <tr key={sub.id} className="hover:bg-gray-50 transition-colors group">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                <button onClick={() => toggleEmail(sub.email)} className="focus:outline-none">
+                                                    {selectedEmails.has(sub.email) ? (
+                                                        <CheckSquare size={16} className="text-black" />
+                                                    ) : (
+                                                        <Square size={16} className="text-gray-300" />
+                                                    )}
+                                                </button>
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition-all">
                                                         <Mail size={14} />
@@ -259,6 +327,47 @@ const Subscribers = () => {
                         </div>
                     </CardContent>
                 </Card>
+            )}
+
+            {/* Email Modal */}
+            {showEmailModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h3 className="text-lg font-bold font-space">Send Email</h3>
+                            <button 
+                                onClick={() => setShowEmailModal(false)}
+                                className="text-gray-400 hover:text-black"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-4 space-y-4">
+                            <div className="text-sm text-gray-500">
+                                <span className="font-bold text-black">{selectedEmails.size}</span> recipient{selectedEmails.size !== 1 ? 's' : ''} selected
+                            </div>
+                            <p className="text-xs text-gray-400">
+                                Click the button below to open your email client with all recipients added as BCC. You'll compose and send the email yourself.
+                            </p>
+                            <div className="flex gap-3 pt-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowEmailModal(false)}
+                                    className="flex-1"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={handleSendEmail}
+                                    className="flex-1 bg-black text-white hover:bg-gray-800"
+                                >
+                                    <Mail size={14} className="mr-2" />
+                                    Open Email
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </AdminLayout>
     );

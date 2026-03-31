@@ -146,7 +146,70 @@ exports.initializePayment = onCall(
     }
 );
 
-// 4. Google Analytics 4 Data API Integration
+// 4. Send Bulk Email via Resend
+exports.sendBulkEmail = onCall(
+    { cors: true },
+    async (request) => {
+        if (!request.auth) {
+            throw new Error("Unauthorized");
+        }
+
+        const userDoc = await db.collection("users").doc(request.auth.uid).get();
+        if (!userDoc.exists || userDoc.data().role !== 'admin') {
+            throw new Error("Forbidden: Admin access required");
+        }
+
+        const { emails, subject, body } = request.data;
+
+        if (!emails || !Array.isArray(emails) || emails.length === 0) {
+            throw new Error("No recipients provided");
+        }
+        if (!subject || !body) {
+            throw new Error("Subject and body are required");
+        }
+
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (!resendApiKey) {
+            throw new Error("Resend API key not configured");
+        }
+
+        try {
+            const results = await Promise.allSettled(
+                emails.map(async (email) => {
+                    const response = await fetch("https://api.resend.com/emails", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${resendApiKey}`,
+                        },
+                        body: JSON.stringify({
+                            from: "Nynth <onboarding@resend.dev>",
+                            to: email,
+                            subject: subject,
+                            html: `<p>${body.replace(/\n/g, '<br>')}</p>`,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.message || "Failed to send email");
+                    }
+                    return response.json();
+                })
+            );
+
+            const successful = results.filter(r => r.status === 'fulfilled').length;
+            const failed = results.filter(r => r.status === 'rejected').length;
+
+            return { success: true, sent: successful, failed };
+        } catch (error) {
+            console.error("Bulk email error:", error);
+            throw new Error(`Failed to send emails: ${error.message}`);
+        }
+    }
+);
+
+// 5. Google Analytics 4 Data API Integration
 const { BetaAnalyticsDataClient } = require('@google-analytics/data');
 
 /**

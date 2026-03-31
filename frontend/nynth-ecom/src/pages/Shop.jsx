@@ -77,7 +77,6 @@ export default function Shop() {
           <img
             src={headerBanner}
             alt="Collection Hero"
-            fetchPriority="high"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />

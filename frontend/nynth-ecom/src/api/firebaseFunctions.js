@@ -716,6 +716,17 @@ export const fetchGA4Analytics = async (propertyId = null) => {
   }
 };
 
+export const sendBulkEmail = async (emails, subject, body) => {
+  try {
+    const sendEmailFn = httpsCallable(functions, "sendBulkEmail");
+    const result = await sendEmailFn({ emails, subject, body });
+    return result.data;
+  } catch (error) {
+    console.error("Error sending bulk email:", error);
+    throw error;
+  }
+};
+
 // Admin Analytics
 export const getAdminAnalytics = async () => {
   try {
@@ -785,5 +796,6 @@ export default {
   updateOrderStatus,
   getAdminAnalytics,
   fetchGA4Analytics,
-  mergeSubscriberDuplicates
+  mergeSubscriberDuplicates,
+  sendBulkEmail
 };
