@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { uploadImageToCloudinary } from "../../api/cloudinary";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
+import headerBanner from "../../assets/header.JPEG";
 
 export default function AdminSettings() {
     const [settings, setSettings] = useState({
@@ -269,20 +270,30 @@ export default function AdminSettings() {
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
                     <div className="space-y-4">
-                        <label className="text-sm font-medium text-gray-700">Main Hero Banner (Store & Lookbook)</label>
+                        <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-black/5">
+                            <span className="text-[10px] font-bold text-black uppercase tracking-widest leading-none">Currently Active Banner</span>
+                            {!settings.hero_banner && (
+                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest bg-white px-2 py-1 rounded border border-black/5">Default System Asset</span>
+                            )}
+                        </div>
                         <div className="flex flex-col gap-4">
-                            {settings.hero_banner && (
-                                <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-black/5">
-                                    <img src={settings.hero_banner} className="w-full h-full object-cover" alt="Hero Preview" />
+                            <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-black/5">
+                                <img 
+                                    src={settings.hero_banner || headerBanner} 
+                                    className="w-full h-full object-cover transition-opacity duration-300" 
+                                    alt="Hero Preview" 
+                                />
+                                {settings.hero_banner && (
                                     <button
                                         type="button"
                                         onClick={() => setSettings(prev => ({ ...prev, hero_banner: "" }))}
-                                        className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black transition-colors"
+                                        className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full hover:bg-black transition-colors shadow-lg"
+                                        title="Reset to Default"
                                     >
-                                        <X size={16} />
+                                        <X size={18} />
                                     </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                             <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-gray-50 transition-all cursor-pointer group">
                                 <input
                                     type="file"
@@ -293,7 +304,7 @@ export default function AdminSettings() {
                                 />
                                 <Upload size={24} className="text-gray-400 mb-2 group-hover:text-black transition-colors" />
                                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-black">
-                                    {isUploading ? "Uploading..." : "Upload New Global Banner"}
+                                    {isUploading ? "Uploading..." : "Replace Header Image"}
                                 </span>
                                 <p className="text-[10px] text-gray-400 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
                             </div>
