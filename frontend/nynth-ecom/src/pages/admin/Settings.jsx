@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings } from "../../api/firebaseFunctions";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { uploadImageToCloudinary } from "../../api/cloudinary";
+import { compressImage } from "../../utils/imageUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 export default function AdminSettings() {
     const [settings, setSettings] = useState({
@@ -20,6 +23,30 @@ export default function AdminSettings() {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const { refreshSettings } = useSettings();
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleHeroBannerUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            setIsUploading(true);
+            toast.loading("Uploading Hero Banner...", { id: "upload-status" });
+            
+            const compressed = await compressImage(file, { maxSizeMB: 2, maxWidthOrHeight: 2500 });
+            const url = await uploadImageToCloudinary(compressed);
+            
+            setSettings(prev => ({ ...prev, hero_banner: url }));
+            toast.success("Image uploaded. Remember to Save All Settings.", { id: "upload-status" });
+        } catch (error) {
+            console.error("Banner upload failed:", error);
+            toast.error("Upload failed.", { id: "upload-status" });
+        } finally {
+            setIsUploading(false);
+            e.target.value = "";
+        }
+    };
 
     useEffect(() => {
         const loadSettings = async () => {
@@ -52,6 +79,7 @@ export default function AdminSettings() {
             const success = await updateSettings(settings);
             if (success) {
                 toast.success("Settings updated successfully");
+                refreshSettings();
             } else {
                 toast.error("Failed to update settings");
             }
@@ -233,6 +261,42 @@ export default function AdminSettings() {
                                 Required for the Admin Dashboard to pull real-time metrics. <br/>
                                 Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
                             </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Brand Assets Section */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
+                    <div className="space-y-4">
+                        <label className="text-sm font-medium text-gray-700">Main Hero Banner (Store & Lookbook)</label>
+                        <div className="flex flex-col gap-4">
+                            {settings.hero_banner && (
+                                <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-black/5">
+                                    <img src={settings.hero_banner} className="w-full h-full object-cover" alt="Hero Preview" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setSettings(prev => ({ ...prev, hero_banner: "" }))}
+                                        className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
+                            <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-gray-50 transition-all cursor-pointer group">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleHeroBannerUpload}
+                                    disabled={isUploading}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                />
+                                <Upload size={24} className="text-gray-400 mb-2 group-hover:text-black transition-colors" />
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-black">
+                                    {isUploading ? "Uploading..." : "Upload New Global Banner"}
+                                </span>
+                                <p className="text-[10px] text-gray-400 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
+                            </div>
                         </div>
                     </div>
                 </div>

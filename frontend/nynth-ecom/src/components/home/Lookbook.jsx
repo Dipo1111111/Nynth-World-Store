@@ -7,6 +7,7 @@ import Footer from "./Footer.jsx";
 import { fetchLookbooks, fetchProductsByCategory, fetchProducts } from "../../api/firebaseFunctions";
 import SEO from "../SEO";
 import headerBanner from "../../assets/header.JPEG";
+import { useSettings } from "../../context/SettingsContext";
 
 export default function Lookbook() {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -18,6 +19,7 @@ export default function Lookbook() {
     tees: null,
     headwear: null
   });
+  const { settings } = useSettings();
 
   // Load lookbooks and shop products
   useEffect(() => {
@@ -94,7 +96,7 @@ export default function Lookbook() {
         {/* Full-width Hero Section - Edge to Edge */}
         <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img
-            src={headerBanner}
+            src={settings.hero_banner || headerBanner}
             alt="Lookbook Hero"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"

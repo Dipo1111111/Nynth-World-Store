@@ -8,6 +8,7 @@ import { fetchProducts } from "../api/firebaseFunctions";
 import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
 import headerBanner from "../assets/header.JPEG";
+import { useSettings } from "../context/SettingsContext";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,6 +24,7 @@ export default function Shop() {
   const [sortBy, setSortBy] = useState(() => searchParams.get("sort") || "newest");
 
   const [displayMode, setDisplayMode] = useState("view");
+  const { settings } = useSettings();
 
   useEffect(() => {
     setSearchQuery(searchParams.get("search") || "");
@@ -75,7 +77,7 @@ export default function Shop() {
         {/* Full-width Hero Section - Edge to Edge */}
         <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img
-            src={headerBanner}
+            src={settings.hero_banner || headerBanner}
             alt="Collection Hero"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
