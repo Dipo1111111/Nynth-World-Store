@@ -77,6 +77,35 @@ export default function ProductDetail() {
     if (!product?.images) return;
     handleManualImageChange(selectedImage === 0 ? product.images.length - 1 : selectedImage - 1);
   };
+
+  // Swipe logic
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextImage();
+    } else if (isRightSwipe) {
+      prevImage();
+    }
+  };
   const [addingToCart, setAddingToCart] = useState(false);
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
@@ -151,7 +180,12 @@ export default function ProductDetail() {
       {/* ====== DESKTOP: Two-Column Layout (lg+) ====== */}
       <main className="hidden lg:grid lg:grid-cols-2 min-h-screen pt-[60px]">
         {/* Left: Edge-to-Edge Image Half */}
-        <div className="bg-white relative h-[calc(100vh-60px)] flex flex-col items-center justify-center sticky top-[60px]">
+        <div 
+          className="bg-white relative h-[calc(100vh-60px)] flex flex-col items-center justify-center sticky top-[60px]"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
           <div className="w-full h-full flex flex-col items-center justify-center p-20 xl:p-32">
             <div className="w-full h-full relative flex items-center justify-center">
               <img
@@ -289,7 +323,12 @@ export default function ProductDetail() {
       {/* ====== MOBILE: Single Column Layout (<lg) ====== */}
       <main className="lg:hidden pt-[68px] pb-24">
         {/* Product Image Mobile Carousel */}
-        <div className="w-full bg-white relative aspect-square flex items-center justify-center overflow-hidden group">
+        <div 
+          className="w-full bg-white relative aspect-square flex items-center justify-center overflow-hidden group"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
           <img
             src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
             alt={product.title}
