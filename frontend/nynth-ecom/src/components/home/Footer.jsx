@@ -148,6 +148,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {[
                 { name: "CONTACT", to: "/contact" },
+                { name: "LOOKBOOK", to: "/lookbook" },
                 { name: "SHIPPING & RETURNS", to: "/shipping" },
                 { name: "TRACK ORDER", to: "/account" },
                 { name: "FAQ", to: "/contact" },

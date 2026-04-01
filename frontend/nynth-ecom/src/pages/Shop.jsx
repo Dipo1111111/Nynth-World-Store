@@ -7,7 +7,7 @@ import ProductCard from "../components/products/ProductCard";
 import { fetchProducts } from "../api/firebaseFunctions";
 import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
-import headerBanner from "../assets/header.webp";
+import headerBanner from "../assets/header.JPEG";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();

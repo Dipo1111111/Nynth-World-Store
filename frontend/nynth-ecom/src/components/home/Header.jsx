@@ -48,6 +48,7 @@ export default function Header() {
     { name: "HOME", to: "/" },
     { name: "SHOP", to: "/shop" },
     { name: "CONTACT", to: "/contact" },
+    { name: "LOOKBOOK", to: "/lookbook" },
   ];
 
   const isNavLinkActive = (to) => location.pathname === to;
