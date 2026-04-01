@@ -332,7 +332,7 @@ export default function ProductDetail() {
           <img
             src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
             alt={product.title}
-            className="w-[85%] h-[85%] object-contain transition-opacity duration-300"
+            className="w-full h-full object-cover transition-opacity duration-300"
           />
           
           {product.images?.length > 1 && (
