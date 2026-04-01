@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 import ProductCard from "../components/products/ProductCard";
 
-const categories = ["Explore", "Apparel", "Homeware", "Accessories", "Drinkware", "Polo"];
+const categories = ["Explore", "Apparel", "Homeware", "Accessories", "Drinkware", "Polo", "Sleeves"];
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("Explore");

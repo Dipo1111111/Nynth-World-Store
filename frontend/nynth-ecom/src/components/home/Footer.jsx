@@ -130,9 +130,10 @@ export default function Footer() {
             <ul className="space-y-4">
               {[
                 { name: "ALL PRODUCTS", to: "/shop" },
-                { name: "TEES", to: "/shop?category=tees" },
+                { name: "T-SHIRTS", to: "/shop?category=tees" },
                 { name: "HOODIES", to: "/shop?category=hoodies" },
                 { name: "HEADWEAR", to: "/shop?category=headwear" },
+                { name: "SLEEVES", to: "/shop?category=sleeves" },
                 { name: "POLO", to: "/shop?category=polo" },
               ].map((link) => (
                 <li key={link.name}>

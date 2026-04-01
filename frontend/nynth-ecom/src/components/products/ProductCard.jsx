@@ -80,13 +80,13 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           {/* Badges */}
           <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1 pointer-events-none">
             {isOutOfStock ? (
-              <span className="bg-white text-black text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
+              <span className="bg-white text-black text-[5.5px] font-bold tracking-[0.2em] px-1.5 py-0.5 uppercase border border-black/5">
                 Sold Out
               </span>
             ) : (
               <>
                 {tagsToShow.map((tag, i) => (
-                  <span key={i} className="bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase shadow-sm">
+                  <span key={i} className="bg-black text-white text-[5.5px] font-bold tracking-[0.2em] px-1.5 py-0.5 uppercase shadow-sm">
                     {tag}
                   </span>
                 ))}
@@ -147,13 +147,13 @@ export default function ProductCard({ product, displayMode = 'model' }) {
         {/* Badges */}
         <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1 pointer-events-none">
           {isOutOfStock ? (
-            <span className="bg-white text-black text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase border border-black/5">
+            <span className="bg-white text-black text-[5.5px] font-bold tracking-[0.2em] px-1.5 py-0.5 uppercase border border-black/5">
               Sold Out
             </span>
           ) : (
             <>
               {tagsToShow.map((tag, i) => (
-                <span key={i} className="bg-black text-white text-[7px] font-bold tracking-[0.2em] px-2 py-1 uppercase shadow-sm">
+                <span key={i} className="bg-black text-white text-[5.5px] font-bold tracking-[0.2em] px-1.5 py-0.5 uppercase shadow-sm">
                   {tag}
                 </span>
               ))}

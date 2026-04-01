@@ -121,14 +121,14 @@ export default function Shop() {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            {["all", "hoodies", "headwear", "tees", "polo"].map((cat) => (
+            {["all", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`text-[9px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${selectedCategory === cat ? "text-black underline underline-offset-[10px]" : "text-gray-300 hover:text-black"
                   }`}
               >
-                {cat}
+                {cat === 'tees' ? 't-shirts' : cat}
               </button>
             ))}
           </div>

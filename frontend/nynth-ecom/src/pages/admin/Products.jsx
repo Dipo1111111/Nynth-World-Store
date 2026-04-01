@@ -145,12 +145,13 @@ export default function AdminProducts() {
   const [isUploading, setIsUploading] = useState(false); // Track active uploads
 
   const categories = [
-    { value: "tees", label: "TEES" },
+    { value: "tees", label: "T-SHIRTS" },
     { value: "hoodies", label: "HOODIES" },
     { value: "headwear", label: "HEADWEAR" },
     { value: "accessories", label: "ACCESSORIES" },
     { value: "pants", label: "PANTS" },
     { value: "polo", label: "POLO" },
+    { value: "sleeves", label: "SLEEVES" },
   ];
 
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
