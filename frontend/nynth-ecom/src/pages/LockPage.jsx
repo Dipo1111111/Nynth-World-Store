@@ -221,8 +221,44 @@ export default function LockPage({ onUnlock }) {
                     </div>
                 </div>
 
+                {/* Password Section */}
+                <form onSubmit={handleSubmit} className="w-full space-y-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+                    <div className="relative group">
+                        <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-black/20 group-focus-within:text-black transition-colors" size={14} />
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="ENTER USING PASSWORD"
+                            className="w-full bg-transparent border-b border-black/10 focus:border-black py-4 pl-8 text-[10px] tracking-[0.3em] font-bold uppercase outline-none transition-all placeholder:text-black/20"
+                            autoFocus
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading || !password}
+                        className="w-full bg-black text-white py-4 text-[10px] tracking-[0.4em] font-bold uppercase flex items-center justify-center gap-3 hover:bg-black/90 transition-all disabled:opacity-20 group"
+                    >
+                        {loading ? (
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                            <>
+                                ENTER NYNTH
+                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                            </>
+                        )}
+                    </button>
+                </form>
+
+                <div className="w-full flex items-center gap-4 my-10 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+                    <div className="h-[1px] flex-1 bg-black/5"></div>
+                    <span className="text-[8px] tracking-[0.4em] text-black/20 font-bold">OR</span>
+                    <div className="h-[1px] flex-1 bg-black/5"></div>
+                </div>
+
                 {/* Waitlist Section */}
-                <div className="w-full mb-12 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+                <div className="w-full mb-8 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
                     <div className="text-center mb-6">
                         <h3 className="text-[9px] tracking-[0.3em] font-bold uppercase text-black/60">
                             {lockWaitlistTitle}
@@ -260,42 +296,7 @@ export default function LockPage({ onUnlock }) {
                             )}
                         </button>
                     </form>
-
-                    <div className="flex items-center gap-4 my-10">
-                        <div className="h-[1px] flex-1 bg-black/5"></div>
-                        <span className="text-[8px] tracking-[0.4em] text-black/20 font-bold">OR</span>
-                        <div className="h-[1px] flex-1 bg-black/5"></div>
-                    </div>
                 </div>
-
-                <form onSubmit={handleSubmit} className="w-full space-y-6">
-                    <div className="relative group">
-                        <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-black/20 group-focus-within:text-black transition-colors" size={14} />
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="ENTER USING PASSWORD"
-                            className="w-full bg-transparent border-b border-black/10 focus:border-black py-4 pl-8 text-[10px] tracking-[0.3em] font-bold uppercase outline-none transition-all placeholder:text-black/20"
-                            autoFocus
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading || !password}
-                        className="w-full bg-black text-white py-4 text-[10px] tracking-[0.4em] font-bold uppercase flex items-center justify-center gap-3 hover:bg-black/90 transition-all disabled:opacity-20 group"
-                    >
-                        {loading ? (
-                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                        ) : (
-                            <>
-                                ENTER NYNTH
-                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                            </>
-                        )}
-                    </button>
-                </form>
 
                 <p className="mt-16 text-[8px] tracking-[0.2em] text-black/30 font-bold uppercase">
                     &copy; {new Date().getFullYear()} NYNTH WORLD. ALL RIGHTS RESERVED.
