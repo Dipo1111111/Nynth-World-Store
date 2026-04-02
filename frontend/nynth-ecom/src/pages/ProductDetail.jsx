@@ -125,7 +125,16 @@ export default function ProductDetail() {
         }
         setProduct(data);
         if (data.availableColors?.length > 0) setSelectedColor(data.availableColors[0]);
-        if (data.availableSizes?.length > 0) setSelectedSize(data.availableSizes[0]);
+        
+        if (data.availableSizes?.length > 0) {
+          // Default to the first size that is actually in stock
+          let firstInStock = data.availableSizes[0];
+          if (data.sizeStock) {
+            const found = data.availableSizes.find(s => (data.sizeStock[s] || 0) > 0);
+            if (found) firstInStock = found;
+          }
+          setSelectedSize(firstInStock);
+        }
       } catch (error) {
         setError("Failed to load product.");
       } finally {
@@ -135,8 +144,12 @@ export default function ProductDetail() {
     if (id) loadProduct();
   }, [id]);
 
-  const isSizeAvailable = product?.sizeStock 
+  const isSizeAvailable = product?.sizeStock && selectedSize
     ? (product.sizeStock[selectedSize] > 0) 
+    : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
+  
+  const anySizeAvailable = product?.sizeStock 
+    ? Object.values(product.sizeStock).some(qty => qty > 0)
     : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
 
   const handleAddToCart = async () => {
@@ -280,26 +293,37 @@ export default function ProductDetail() {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {product.availableSizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`flex-1 min-w-[50px] py-1 text-[9px] font-bold tracking-[0.2em] text-center transition-all border ${selectedSize === size ? "border-black bg-black text-white" : "border-black/10 text-black hover:border-black"}`}
-                    >
-                      {size}
-                    </button>
-                  ))}
+                  {product.availableSizes.map((size) => {
+                    const stock = product.sizeStock?.[size];
+                    const isOutOfStock = stock !== undefined && stock <= 0;
+                    return (
+                      <button
+                        key={size}
+                        disabled={isOutOfStock}
+                        onClick={() => setSelectedSize(size)}
+                        className={`flex-1 min-w-[50px] py-1 text-[9px] font-bold tracking-[0.2em] text-center transition-all border ${
+                          selectedSize === size 
+                            ? "border-black bg-black text-white" 
+                            : isOutOfStock
+                              ? "border-gray-100 text-gray-300 cursor-not-allowed line-through"
+                              : "border-black/10 text-black hover:border-black"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
-
-            {/* Add to Cart Button - Suvene Grey Button */}
+ 
+            {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              disabled={!isSizeAvailable || addingToCart}
+              disabled={!anySizeAvailable || !isSizeAvailable || addingToCart}
               className="w-full bg-[#999999] text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black transition-all duration-500 disabled:opacity-50 mb-10"
             >
-              {addingToCart ? "ADDING..." : isSizeAvailable ? (selectedSize ? "ADD TO CART" : "SELECT SIZE") : "OUT OF STOCK"}
+              {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : (selectedSize ? "ADD TO CART" : "SELECT SIZE")}
             </button>
 
             {/* Shipping Badges - Simple minimalist */}
@@ -455,27 +479,38 @@ export default function ProductDetail() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                {product.availableSizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`min-w-[48px] py-2.5 px-2 text-[10px] font-bold tracking-widest text-center transition-all border ${selectedSize === size ? "border-black text-black border-2" : "border-gray-300 text-gray-500 hover:border-gray-500"}`}
-                  >
-                    {size}
-                  </button>
-                ))}
+                  {product.availableSizes.map((size) => {
+                    const stock = product.sizeStock?.[size];
+                    const isOutOfStock = stock !== undefined && stock <= 0;
+                    return (
+                      <button
+                        key={size}
+                        disabled={isOutOfStock}
+                        onClick={() => setSelectedSize(size)}
+                        className={`min-w-[48px] py-2.5 px-2 text-[10px] font-bold tracking-widest text-center transition-all border ${
+                          selectedSize === size 
+                            ? "border-black text-black border-2" 
+                            : isOutOfStock
+                              ? "border-gray-200 text-gray-300 cursor-not-allowed line-through"
+                              : "border-gray-300 text-gray-500 hover:border-gray-500"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
-
-          {/* Add to Cart (in-flow for mobile) */}
-          <button
-            onClick={handleAddToCart}
-            disabled={!isSizeAvailable || addingToCart}
-            className="w-full bg-black text-white py-4 text-[11px] tracking-[0.2em] font-bold uppercase hover:bg-gray-900 transition-colors disabled:opacity-50 mb-6"
-          >
-            {addingToCart ? "ADDING..." : isSizeAvailable ? (selectedSize ? "ADD TO CART" : "SELECT SIZE") : "OUT OF STOCK"}
-          </button>
+            )}
+ 
+            {/* Add to Cart (in-flow for mobile) */}
+            <button
+              onClick={handleAddToCart}
+              disabled={!anySizeAvailable || !isSizeAvailable || addingToCart}
+              className="w-full bg-black text-white py-4 text-[11px] tracking-[0.2em] font-bold uppercase hover:bg-gray-900 transition-colors disabled:opacity-50 mb-6"
+            >
+              {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : (selectedSize ? "ADD TO CART" : "SELECT SIZE")}
+            </button>
 
           {/* Shipping Badges */}
           <div className="space-y-3 mb-8">
