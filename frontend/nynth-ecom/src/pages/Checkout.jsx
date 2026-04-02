@@ -72,7 +72,7 @@ const Checkout = () => {
   useEffect(() => {
     if (form.state === "Lagos") {
       if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
-        setShippingFee(LAGOS_SHIPPING_DATA[form.city]);
+        setShippingFee(LAGOS_SHIPPING_DATA[form.city].price);
       } else {
         setShippingFee(settings.shipping_fee || 0);
       }
@@ -427,6 +427,11 @@ const Checkout = () => {
                 <span className="text-black font-bold uppercase block">
                   {form.city ? `${form.city} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
                 </span>
+                {form.state === "Lagos" && form.city && LAGOS_SHIPPING_DATA[form.city] && (
+                  <span className="text-[9px] text-gray-400 block mt-1 uppercase">
+                    {LAGOS_SHIPPING_DATA[form.city].speed} [PRISON SPEED]
+                  </span>
+                )}
                 {form.state !== "Lagos" && (
                   <span className="text-[9px] text-gray-400 block mt-1 uppercase">
                     {totalWeight.toFixed(1)}kg Total Weight 

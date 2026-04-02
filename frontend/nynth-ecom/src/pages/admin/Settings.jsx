@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchSettings, updateSettings } from "../../api/firebaseFunctions";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X } from "lucide-react";
+import { fetchSettings, updateSettings, mergeSubscriberDuplicates } from "../../api/firebaseFunctions";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { uploadImageToCloudinary } from "../../api/cloudinary";
 import { compressImage } from "../../utils/imageUtils";
@@ -20,12 +20,25 @@ export default function AdminSettings() {
         tiktok_url: "",
         shipping_fee: 0,
         currency_symbol: "₦",
-        ga_property_id: ""
+        ga_property_id: "",
+        show_size_chart: true,
+        size_chart_model_info: "",
+        size_chart_data: [],
+        // Lock Page Settings
+        lock_password: "WINNERSONLY",
+        lock_title1: "BY WINNERS FOR WINNERS",
+        lock_title2: "STAY ABOVE",
+        lock_waitlist_title: "JOIN THE WAITLIST",
+        lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
+        // Product Options
+        available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
+        available_sizes: "XS, S, M, L, XL, XXL, XXXL"
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const { refreshSettings } = useSettings();
     const [isUploading, setIsUploading] = useState(false);
+    const [isMerging, setIsMerging] = useState(false);
 
     const handleHeroBannerUpload = async (e) => {
         const file = e.target.files[0];
@@ -49,12 +62,39 @@ export default function AdminSettings() {
         }
     };
 
+    const handleMerge = async () => {
+        if (!window.confirm("This will find all duplicate emails and merge them into single entries (keeping the oldest signup). Proceed?")) return;
+        
+        setIsMerging(true);
+        try {
+            const result = await mergeSubscriberDuplicates();
+            if (result.success) {
+                toast.success(`Succesfully merged ${result.mergedCount} duplicates.`);
+            }
+        } catch (error) {
+            toast.error("Failed to merge duplicates");
+        } finally {
+            setIsMerging(false);
+        }
+    };
+
     useEffect(() => {
         const loadSettings = async () => {
             try {
                 const data = await fetchSettings();
                 if (data) {
-                    setSettings(data);
+                    setSettings(prev => ({
+                        ...prev,
+                        ...data,
+                        // Ensure defaults if missing in DB
+                        lock_password: data.lock_password || "WINNERSONLY",
+                        lock_title1: data.lock_title1 || "BY WINNERS FOR WINNERS",
+                        lock_title2: data.lock_title2 || "STAY ABOVE",
+                        lock_waitlist_title: data.lock_waitlist_title || "JOIN THE WAITLIST",
+                        lock_waitlist_subtitle: data.lock_waitlist_subtitle || "BE NOTIFIED WHEN WE GO LIVE",
+                        available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
+                        available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL"
+                    }));
                 }
             } catch (error) {
                 toast.error("Failed to load settings");
@@ -133,6 +173,98 @@ export default function AdminSettings() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
                                 placeholder="₦"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PRODUCT VARIANT OPTIONS */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={PackageIcon} title="Product Variant Options" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        Manage the preset options available when creating or editing products. Separate items with commas.
+                    </p>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Available Colors</label>
+                            <textarea
+                                name="available_colors"
+                                value={settings.available_colors}
+                                onChange={handleChange}
+                                rows={3}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
+                                placeholder="Black, White, Red..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Available Sizes</label>
+                            <textarea
+                                name="available_sizes"
+                                value={settings.available_sizes}
+                                onChange={handleChange}
+                                rows={2}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
+                                placeholder="XS, S, M, L, XL..."
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* LOCK PAGE CONFIGURATION */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={MapPin} title="Lock Page Configuration" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        Control the content and access for the pre-launch/maintenance page.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Lock Password</label>
+                            <input
+                                name="lock_password"
+                                value={settings.lock_password}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+                                placeholder="WINNERSONLY"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Title Line 1</label>
+                            <input
+                                name="lock_title1"
+                                value={settings.lock_title1}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="BY WINNERS FOR WINNERS"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Title Line 2 (Faded)</label>
+                            <input
+                                name="lock_title2"
+                                value={settings.lock_title2}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="STAY ABOVE"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Waitlist Section Title</label>
+                            <input
+                                name="lock_waitlist_title"
+                                value={settings.lock_waitlist_title}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="JOIN THE WAITLIST"
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-sm font-medium text-gray-700">Waitlist Section Subtitle</label>
+                            <input
+                                name="lock_waitlist_subtitle"
+                                value={settings.lock_waitlist_subtitle}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="BE NOTIFIED WHEN WE GO LIVE"
                             />
                         </div>
                     </div>
@@ -327,6 +459,167 @@ export default function AdminSettings() {
                     </div>
                 </div>
 
+                {/* Email Section Settings */}
+                <div className="bg-white p-6 rounded-xl border border-red-100 shadow-sm">
+                    <SectionTitle icon={Mail} title="Email Section Settings" />
+                    <div className="space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Database Cleanup</h4>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                                    Merge duplicate subscriber entries to maintain a clean mailing list.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleMerge}
+                                disabled={isMerging}
+                                className="px-6 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
+                            >
+                                {isMerging ? "Cleaning..." : "Clean Duplicates"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Size Chart Settings */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Ruler} title="Size Chart Configuration" />
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <h4 className="text-sm font-bold uppercase tracking-widest text-black">Enable Size Chart</h4>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
+                                className={`w-12 h-6 rounded-full transition-colors relative ${settings.show_size_chart ? 'bg-black' : 'bg-gray-200'}`}
+                            >
+                                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+
+                        {settings.show_size_chart && (
+                            <>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold uppercase tracking-widest text-black">Model & Sizing Info</label>
+                                    <textarea
+                                        name="size_chart_model_info"
+                                        value={settings.size_chart_model_info}
+                                        onChange={handleChange}
+                                        rows={3}
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors text-[11px] leading-relaxed"
+                                        placeholder="Our model is 185cm tall and wears a size M..."
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-bold uppercase tracking-widest text-black">Measurement Table</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSettings(prev => ({
+                                                ...prev,
+                                                size_chart_data: [...(prev.size_chart_data || []), { size: "", chest: "", waist: "", length: "" }]
+                                            }))}
+                                            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
+                                        >
+                                            <Plus size={12} /> Add Row
+                                        </button>
+                                    </div>
+
+                                    <div className="overflow-x-auto border border-gray-100 rounded-lg">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-gray-50 border-b border-gray-100">
+                                                <tr>
+                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Size</th>
+                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Chest (cm)</th>
+                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Waist (cm)</th>
+                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Length (cm)</th>
+                                                    <th className="p-3 w-10"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-50">
+                                                {(settings.size_chart_data || []).map((row, idx) => (
+                                                    <tr key={idx}>
+                                                        <td className="p-2">
+                                                            <input
+                                                                value={row.size}
+                                                                onChange={(e) => {
+                                                                    const newData = [...settings.size_chart_data];
+                                                                    newData[idx].size = e.target.value;
+                                                                    setSettings({ ...settings, size_chart_data: newData });
+                                                                }}
+                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] font-bold uppercase text-center"
+                                                                placeholder="M"
+                                                            />
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <input
+                                                                value={row.chest}
+                                                                onChange={(e) => {
+                                                                    const newData = [...settings.size_chart_data];
+                                                                    newData[idx].chest = e.target.value;
+                                                                    setSettings({ ...settings, size_chart_data: newData });
+                                                                }}
+                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+                                                                placeholder="91-97"
+                                                            />
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <input
+                                                                value={row.waist}
+                                                                onChange={(e) => {
+                                                                    const newData = [...settings.size_chart_data];
+                                                                    newData[idx].waist = e.target.value;
+                                                                    setSettings({ ...settings, size_chart_data: newData });
+                                                                }}
+                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+                                                                placeholder="76-81"
+                                                            />
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <input
+                                                                value={row.length}
+                                                                onChange={(e) => {
+                                                                    const newData = [...settings.size_chart_data];
+                                                                    newData[idx].length = e.target.value;
+                                                                    setSettings({ ...settings, size_chart_data: newData });
+                                                                }}
+                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+                                                                placeholder="72"
+                                                            />
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newData = settings.size_chart_data.filter((_, i) => i !== idx);
+                                                                    setSettings({ ...settings, size_chart_data: newData });
+                                                                }}
+                                                                className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
+                                            <div className="p-8 text-center bg-gray-50/50">
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">No measurement rows added</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+
                 {/* Submit */}
                 <div className="flex justify-end pt-4">
                     <button
@@ -344,5 +637,6 @@ export default function AdminSettings() {
                 </div>
             </form>
         </AdminLayout>
+
     );
 }

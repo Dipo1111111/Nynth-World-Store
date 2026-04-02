@@ -135,8 +135,12 @@ export default function ProductDetail() {
     if (id) loadProduct();
   }, [id]);
 
+  const isSizeAvailable = product?.sizeStock 
+    ? (product.sizeStock[selectedSize] > 0) 
+    : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
+
   const handleAddToCart = async () => {
-    if (!product || !product.inStock) return;
+    if (!product || !isSizeAvailable) return;
     try {
       setAddingToCart(true);
       await addToCart(product, 1, selectedSize, selectedColor);
@@ -178,10 +182,10 @@ export default function ProductDetail() {
       )}
 
       {/* ====== DESKTOP: Two-Column Layout (lg+) ====== */}
-      <main className="hidden lg:grid lg:grid-cols-2 min-h-screen pt-[60px]">
+      <main className="hidden lg:grid lg:grid-cols-2 min-h-screen pt-[104px]">
         {/* Left: Edge-to-Edge Image Half */}
         <div 
-          className="bg-white relative h-[calc(100vh-60px)] flex flex-col items-center justify-center sticky top-[60px]"
+          className="bg-white relative h-[calc(100vh-104px)] flex flex-col items-center justify-center sticky top-[104px]"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -253,7 +257,9 @@ export default function ProductDetail() {
                   <p className="text-[8px] tracking-[0.25em] font-bold uppercase text-black">
                     SIZE: <span className="font-normal text-gray-400 ml-1">{selectedSize}</span>
                   </p>
-                  <button onClick={() => setShowSizeGuide(true)} className="text-[8px] tracking-[0.2em] uppercase underline underline-offset-8 font-bold text-black hover:opacity-50 transition-opacity">SIZECHART</button>
+                  {settings.show_size_chart !== false && (
+                    <button onClick={() => setShowSizeGuide(true)} className="text-[8px] tracking-[0.2em] uppercase underline underline-offset-8 font-bold text-black hover:opacity-50 transition-opacity">SIZECHART</button>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {product.availableSizes.map((size) => (
@@ -272,10 +278,10 @@ export default function ProductDetail() {
             {/* Add to Cart Button - Suvene Grey Button */}
             <button
               onClick={handleAddToCart}
-              disabled={!product.inStock || addingToCart}
+              disabled={!isSizeAvailable || addingToCart}
               className="w-full bg-[#999999] text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black transition-all duration-500 disabled:opacity-50 mb-10"
             >
-              {addingToCart ? "ADDING..." : product.inStock ? "SELECT OPTION" : "OUT OF STOCK"}
+              {addingToCart ? "ADDING..." : isSizeAvailable ? (selectedSize ? "ADD TO CART" : "SELECT SIZE") : "OUT OF STOCK"}
             </button>
 
             {/* Shipping Badges - Simple minimalist */}
@@ -321,7 +327,7 @@ export default function ProductDetail() {
       </main>
 
       {/* ====== MOBILE: Single Column Layout (<lg) ====== */}
-      <main className="lg:hidden pt-[68px] pb-24">
+      <main className="lg:hidden pt-[100px] pb-24">
         {/* Product Image Mobile Carousel */}
         <div 
           className="w-full bg-white relative aspect-square flex items-center justify-center overflow-hidden group"
@@ -405,12 +411,14 @@ export default function ProductDetail() {
                 <p className="text-[9px] tracking-[0.2em] font-bold uppercase text-gray-500">
                   SIZE: <span className="text-black">{selectedSize}</span>
                 </p>
-                <button 
-                  onClick={() => setShowSizeGuide(true)}
-                  className="text-[9px] tracking-widest uppercase underline underline-offset-4 font-bold text-gray-500 hover:text-black"
-                >
-                  SIZECHART
-                </button>
+                {settings.show_size_chart !== false && (
+                  <button 
+                    onClick={() => setShowSizeGuide(true)}
+                    className="text-[9px] tracking-widest uppercase underline underline-offset-4 font-bold text-gray-500 hover:text-black"
+                  >
+                    SIZECHART
+                  </button>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.availableSizes.map((size) => (
@@ -429,10 +437,10 @@ export default function ProductDetail() {
           {/* Add to Cart (in-flow for mobile) */}
           <button
             onClick={handleAddToCart}
-            disabled={!product.inStock || addingToCart}
+            disabled={!isSizeAvailable || addingToCart}
             className="w-full bg-black text-white py-4 text-[11px] tracking-[0.2em] font-bold uppercase hover:bg-gray-900 transition-colors disabled:opacity-50 mb-6"
           >
-            {addingToCart ? "ADDING..." : product.inStock ? "ADD TO CART" : "OUT OF STOCK"}
+            {addingToCart ? "ADDING..." : isSizeAvailable ? (selectedSize ? "ADD TO CART" : "SELECT SIZE") : "OUT OF STOCK"}
           </button>
 
           {/* Shipping Badges */}

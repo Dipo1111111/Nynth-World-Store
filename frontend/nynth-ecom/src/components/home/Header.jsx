@@ -21,6 +21,36 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Countdown for Announcement Bar
+  const [timeLeftStr, setTimeLeftStr] = useState("");
+
+  useEffect(() => {
+    const target = new Date('2026-04-03T18:00:00').getTime();
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff > 0) {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+        
+        let str = "";
+        if (d > 0) str += `${d}D `;
+        str += `${h}H ${m}M ${s}S`;
+        setTimeLeftStr(str);
+      } else {
+        setTimeLeftStr("00H 00M 00S");
+      }
+    };
+
+    const timer = setInterval(updateTimer, 1000);
+    updateTimer();
+    return () => clearInterval(timer);
+  }, []);
+
   const { totalItems, isCartOpen, setIsCartOpen } = useCart();
   const { currentUser } = useAuth();
   const { settings } = useSettings();
@@ -55,8 +85,17 @@ export default function Header() {
 
   return (
     <>
+      {/* Announcement Bar */}
+      <div className="fixed top-0 z-[60] w-full bg-black text-white py-2 text-[8px] md:text-[9px] tracking-[0.4em] font-bold uppercase text-center overflow-hidden">
+        <div className="flex items-center justify-center gap-4">
+          <span className="opacity-50 hidden sm:inline">NEXT DROP IN:</span>
+          <span className="tabular-nums translate-y-[1px]">{timeLeftStr}</span>
+          <span className="opacity-50 hidden sm:inline">FRIDAY 6PM</span>
+        </div>
+      </div>
+
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
+        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top mt-[30px] md:mt-[32px] ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
       >
         <div className="w-full px-6 md:px-10">
           <div className="flex items-center justify-between h-10">

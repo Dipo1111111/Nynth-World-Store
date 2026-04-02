@@ -27,15 +27,15 @@ export default function Lookbook() {
       try {
         setLoading(true);
 
-        // Load lookbooks
-        const lookbookData = await fetchLookbooks();
+        // Fetch all data in parallel
+        const [lookbookData, hoodies, tees, headwear] = await Promise.all([
+          fetchLookbooks(),
+          fetchProductsByCategory("hoodies", 1),
+          fetchProductsByCategory("tees", 1),
+          fetchProductsByCategory("headwear", 1)
+        ]);
+
         setLookbooks(lookbookData);
-
-        // Load one product from each category for "Shop by Style"
-        const hoodies = await fetchProductsByCategory("hoodies", 1);
-        const tees = await fetchProductsByCategory("tees", 1);
-        const headwear = await fetchProductsByCategory("headwear", 1);
-
         setShopProducts({
           hoodies: hoodies[0] || null,
           tees: tees[0] || null,

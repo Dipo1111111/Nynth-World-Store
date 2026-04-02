@@ -130,143 +130,138 @@ function App() {
     document.title = "Nynth World Store";
   }, []);
 
-  if (!isSiteUnlocked) {
-    return (
-      <HelmetProvider>
-        <Toaster position="top-center" />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
-            <Route path="*" element={<LockPage onUnlock={() => setIsSiteUnlocked(true)} />} />
-          </Routes>
-        </BrowserRouter>
-      </HelmetProvider>
-    );
-  }
-
   return (
     <HelmetProvider>
-      <Toaster position="top-center" />
-      {isOffline && (
-        <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white py-2 px-4 flex items-center justify-center gap-2 animate-slideDown">
-          <WifiOff size={16} />
-          <span className="text-sm font-medium">You are currently offline. Some features may not work.</span>
-        </div>
-      )}
-      <ErrorBoundary>
-        <SettingsProvider>
-          <AuthProvider>
-            <CartProvider>
-              <BrowserRouter>
-                <PageTracker />
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Navigate to="/shop" replace />} />
-                  <Route path="/home" element={<Navigate to="/shop" replace />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/lookbook" element={<Lookbook />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/update-db" element={<UpdateDB />} />
+      <SettingsProvider>
+        <Toaster position="top-center" />
+        {isOffline && (
+          <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white py-2 px-4 flex items-center justify-center gap-2 animate-slideDown">
+            <WifiOff size={16} />
+            <span className="text-sm font-medium">You are currently offline. Some features may not work.</span>
+          </div>
+        )}
+        {!isSiteUnlocked ? (
+          <BrowserRouter>
+            <Routes>
+              <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
+              <Route path="*" element={<LockPage onUnlock={() => setIsSiteUnlocked(true)} />} />
+            </Routes>
+          </BrowserRouter>
+        ) : (
+          <ErrorBoundary>
+            <AuthProvider>
+              <CartProvider>
+                <BrowserRouter>
+                  <PageTracker />
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<Navigate to="/shop" replace />} />
+                    <Route path="/home" element={<Navigate to="/shop" replace />} />
+                    <Route path="/shop" element={<Shop />} />
+                    <Route path="/lookbook" element={<Lookbook />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/update-db" element={<UpdateDB />} />
 
-                  {/* Auth Routes */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                    {/* Auth Routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                  {/* Protected User Routes */}
-                  <Route
-                    path="/account"
-                    element={
-                      <ProtectedRoute>
-                        <Account />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/thank-you" element={<ThankYou />} />
+                    {/* Protected User Routes */}
+                    <Route
+                      path="/account"
+                      element={
+                        <ProtectedRoute>
+                          <Account />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/thank-you" element={<ThankYou />} />
 
-                  {/* Legal & Support Routes */}
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/terms-of-service" element={<TermsOfService />} />
-                  <Route path="/shipping" element={<ShippingReturns />} />
-                  <Route path="/returns" element={<ShippingReturns />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/our-story" element={<OurStory />} />
-                  <Route path="/sustainability" element={<Sustainability />} />
-                  <Route path="/403" element={<ErrorPage status={403} />} />
-                  <Route path="/500" element={<ErrorPage status={500} />} />
+                    {/* Legal & Support Routes */}
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/terms-of-service" element={<TermsOfService />} />
+                    <Route path="/shipping" element={<ShippingReturns />} />
+                    <Route path="/returns" element={<ShippingReturns />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/our-story" element={<OurStory />} />
+                    <Route path="/sustainability" element={<Sustainability />} />
+                    <Route path="/403" element={<ErrorPage status={403} />} />
+                    <Route path="/500" element={<ErrorPage status={500} />} />
 
-                  {/* Protected Admin Routes */}
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <Suspense fallback={<AdminLoader />}>
-                          <AdminDashboard />
-                        </Suspense>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/orders"
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <Suspense fallback={<AdminLoader />}>
-                          <Orders />
-                        </Suspense>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/products"
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <Suspense fallback={<AdminLoader />}>
-                          <Products />
-                        </Suspense>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/lookbooks"
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <Suspense fallback={<AdminLoader />}>
-                          <Lookbooks />
-                        </Suspense>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/subscribers"
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <Suspense fallback={<AdminLoader />}>
-                          <Subscribers />
-                        </Suspense>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/settings"
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <Suspense fallback={<AdminLoader />}>
-                          <Settings />
-                        </Suspense>
-                      </ProtectedRoute>
-                    }
-                  />
+                    {/* Protected Admin Routes */}
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <AdminDashboard />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/orders"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <Orders />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/products"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <Products />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/lookbooks"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <Lookbooks />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/subscribers"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <Subscribers />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/settings"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <Settings />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
 
-                  {/* 404 Catch-All Route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </CartProvider>
-          </AuthProvider>
-        </SettingsProvider>
-      </ErrorBoundary>
+                    {/* 404 Catch-All Route */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </CartProvider>
+            </AuthProvider>
+          </ErrorBoundary>
+        )}
+      </SettingsProvider>
     </HelmetProvider>
   );
 }

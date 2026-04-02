@@ -14,7 +14,7 @@ export default function AdminLookbooks() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Form State
-    const [formData, setFormData] = useState({
+    const initialFormState = {
         title: "",
         description: "",
         season: "",
@@ -23,7 +23,10 @@ export default function AdminLookbooks() {
         featured: false,
         colorPalette: "",
         productTags: "" // comma separated
-    });
+    };
+
+    const [formData, setFormData] = useState(initialFormState);
+    const [submitStep, setSubmitStep] = useState(""); // "", "compressing", "uploading", "saving"
 
     const loadLookbooks = async () => {
         try {
@@ -41,6 +44,11 @@ export default function AdminLookbooks() {
         loadLookbooks();
     }, []);
 
+    const resetForm = () => {
+        setFormData(initialFormState);
+        setSubmitStep("");
+    };
+
     const handleImageChange = (e) => {
         if (e.target.files[0]) {
             setFormData({ ...formData, image: e.target.files[0] });
@@ -55,13 +63,17 @@ export default function AdminLookbooks() {
             let finalImageUrl = formData.imageUrl;
 
             if (formData.image) {
+                setSubmitStep("compressing");
                 toast.loading("Compressing look image...", { id: "look-upload" });
                 const compressedFile = await compressImage(formData.image, { maxSizeMB: 1.5 });
+                
+                setSubmitStep("uploading");
                 toast.loading("Uploading look image...", { id: "look-upload" });
                 finalImageUrl = await uploadImage(compressedFile);
                 toast.success("Image uploaded", { id: "look-upload" });
             }
 
+            setSubmitStep("saving");
             if (!finalImageUrl) {
                 throw new Error("Please upload an image or provide a URL");
             }
@@ -79,16 +91,7 @@ export default function AdminLookbooks() {
 
             toast.success("Lookbook added successfully!");
             setIsModalOpen(false);
-            setFormData({
-                title: "",
-                description: "",
-                season: "",
-                image: null,
-                imageUrl: "",
-                featured: false,
-                colorPalette: "",
-                productTags: ""
-            });
+            resetForm();
             loadLookbooks();
         } catch (error) {
             console.error(error);
@@ -184,7 +187,15 @@ export default function AdminLookbooks() {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div 
+                    className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setIsModalOpen(false);
+                            resetForm();
+                        }
+                    }}
+                >
                     <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
                         <h2 className="text-2xl font-bold mb-6">Add Lookbook Entry</h2>
 
@@ -279,7 +290,10 @@ export default function AdminLookbooks() {
                             <div className="flex justify-end gap-3 pt-4">
                                 <button
                                     type="button"
-                                    onClick={() => setIsModalOpen(false)}
+                                    onClick={() => {
+                                        setIsModalOpen(false);
+                                        resetForm();
+                                    }}
                                     className="px-6 py-2 border rounded-lg hover:bg-gray-50"
                                 >
                                     Cancel
@@ -287,9 +301,18 @@ export default function AdminLookbooks() {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="px-6 py-2 bg-black text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+                                    className="px-6 py-2 bg-black text-white rounded-lg hover:opacity-90 disabled:opacity-50 min-w-[140px] flex items-center justify-center gap-2"
                                 >
-                                    {isSubmitting ? "Creating..." : "Create Look"}
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={16} />
+                                            <span>
+                                                {submitStep === "compressing" ? "Compressing..." : 
+                                                 submitStep === "uploading" ? "Uploading..." : 
+                                                 "Saving..."}
+                                            </span>
+                                        </>
+                                    ) : "Create Look"}
                                 </button>
                             </div>
                         </form>

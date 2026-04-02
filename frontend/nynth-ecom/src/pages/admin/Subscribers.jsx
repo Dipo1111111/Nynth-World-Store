@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchSubscribers, mergeSubscriberDuplicates } from "../../api/firebaseFunctions";
+import { fetchSubscribers } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -24,7 +24,6 @@ const Subscribers = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilter, setActiveFilter] = useState("all");
-    const [isMerging, setIsMerging] = useState(false);
     const [selectedEmails, setSelectedEmails] = useState(new Set());
     const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -47,22 +46,7 @@ const Subscribers = () => {
         }
     };
 
-    const handleMerge = async () => {
-        if (!window.confirm("This will find all duplicate emails and merge them into single entries (keeping the oldest signup). Proceed?")) return;
-        
-        setIsMerging(true);
-        try {
-            const result = await mergeSubscriberDuplicates();
-            if (result.success) {
-                toast.success(`Succesfully merged ${result.mergedCount} duplicates.`);
-                fetchData();
-            }
-        } catch (error) {
-            toast.error("Failed to merge duplicates");
-        } finally {
-            setIsMerging(false);
-        }
-    };
+
 
     const toggleSelectAll = () => {
         if (selectedEmails.size === filteredSubscribers.length) {
@@ -206,16 +190,7 @@ const Subscribers = () => {
                                     {filteredSubscribers.length}
                                 </span>
                             </CardTitle>
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={handleMerge}
-                                disabled={isMerging}
-                                className="text-[10px] tracking-widest font-bold uppercase border-black/10 hover:bg-black hover:text-white transition-all h-8 px-2 sm:px-3 shrink-0 ml-2"
-                            >
-                                <span className="hidden sm:inline">{isMerging ? "Merging..." : "Clean Duplicates"}</span>
-                                <span className="sm:hidden">{isMerging ? "..." : "Clean"}</span>
-                            </Button>
+
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">

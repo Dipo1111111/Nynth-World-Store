@@ -73,7 +73,7 @@ export default function Shop() {
       <SEO title="Shop Collection | NYNTH" description="Premium Minimal Streetwear" url="/shop" />
       <Header />
 
-      <main className="w-full pt-[68px]">
+      <main className="w-full pt-[98px] md:pt-[102px]">
         {/* Full-width Hero Section - Edge to Edge */}
         <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img

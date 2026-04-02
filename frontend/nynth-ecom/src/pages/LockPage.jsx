@@ -1,21 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../components/common/Logo';
-import { Lock, ArrowRight, Mail } from 'lucide-react';
+import { Lock, ArrowRight, Mail, Timer } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { addSubscriber } from '../api/firebaseFunctions';
+import { useSettings } from '../context/SettingsContext';
 
 export default function LockPage({ onUnlock }) {
+    const { settings } = useSettings();
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [waitlistEmail, setWaitlistEmail] = useState('');
     const [waitlistLoading, setWaitlistLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Countdown state
+    const [timeLeft, setTimeLeft] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+    });
+
+    useEffect(() => {
+        // Target: Friday 6pm (April 3rd, 2026)
+        const target = new Date('2026-04-03T18:00:00').getTime();
+
+        const calculateTimeLeft = () => {
+            const now = new Date().getTime();
+            const difference = target - now;
+
+            if (difference > 0) {
+                setTimeLeft({
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((difference / 1000 / 60) % 60),
+                    seconds: Math.floor((difference / 1000) % 60)
+                });
+            } else {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+            }
+        };
+
+        const timer = setInterval(calculateTimeLeft, 1000);
+        calculateTimeLeft(); // Initial call
+
+        return () => clearInterval(timer);
+    }, []);
+
+    const lockPassword = settings?.lock_password || 'WINNERSONLY';
+    const lockTitle1 = settings?.lock_title1 || 'BY WINNERS FOR WINNERS';
+    const lockTitle2 = settings?.lock_title2 || 'STAY ABOVE';
+    const lockWaitlistTitle = settings?.lock_waitlist_title || 'JOIN THE WAITLIST';
+    const lockWaitlistSubtitle = settings?.lock_waitlist_subtitle || 'BE NOTIFIED WHEN WE GO LIVE';
+
     const validateEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
-
+    
     const handleWaitlistSubmit = async (e) => {
         e.preventDefault();
         if (!waitlistEmail) return;
@@ -86,8 +128,8 @@ export default function LockPage({ onUnlock }) {
         e.preventDefault();
         setLoading(true);
 
-        // Required Password: WINNERSONLY
-        if (password.trim().toUpperCase() === 'WINNERSONLY') {
+        // Required Password from settings
+        if (password.trim().toUpperCase() === lockPassword.toUpperCase()) {
             setTimeout(() => {
                 localStorage.setItem('nynth_site_unlocked', 'true');
                 onUnlock();
@@ -119,6 +161,17 @@ export default function LockPage({ onUnlock }) {
         }
     };
 
+    const CountdownBox = ({ value, label }) => (
+        <div className="flex flex-col items-center">
+            <span className="text-3xl md:text-4xl font-space font-medium tracking-tighter tabular-nums mb-1">
+                {String(value).padStart(2, '0')}
+            </span>
+            <span className="text-[7px] md:text-[8px] tracking-[0.3em] font-bold uppercase text-black/30">
+                {label}
+            </span>
+        </div>
+    );
+
     return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
             {/* Background elements for premium feel */}
@@ -128,23 +181,34 @@ export default function LockPage({ onUnlock }) {
             <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
                 <Logo size="xl" className="mb-12" />
 
-                <div className="text-center mb-12 space-y-2">
+                <div className="text-center mb-10 space-y-2">
                     <h2 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black">
-                        BY WINNERS FOR WINNERS
+                        {lockTitle1}
                     </h2>
                     <h2 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black/40">
-                        STAY ABOVE
+                        {lockTitle2}
                     </h2>
+                </div>
+
+                {/* Live Countdown */}
+                <div className="w-full mb-16 flex items-center justify-center gap-6 md:gap-8 bg-black/5 py-8 px-6 rounded-2xl animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+                    <CountdownBox value={timeLeft.days} label="Days" />
+                    <div className="text-2xl text-black/10 font-thin mb-4 self-start leading-none pt-1">:</div>
+                    <CountdownBox value={timeLeft.hours} label="Hrs" />
+                    <div className="text-2xl text-black/10 font-thin mb-4 self-start leading-none pt-1">:</div>
+                    <CountdownBox value={timeLeft.minutes} label="Mins" />
+                    <div className="text-2xl text-black/10 font-thin mb-4 self-start leading-none pt-1">:</div>
+                    <CountdownBox value={timeLeft.seconds} label="Secs" />
                 </div>
 
                 {/* Waitlist Section */}
                 <div className="w-full mb-12 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
                     <div className="text-center mb-6">
                         <h3 className="text-[9px] tracking-[0.3em] font-bold uppercase text-black/60">
-                            JOIN THE WAITLIST
+                            {lockWaitlistTitle}
                         </h3>
                         <p className="text-[8px] tracking-[0.2em] uppercase text-black/30 mt-1">
-                            BE NOTIFIED WHEN WE GO LIVE
+                            {lockWaitlistSubtitle}
                         </p>
                     </div>
 

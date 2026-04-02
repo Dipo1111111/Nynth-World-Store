@@ -14,6 +14,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } 
 import { CSS } from "@dnd-kit/utilities";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 
 const SortableMobileCard = ({ product, handleEdit, handleDelete }) => {
@@ -134,11 +135,13 @@ export default function AdminProducts() {
     colors: [], // Array of strings e.g. ["Black", "White"]
     tags: [], // E.g. ["New", "Best Seller"]
     stockQuantity: 0,
+    sizeStock: {}, // { "S": 10, "M": 5 }
     weight: 0,
     inStock: true,
     featured: false,
     bestSeller: false,
-    modelImage: null, // Image for the storefront model toggle
+    modelImage: null,
+    displayOrder: 999, // Default for new products
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -154,8 +157,9 @@ export default function AdminProducts() {
     { value: "sleeves", label: "SLEEVES" },
   ];
 
-  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
-  const availableColors = [
+  const { settings } = useSettings();
+  const availableSizes = settings?.available_sizes ? settings.available_sizes.split(',').map(s => s.trim()) : ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+  const availableColors = settings?.available_colors ? settings.available_colors.split(',').map(c => c.trim()) : [
     "Black", "White", "Grey", "Navy", "Beige", "Red",
     "Blue", "Green", "Olive", "Brown", "Burgundy",
     "Pink", "Yellow", "Purple"
@@ -215,11 +219,13 @@ export default function AdminProducts() {
       price: product.price || "",
       description: product.description || "",
       category: product.category || "tees",
+      displayOrder: product.displayOrder, // Preserve existing order
       images: product.images || (product.imageUrl ? [product.imageUrl] : []),
       sizes: product.availableSizes || product.sizes || [],
       colors: product.availableColors || product.colors || [],
       tags: product.tags || [],
       stockQuantity: product.stockQuantity || 0,
+      sizeStock: product.sizeStock || {},
       weight: product.weight || 0,
       inStock: product.inStock !== false,
       featured: product.featured || false,
@@ -283,10 +289,47 @@ export default function AdminProducts() {
     setFormData(prev => {
       const current = prev[field];
       if (current.includes(value)) {
-        return { ...prev, [field]: current.filter(item => item !== value) };
+        // If removing a size, also remove it from sizeStock
+        const newSizeStock = { ...prev.sizeStock };
+        if (field === 'sizes') delete newSizeStock[value];
+        
+        return { 
+          ...prev, 
+          [field]: current.filter(item => item !== value),
+          sizeStock: field === 'sizes' ? newSizeStock : prev.sizeStock
+        };
       } else {
         return { ...prev, [field]: [...current, value] };
       }
+    });
+  };
+
+  const handleSizeStockChange = (size, value) => {
+    const qty = parseInt(value) || 0;
+    setFormData(prev => {
+      const newSizeStock = { ...prev.sizeStock, [size]: qty };
+      const totalStock = Object.values(newSizeStock).reduce((a, b) => a + b, 0);
+      return { 
+        ...prev, 
+        sizeStock: newSizeStock,
+        stockQuantity: totalStock
+      };
+    });
+  };
+
+  const bulkUpdateStock = (value) => {
+    const qty = parseInt(value) || 0;
+    setFormData(prev => {
+      const newSizeStock = {};
+      prev.sizes.forEach(size => {
+        newSizeStock[size] = qty;
+      });
+      const totalStock = Object.values(newSizeStock).reduce((a, b) => a + b, 0);
+      return { 
+        ...prev, 
+        sizeStock: newSizeStock,
+        stockQuantity: totalStock
+      };
     });
   };
 
@@ -391,34 +434,34 @@ export default function AdminProducts() {
 
             {/* Desktop Table View */}
             <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Product</th>
-                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Category</th>
-                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Price</th>
-                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Stock</th>
-                    <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Product</th>
+                      <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Category</th>
+                      <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Price</th>
+                      <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Stock</th>
+                      <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 text-right">Actions</th>
+                    </tr>
+                  </thead>
                   <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
                     <tbody className="divide-y divide-gray-100">
-                  {products.map(product => (
-                    <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} />
-                  ))}
-                  {products.length === 0 && (
-                    <tr>
-                      <td colSpan="5" className="p-12 text-center">
-                        <Package className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
+                      {products.map(product => (
+                        <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} />
+                      ))}
+                      {products.length === 0 && (
+                        <tr>
+                          <td colSpan="5" className="p-12 text-center">
+                            <Package className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
                   </SortableContext>
-                </DndContext>
-              </table>
+                </table>
+              </DndContext>
             </div>
           </>
         )}
@@ -545,6 +588,64 @@ export default function AdminProducts() {
                 </div>
               </div>
 
+              {formData.sizes.length > 0 && (
+                <div className="bg-gray-50 p-4 rounded-xl space-y-4">
+                  <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/5 shadow-sm">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-black">Inventory per Size</label>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 border-r border-gray-100 pr-3">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Bulk Update:</span>
+                        <div className="flex">
+                          <input 
+                            id="bulk-stock-input"
+                            type="number" 
+                            placeholder="0"
+                            className="w-12 p-1 text-[10px] border border-r-0 rounded-l font-bold text-center focus:outline-none focus:border-black"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const input = document.getElementById('bulk-stock-input');
+                              if (input.value !== "") {
+                                bulkUpdateStock(input.value);
+                                input.value = "";
+                                toast.success("Applied to all sizes");
+                              }
+                            }}
+                            className="px-2 py-1 bg-black text-white text-[8px] font-bold uppercase rounded-r hover:bg-gray-800 transition-colors"
+                          >
+                            Set All
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
+                        }}
+                        className="text-[9px] font-bold text-red-400 hover:text-red-500 uppercase tracking-tighter transition-colors"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {formData.sizes.map(size => (
+                      <div key={size} className="space-y-1">
+                        <label className="text-[10px] font-bold text-gray-500">{size}</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.sizeStock[size] || 0}
+                          onChange={(e) => handleSizeStockChange(size, e.target.value)}
+                          className="w-full p-2 text-xs border rounded-lg font-bold focus:border-black transition-colors"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Images */}
               <div className="space-y-2 pt-4 border-t border-gray-100">
                 <label className="text-sm font-medium">Images</label>
@@ -661,13 +762,13 @@ export default function AdminProducts() {
                     <input
                       type="number"
                       min="0"
-                      className="w-full border p-3 rounded-lg pl-10"
+                      readOnly
+                      className="w-full border p-3 rounded-lg pl-10 bg-gray-50 text-gray-500 font-bold"
                       value={formData.stockQuantity}
-                      onChange={e => setFormData({ ...formData, stockQuantity: parseInt(e.target.value) || 0 })}
                     />
                     <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                   </div>
-                  <p className="text-[11px] text-gray-400">Updating this will automatically set {formData.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'} status.</p>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Automatic Total from Sizes</p>
                 </div>
 
                 <div className="space-y-2 flex-1">
