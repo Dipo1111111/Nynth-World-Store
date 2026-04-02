@@ -16,6 +16,7 @@ const ThankYou = () => {
   const [cartCleared, setCartCleared] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     // Trigger premium confetti
     const duration = 3 * 1000;

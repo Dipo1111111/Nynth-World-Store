@@ -8,7 +8,7 @@ import {
   updateProductOrderBatch
 } from "../../api/firebaseFunctions";
 import { uploadImageToCloudinary } from "../../api/cloudinary";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical, Eye, EyeOff } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -17,7 +17,7 @@ import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 
 
-const SortableMobileCard = ({ product, handleEdit, handleDelete }) => {
+const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePublic }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
@@ -54,18 +54,24 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete }) => {
         <button {...attributes} {...listeners} className="flex items-center justify-center p-2 bg-gray-50 text-gray-400 hover:text-black rounded-lg border border-transparent touch-none active:cursor-grabbing">
           <GripVertical size={16} />
         </button>
-        <button onClick={() => handleEdit(product)} className="flex-1 flex items-center justify-center gap-2 p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5 text-[10px] font-bold uppercase tracking-wider">
-          <Edit2 size={14} /> Edit
+        <button 
+          onClick={() => handleTogglePublic(product)} 
+          className={`flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-green-50 text-green-600 border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
+        >
+          {product.isPublic !== false ? <><Eye size={14}/> Visible</> : <><EyeOff size={14}/> Hidden</>}
         </button>
-        <button onClick={() => handleDelete(product.id)} className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-50 text-red-500 rounded-lg border border-red-100 text-[10px] font-bold uppercase tracking-wider">
-          <Trash2 size={14} /> Delete
+        <button onClick={() => handleEdit(product)} className="flex items-center justify-center p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5 hover:bg-gray-100">
+          <Edit2 size={14} />
+        </button>
+        <button onClick={() => handleDelete(product.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-500 rounded-lg border border-red-100 hover:bg-red-100">
+          <Trash2 size={14} />
         </button>
       </div>
     </div>
   );
 };
 
-const SortableDesktopRow = ({ product, handleEdit, handleDelete }) => {
+const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePublic }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
@@ -102,6 +108,13 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete }) => {
       </td>
       <td className="p-4 text-right">
         <div className="flex justify-end items-center gap-2 transition-all">
+          <button 
+            onClick={() => handleTogglePublic(product)} 
+            className={`p-1.5 focus:outline-none rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-400 border-gray-200'}`}
+            title={product.isPublic !== false ? "Hide from Store" : "Show on Store"}
+          >
+            {product.isPublic !== false ? <Eye size={16} /> : <EyeOff size={16} />}
+          </button>
           <button {...attributes} {...listeners} className="p-2 text-gray-400 hover:text-black cursor-grab active:cursor-grabbing touch-none">
             <GripVertical size={16} />
           </button>
@@ -193,7 +206,7 @@ export default function AdminProducts() {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const data = await fetchProducts();
+      const data = await fetchProducts({ admin: true });
       data.sort((a, b) => {
         const orderA = a.displayOrder !== undefined ? Number(a.displayOrder) : 999;
         const orderB = b.displayOrder !== undefined ? Number(b.displayOrder) : 999;
@@ -395,6 +408,22 @@ export default function AdminProducts() {
     }
   };
 
+  const handleTogglePublic = async (product) => {
+    const newStatus = product.isPublic === false ? true : false;
+    const actionText = newStatus ? 'show' : 'hide';
+    
+    if (confirm(`Are you sure you want to ${actionText} "${product.title || product.name}" on the storefront?`)) {
+      try {
+        await updateProduct(product.id, { isPublic: newStatus });
+        toast.success(newStatus ? "Product is now visible on the store" : "Product is hidden from the store");
+        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isPublic: newStatus } : p));
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to update visibility");
+      }
+    }
+  };
+
   return (
     <AdminLayout title="Products">
       <div className="flex justify-end mb-6">
@@ -420,7 +449,7 @@ export default function AdminProducts() {
               <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
 <div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
               {products.map(product => (
-                <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} />
+                <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
               ))}
               {products.length === 0 && (
                 <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-200">
@@ -448,7 +477,7 @@ export default function AdminProducts() {
                   <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
                     <tbody className="divide-y divide-gray-100">
                       {products.map(product => (
-                        <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} />
+                        <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
                       ))}
                       {products.length === 0 && (
                         <tr>

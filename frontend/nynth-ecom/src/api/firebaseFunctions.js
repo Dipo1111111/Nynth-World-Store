@@ -32,21 +32,24 @@ export const addProduct = async (product) => {
   return docRef.id;
 };
 
-export const fetchProducts = async () => {
+export const fetchProducts = async ({ admin = false } = {}) => {
   try {
     const snapshot = await getDocs(collection(db, "products"));
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return admin ? data : data.filter((p) => p.isPublic !== false);
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
   }
 };
 
-export const fetchSingleProduct = async (id) => {
+export const fetchSingleProduct = async (id, { admin = false } = {}) => {
   try {
     const docRef = doc(db, "products", id);
     const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+    if (!docSnap.exists()) return null;
+    const data = { id: docSnap.id, ...docSnap.data() };
+    return admin ? data : (data.isPublic !== false ? data : null);
   } catch (error) {
     console.error(`Error fetching product ${id}:`, error);
     return null;
@@ -132,10 +135,10 @@ export const fetchFeaturedProducts = async (max = 6) => {
         limit(max)
       );
       const latestSnapshot = await getDocs(latestQ);
-      return latestSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return latestSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(p => p.isPublic !== false);
     }
 
-    return featuredProducts;
+    return featuredProducts.filter(p => p.isPublic !== false);
   } catch (error) {
     console.error("Error fetching featured products:", error);
     return [];
@@ -150,7 +153,7 @@ export const fetchProductsByCategory = async (category, max = 15) => {
       limit(max)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(p => p.isPublic !== false);
   } catch (error) {
     console.error(`Error fetching ${category} products:`, error);
     return [];
@@ -165,7 +168,7 @@ export const fetchProductsByTag = async (tag, max = 10) => {
       limit(max)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(p => p.isPublic !== false);
   } catch (error) {
     console.error(`Error fetching products by tag ${tag}:`, error);
     return [];

@@ -19,6 +19,7 @@ const AdminPWAPrompt = () => {
         const isIOS = /iphone|ipad|ipod/.test(userAgent);
         const isAndroid = /android/.test(userAgent);
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
         if (isIOS) setPlatform('ios');
         else if (isAndroid) setPlatform('android');
 

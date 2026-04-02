@@ -49,6 +49,7 @@ const Orders = () => {
 
     useEffect(() => {
         applyFilters();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [orders, searchTerm, statusFilter, monthFilter]);
 
     const fetchOrders = async () => {
