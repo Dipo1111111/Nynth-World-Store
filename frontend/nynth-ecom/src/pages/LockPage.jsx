@@ -190,31 +190,34 @@ export default function LockPage({ onUnlock }) {
                     </h2>
                 </div>
 
-                {/* Live Countdown - Minimalist Typography */}
-                <div className="w-full mb-16 flex items-center justify-center gap-6 md:gap-10 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+                {/* Live Countdown - Branded Typography */}
+                <div className="w-full mb-20 flex items-center justify-center gap-4 md:gap-8 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
                     <div className="flex flex-col items-center">
-                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
                             {timeLeft.days}
                         </span>
-                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">DAYS</span>
+                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">DAYS</span>
                     </div>
+                    <div className="text-xl text-black/10 self-start mt-2">:</div>
                     <div className="flex flex-col items-center">
-                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
                             {String(timeLeft.hours).padStart(2, '0')}
                         </span>
-                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">HOURS</span>
+                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">HOURS</span>
                     </div>
+                    <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
                     <div className="flex flex-col items-center">
-                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
                             {String(timeLeft.minutes).padStart(2, '0')}
                         </span>
-                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">MINS</span>
+                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">MINS</span>
                     </div>
+                    <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
                     <div className="flex flex-col items-center">
-                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
                             {String(timeLeft.seconds).padStart(2, '0')}
                         </span>
-                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">SECS</span>
+                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">SECS</span>
                     </div>
                 </div>
 
