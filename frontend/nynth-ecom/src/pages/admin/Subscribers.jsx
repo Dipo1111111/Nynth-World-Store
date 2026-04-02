@@ -37,27 +37,47 @@ const Subscribers = () => {
         try {
             const data = await fetchSubscribers();
             
-            // Also fetch raw abandoned checkouts
+            // Also fetch raw orders
             const rawOrders = await getAllOrders();
             const abandonedOrders = rawOrders.filter(o => 
                 o.payment_status === 'pending' || 
-                !o.payment_status // catch-all for incomplete
+                !o.payment_status
+            );
+            
+            const completedOrders = rawOrders.filter(o => 
+                o.payment_status === 'paid' || 
+                o.payment_status === 'success'
             );
 
-            // Create "subscriber" objects for these checkouts 
+            // Create "subscriber" objects for abandoned checkouts 
             const abandonedSubscribers = abandonedOrders
-                .filter(o => o.customer?.email) // Only if they left an email
+                .filter(o => o.customer?.email)
                 .map(o => ({
                     id: `abandoned_${o.id}`,
                     email: o.customer.email,
                     source: "abandoned",
                     status: "active",
-                    subscribed_at: o.created_at, // Use the order's created_at time
+                    subscribed_at: o.created_at,
                     firstName: o.customer.firstName,
-                    lastName: o.customer.lastName
+                    lastName: o.customer.lastName,
+                    orderId: o.id
+                }));
+                
+            // Create "subscriber" objects for completed checkouts
+            const customerSubscribers = completedOrders
+                .filter(o => o.customer?.email)
+                .map(o => ({
+                    id: `customer_${o.id}`,
+                    email: o.customer.email,
+                    source: "customers",
+                    status: "active",
+                    subscribed_at: o.created_at,
+                    firstName: o.customer.firstName,
+                    lastName: o.customer.lastName,
+                    orderId: o.id
                 }));
 
-            const combinedData = [...data, ...abandonedSubscribers];
+            const combinedData = [...data, ...abandonedSubscribers, ...customerSubscribers];
             setSubscribers(combinedData);
             setFilteredSubscribers(combinedData);
         } catch (error) {
@@ -155,12 +175,12 @@ const Subscribers = () => {
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex bg-gray-100 p-1 rounded-lg self-start sm:self-auto overflow-x-auto no-scrollbar max-w-full">
-                    {["all", "waitlist", "newsletter", "abandoned"].map((f) => (
+                <div className="flex flex-wrap bg-gray-100 p-1 rounded-lg w-full sm:w-auto gap-1">
+                    {["all", "waitlist", "newsletter", "abandoned", "customers"].map((f) => (
                         <button
                             key={f}
                             onClick={() => { setActiveFilter(f); setSelectedEmails(new Set()); }}
-                            className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                            className={`min-w-0 flex-grow sm:flex-none text-center px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                                 activeFilter === f 
                                     ? "bg-white text-black shadow-sm" 
                                     : "text-gray-500 hover:text-black"
@@ -206,10 +226,10 @@ const Subscribers = () => {
                     <CardContent className="flex flex-col items-center justify-center py-16">
                         <Users className="h-16 w-16 text-gray-300 mb-4" />
                         <h3 className="text-lg font-medium mb-2 font-space">
-                            {activeFilter === 'abandoned' ? 'No abandoned checkouts found' : 'No subscribers found'}
+                            {activeFilter === 'abandoned' ? 'No abandoned checkouts found' : activeFilter === 'customers' ? 'No customers found' : 'No subscribers found'}
                         </h3>
                         <p className="text-gray-500 text-sm">
-                            {activeFilter === 'abandoned' ? 'Abandoned checkouts with an email will appear here.' : 'Signups from the website will appear here.'}
+                            {activeFilter === 'abandoned' ? 'Abandoned checkouts with an email will appear here.' : activeFilter === 'customers' ? 'Successful purchases will appear here.' : 'Signups from the website will appear here.'}
                         </p>
                     </CardContent>
                 </Card>
@@ -218,7 +238,7 @@ const Subscribers = () => {
                     <CardHeader className="border-b border-gray-50">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-base font-space">
-                                {activeFilter === 'all' ? 'All Subscribers' : activeFilter === 'abandoned' ? 'Abandoned Checkouts' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
+                                {activeFilter === 'all' ? 'All Subscribers' : activeFilter === 'abandoned' ? 'Abandoned Checkouts' : activeFilter === 'customers' ? 'Customers' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
                                 <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-sans tracking-normal">
                                     {filteredSubscribers.length}
                                 </span>
@@ -254,6 +274,8 @@ const Subscribers = () => {
                                                 ? "bg-black text-white" 
                                                 : sub.source === 'abandoned'
                                                 ? "bg-red-50 text-red-500"
+                                                : sub.source === 'customers'
+                                                ? "bg-green-50 text-green-600"
                                                 : "bg-gray-100 text-gray-600"
                                         }`}>
                                             {sub.source || 'newsletter'}
@@ -318,6 +340,8 @@ const Subscribers = () => {
                                                         ? "bg-black text-white" 
                                                         : sub.source === 'abandoned'
                                                         ? "bg-red-50 text-red-500"
+                                                        : sub.source === 'customers'
+                                                        ? "bg-green-50 text-green-600"
                                                         : "bg-gray-100 text-gray-600"
                                                 }`}>
                                                     {sub.source || 'newsletter'}

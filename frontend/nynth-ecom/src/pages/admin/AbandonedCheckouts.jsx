@@ -486,9 +486,22 @@ const AbandonedCheckouts = () => {
                                                                              Contact Information
                                                                          </h4>
                                                                          <div className="p-4 bg-white rounded-lg border border-gray-100 space-y-3">
-                                                                             <div className="flex items-center gap-2 text-sm">
-                                                                                 <Mail size={14} className="text-gray-400" />
-                                                                                 <span className="truncate">{order.customer?.email}</span>
+                                                                             <div className="flex items-center justify-between">
+                                                                                 <div className="flex items-center gap-2 text-sm">
+                                                                                     <Mail size={14} className="text-gray-400" />
+                                                                                     <span className="truncate">{order.customer?.email}</span>
+                                                                                 </div>
+                                                                                 {order.customer?.email && (
+                                                                                     <button 
+                                                                                         onClick={(e) => {
+                                                                                             e.stopPropagation();
+                                                                                             window.location.href = `mailto:${order.customer?.email}?subject=Did you forget something? (Order #${order.id.slice(0,8)})&body=Hi ${order.customer?.firstName},%0D%0A%0D%0AWe noticed you left some items in your cart...`
+                                                                                         }}
+                                                                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-black text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
+                                                                                     >
+                                                                                         <Mail size={12} /> Email Buyer
+                                                                                     </button>
+                                                                                 )}
                                                                              </div>
                                                                              <div className="flex items-center gap-2 text-sm">
                                                                                  <Phone size={14} className="text-gray-400" />
