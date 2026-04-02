@@ -559,24 +559,26 @@ export default function AdminProducts() {
 
               {/* Variants */}
               <div className="space-y-4 pt-4 border-t border-gray-100">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Sizes</label>
-                  <div className="flex flex-wrap gap-2">
-                    {availableSizes.map(size => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => toggleSelection("sizes", size)}
-                        className={`px-3 py-1 rounded-full border text-sm font-medium transition-all ${formData.sizes.includes(size)
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-gray-600 border-gray-200 hover:border-black"
-                          }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                {formData.category !== "headwear" && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Sizes</label>
+                    <div className="flex flex-wrap gap-2">
+                      {availableSizes.map(size => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => toggleSelection("sizes", size)}
+                          className={`px-3 py-1 rounded-full border text-sm font-medium transition-all ${formData.sizes.includes(size)
+                            ? "bg-black text-white border-black"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-black"
+                            }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Colors</label>
@@ -617,61 +619,78 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              {formData.sizes.length > 0 && (
-                <div className="bg-gray-50 p-4 rounded-xl space-y-4">
-                  <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/5 shadow-sm">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-black">Inventory per Size</label>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 border-r border-gray-100 pr-3">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Bulk Update:</span>
-                        <div className="flex">
-                          <input 
-                            id="bulk-stock-input"
-                            type="number" 
-                            placeholder="0"
-                            className="w-12 p-1 text-[10px] border border-r-0 rounded-l font-bold text-center focus:outline-none focus:border-black"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const input = document.getElementById('bulk-stock-input');
-                              if (input.value !== "") {
-                                bulkUpdateStock(input.value);
-                                input.value = "";
-                                toast.success("Applied to all sizes");
-                              }
-                            }}
-                            className="px-2 py-1 bg-black text-white text-[8px] font-bold uppercase rounded-r hover:bg-gray-800 transition-colors"
-                          >
-                            Set All
-                          </button>
+              {formData.category !== "headwear" ? (
+                formData.sizes.length > 0 && (
+                  <div className="bg-gray-50 p-4 rounded-xl space-y-4">
+                    <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/5 shadow-sm">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-black">Inventory per Size</label>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 border-r border-gray-100 pr-3">
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Bulk Update:</span>
+                          <div className="flex">
+                            <input 
+                              id="bulk-stock-input"
+                              type="number" 
+                              placeholder="0"
+                              className="w-12 p-1 text-[10px] border border-r-0 rounded-l font-bold text-center focus:outline-none focus:border-black"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const input = document.getElementById('bulk-stock-input');
+                                if (input.value !== "") {
+                                  bulkUpdateStock(input.value);
+                                  input.value = "";
+                                  toast.success("Applied to all sizes");
+                                }
+                              }}
+                              className="px-2 py-1 bg-black text-white text-[8px] font-bold uppercase rounded-r hover:bg-gray-800 transition-colors"
+                            >
+                              Set All
+                            </button>
+                          </div>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
+                          }}
+                          className="text-[9px] font-bold text-red-400 hover:text-red-500 uppercase tracking-tighter transition-colors"
+                        >
+                          Clear All
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
-                        }}
-                        className="text-[9px] font-bold text-red-400 hover:text-red-500 uppercase tracking-tighter transition-colors"
-                      >
-                        Clear All
-                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {formData.sizes.map(size => (
+                        <div key={size} className="space-y-1">
+                          <label className="text-[10px] font-bold text-gray-500">{size}</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={formData.sizeStock[size] || 0}
+                            onChange={(e) => handleSizeStockChange(size, e.target.value)}
+                            className="w-full p-2 text-xs border rounded-lg font-bold focus:border-black transition-colors"
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {formData.sizes.map(size => (
-                      <div key={size} className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-500">{size}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={formData.sizeStock[size] || 0}
-                          onChange={(e) => handleSizeStockChange(size, e.target.value)}
-                          className="w-full p-2 text-xs border rounded-lg font-bold focus:border-black transition-colors"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                )
+              ) : (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Total Units In Stock</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Enter total quantity"
+                    className="w-full border p-3 rounded-lg"
+                    value={formData.stockQuantity}
+                    onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
+                  />
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight italic">
+                    * Headwear is treat as One Size. Enter total units available across all expandable strap units.
+                  </p>
                 </div>
               )}
 

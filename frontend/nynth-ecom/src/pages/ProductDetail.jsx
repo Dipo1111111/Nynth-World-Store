@@ -282,7 +282,7 @@ export default function ProductDetail() {
             )}
 
             {/* Size Selection - Exact Suvene Style Boxes */}
-            {product.availableSizes?.length > 0 && (
+            {product.category !== "headwear" && product.availableSizes?.length > 0 && (
               <div className="mb-10">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-[8px] tracking-[0.25em] font-bold uppercase text-black">
@@ -463,7 +463,7 @@ export default function ProductDetail() {
           )}
 
           {/* Size Selection */}
-          {product.availableSizes?.length > 0 && (
+          {product.category !== "headwear" && product.availableSizes?.length > 0 && (
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
                 <p className="text-[9px] tracking-[0.2em] font-bold uppercase text-gray-500">
