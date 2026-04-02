@@ -138,7 +138,7 @@ const AdminDashboard = () => {
         return () => unsubscribe();
     }, []);
 
-    // --- REALTIME ORDERS NOTIFICATIONS ---
+// --- REALTIME ORDERS NOTIFICATIONS ---
     useEffect(() => {
         if (loading) return;
 
@@ -146,17 +146,19 @@ const AdminDashboard = () => {
         const q = query(collection(db, "orders"), orderBy("created_at", "desc"), limit(20));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
+                const orderData = change.doc.data();
+                const isPaid = orderData.payment_status === 'paid' || orderData.payment_status === 'success';
+                
+                // Only alert on NEWLY PAID orders (either added as paid or modified to paid)
+                if ((change.type === "added" || change.type === "modified") && isPaid) {
                     const orderId = change.doc.id;
-                    const order = change.doc.data();
-                    const orderTime = order.created_at?.seconds ? order.created_at.seconds * 1000 : Date.now();
+                    const orderTime = orderData.created_at?.seconds ? orderData.created_at.seconds * 1000 : Date.now();
 
-                    if (!seenOrderIds.has(orderId) && orderTime > (sessionStartTime - 5000)) {
-                        setSeenOrderIds(prev => new Set([...prev, orderId]));
-                        triggerSaleAlert(order);
+                    // Only trigger if we haven't seen this PAID order yet in this session
+                    if (!seenOrderIds.has(orderId + "_paid") && orderTime > (sessionStartTime - 30000)) {
+                        setSeenOrderIds(prev => new Set([...prev, orderId + "_paid"]));
+                        triggerSaleAlert(orderData);
                         fetchDashboardData();
-                    } else if (!seenOrderIds.has(orderId)) {
-                        setSeenOrderIds(prev => new Set([...prev, orderId]));
                     }
                 }
             });
@@ -192,12 +194,20 @@ const AdminDashboard = () => {
 
         const currentOrders = analytics.rawOrders.filter(o => {
             if (!o.created_at?.seconds) return false;
+            // ONLY COUNT PAID ORDERS IN DASHBOARD METRICS
+            const isPaid = o.payment_status === 'paid' || o.payment_status === 'success';
+            if (!isPaid) return false;
+            
             const d = new Date(o.created_at.seconds * 1000);
             return d >= currentBounds.start && d <= currentBounds.end;
         });
 
         const prevOrders = analytics.rawOrders.filter(o => {
             if (!o.created_at?.seconds) return false;
+            // ONLY COUNT PAID ORDERS IN DASHBOARD METRICS
+            const isPaid = o.payment_status === 'paid' || o.payment_status === 'success';
+            if (!isPaid) return false;
+
             const d = new Date(o.created_at.seconds * 1000);
             return d >= prevBounds.start && d <= prevBounds.end;
         });

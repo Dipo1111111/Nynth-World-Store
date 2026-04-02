@@ -55,8 +55,14 @@ const Orders = () => {
         setLoading(true);
         try {
             const data = await getAllOrders();
-            setOrders(data);
-            setFilteredOrders(data);
+            // STRICT FILTER: Only show orders that have been PAID
+            const paidOnly = data.filter(o => 
+                o.payment_status === 'paid' || 
+                o.payment_status === 'success' ||
+                o.order_status === 'delivered' // safety for legacy
+            );
+            setOrders(paidOnly);
+            setFilteredOrders(paidOnly);
         } catch (error) {
             console.error('Error fetching orders:', error);
             toast.error('Failed to load orders');
