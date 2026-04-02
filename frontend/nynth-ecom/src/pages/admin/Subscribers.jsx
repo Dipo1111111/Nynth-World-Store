@@ -153,16 +153,27 @@ const Subscribers = () => {
                     ))}
                 </div>
 
-                {/* Send Email Button */}
-                {selectedEmails.size > 0 && (
+                {/* Actions */}
+                <div className="flex items-center gap-2">
                     <Button 
-                        onClick={() => setShowEmailModal(true)}
-                        className="bg-black text-white hover:bg-gray-800 text-[10px] tracking-widest font-bold uppercase h-9 px-4 shrink-0"
+                        variant="outline"
+                        onClick={toggleSelectAll}
+                        className="text-[10px] tracking-widest font-bold uppercase h-9 px-4 border-gray-100 hover:border-black transition-colors"
                     >
-                        <Send size={14} className="mr-2" />
-                        Email {selectedEmails.size}
+                        {selectedEmails.size === filteredSubscribers.length && filteredSubscribers.length > 0 ? "Deselect All" : "Select All"}
                     </Button>
-                )}
+
+                    {/* Send Email Button */}
+                    {selectedEmails.size > 0 && (
+                        <Button 
+                            onClick={() => setShowEmailModal(true)}
+                            className="bg-black text-white hover:bg-gray-800 text-[10px] tracking-widest font-bold uppercase h-9 px-4 shrink-0 transition-all animate-fadeIn"
+                        >
+                            <Send size={14} className="mr-2" />
+                            Email {selectedEmails.size}
+                        </Button>
+                    )}
+                </div>
             </div>
 
             {loading ? (
