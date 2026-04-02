@@ -25,7 +25,7 @@ function ProductCard({ product }) {
   return (
     <div className="group">
       <Link to={`/product/${product.id}`}>
-        <div className="aspect-square overflow-hidden rounded-xl bg-gray-100 mb-4 relative">
+        <div className="aspect-[3/4] overflow-hidden rounded-xl bg-gray-100 mb-4 relative">
           <img
             src={image}
             alt={product.title}
@@ -108,7 +108,7 @@ export default function NewArrivals() {
           ) : (
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-square bg-gray-200 rounded-xl mb-4"></div>
+                <div className="aspect-[3/4] bg-gray-200 rounded-xl mb-4"></div>
                 <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
               </div>

@@ -147,7 +147,7 @@ export default function Lookbook() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {fallbackProducts.map((product) => (
                     <Link key={product.id} to={`/product/${product.id}`} className="group block">
-                      <div className="aspect-[4/5] overflow-hidden bg-gray-50 mb-4">
+                      <div className="aspect-[3/4] overflow-hidden bg-gray-50 mb-4">
                         <img
                           src={product.images?.[0] || product.imageUrl}
                           alt={product.title}

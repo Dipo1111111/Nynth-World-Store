@@ -68,7 +68,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
         {/* Image */}
         <Link
           to={`/product/${product.id}`}
-          className="relative w-full aspect-[4/5] overflow-hidden block bg-[#f5f5f5]"
+          className="relative w-full aspect-[3/4] overflow-hidden block bg-[#f5f5f5]"
         >
           <img
             src={mainImage}
@@ -126,7 +126,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
     <div className="group flex flex-col w-full bg-white">
       <Link
         to={`/product/${product.id}`}
-        className="relative aspect-[4/5] w-full overflow-hidden block bg-white"
+        className="relative aspect-[3/4] w-full overflow-hidden block bg-white"
       >
         <img
           src={mainImage}

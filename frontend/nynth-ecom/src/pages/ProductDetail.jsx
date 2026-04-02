@@ -330,7 +330,7 @@ export default function ProductDetail() {
       <main className="lg:hidden pt-[100px] pb-24">
         {/* Product Image Mobile Carousel */}
         <div 
-          className="w-full bg-white relative aspect-square flex items-center justify-center overflow-hidden group"
+          className="w-full bg-white relative aspect-[3/4] flex items-center justify-center overflow-hidden group"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
