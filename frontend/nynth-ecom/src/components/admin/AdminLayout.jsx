@@ -13,6 +13,7 @@ export default function AdminLayout({ children, title }) {
         { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
         { label: "Products", href: "/admin/products", icon: ShoppingBag },
         { label: "Orders", href: "/admin/orders", icon: Package },
+        { label: "Abandoned Checkouts", href: "/admin/abandoned-checkouts", icon: ShoppingBag }, // Used ShoppingBag from lucide-react as an alternative, but can use different if preferred
         { label: "Lookbooks", href: "/admin/lookbooks", icon: ImageIcon },
         { label: "Subscribers", href: "/admin/subscribers", icon: Users },
         { label: "Settings", href: "/admin/settings", icon: Settings },

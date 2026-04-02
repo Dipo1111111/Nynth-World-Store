@@ -44,6 +44,7 @@ import WaitlistConfirmation from "./pages/WaitlistConfirmation.jsx";
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Orders = lazy(() => import("./pages/admin/Orders"));
+const AbandonedCheckouts = lazy(() => import("./pages/admin/AbandonedCheckouts"));
 const Products = lazy(() => import("./pages/admin/Products"));
 const Lookbooks = lazy(() => import("./pages/admin/Lookbooks"));
 const Subscribers = lazy(() => import("./pages/admin/Subscribers"));
@@ -208,6 +209,16 @@ function App() {
                         <ProtectedRoute requireAdmin={true}>
                           <Suspense fallback={<AdminLoader />}>
                             <Orders />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/abandoned-checkouts"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <AbandonedCheckouts />
                           </Suspense>
                         </ProtectedRoute>
                       }
