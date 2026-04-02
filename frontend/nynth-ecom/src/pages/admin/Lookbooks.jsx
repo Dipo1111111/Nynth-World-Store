@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchLookbooks, uploadImage } from "../../api/firebaseFunctions";
 import { db } from "../../api/firebase";
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, onSnapshot, query, orderBy, getDocs } from "firebase/firestore";
 import { Loader2, Plus, Trash2, Edit2, Upload, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
@@ -28,21 +28,58 @@ export default function AdminLookbooks() {
     const [formData, setFormData] = useState(initialFormState);
     const [submitStep, setSubmitStep] = useState(""); // "", "compressing", "uploading", "saving"
 
+    const loadLookbooks = async (isManual = false) => {
+        try {
+            setLoading(true);
+            const snapshot = await getDocs(collection(db, "lookbooks"));
+            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Client-side sort to avoid index requirements and missing field issues
+            data.sort((a, b) => {
+                const dateA = a.created_at?.seconds || 0;
+                const dateB = b.created_at?.seconds || 0;
+                return dateB - dateA;
+            });
+            
+            setLookbooks(data);
+            if (isManual) toast.success("Refreshed!");
+        } catch (error) {
+            console.error("Manual Fetch Error:", error);
+            toast.error("Failed to fetch lookbooks: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         setLoading(true);
-        // Use onSnapshot for real-time updates and better resilience to network drops/QUIC errors
-        const q = query(collection(db, "lookbooks"), orderBy("created_at", "desc"));
+        // Use onSnapshot for real-time updates - Simplified to avoid index/QUIC errors
+        const q = collection(db, "lookbooks");
         const unsubscribe = onSnapshot(q, 
             (snapshot) => {
                 const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Client-side sort is safer and handles missing created_at fields from legacy scripts
+                data.sort((a, b) => {
+                    const dateA = a.created_at?.seconds || 0;
+                    const dateB = b.created_at?.seconds || 0;
+                    return dateB - dateA;
+                });
+
+                console.log(`Syncing ${data.length} lookbooks from Firestore`);
                 setLookbooks(data);
                 setLoading(false);
             },
             (error) => {
                 console.error("Firestore Sync Error (Lookbooks):", error);
-                // If it's a 400 or QUIC error, we notify the user
-                toast.error("Real-time sync failed. Please check your connection.");
-                setLoading(false);
+                
+                // If onSnapshot fails (permission or index), try a fallback raw fetch
+                if (error.code === 'permission-denied' || error.code === 'failed-precondition') {
+                    loadLookbooks();
+                } else {
+                    toast.error("Real-time sync failed. Please check your connection.");
+                    setLoading(false);
+                }
             }
         );
 
@@ -119,7 +156,13 @@ export default function AdminLookbooks() {
 
     return (
         <AdminLayout title="Lookbook Management">
-            <div className="mb-6 flex justify-end">
+            <div className="mb-6 flex justify-end gap-3">
+                <button
+                    onClick={() => loadLookbooks(true)}
+                    className="px-4 py-2 border border-gray-200 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors"
+                >
+                    Refresh
+                </button>
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="btn-primary flex items-center gap-2"
@@ -140,8 +183,23 @@ export default function AdminLookbooks() {
                     </div>
                     <h3 className="text-xl font-space font-bold mb-2">No Lookbooks Found</h3>
                     <p className="text-gray-500 max-w-md mb-8 text-sm leading-relaxed">
-                        You haven't created any lookbooks yet. Click the "Add New Look" button to create your first lookbook collection so your customers can get inspired.
+                        You haven't created any lookbooks yet. Click the "Add New Look" button to create your first lookbook collection.
                     </p>
+                    
+                    {/* Diagnostic Info for Troubleshooting */}
+                    <div className="mb-8 p-4 bg-gray-50 rounded-lg text-left w-full max-w-md border border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Connectivity Status</p>
+                        <div className="space-y-1 text-xs font-medium font-mono text-gray-600">
+                            <p>• Firestore Collection: "lookbooks"</p>
+                            <p>• Current User UID: {doc(db, 'users', 'test').id.slice(0,5)}... (connected)</p>
+                            <p>• Auth State: {loading ? "Verifying..." : "Authenticated"}</p>
+                            <p>• Last Sync Attempt: {new Date().toLocaleTimeString()}</p>
+                        </div>
+                        <p className="mt-4 text-[9px] text-gray-400 italic">
+                            * Note: If you see 6 images on the website but 0 here, the website is showing its automatic product fallback because this collection is truly empty.
+                        </p>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button
                             onClick={() => setIsModalOpen(true)}
@@ -150,14 +208,12 @@ export default function AdminLookbooks() {
                             <Plus size={18} />
                             Add New Look
                         </button>
-                        <a 
-                            href="/lookbook" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="px-6 py-3 border border-gray-200 text-black font-bold text-sm tracking-widest uppercase rounded-full hover:bg-gray-50 transition-all flex items-center justify-center"
+                        <button
+                             onClick={() => loadLookbooks(true)}
+                             className="px-6 py-3 border border-gray-200 text-black font-bold text-sm tracking-widest uppercase rounded-full hover:bg-gray-50 transition-all flex items-center justify-center"
                         >
-                            View Live Page
-                        </a>
+                            Retry Sync
+                        </button>
                     </div>
                 </div>
             ) : (

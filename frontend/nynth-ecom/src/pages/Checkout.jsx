@@ -17,7 +17,7 @@ import { LAGOS_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../data/locationD
 const Checkout = () => {
   const { settings } = useSettings();
   const { cartItems, totalAmount, clearCart } = useCart();
-  const { currentUser } = useAuth(); // Get current user
+  const { currentUser, isAdmin } = useAuth(); // Get current user and admin status
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -71,7 +71,9 @@ const Checkout = () => {
 
   useEffect(() => {
     if (form.state === "Lagos") {
-      if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
+      if (form.city === "NYNTH WORLD (TEST)") {
+        setShippingFee(0);
+      } else if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
         setShippingFee(LAGOS_SHIPPING_DATA[form.city].price);
       } else {
         setShippingFee(settings.shipping_fee || 0);
@@ -299,6 +301,11 @@ const Checkout = () => {
                     className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
                   >
                     <option value="">SELECT AREA</option>
+                    {isAdmin && (
+                      <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
+                        NYNTH WORLD (TEST)
+                      </option>
+                    )}
                     {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => (
                       <option key={area} value={area}>
                         {area.toUpperCase()}

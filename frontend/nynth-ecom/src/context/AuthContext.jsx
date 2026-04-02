@@ -24,8 +24,9 @@ export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdminLoading, setIsAdminLoading] = useState(false);
 
-    console.log("AuthContext Render. Loading:", loading);
+    console.log("AuthContext Render. Loading:", loading, "Admin:", isAdmin, "AdminLoading:", isAdminLoading);
 
     // Helper: Check if email is in admin whitelist
     const isAdminEmail = (email) => {
@@ -114,6 +115,7 @@ export function AuthProvider({ children }) {
     // Check if user is admin
     async function checkAdmin(uid) {
         try {
+            setIsAdminLoading(true);
             const docRef = doc(db, "users", uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
@@ -125,31 +127,31 @@ export function AuthProvider({ children }) {
         } catch (error) {
             console.error("Error checking admin status:", error);
             setIsAdmin(false);
+        } finally {
+            setIsAdminLoading(false);
         }
     }
 
     // Auth State Listener
     useEffect(() => {
-        // Set persistence to local storage (keeps user signed in across sessions)
         setPersistence(auth, browserLocalPersistence)
-            .then(() => {
-                console.log("Auth persistence set to local storage");
-            })
-            .catch((error) => {
-                console.error("Error setting persistence:", error);
-            });
+            .then(() => console.log("Auth persistence set"))
+            .catch((e) => console.error("Persistence error:", e));
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            console.log("Auth State Changed. User:", user?.email);
             setCurrentUser(user);
+            
             if (user) {
                 await checkAdmin(user.uid);
             } else {
                 setIsAdmin(false);
+                setIsAdminLoading(false);
             }
             setLoading(false);
         });
 
-        // Failsafe: If auth doesn't respond in 2s, stop loading (allows app to render)
+        // Failsafe: Increased from 2s to 5s because of Firestore network instability
         const timeout = setTimeout(() => {
             setLoading((prev) => {
                 if (prev) {
@@ -158,7 +160,7 @@ export function AuthProvider({ children }) {
                 }
                 return prev;
             });
-        }, 2000);
+        }, 5000);
 
         return () => {
             clearTimeout(timeout);
@@ -169,6 +171,7 @@ export function AuthProvider({ children }) {
     const value = {
         currentUser,
         isAdmin,
+        isAdminLoading,
         signup,
         login,
         logout,
