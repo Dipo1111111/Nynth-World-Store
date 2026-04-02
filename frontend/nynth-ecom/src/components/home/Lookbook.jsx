@@ -62,15 +62,13 @@ export default function Lookbook() {
               {lookbooks.map((look, index) => (
                 <div 
                   key={look.id} 
-                  className={`${getGridSpan(index)} relative overflow-hidden group`}
+                  className={`${getGridSpan(index)} relative overflow-hidden`}
                 >
                   <img
                     src={look.image}
                     alt=""
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    className="w-full h-full object-cover"
                   />
-                  {/* Subtle overlay on hover just for visual depth, but no text */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500"></div>
                 </div>
               ))}
             </div>

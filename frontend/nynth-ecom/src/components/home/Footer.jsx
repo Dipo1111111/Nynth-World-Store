@@ -95,31 +95,7 @@ export default function Footer() {
   return (
     <footer className="bg-white text-black border-t border-black/5 safe-bottom">
 
-      {/* Newsletter Section */}
-      <div className="section-pad py-16 border-b border-black/5">
-        <div className="max-w-md mx-auto text-center">
-          <h3 className="text-[11px] tracking-[0.3em] font-bold uppercase text-black mb-8">
-            SIGN UP FOR EARLY ACCESS
-          </h3>
-          <form onSubmit={handleSubscribe} className="flex gap-2">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="YOUR EMAIL"
-              required
-              className="flex-1 border border-black/10 px-4 py-3 text-[10px] tracking-[0.2em] font-bold uppercase outline-none focus:border-black transition-colors bg-transparent placeholder:text-black/20"
-            />
-            <button
-              type="submit"
-              disabled={loading || !email}
-              className="bg-black text-white px-6 py-3 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black/80 transition-colors disabled:opacity-40"
-            >
-              {loading ? "..." : "JOIN"}
-            </button>
-          </form>
-        </div>
-      </div>
+
 
       {/* Main Footer Links */}
       <div className="section-pad py-10 md:py-14">
