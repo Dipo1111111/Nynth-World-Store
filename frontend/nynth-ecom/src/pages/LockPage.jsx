@@ -190,15 +190,32 @@ export default function LockPage({ onUnlock }) {
                     </h2>
                 </div>
 
-                {/* Live Countdown */}
-                <div className="w-full mb-16 flex items-center justify-center gap-6 md:gap-8 bg-black/5 py-8 px-6 rounded-2xl animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-                    <CountdownBox value={timeLeft.days} label="Days" />
-                    <div className="text-2xl text-black/10 font-thin mb-4 self-start leading-none pt-1">:</div>
-                    <CountdownBox value={timeLeft.hours} label="Hrs" />
-                    <div className="text-2xl text-black/10 font-thin mb-4 self-start leading-none pt-1">:</div>
-                    <CountdownBox value={timeLeft.minutes} label="Mins" />
-                    <div className="text-2xl text-black/10 font-thin mb-4 self-start leading-none pt-1">:</div>
-                    <CountdownBox value={timeLeft.seconds} label="Secs" />
+                {/* Live Countdown - Minimalist Typography */}
+                <div className="w-full mb-16 flex items-center justify-center gap-6 md:gap-10 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+                    <div className="flex flex-col items-center">
+                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                            {timeLeft.days}
+                        </span>
+                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">DAYS</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                            {String(timeLeft.hours).padStart(2, '0')}
+                        </span>
+                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">HOURS</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                            {String(timeLeft.minutes).padStart(2, '0')}
+                        </span>
+                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">MINS</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <span className="text-4xl md:text-5xl font-inter font-bold tracking-tighter tabular-nums">
+                            {String(timeLeft.seconds).padStart(2, '0')}
+                        </span>
+                        <span className="text-[7px] tracking-[0.3em] font-bold uppercase text-black/40 mt-1">SECS</span>
+                    </div>
                 </div>
 
                 {/* Waitlist Section */}
