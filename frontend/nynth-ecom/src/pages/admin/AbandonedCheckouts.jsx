@@ -288,6 +288,11 @@ const AbandonedCheckouts = () => {
                                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
                                                         {order.customer?.firstName} • {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
                                                     </p>
+                                                    {order.customer?.email && (
+                                                        <p className="text-[10px] text-gray-400 mt-0.5 truncate lowercase">
+                                                            {order.customer.email}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="text-right flex flex-col items-end gap-1.5 shrink-0">

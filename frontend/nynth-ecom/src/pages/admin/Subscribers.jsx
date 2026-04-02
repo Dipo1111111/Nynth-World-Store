@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchSubscribers } from "../../api/firebaseFunctions";
+import { fetchSubscribers, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,8 +36,30 @@ const Subscribers = () => {
         setLoading(true);
         try {
             const data = await fetchSubscribers();
-            setSubscribers(data);
-            setFilteredSubscribers(data);
+            
+            // Also fetch raw abandoned checkouts
+            const rawOrders = await getAllOrders();
+            const abandonedOrders = rawOrders.filter(o => 
+                o.payment_status === 'pending' || 
+                !o.payment_status // catch-all for incomplete
+            );
+
+            // Create "subscriber" objects for these checkouts 
+            const abandonedSubscribers = abandonedOrders
+                .filter(o => o.customer?.email) // Only if they left an email
+                .map(o => ({
+                    id: `abandoned_${o.id}`,
+                    email: o.customer.email,
+                    source: "abandoned",
+                    status: "active",
+                    subscribed_at: o.created_at, // Use the order's created_at time
+                    firstName: o.customer.firstName,
+                    lastName: o.customer.lastName
+                }));
+
+            const combinedData = [...data, ...abandonedSubscribers];
+            setSubscribers(combinedData);
+            setFilteredSubscribers(combinedData);
         } catch (error) {
             console.error('Error fetching subscribers:', error);
             toast.error('Failed to load subscribers');
@@ -78,27 +100,12 @@ const Subscribers = () => {
     useEffect(() => {
         let results = subscribers;
         
-        // 1. Deduplicate by email first (Frontend safety)
-        const uniqueMap = new Map();
-        results.forEach(sub => {
-            const email = sub.email?.trim().toLowerCase();
-            if (!email) return;
-            // Keep the one we have, or if it's new, add it. 
-            // Since subscribers is ordered by date desc, this keeps the NEWEST by default.
-            // But we might want the OLDEST as the 'primary'. 
-            // Let's actually sort by date before deduplicating to be sure.
-            if (!uniqueMap.has(email)) {
-                uniqueMap.set(email, sub);
-            }
-        });
-        results = Array.from(uniqueMap.values());
-
-        // 2. Filter by source
+        // 1. Filter by source FIRST so we don't accidentally remove an abandoned checkout because they are also on the waitlist
         if (activeFilter !== "all") {
             results = results.filter(sub => sub.source === activeFilter);
         }
         
-        // 3. Filter by search term
+        // 2. Filter by search term
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             results = results.filter(sub => 
@@ -106,6 +113,17 @@ const Subscribers = () => {
                 sub.id?.toLowerCase().includes(term)
             );
         }
+        
+        // 3. Deduplicate by email
+        const uniqueMap = new Map();
+        results.forEach(sub => {
+            const email = sub.email?.trim().toLowerCase();
+            if (!email) return;
+            if (!uniqueMap.has(email)) {
+                uniqueMap.set(email, sub);
+            }
+        });
+        results = Array.from(uniqueMap.values());
         
         setFilteredSubscribers(results);
     }, [searchTerm, activeFilter, subscribers]);
@@ -138,7 +156,7 @@ const Subscribers = () => {
 
                 {/* Filter Tabs */}
                 <div className="flex bg-gray-100 p-1 rounded-lg self-start sm:self-auto overflow-x-auto no-scrollbar max-w-full">
-                    {["all", "waitlist", "newsletter"].map((f) => (
+                    {["all", "waitlist", "newsletter", "abandoned"].map((f) => (
                         <button
                             key={f}
                             onClick={() => { setActiveFilter(f); setSelectedEmails(new Set()); }}
@@ -187,8 +205,12 @@ const Subscribers = () => {
                 <Card className="border-gray-100 shadow-sm">
                     <CardContent className="flex flex-col items-center justify-center py-16">
                         <Users className="h-16 w-16 text-gray-300 mb-4" />
-                        <h3 className="text-lg font-medium mb-2 font-space">No subscribers found</h3>
-                        <p className="text-gray-500 text-sm">Signups from the website will appear here.</p>
+                        <h3 className="text-lg font-medium mb-2 font-space">
+                            {activeFilter === 'abandoned' ? 'No abandoned checkouts found' : 'No subscribers found'}
+                        </h3>
+                        <p className="text-gray-500 text-sm">
+                            {activeFilter === 'abandoned' ? 'Abandoned checkouts with an email will appear here.' : 'Signups from the website will appear here.'}
+                        </p>
                     </CardContent>
                 </Card>
             ) : (
@@ -196,7 +218,7 @@ const Subscribers = () => {
                     <CardHeader className="border-b border-gray-50">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-base font-space">
-                                {activeFilter === 'all' ? 'All Subscribers' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
+                                {activeFilter === 'all' ? 'All Subscribers' : activeFilter === 'abandoned' ? 'Abandoned Checkouts' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
                                 <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-sans tracking-normal">
                                     {filteredSubscribers.length}
                                 </span>
@@ -230,6 +252,8 @@ const Subscribers = () => {
                                         <span className={`shrink-0 px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
                                             sub.source === 'waitlist' 
                                                 ? "bg-black text-white" 
+                                                : sub.source === 'abandoned'
+                                                ? "bg-red-50 text-red-500"
                                                 : "bg-gray-100 text-gray-600"
                                         }`}>
                                             {sub.source || 'newsletter'}
@@ -292,6 +316,8 @@ const Subscribers = () => {
                                                 <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
                                                     sub.source === 'waitlist' 
                                                         ? "bg-black text-white" 
+                                                        : sub.source === 'abandoned'
+                                                        ? "bg-red-50 text-red-500"
                                                         : "bg-gray-100 text-gray-600"
                                                 }`}>
                                                     {sub.source || 'newsletter'}
