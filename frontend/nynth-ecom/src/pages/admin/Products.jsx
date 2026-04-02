@@ -5,9 +5,9 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
-  updateProductOrderBatch
+  updateProductOrderBatch,
+  uploadImage
 } from "../../api/firebaseFunctions";
-import { uploadImageToCloudinary } from "../../api/cloudinary";
 import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical, Eye, EyeOff } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
@@ -271,7 +271,7 @@ export default function AdminProducts() {
       for (let i = 0; i < compressedFiles.length; i++) {
         toast.loading(`Uploading image ${i + 1} of ${totalFiles}...`, { id: "upload-status" });
         try {
-          const url = await uploadImageToCloudinary(compressedFiles[i]);
+          const url = await uploadImage(compressedFiles[i]);
           uploadedUrls.push(url);
         } catch (uploadErr) {
           console.error(`Failed to upload image ${i + 1}:`, uploadErr);

@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { httpsCallable } from "firebase/functions";
+import { uploadImageToCloudinary, uploadMultipleImagesToCloudinary } from "./cloudinary";
 
 // --- PRODUCTS CRUD ---
 
@@ -237,10 +238,7 @@ export const fetchFeaturedLookbooks = async () => {
 
 export const uploadImage = async (file) => {
   try {
-    const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    return url;
+    return await uploadImageToCloudinary(file);
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
@@ -249,9 +247,7 @@ export const uploadImage = async (file) => {
 
 export const uploadMultipleImages = async (files) => {
   try {
-    const uploadPromises = files.map(file => uploadImage(file));
-    const urls = await Promise.all(uploadPromises);
-    return urls;
+    return await uploadMultipleImagesToCloudinary(files);
   } catch (error) {
     console.error("Error uploading multiple images:", error);
     throw error;

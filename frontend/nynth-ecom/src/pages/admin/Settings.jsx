@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchSettings, updateSettings, mergeSubscriberDuplicates } from "../../api/firebaseFunctions";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon } from "lucide-react";
+import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { uploadImageToCloudinary } from "../../api/cloudinary";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
@@ -49,7 +48,7 @@ export default function AdminSettings() {
             toast.loading("Uploading Hero Banner...", { id: "upload-status" });
             
             const compressed = await compressImage(file, { maxSizeMB: 2, maxWidthOrHeight: 2500 });
-            const url = await uploadImageToCloudinary(compressed);
+            const url = await uploadImage(compressed);
             
             setSettings(prev => ({ ...prev, hero_banner: url }));
             toast.success("Image uploaded. Remember to Save All Settings.", { id: "upload-status" });

@@ -60,30 +60,32 @@ export default function Lookbook() {
     loadData();
   }, []);
 
-  // Filter featured looks for carousel
+  // Filter lookbooks to show in carousel
+  // If we have featured looks, use them. Otherwise, use all available lookbooks.
   const featuredLooks = lookbooks.filter(look => look.featured);
+  const displayLooks = featuredLooks.length > 0 ? featuredLooks : lookbooks;
 
-  // Carousel Navigation - FIXED
+  // Carousel Navigation
   const nextSlide = () => {
-    if (featuredLooks.length <= 1) return;
-    setActiveSlide((prev) => (prev === featuredLooks.length - 1 ? 0 : prev + 1));
+    if (displayLooks.length <= 1) return;
+    setActiveSlide((prev) => (prev === displayLooks.length - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    if (featuredLooks.length <= 1) return;
-    setActiveSlide((prev) => (prev === 0 ? featuredLooks.length - 1 : prev - 1));
+    if (displayLooks.length <= 1) return;
+    setActiveSlide((prev) => (prev === 0 ? displayLooks.length - 1 : prev - 1));
   };
 
   // Auto-advance only if we have multiple slides
   useEffect(() => {
-    if (featuredLooks.length <= 1) return;
+    if (displayLooks.length <= 1) return;
 
     const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev === featuredLooks.length - 1 ? 0 : prev + 1));
+      setActiveSlide((prev) => (prev === displayLooks.length - 1 ? 0 : prev + 1));
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [featuredLooks.length]);
+  }, [displayLooks.length]);
 
   return (
     <div className="min-h-screen bg-white text-black font-inter flex flex-col">
@@ -120,7 +122,7 @@ export default function Lookbook() {
                 </h2>
               </div>
 
-              {featuredLooks.length > 1 && (
+              {displayLooks.length > 1 && (
                 <div className="flex items-center gap-6 mt-8 md:mt-0">
                   <button
                     onClick={prevSlide}
@@ -142,7 +144,8 @@ export default function Lookbook() {
 
             {loading ? (
               <div className="min-h-[500px] bg-gray-50 animate-pulse"></div>
-            ) : featuredLooks.length === 0 ? (
+            ) : lookbooks.length === 0 ? (
+              // Case 1: No lookbooks at all, show product fallback
               fallbackProducts.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {fallbackProducts.map((product) => (
@@ -168,12 +171,13 @@ export default function Lookbook() {
                 </div>
               )
             ) : (
+              // Case 2: We have lookbooks (either featured or total), show them in the carousel
               <div className="relative overflow-hidden border border-gray-100">
                 <div
                   className="flex transition-transform duration-700 ease-in-out"
                   style={{ transform: `translateX(-${activeSlide * 100}%)` }}
                 >
-                  {featuredLooks.map((look) => (
+                  {displayLooks.map((look) => (
                     <div key={look.id} className="w-full flex-shrink-0">
                       <div className="flex flex-col md:flex-row min-h-[500px] md:min-h-[600px]">
                         <div className="w-full md:w-1/2 h-[400px] md:h-auto bg-gray-50">
@@ -222,9 +226,9 @@ export default function Lookbook() {
                   ))}
                 </div>
 
-                {featuredLooks.length > 1 && (
+                {displayLooks.length > 1 && (
                   <div className="absolute bottom-8 left-10 md:left-auto md:right-10 flex gap-4">
-                    {featuredLooks.map((_, index) => (
+                    {displayLooks.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveSlide(index)}
@@ -243,4 +247,4 @@ export default function Lookbook() {
       <Footer />
     </div>
   );
-}
+}
