@@ -75,10 +75,15 @@ export default function Lookbook() {
 
             {/* Empty state fallback */}
             {lookbooks.length === 0 && (
-              <div className="h-screen flex items-center justify-center p-8 bg-gray-50">
-                <p className="text-[11px] tracking-[0.2em] font-bold text-gray-400 uppercase">
-                  Imagery loading...
-                </p>
+              <div className="h-[60vh] flex items-center justify-center p-8 bg-white">
+                <div className="text-center">
+                  <p className="text-[11px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-4">
+                    The Lookbook is currently empty.
+                  </p>
+                  <p className="text-[9px] tracking-[0.2em] font-bold text-gray-300 uppercase">
+                    Check back soon for our latest collections.
+                  </p>
+                </div>
               </div>
             )}
           </section>
