@@ -210,9 +210,11 @@ export const fetchNewArrivals = async (max = 8) => {
 export const fetchLookbooks = async () => {
   try {
     const snapshot = await getDocs(collection(db, "lookbooks"));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    console.log(`Fetched ${data.length} lookbooks from Firestore`);
+    return data;
   } catch (error) {
-    console.error("Error fetching lookbooks:", error);
+    console.error("CRITICAL: Error fetching lookbooks:", error);
     return [];
   }
 };
@@ -280,10 +282,45 @@ export const addOrder = async (order) => {
         }
 
         const productData = productDoc.data();
+        
+        // --- IMPROVED STOCK VALIDATION ---
+        
+        // 1. Check if product is disabled/out of stock generally
         if (productData.inStock === false) {
-          throw new Error(`Item ${item.title} is out of stock!`);
+          throw new Error(`Item ${item.title || item.name} is completely out of stock!`);
         }
-        // Future: Check quantity here if/when we track exact numbers
+
+        // 2. Check specific size stock if applicable
+        if (item.size && productData.sizeStock && productData.sizeStock[item.size] !== undefined) {
+          const availableSizeStock = Number(productData.sizeStock[item.size]) || 0;
+          if (availableSizeStock < item.quantity) {
+            throw new Error(`Not enough stock for ${item.title || item.name} in size ${item.size}. Only ${availableSizeStock} left.`);
+          }
+          
+          // --- STOCK DECREMENT ---
+          const newSizeStock = { ...productData.sizeStock };
+          newSizeStock[item.size] = availableSizeStock - item.quantity;
+          
+          const newGlobalStock = (Number(productData.stockQuantity) || 0) - item.quantity;
+          
+          transaction.update(productRef, {
+            sizeStock: newSizeStock,
+            stockQuantity: Math.max(0, newGlobalStock),
+            inStock: newGlobalStock > 0
+          });
+        } else if (productData.stockQuantity !== undefined) {
+          // Fallback for non-sized products
+          const availableStock = Number(productData.stockQuantity) || 0;
+          if (availableStock < item.quantity) {
+            throw new Error(`Not enough stock for ${item.title || item.name}. Only ${availableStock} left.`);
+          }
+          
+          const newGlobalStock = availableStock - item.quantity;
+          transaction.update(productRef, {
+            stockQuantity: Math.max(0, newGlobalStock),
+            inStock: newGlobalStock > 0
+          });
+        }
       }
 
       // 2. Create Order
@@ -643,7 +680,8 @@ export const saveContactMessage = async (messageData) => {
 
 export const getAllOrders = async () => {
   try {
-    const q = query(collection(db, "orders"), orderBy("created_at", "desc"));
+    // Simplified query to reduce chance of 400 Bad Request/Index issues
+    const q = query(collection(db, "orders"), limit(20));
     const querySnapshot = await getDocs(q);
     const orders = [];
     querySnapshot.forEach((doc) => {

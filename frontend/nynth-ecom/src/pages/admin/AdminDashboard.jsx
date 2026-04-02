@@ -87,7 +87,7 @@ const generateSparklineData = (orders, start, days, valueType = 'sales') => {
 };
 
 const AdminDashboard = () => {
-    const { currentUser, logout } = useAuth();
+    const { currentUser, logout, isAdmin } = useAuth();
     const navigate = useNavigate();
     
     const [analytics, setAnalytics] = useState(null);
@@ -142,7 +142,8 @@ const AdminDashboard = () => {
     useEffect(() => {
         if (loading) return;
 
-        const q = query(collection(db, "orders"), orderBy("created_at", "desc"), limit(10));
+        // Unified listener for order notifications and dashboard sync
+        const q = query(collection(db, "orders"), orderBy("created_at", "desc"), limit(20));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
@@ -332,7 +333,18 @@ const AdminDashboard = () => {
             {/* Header & Global Filter */}
             <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
                 <div>
-                    <h1 className="text-2xl font-bold mb-1 text-gray-900">Overview dashboard</h1>
+                    <div className="flex items-center gap-2 mb-1">
+                        <h1 className="text-2xl font-bold text-gray-900">Overview dashboard</h1>
+                        {isAdmin ? (
+                            <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-100">
+                                Verified Admin
+                            </span>
+                        ) : (
+                            <span className="bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-amber-100">
+                                Standard Role
+                            </span>
+                        )}
+                    </div>
                     <p className="text-sm text-gray-500">View and analyze your store's performance.</p>
                 </div>
                 <div className="flex items-center gap-3">

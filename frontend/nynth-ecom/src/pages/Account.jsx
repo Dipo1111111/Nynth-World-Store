@@ -161,11 +161,14 @@ export default function Account() {
                                                             </span>
                                                         </div>
                                                         <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold">
-                                                            Registered {new Date(order.created_at?.seconds * 1000).toLocaleDateString(undefined, {
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric'
-                                                            })}
+                                                            Registered {order.created_at?.seconds 
+                                                                ? new Date(order.created_at.seconds * 1000).toLocaleDateString(undefined, {
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    day: 'numeric'
+                                                                })
+                                                                : "Processing..."
+                                                            }
                                                         </p>
                                                     </div>
                                                     <div className="md:text-right space-y-2">

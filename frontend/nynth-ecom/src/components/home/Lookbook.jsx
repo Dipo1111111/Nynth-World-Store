@@ -35,6 +35,7 @@ export default function Lookbook() {
           fetchProductsByCategory("headwear", 1)
         ]);
 
+        console.log(`Lookbook Data Fetched: ${lookbookData.length} items`);
         setLookbooks(lookbookData);
         setShopProducts({
           hoodies: hoodies[0] || null,
@@ -44,6 +45,7 @@ export default function Lookbook() {
 
         // Fallback: load all products for editorial grid if no lookbooks
         if (lookbookData.length === 0) {
+          console.log("No lookbooks found in database - showing product fallback");
           const allProducts = await fetchProducts();
           setFallbackProducts(allProducts.slice(0, 6));
         }

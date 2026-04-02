@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchLookbooks, uploadImage } from "../../api/firebaseFunctions";
 import { db } from "../../api/firebase";
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore";
 import { Loader2, Plus, Trash2, Edit2, Upload, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
@@ -28,20 +28,25 @@ export default function AdminLookbooks() {
     const [formData, setFormData] = useState(initialFormState);
     const [submitStep, setSubmitStep] = useState(""); // "", "compressing", "uploading", "saving"
 
-    const loadLookbooks = async () => {
-        try {
-            setLoading(true);
-            const data = await fetchLookbooks();
-            setLookbooks(data);
-        } catch (error) {
-            toast.error("Failed to load lookbooks");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        loadLookbooks();
+        setLoading(true);
+        // Use onSnapshot for real-time updates and better resilience to network drops/QUIC errors
+        const q = query(collection(db, "lookbooks"), orderBy("created_at", "desc"));
+        const unsubscribe = onSnapshot(q, 
+            (snapshot) => {
+                const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setLookbooks(data);
+                setLoading(false);
+            },
+            (error) => {
+                console.error("Firestore Sync Error (Lookbooks):", error);
+                // If it's a 400 or QUIC error, we notify the user
+                toast.error("Real-time sync failed. Please check your connection.");
+                setLoading(false);
+            }
+        );
+
+        return () => unsubscribe();
     }, []);
 
     const resetForm = () => {
@@ -92,7 +97,7 @@ export default function AdminLookbooks() {
             toast.success("Lookbook added successfully!");
             setIsModalOpen(false);
             resetForm();
-            loadLookbooks();
+            // loadLookbooks(); // Not needed with onSnapshot
         } catch (error) {
             console.error(error);
             toast.error("Failed to add lookbook: " + error.message);
@@ -106,7 +111,7 @@ export default function AdminLookbooks() {
         try {
             await deleteDoc(doc(db, "lookbooks", id));
             toast.success("Lookbook deleted");
-            loadLookbooks();
+            // loadLookbooks(); // Not needed with onSnapshot
         } catch (error) {
             toast.error("Failed to delete");
         }

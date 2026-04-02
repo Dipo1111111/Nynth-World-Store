@@ -20,9 +20,10 @@ const app = initializeApp(firebaseConfig);
 
 // Export the services you need
 export const auth = getAuth(app);
-// FORCE LONG POLLING to fix 'Client is offline' WebSocket dropouts on mobile data
+// FORCE LONG POLLING to fix 'Client is offline' WebSocket dropouts/QUIC errors on some networks
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
+  ignoreUndefinedProperties: true,
 });
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
