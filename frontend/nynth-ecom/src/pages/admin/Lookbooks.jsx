@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchLookbooks, uploadImage } from "../../api/firebaseFunctions";
 import { db } from "../../api/firebase";
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, onSnapshot, query, orderBy, getDocs } from "firebase/firestore";
-import { Loader2, Plus, Trash2, Edit2, Upload, CheckCircle } from "lucide-react";
+import { collection, addDoc, deleteDoc, doc, serverTimestamp, onSnapshot, getDocs } from "firebase/firestore";
+import { Loader2, Plus, Trash2, Upload, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
 
@@ -13,16 +13,10 @@ export default function AdminLookbooks() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Form State
+    // Form State - Minimal
     const initialFormState = {
-        title: "",
-        description: "",
-        season: "",
         image: null,
-        imageUrl: "",
-        featured: false,
-        colorPalette: "",
-        productTags: "" // comma separated
+        imageUrl: ""
     };
 
     const [formData, setFormData] = useState(initialFormState);
@@ -34,7 +28,6 @@ export default function AdminLookbooks() {
             const snapshot = await getDocs(collection(db, "lookbooks"));
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            // Client-side sort to avoid index requirements and missing field issues
             data.sort((a, b) => {
                 const dateA = a.created_at?.seconds || 0;
                 const dateB = b.created_at?.seconds || 0;
@@ -53,36 +46,28 @@ export default function AdminLookbooks() {
 
     useEffect(() => {
         setLoading(true);
-        // Use onSnapshot for real-time updates - Simplified to avoid index/QUIC errors
         const q = collection(db, "lookbooks");
         const unsubscribe = onSnapshot(q, 
             (snapshot) => {
                 const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // Client-side sort is safer and handles missing created_at fields from legacy scripts
                 data.sort((a, b) => {
                     const dateA = a.created_at?.seconds || 0;
                     const dateB = b.created_at?.seconds || 0;
                     return dateB - dateA;
                 });
-
-                console.log(`Syncing ${data.length} lookbooks from Firestore`);
                 setLookbooks(data);
                 setLoading(false);
             },
             (error) => {
                 console.error("Firestore Sync Error (Lookbooks):", error);
-                
-                // If onSnapshot fails (permission or index), try a fallback raw fetch
                 if (error.code === 'permission-denied' || error.code === 'failed-precondition') {
                     loadLookbooks();
                 } else {
-                    toast.error("Real-time sync failed. Please check your connection.");
+                    toast.error("Real-time sync failed.");
                     setLoading(false);
                 }
             }
         );
-
         return () => unsubscribe();
     }, []);
 
@@ -99,9 +84,13 @@ export default function AdminLookbooks() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.image && !formData.imageUrl) {
+            toast.error("Please select an image");
+            return;
+        }
+
         try {
             setIsSubmitting(true);
-
             let finalImageUrl = formData.imageUrl;
 
             if (formData.image) {
@@ -116,39 +105,27 @@ export default function AdminLookbooks() {
             }
 
             setSubmitStep("saving");
-            if (!finalImageUrl) {
-                throw new Error("Please upload an image or provide a URL");
-            }
-
             await addDoc(collection(db, "lookbooks"), {
-                title: formData.title,
-                description: formData.description,
-                season: formData.season,
                 image: finalImageUrl,
-                featured: formData.featured,
-                colorPalette: formData.colorPalette,
-                products: formData.productTags.split(",").map(t => t.trim()).filter(Boolean),
                 created_at: serverTimestamp()
             });
 
-            toast.success("Lookbook added successfully!");
+            toast.success("Look added successfully!");
             setIsModalOpen(false);
             resetForm();
-            // loadLookbooks(); // Not needed with onSnapshot
         } catch (error) {
             console.error(error);
-            toast.error("Failed to add lookbook: " + error.message);
+            toast.error("Failed to add look: " + error.message);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this lookbook?")) return;
+        if (!window.confirm("Are you sure you want to delete this look?")) return;
         try {
             await deleteDoc(doc(db, "lookbooks", id));
-            toast.success("Lookbook deleted");
-            // loadLookbooks(); // Not needed with onSnapshot
+            toast.success("Look deleted");
         } catch (error) {
             toast.error("Failed to delete");
         }
@@ -181,26 +158,8 @@ export default function AdminLookbooks() {
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                         <Upload className="w-8 h-8 text-gray-300" />
                     </div>
-                    <h3 className="text-xl font-space font-bold mb-2">No Lookbooks Found</h3>
-                    <p className="text-gray-500 max-w-md mb-8 text-sm leading-relaxed">
-                        You haven't created any lookbooks yet. Click the "Add New Look" button to create your first lookbook collection.
-                    </p>
-                    
-                    {/* Diagnostic Info for Troubleshooting */}
-                    <div className="mb-8 p-4 bg-gray-50 rounded-lg text-left w-full max-w-md border border-gray-100">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Connectivity Status</p>
-                        <div className="space-y-1 text-xs font-medium font-mono text-gray-600">
-                            <p>• Firestore Collection: "lookbooks"</p>
-                            <p>• Current User UID: {doc(db, 'users', 'test').id.slice(0,5)}... (connected)</p>
-                            <p>• Auth State: {loading ? "Verifying..." : "Authenticated"}</p>
-                            <p>• Last Sync Attempt: {new Date().toLocaleTimeString()}</p>
-                        </div>
-                        <p className="mt-4 text-[9px] text-gray-400 italic">
-                            * Note: If you see 6 images on the website but 0 here, the website is showing its automatic product fallback because this collection is truly empty.
-                        </p>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <h3 className="text-xl font-space font-bold mb-2">No Looks Found</h3>
+                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
                         <button
                             onClick={() => setIsModalOpen(true)}
                             className="btn-primary flex items-center justify-center gap-2 px-6 py-3"
@@ -208,45 +167,27 @@ export default function AdminLookbooks() {
                             <Plus size={18} />
                             Add New Look
                         </button>
-                        <button
-                             onClick={() => loadLookbooks(true)}
-                             className="px-6 py-3 border border-gray-200 text-black font-bold text-sm tracking-widest uppercase rounded-full hover:bg-gray-50 transition-all flex items-center justify-center"
-                        >
-                            Retry Sync
-                        </button>
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {lookbooks.map((look) => (
-                        <div key={look.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden group">
-                            <div className="aspect-[3/4] relative bg-gray-100">
-                                <img src={look.image} alt={look.title} className="w-full h-full object-cover" />
-                                {look.featured && (
-                                    <span className="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-full">
-                                        Featured
-                                    </span>
-                                )}
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-bold text-lg mb-1">{look.title}</h3>
-                                <p className="text-gray-500 text-sm line-clamp-2 mb-3">{look.description}</p>
-                                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                                    <span className="text-xs text-gray-400">{look.season}</span>
-                                    <button
-                                        onClick={() => handleDelete(look.id)}
-                                        className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
+                        <div key={look.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden group relative aspect-[3/4]">
+                            <img src={look.image} alt="" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button
+                                    onClick={() => handleDelete(look.id)}
+                                    className="bg-white text-red-500 p-3 rounded-full hover:bg-red-50 transition-colors"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* Modal */}
+            {/* Visual-First Modal */}
             {isModalOpen && (
                 <div 
                     className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
@@ -257,95 +198,28 @@ export default function AdminLookbooks() {
                         }
                     }}
                 >
-                    <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
-                        <h2 className="text-2xl font-bold mb-6">Add Lookbook Entry</h2>
+                    <div className="bg-white rounded-2xl w-full max-w-lg p-6 md:p-8">
+                        <h2 className="text-2xl font-bold mb-6">Add New Look</h2>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Title</label>
-                                    <input
-                                        required
-                                        className="w-full border rounded-lg p-3"
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Season</label>
-                                    <input
-                                        className="w-full border rounded-lg p-3"
-                                        placeholder="SS24"
-                                        value={formData.season}
-                                        onChange={(e) => setFormData({ ...formData, season: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Description</label>
-                                <textarea
-                                    required
-                                    rows={3}
-                                    className="w-full border rounded-lg p-3"
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Upload Image</label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 bg-gray-50 relative">
-                                    <input
-                                        type="file"
-                                        onChange={handleImageChange}
-                                        accept="image/*"
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    />
-                                    {formData.image ? (
-                                        <div className="flex items-center justify-center gap-2 text-green-600">
-                                            <CheckCircle size={20} />
-                                            <span>{formData.image.name}</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center text-gray-400">
-                                            <Upload size={32} className="mb-2" />
-                                            <span>Click to upload image</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Color Palette</label>
-                                    <input
-                                        className="w-full border rounded-lg p-3"
-                                        placeholder="Black, White, Grey"
-                                        value={formData.colorPalette}
-                                        onChange={(e) => setFormData({ ...formData, colorPalette: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Product Tags</label>
-                                    <input
-                                        className="w-full border rounded-lg p-3"
-                                        placeholder="Hoodie, Tee (comma separated)"
-                                        value={formData.productTags}
-                                        onChange={(e) => setFormData({ ...formData, productTags: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:bg-gray-50 bg-gray-50 relative">
                                 <input
-                                    type="checkbox"
-                                    id="featured"
-                                    checked={formData.featured}
-                                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                                    className="w-4 h-4"
+                                    type="file"
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 />
-                                <label htmlFor="featured" className="text-sm font-medium">Feature on Homepage</label>
+                                {formData.image ? (
+                                    <div className="flex flex-col items-center gap-2 text-green-600">
+                                        <CheckCircle size={32} />
+                                        <span className="text-sm font-medium">{formData.image.name}</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center text-gray-400">
+                                        <Upload size={48} className="mb-4" />
+                                        <span className="font-bold uppercase tracking-widest text-xs">Select Image</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex justify-end gap-3 pt-4">
@@ -355,25 +229,25 @@ export default function AdminLookbooks() {
                                         setIsModalOpen(false);
                                         resetForm();
                                     }}
-                                    className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+                                    className="px-6 py-2 border rounded-full text-xs font-bold uppercase tracking-widest hover:bg-gray-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="px-6 py-2 bg-black text-white rounded-lg hover:opacity-90 disabled:opacity-50 min-w-[140px] flex items-center justify-center gap-2"
+                                    className="px-8 py-2 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50 min-w-[140px] flex items-center justify-center gap-2"
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <Loader2 className="animate-spin" size={16} />
+                                            <Loader2 className="animate-spin" size={14} />
                                             <span>
-                                                {submitStep === "compressing" ? "Compressing..." : 
-                                                 submitStep === "uploading" ? "Uploading..." : 
-                                                 "Saving..."}
+                                                {submitStep === "compressing" ? "COMPRESSING..." : 
+                                                 submitStep === "uploading" ? "UPLOADING..." : 
+                                                 "SAVING..."}
                                             </span>
                                         </>
-                                    ) : "Create Look"}
+                                    ) : "CREATE LOOK"}
                                 </button>
                             </div>
                         </form>
