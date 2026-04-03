@@ -14,16 +14,24 @@ import { useAuth } from "../../context/AuthContext";
 import { useSettings } from "../../context/SettingsContext";
 import Logo from "../common/Logo";
 import CartDrawer from "../cart/CartDrawer";
+import confetti from 'canvas-confetti';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Countdown for Announcement Bar
   const [timeLeftStr, setTimeLeftStr] = useState("");
+  const [isLaunchFinished, setIsLaunchFinished] = useState(false);
 
+  // All hooks declared BEFORE any useEffect
+  const { totalItems, isCartOpen, setIsCartOpen } = useCart();
+  const { currentUser } = useAuth();
+  const { settings } = useSettings();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Countdown timer — settings is now available
   useEffect(() => {
     const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
     const target = new Date(launchDate).getTime();
@@ -37,26 +45,24 @@ export default function Header() {
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / 1000 / 60) % 60);
         const s = Math.floor((diff / 1000) % 60);
-        
         let str = "";
         if (d > 0) str += `${d}D `;
         str += `${h}H ${m}M ${s}S`;
         setTimeLeftStr(str);
+        setIsLaunchFinished(false);
       } else {
-        setTimeLeftStr("00H 00M 00S");
+        setTimeLeftStr("HAPPY LAUNCH DAY NYNTH WORLD 🎉");
+        if (!isLaunchFinished && diff > -5000) {
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#000000', '#ffffff', '#808080'] });
+          setIsLaunchFinished(true);
+        }
       }
     };
 
     const timer = setInterval(updateTimer, 1000);
     updateTimer();
     return () => clearInterval(timer);
-  }, []);
-
-  const { totalItems, isCartOpen, setIsCartOpen } = useCart();
-  const { currentUser } = useAuth();
-  const { settings } = useSettings();
-  const location = useLocation();
-  const navigate = useNavigate();
+  }, [settings?.launch_date, isLaunchFinished]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,9 +95,9 @@ export default function Header() {
       {/* Announcement Bar */}
       <div className="fixed top-0 z-[60] w-full bg-black text-white py-2 text-[8px] md:text-[9px] tracking-[0.4em] font-bold uppercase text-center overflow-hidden">
         <div className="flex items-center justify-center gap-4">
-          <span className="opacity-50 hidden sm:inline">NEXT DROP IN:</span>
+          {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">NEXT DROP IN:</span>}
           <span className="tabular-nums translate-y-[1px]">{timeLeftStr}</span>
-          <span className="opacity-50 hidden sm:inline">FRIDAY 6PM</span>
+          {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">FRIDAY 6PM</span>}
         </div>
       </div>
 
