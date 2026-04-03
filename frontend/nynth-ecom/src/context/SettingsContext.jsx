@@ -21,6 +21,8 @@ export function SettingsProvider({ children }) {
         shipping_fee: Number(import.meta.env.VITE_DEFAULT_SHIPPING_FEE) || 2500,
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         hero_banner: "",
+        lock_page_enabled: false,
+        launch_date: "2026-04-03T18:00:00",
         show_size_chart: true,
         size_chart_model_info: "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette — size down if you prefer a more fitted look.",
         size_chart_data: [

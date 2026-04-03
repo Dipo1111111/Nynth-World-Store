@@ -25,7 +25,8 @@ export default function Header() {
   const [timeLeftStr, setTimeLeftStr] = useState("");
 
   useEffect(() => {
-    const target = new Date('2026-04-03T18:00:00').getTime();
+    const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
+    const target = new Date(launchDate).getTime();
 
     const updateTimer = () => {
       const now = new Date().getTime();

@@ -23,8 +23,9 @@ export default function LockPage({ onUnlock }) {
     });
 
     useEffect(() => {
-        // Target: Friday 6pm (April 3rd, 2026)
-        const target = new Date('2026-04-03T18:00:00').getTime();
+        // Target: From settings or fallback
+        const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
+        const target = new Date(launchDate).getTime();
 
         const calculateTimeLeft = () => {
             const now = new Date().getTime();

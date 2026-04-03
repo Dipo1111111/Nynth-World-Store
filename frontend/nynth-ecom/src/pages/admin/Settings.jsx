@@ -18,8 +18,10 @@ export default function AdminSettings() {
         facebook_url: "",
         tiktok_url: "",
         shipping_fee: 0,
-        currency_symbol: "₦",
-        ga_property_id: "",
+        currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
+        hero_banner: "",
+        lock_page_enabled: false,
+        launch_date: "2026-04-03T18:00:00",
         show_size_chart: true,
         size_chart_model_info: "",
         size_chart_data: [],
@@ -28,7 +30,10 @@ export default function AdminSettings() {
         lock_title1: "BY WINNERS FOR WINNERS",
         lock_title2: "STAY ABOVE",
         lock_waitlist_title: "JOIN THE WAITLIST",
+        lock_waitlist_title: "JOIN THE WAITLIST",
         lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
+        lock_page_enabled: false,
+        launch_date: "2026-04-03T18:00:00",
         // Product Options
         available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
         available_sizes: "XS, S, M, L, XL, XXL, XXXL"
@@ -105,10 +110,10 @@ export default function AdminSettings() {
     }, []);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
         setSettings(prev => ({
             ...prev,
-            [name]: name === "shipping_fee" ? Number(value) : value
+            [name]: name === "shipping_fee" ? Number(value) : 
+                    name === "lock_page_enabled" ? e.target.checked : value
         }));
     };
 
@@ -215,7 +220,36 @@ export default function AdminSettings() {
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
                         Control the content and access for the pre-launch/maintenance page.
                     </p>
+                    
+                    <div className="mb-8 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Lock Page</h4>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                name="lock_page_enabled"
+                                checked={settings.lock_page_enabled}
+                                onChange={handleChange}
+                                className="sr-only peer" 
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                        </label>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Launch Countdown Date</label>
+                            <input
+                                type="datetime-local"
+                                name="launch_date"
+                                value={settings.launch_date ? settings.launch_date.substring(0, 16) : ""}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
+                        </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700">Lock Password</label>
                             <input

@@ -14,6 +14,8 @@ import { useLocation } from "react-router-dom";
 import { logPageView } from "./utils/monitoring";
 import { incrementCounter } from "./api/firebaseFunctions";
 import { db } from "./api/firebase";
+import { useSettings } from "./context/SettingsContext";
+import { useAuth } from "./context/AuthContext";
 import { doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 
 
@@ -134,27 +136,52 @@ function App() {
   return (
     <HelmetProvider>
       <SettingsProvider>
-        <Toaster position="top-center" />
-        {isOffline && (
-          <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white py-2 px-4 flex items-center justify-center gap-2 animate-slideDown">
-            <WifiOff size={16} />
-            <span className="text-sm font-medium">You are currently offline. Some features may not work.</span>
-          </div>
-        )}
-        {!isSiteUnlocked ? (
+        <AuthProvider>
+          <Toaster position="top-center" />
+          {isOffline && (
+            <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white py-2 px-4 flex items-center justify-center gap-2 animate-slideDown">
+              <WifiOff size={16} />
+              <span className="text-sm font-medium">You are currently offline. Some features may not work.</span>
+            </div>
+          )}
+          <AppContent isSiteUnlocked={isSiteUnlocked} setIsSiteUnlocked={setIsSiteUnlocked} />
+        </AuthProvider>
+      </SettingsProvider>
+    </HelmetProvider>
+  );
+}
+
+function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
+  const { settings, loading: settingsLoading } = useSettings();
+  const { currentUser, isAdmin, isAdminLoading } = useAuth();
+  const location = window.location;
+
+  // The site is "Globally Locked" if the setting is true
+  const isGloballyLocked = settings?.lock_page_enabled;
+
+  // Logic to determine if we should show the lock page:
+  // 1. Site is globally locked AND user is NOT an admin AND NOT previously unlocked via password
+  // (Admins should always be able to see the site to manage it)
+  const shouldShowLock = isGloballyLocked && !isAdmin && !isSiteUnlocked;
+
+  if (settingsLoading || isAdminLoading) {
+    return <AdminLoader />;
+  }
+
+  return (
+    <CartProvider>
+      {!isSiteUnlocked && shouldShowLock ? (
+        <BrowserRouter>
+          <Routes>
+            <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
+            <Route path="*" element={<LockPage onUnlock={() => setIsSiteUnlocked(true)} />} />
+          </Routes>
+        </BrowserRouter>
+      ) : (
+        <ErrorBoundary>
           <BrowserRouter>
+            <PageTracker />
             <Routes>
-              <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
-              <Route path="*" element={<LockPage onUnlock={() => setIsSiteUnlocked(true)} />} />
-            </Routes>
-          </BrowserRouter>
-        ) : (
-          <ErrorBoundary>
-            <AuthProvider>
-              <CartProvider>
-                <BrowserRouter>
-                  <PageTracker />
-                  <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Navigate to="/shop" replace />} />
                     <Route path="/home" element={<Navigate to="/shop" replace />} />
@@ -268,12 +295,9 @@ function App() {
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>
-              </CartProvider>
-            </AuthProvider>
-          </ErrorBoundary>
-        )}
-      </SettingsProvider>
-    </HelmetProvider>
+              </ErrorBoundary>
+            )}
+          </CartProvider>
   );
 }
 
