@@ -110,10 +110,10 @@ export default function AdminSettings() {
     }, []);
 
     const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
         setSettings(prev => ({
             ...prev,
-            [name]: name === "shipping_fee" ? Number(value) : 
-                    name === "lock_page_enabled" ? e.target.checked : value
+            [name]: type === "checkbox" ? checked : (name === "shipping_fee" ? Number(value) : value)
         }));
     };
 
