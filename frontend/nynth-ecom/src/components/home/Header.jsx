@@ -54,8 +54,8 @@ export default function Header() {
         setTimeLeftStr("HAPPY LAUNCH DAY NYNTH WORLD 🎉");
         if (!isLaunchFinished && diff > -5000) {
           confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#000000', '#ffffff', '#808080'] });
-          setIsLaunchFinished(true);
         }
+        setIsLaunchFinished(true);
       }
     };
 
