@@ -222,6 +222,15 @@ export default function LockPage({ onUnlock }) {
                     </div>
                 </div>
 
+                {/* Countdown Ended Message */}
+                {(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && (
+                    <div className="w-full text-center mb-8 animate-fadeIn">
+                        <p className="text-[9px] tracking-[0.2em] font-bold text-black uppercase leading-loose border border-black/10 p-4 bg-gray-50/50">
+                            The wait is over. If you joined the waitlist, the access password has been sent to your email.
+                        </p>
+                    </div>
+                )}
+
                 {/* Password Section */}
                 <form onSubmit={handleSubmit} className="w-full space-y-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
                     <div className="relative group">
