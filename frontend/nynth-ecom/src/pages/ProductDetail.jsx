@@ -330,7 +330,7 @@ export default function ProductDetail() {
               disabled={!anySizeAvailable || !isSizeAvailable || addingToCart}
               className="w-full bg-[#999999] text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black transition-all duration-500 disabled:opacity-50 mb-10"
             >
-              {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : (selectedSize ? "ADD TO CART" : "SELECT SIZE")}
+              {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : "ADD TO CART"}
             </button>
 
             {/* Shipping Badges - Simple minimalist */}
@@ -516,7 +516,7 @@ export default function ProductDetail() {
               disabled={!anySizeAvailable || !isSizeAvailable || addingToCart}
               className="w-full bg-black text-white py-4 text-[11px] tracking-[0.2em] font-bold uppercase hover:bg-gray-900 transition-colors disabled:opacity-50 mb-6"
             >
-              {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : (selectedSize ? "ADD TO CART" : "SELECT SIZE")}
+              {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : "ADD TO CART"}
             </button>
 
           {/* Shipping Badges */}
