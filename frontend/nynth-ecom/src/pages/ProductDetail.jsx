@@ -144,13 +144,20 @@ export default function ProductDetail() {
     if (id) loadProduct();
   }, [id]);
 
-  const isSizeAvailable = product?.sizeStock && selectedSize
-    ? (product.sizeStock[selectedSize] > 0) 
-    : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
+  // For headwear, ignore sizeStock entirely and use stockQuantity directly
+  const isHeadwear = product?.category === "headwear";
+
+  const isSizeAvailable = isHeadwear
+    ? (product?.stockQuantity > 0)
+    : product?.sizeStock && selectedSize
+      ? (product.sizeStock[selectedSize] > 0)
+      : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
   
-  const anySizeAvailable = product?.sizeStock 
-    ? Object.values(product.sizeStock).some(qty => qty > 0)
-    : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
+  const anySizeAvailable = isHeadwear
+    ? (product?.stockQuantity > 0)
+    : product?.sizeStock
+      ? Object.values(product.sizeStock).some(qty => qty > 0)
+      : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
 
   const handleAddToCart = async () => {
     if (!product || !isSizeAvailable) return;
