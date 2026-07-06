@@ -21,6 +21,8 @@ export default function AdminSettings() {
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         hero_banner: "",
         lock_page_enabled: false,
+        lock_timer_enabled: true,
+        lock_timer_duration_minutes: 5,
         launch_date: "2026-04-03T18:00:00",
         show_size_chart: true,
         size_chart_model_info: "",
@@ -32,8 +34,6 @@ export default function AdminSettings() {
         lock_waitlist_title: "JOIN THE WAITLIST",
         lock_waitlist_title: "JOIN THE WAITLIST",
         lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
-        lock_page_enabled: false,
-        launch_date: "2026-04-03T18:00:00",
         // Product Options
         available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
         available_sizes: "XS, S, M, L, XL, XXL, XXXL"
@@ -96,6 +96,8 @@ export default function AdminSettings() {
                         lock_title2: data.lock_title2 || "STAY ABOVE",
                         lock_waitlist_title: data.lock_waitlist_title || "JOIN THE WAITLIST",
                         lock_waitlist_subtitle: data.lock_waitlist_subtitle || "BE NOTIFIED WHEN WE GO LIVE",
+                        lock_timer_enabled: data.lock_timer_enabled !== undefined ? data.lock_timer_enabled : true,
+                        lock_timer_duration_minutes: data.lock_timer_duration_minutes || 5,
                         available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
                         available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL"
                     }));
@@ -221,18 +223,36 @@ export default function AdminSettings() {
                         Control the content and access for the pre-launch/maintenance page.
                     </p>
                     
-                    <div className="mb-8 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
                         <div className="space-y-1">
                             <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Lock Page</h4>
                             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 name="lock_page_enabled"
                                 checked={settings.lock_page_enabled}
                                 onChange={handleChange}
-                                className="sr-only peer" 
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                        </label>
+                    </div>
+
+                    {/* Timer Toggle */}
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Countdown Timer</h4>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="lock_timer_enabled"
+                                checked={settings.lock_timer_enabled}
+                                onChange={handleChange}
+                                className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                         </label>
@@ -249,6 +269,19 @@ export default function AdminSettings() {
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
                             />
                             <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Countdown Duration (minutes)</label>
+                            <input
+                                type="number"
+                                name="lock_timer_duration_minutes"
+                                value={settings.lock_timer_duration_minutes}
+                                onChange={handleChange}
+                                min="1"
+                                max="999"
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700">Lock Password</label>

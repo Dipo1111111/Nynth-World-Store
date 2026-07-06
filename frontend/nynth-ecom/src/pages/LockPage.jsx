@@ -22,8 +22,14 @@ export default function LockPage({ onUnlock }) {
         seconds: 0
     });
 
+    // Timer-enabled countdown state
+    const timerEnabled = settings?.lock_timer_enabled === true;
+    const timerDuration = settings?.lock_timer_duration_minutes || 5;
+    const [timerCountdownActive, setTimerCountdownActive] = useState(false);
+    const [timerSecondsLeft, setTimerSecondsLeft] = useState(0);
+
+    // Launch date countdown
     useEffect(() => {
-        // Target: From settings or fallback
         const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
         const target = new Date(launchDate).getTime();
 
@@ -44,10 +50,40 @@ export default function LockPage({ onUnlock }) {
         };
 
         const timer = setInterval(calculateTimeLeft, 1000);
-        calculateTimeLeft(); // Initial call
+        calculateTimeLeft();
 
         return () => clearInterval(timer);
     }, []);
+
+    // Lock timer: countdown from X minutes (duration is driven by admin setting)
+    useEffect(() => {
+        if (!timerEnabled) {
+            setTimerCountdownActive(false);
+            setTimerSecondsLeft(0);
+            return;
+        }
+
+        // Initialize/reset the timer from the duration setting
+        const totalSeconds = timerDuration * 60;
+        setTimerSecondsLeft(totalSeconds);
+        setTimerCountdownActive(true);
+
+        const interval = setInterval(() => {
+            setTimerSecondsLeft(prev => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    setTimerCountdownActive(false);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timerEnabled, timerDuration]);
+
+    const showTimerCountdown = timerEnabled && timerCountdownActive;
+    const showAccessSection = !timerEnabled || !timerCountdownActive;
 
     const lockPassword = settings?.lock_password || 'WINNERSONLY';
     const lockTitle1 = settings?.lock_title1 || 'BY WINNERS FOR WINNERS';
@@ -191,39 +227,55 @@ export default function LockPage({ onUnlock }) {
                     </h2>
                 </div>
 
-                {/* Live Countdown - Branded Typography */}
-                <div className="w-full mb-20 flex items-center justify-center gap-4 md:gap-8 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-                    <div className="flex flex-col items-center">
-                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                            {timeLeft.days}
-                        </span>
-                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">DAYS</span>
+                {/* Timer Countdown - Duration-based when lock_timer_enabled */}
+                {showTimerCountdown ? (
+                    <div className="w-full mb-20 flex flex-col items-center animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+                        <div className="flex items-center justify-center gap-1">
+                            <span className="text-[56px] md:text-[72px] font-inter font-bold tracking-[0.08em] tabular-nums">
+                                {String(Math.floor(timerSecondsLeft / 60)).padStart(2, '0')}
+                            </span>
+                            <span className="text-[56px] md:text-[72px] font-inter font-bold tracking-[0.08em] tabular-nums text-black/10">:</span>
+                            <span className="text-[56px] md:text-[72px] font-inter font-bold tracking-[0.08em] tabular-nums">
+                                {String(timerSecondsLeft % 60).padStart(2, '0')}
+                            </span>
+                        </div>
+                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">ACCESS OPENS IN</span>
                     </div>
-                    <div className="text-xl text-black/10 self-start mt-2">:</div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                            {String(timeLeft.hours).padStart(2, '0')}
-                        </span>
-                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">HOURS</span>
+                ) : (
+                    /* Launch Date Countdown (existing) */
+                    <div className="w-full mb-20 flex items-center justify-center gap-4 md:gap-8 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {timeLeft.days}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">DAYS</span>
+                        </div>
+                        <div className="text-xl text-black/10 self-start mt-2">:</div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {String(timeLeft.hours).padStart(2, '0')}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">HOURS</span>
+                        </div>
+                        <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {String(timeLeft.minutes).padStart(2, '0')}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">MINS</span>
+                        </div>
+                        <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {String(timeLeft.seconds).padStart(2, '0')}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">SECS</span>
+                        </div>
                     </div>
-                    <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                            {String(timeLeft.minutes).padStart(2, '0')}
-                        </span>
-                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">MINS</span>
-                    </div>
-                    <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                            {String(timeLeft.seconds).padStart(2, '0')}
-                        </span>
-                        <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">SECS</span>
-                    </div>
-                </div>
+                )}
 
-                {/* Countdown Ended Message */}
-                {(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && (
+                {/* Countdown Ended Message - only shown when access section is visible */}
+                {showAccessSection && (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && (
                     <div className="w-full text-center mb-8 animate-fadeIn">
                         <p className="text-[9px] tracking-[0.2em] font-bold text-black uppercase leading-loose border border-black/10 p-4 bg-gray-50/50">
                             The wait is over. If you joined the waitlist, the access password has been sent to your email.
@@ -231,7 +283,8 @@ export default function LockPage({ onUnlock }) {
                     </div>
                 )}
 
-                {/* Password Section */}
+                {/* Password Section - hidden during timer countdown */}
+                {showAccessSection && (
                 <form onSubmit={handleSubmit} className="w-full space-y-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
                     <div className="relative group">
                         <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-black/20 group-focus-within:text-black transition-colors" size={14} />
@@ -260,6 +313,7 @@ export default function LockPage({ onUnlock }) {
                         )}
                     </button>
                 </form>
+                )}
 
                 <div className="w-full flex items-center gap-4 my-10 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
                     <div className="h-[1px] flex-1 bg-black/5"></div>

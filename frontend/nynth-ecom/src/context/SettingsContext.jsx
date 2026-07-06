@@ -22,6 +22,8 @@ export function SettingsProvider({ children }) {
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         hero_banner: "",
         lock_page_enabled: false,
+        lock_timer_enabled: true,
+        lock_timer_duration_minutes: 5,
         launch_date: "2026-04-03T18:00:00",
         show_size_chart: true,
         size_chart_model_info: "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette — size down if you prefer a more fitted look.",
