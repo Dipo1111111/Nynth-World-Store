@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../components/common/Logo';
 import { ArrowRight, Mail, Lock } from 'lucide-react';
@@ -14,6 +14,37 @@ export default function LockPage() {
 
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Countdown state
+    const timerEnabled = settings?.lock_timer_enabled === true;
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+    useEffect(() => {
+        if (!timerEnabled) return;
+
+        const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
+        const target = new Date(launchDate).getTime();
+
+        const calculateTimeLeft = () => {
+            const now = new Date().getTime();
+            const difference = target - now;
+
+            if (difference > 0) {
+                setTimeLeft({
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((difference / 1000 / 60) % 60),
+                    seconds: Math.floor((difference / 1000) % 60)
+                });
+            } else {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+            }
+        };
+
+        const timer = setInterval(calculateTimeLeft, 1000);
+        calculateTimeLeft();
+        return () => clearInterval(timer);
+    }, [timerEnabled, settings?.launch_date]);
 
     const lockPassword = settings?.lock_password || 'WINNERSONLY';
     const lockTitle1 = settings?.lock_title1 || 'BY WINNERS FOR WINNERS';
@@ -31,14 +62,7 @@ export default function LockPage() {
 
         if (!validateEmail(waitlistEmail)) {
             toast.error('INVALID EMAIL FORMAT', {
-                style: {
-                    borderRadius: '0px',
-                    background: '#000',
-                    color: '#fff',
-                    fontSize: '10px',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                },
+                style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
             });
             return;
         }
@@ -50,14 +74,7 @@ export default function LockPage() {
                 if (result.message === 'ALREADY_ADDED') {
                     toast('YOU ARE ALREADY ON THE WAITLIST', {
                         icon: 'ℹ️',
-                        style: {
-                            borderRadius: '0px',
-                            background: '#000',
-                            color: '#fff',
-                            fontSize: '10px',
-                            letterSpacing: '0.2em',
-                            fontWeight: 'bold',
-                        },
+                        style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', fontWeight: 'bold' },
                     });
                 } else {
                     navigate('/waitlist-confirmation');
@@ -65,26 +82,12 @@ export default function LockPage() {
                 setWaitlistEmail('');
             } else {
                 toast.error(result.message.toUpperCase(), {
-                    style: {
-                        borderRadius: '0px',
-                        background: '#000',
-                        color: '#fff',
-                        fontSize: '10px',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                    },
+                    style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
                 });
             }
         } catch (error) {
             toast.error('SOMETHING WENT WRONG', {
-                style: {
-                    borderRadius: '0px',
-                    background: '#000',
-                    color: '#fff',
-                    fontSize: '10px',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                },
+                style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
             });
         } finally {
             setWaitlistLoading(false);
@@ -101,28 +104,14 @@ export default function LockPage() {
                 localStorage.setItem('nynth_lock_epoch', String(settings?.lock_epoch || 0));
                 window.location.reload();
                 toast.success('ACCESS GRANTED', {
-                    style: {
-                        borderRadius: '0px',
-                        background: '#000',
-                        color: '#fff',
-                        fontSize: '10px',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                    },
+                    style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
                 });
             }, 800);
         } else {
             setTimeout(() => {
                 setLoading(false);
                 toast.error('ACCESS DENIED', {
-                    style: {
-                        borderRadius: '0px',
-                        background: '#000',
-                        color: '#fff',
-                        fontSize: '10px',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                    },
+                    style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
                 });
             }, 500);
         }
@@ -145,6 +134,39 @@ export default function LockPage() {
                         {lockTitle2}
                     </h2>
                 </div>
+
+                {/* Launch Countdown — only when timer is ON */}
+                {timerEnabled && (
+                    <div className="w-full mb-12 flex items-center justify-center gap-4 md:gap-8 animate-fadeIn">
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {timeLeft.days}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">DAYS</span>
+                        </div>
+                        <div className="text-xl text-black/10 self-start mt-2">:</div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {String(timeLeft.hours).padStart(2, '0')}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">HOURS</span>
+                        </div>
+                        <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {String(timeLeft.minutes).padStart(2, '0')}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">MINS</span>
+                        </div>
+                        <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
+                                {String(timeLeft.seconds).padStart(2, '0')}
+                            </span>
+                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">SECS</span>
+                        </div>
+                    </div>
+                )}
 
                 {/* Waitlist Section */}
                 <div className="w-full mb-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
@@ -185,7 +207,6 @@ export default function LockPage() {
                             )}
                         </button>
                     </form>
-
                 </div>
 
                 <div className="w-full flex items-center gap-4 my-6 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
