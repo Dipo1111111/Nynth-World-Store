@@ -12,7 +12,7 @@ import { useSettings } from "../context/SettingsContext";
 import { trackConversion } from "../utils/monitoring";
 
 import Logo from "../components/common/Logo";
-import { LAGOS_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../data/locationData";
+import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../data/locationData";
 
 const Checkout = () => {
   const { settings } = useSettings();
@@ -78,6 +78,8 @@ const Checkout = () => {
       } else {
         setShippingFee(settings.shipping_fee || 0);
       }
+    } else if (form.state === "Abuja" && form.city && ABUJA_SHIPPING_DATA[form.city]) {
+      setShippingFee(ABUJA_SHIPPING_DATA[form.city].price);
     } else if (INTERSTATE_SHIPPING_DATA[form.state]) {
       const stateData = INTERSTATE_SHIPPING_DATA[form.state];
       // South West only has home delivery
@@ -312,6 +314,20 @@ const Checkout = () => {
                       </option>
                     ))}
                   </select>
+                ) : form.state === "Abuja" ? (
+                  <select
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                  >
+                    <option value="">SELECT AREA</option>
+                    {Object.keys(ABUJA_SHIPPING_DATA).sort().map((area) => (
+                      <option key={area} value={area}>
+                        {area.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
                 ) : (
                   <input
                     name="city"
@@ -437,6 +453,11 @@ const Checkout = () => {
                 {form.state === "Lagos" && form.city && LAGOS_SHIPPING_DATA[form.city] && (
                   <span className="text-[9px] text-gray-400 block mt-1 uppercase">
                     {LAGOS_SHIPPING_DATA[form.city].speed} [PRISON SPEED]
+                  </span>
+                )}
+                {form.state === "Abuja" && form.city && ABUJA_SHIPPING_DATA[form.city] && (
+                  <span className="text-[9px] text-gray-400 block mt-1 uppercase">
+                    {ABUJA_SHIPPING_DATA[form.city].speed}
                   </span>
                 )}
                 {form.state !== "Lagos" && (

@@ -21,7 +21,8 @@ export default function AdminSettings() {
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         hero_banner: "",
         lock_page_enabled: false,
-        lock_timer_enabled: true,
+        lock_epoch: 0,
+        lock_timer_enabled: false,
         lock_timer_duration_minutes: 5,
         launch_date: "2026-04-03T18:00:00",
         show_size_chart: true,
@@ -96,7 +97,7 @@ export default function AdminSettings() {
                         lock_title2: data.lock_title2 || "STAY ABOVE",
                         lock_waitlist_title: data.lock_waitlist_title || "JOIN THE WAITLIST",
                         lock_waitlist_subtitle: data.lock_waitlist_subtitle || "BE NOTIFIED WHEN WE GO LIVE",
-                        lock_timer_enabled: data.lock_timer_enabled !== undefined ? data.lock_timer_enabled : true,
+                        lock_timer_enabled: data.lock_timer_enabled !== undefined ? data.lock_timer_enabled : false,
                         lock_timer_duration_minutes: data.lock_timer_duration_minutes || 5,
                         available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
                         available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL"
@@ -123,8 +124,16 @@ export default function AdminSettings() {
         e.preventDefault();
         setSaving(true);
         try {
-            const success = await updateSettings(settings);
+            // When enabling lock page, increment epoch to force-lock everyone
+            const settingsToSave = settings.lock_page_enabled
+                ? { ...settings, lock_epoch: (settings.lock_epoch || 0) + 1 }
+                : settings;
+            const success = await updateSettings(settingsToSave);
             if (success) {
+                // Update local state with the new epoch if it was incremented
+                if (settings.lock_page_enabled) {
+                    setSettings(prev => ({ ...prev, lock_epoch: (prev.lock_epoch || 0) + 1 }));
+                }
                 toast.success("Settings updated successfully");
                 refreshSettings();
             } else {

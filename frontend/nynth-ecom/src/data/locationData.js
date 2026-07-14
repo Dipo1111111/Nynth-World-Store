@@ -146,6 +146,10 @@ export const LAGOS_SHIPPING_DATA = {
     "Lekki Deep Sea Port": { price: 6000, speed: "2-3 Days Delivery" }
 };
 
+export const ABUJA_SHIPPING_DATA = {
+    "University of Abuja": { price: 1500, speed: "Delivery" },
+};
+
 export const INTERSTATE_SHIPPING_DATA = {
     // SOUTH WEST
     "Ekiti": { home: 6500, park: 6500 },

@@ -92,7 +92,8 @@ export default function Header() {
 
   return (
     <>
-      {/* Announcement Bar */}
+      {/* Announcement Bar — hidden when countdown timer is off */}
+      {settings?.lock_timer_enabled !== false && (
       <div className="fixed top-0 z-[60] w-full bg-black text-white py-2 text-[8px] md:text-[9px] tracking-[0.4em] font-bold uppercase text-center overflow-hidden">
         <div className="flex items-center justify-center gap-4">
           {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">NEXT DROP IN:</span>}
@@ -100,9 +101,10 @@ export default function Header() {
           {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">FRIDAY 6PM</span>}
         </div>
       </div>
+      )}
 
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top mt-[30px] md:mt-[32px] ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
+        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top ${settings?.lock_timer_enabled !== false ? 'mt-[30px] md:mt-[32px]' : ''} ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
       >
         <div className="w-full px-6 md:px-10">
           <div className="flex items-center justify-between h-10">

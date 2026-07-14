@@ -57,7 +57,7 @@ const AdminLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="flex flex-col items-center gap-3">
       <Loader2 className="w-10 h-10 animate-spin text-black" />
-      <p className="text-gray-500 font-medium font-space">Loading Dashboard...</p>
+      <p className="text-gray-500 font-medium font-space">Loading...</p>
     </div>
   </div>
 );
@@ -159,10 +159,16 @@ function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
   // The site is "Globally Locked" if the setting is true
   const isGloballyLocked = settings?.lock_page_enabled;
 
+  // Force-lock: if the admin enabled the lock, increment lock_epoch to invalidate all previous unlocks
+  const lockEpoch = settings?.lock_epoch || 0;
+  const storedEpoch = Number(localStorage.getItem('nynth_lock_epoch') || '0');
+  const isUnlockValid = isSiteUnlocked && storedEpoch === lockEpoch;
+
   // Logic to determine if we should show the lock page:
   // 1. Site is globally locked AND user is NOT an admin AND NOT previously unlocked via password
   // (Admins should always be able to see the site to manage it)
-  const shouldShowLock = isGloballyLocked && !isAdmin && !isSiteUnlocked;
+  // 2. If lock_epoch doesn't match stored epoch, force lock even if previously unlocked
+  const shouldShowLock = isGloballyLocked && !isAdmin && !isUnlockValid;
 
   if (settingsLoading || isAdminLoading) {
     return <AdminLoader />;
@@ -170,11 +176,11 @@ function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
 
   return (
     <CartProvider>
-      {!isSiteUnlocked && shouldShowLock ? (
+      {shouldShowLock ? (
         <BrowserRouter>
           <Routes>
             <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
-            <Route path="*" element={<LockPage onUnlock={() => setIsSiteUnlocked(true)} />} />
+            <Route path="*" element={<LockPage />} />
           </Routes>
         </BrowserRouter>
       ) : (
