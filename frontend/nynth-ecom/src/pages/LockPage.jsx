@@ -118,134 +118,140 @@ export default function LockPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
-            {/* Background elements for premium feel */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-black/5"></div>
-            <div className="absolute bottom-0 left-0 w-full h-1 bg-black/5"></div>
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+            {/* Subtle top/bottom lines */}
+            <div className="absolute top-0 left-0 w-full h-px bg-black/5"></div>
+            <div className="absolute bottom-0 left-0 w-full h-px bg-black/5"></div>
 
-            <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
-                <Logo size="xl" className="mb-12" />
+            <div className="w-full max-w-[340px] flex flex-col items-center">
+                {/* Logo */}
+                <div className="mb-10">
+                    <Logo size="xl" />
+                </div>
 
-                <div className="text-center mb-10 space-y-2">
-                    <h2 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black">
+                {/* Titles */}
+                <div className="text-center mb-8">
+                    <h1 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black mb-2">
                         {lockTitle1}
-                    </h2>
-                    <h2 className="text-[10px] tracking-[0.4em] font-bold uppercase text-black/40">
+                    </h1>
+                    <p className="text-[10px] tracking-[0.4em] font-bold uppercase text-black/30">
                         {lockTitle2}
-                    </h2>
+                    </p>
                 </div>
 
                 {/* Launch Countdown — only when timer is ON */}
                 {timerEnabled && (
-                    <div className="w-full mb-12 flex items-center justify-center gap-4 md:gap-8 animate-fadeIn">
-                        <div className="flex flex-col items-center">
-                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                                {timeLeft.days}
-                            </span>
-                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">DAYS</span>
-                        </div>
-                        <div className="text-xl text-black/10 self-start mt-2">:</div>
-                        <div className="flex flex-col items-center">
-                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                                {String(timeLeft.hours).padStart(2, '0')}
-                            </span>
-                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">HOURS</span>
-                        </div>
-                        <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
-                        <div className="flex flex-col items-center">
-                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                                {String(timeLeft.minutes).padStart(2, '0')}
-                            </span>
-                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">MINS</span>
-                        </div>
-                        <div className="text-xl text-black/10 self-start mt-2 px-1">:</div>
-                        <div className="flex flex-col items-center">
-                            <span className="text-[32px] md:text-[40px] font-inter font-bold tracking-[0.2em] tabular-nums">
-                                {String(timeLeft.seconds).padStart(2, '0')}
-                            </span>
-                            <span className="text-[7px] tracking-[0.4em] font-bold uppercase text-black/35 mt-2">SECS</span>
-                        </div>
+                    <div className="w-full mb-10 flex items-center justify-center gap-5">
+                        {[
+                            { value: timeLeft.days, label: 'DAYS' },
+                            { value: String(timeLeft.hours).padStart(2, '0'), label: 'HRS' },
+                            { value: String(timeLeft.minutes).padStart(2, '0'), label: 'MIN' },
+                            { value: String(timeLeft.seconds).padStart(2, '0'), label: 'SEC' },
+                        ].map((item, i) => (
+                            <React.Fragment key={item.label}>
+                                {i > 0 && <span className="text-xl text-black/10 self-start mt-3">:</span>}
+                                <div className="flex flex-col items-center">
+                                    <span className="text-[28px] md:text-[36px] font-inter font-bold tracking-[0.15em] tabular-nums leading-none">
+                                        {item.value}
+                                    </span>
+                                    <span className="text-[6px] tracking-[0.35em] font-bold uppercase text-black/25 mt-2">
+                                        {item.label}
+                                    </span>
+                                </div>
+                            </React.Fragment>
+                        ))}
                     </div>
                 )}
 
-                {/* Waitlist Section */}
-                <div className="w-full mb-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-                    <div className="text-center mb-6">
-                        <h3 className="text-[9px] tracking-[0.3em] font-bold uppercase text-black/60">
+                {/* ─── Waitlist Section ─── */}
+                <div className="w-full">
+                    <div className="text-center mb-5">
+                        <h2 className="text-[9px] tracking-[0.3em] font-bold uppercase text-black/50">
                             {lockWaitlistTitle}
-                        </h3>
-                        <p className="text-[8px] tracking-[0.2em] uppercase text-black/30 mt-1">
+                        </h2>
+                        <p className="text-[7px] tracking-[0.2em] uppercase text-black/25 mt-1.5">
                             {lockWaitlistSubtitle}
                         </p>
                     </div>
 
-                    <form onSubmit={handleWaitlistSubmit} className="space-y-4">
-                        <div className="relative group">
-                            <Mail className="absolute left-0 top-1/2 -translate-y-1/2 text-black/20 group-focus-within:text-black transition-colors" size={14} />
+                    <form onSubmit={handleWaitlistSubmit} className="space-y-3">
+                        {/* Visually hidden label for accessibility */}
+                        <label htmlFor="lock-waitlist-email" className="sr-only">Email address</label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-black/15 pointer-events-none" size={14} />
                             <input
+                                id="lock-waitlist-email"
                                 type="email"
                                 value={waitlistEmail}
                                 onChange={(e) => setWaitlistEmail(e.target.value)}
                                 placeholder="YOUR EMAIL"
-                                className="w-full bg-transparent border-b border-black/10 focus:border-black py-4 pl-8 text-[10px] tracking-[0.3em] font-bold uppercase outline-none transition-all placeholder:text-black/20"
-                                required
+                                autoComplete="email"
+                                className="w-full bg-transparent border border-black/8 focus:border-black/20 rounded-none py-3.5 pl-10 pr-4 text-[10px] tracking-[0.25em] font-bold uppercase outline-none transition-colors placeholder:text-black/20 placeholder:font-normal min-h-[44px]"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={waitlistLoading || !waitlistEmail}
-                            className="w-full border border-black text-black py-4 text-[10px] tracking-[0.4em] font-bold uppercase flex items-center justify-center gap-3 hover:bg-black hover:text-white transition-all disabled:opacity-20 group"
+                            className="w-full border border-black text-black py-3.5 text-[10px] tracking-[0.35em] font-bold uppercase flex items-center justify-center gap-2.5 hover:bg-black hover:text-white active:scale-[0.98] transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed disabled:active:scale-100 min-h-[44px]"
                         >
                             {waitlistLoading ? (
-                                <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                                <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                             ) : (
                                 <>
                                     ADD TO LIST
-                                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                    <ArrowRight size={13} strokeWidth={2.5} />
                                 </>
                             )}
                         </button>
                     </form>
                 </div>
 
-                <div className="w-full flex items-center gap-4 my-6 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-                    <div className="h-[1px] flex-1 bg-black/5"></div>
-                    <span className="text-[8px] tracking-[0.4em] text-black/20 font-bold">OR</span>
-                    <div className="h-[1px] flex-1 bg-black/5"></div>
+                {/* ─── Divider ─── */}
+                <div className="w-full flex items-center gap-4 my-7">
+                    <div className="h-px flex-1 bg-black/6"></div>
+                    <span className="text-[7px] tracking-[0.4em] text-black/15 font-bold">OR</span>
+                    <div className="h-px flex-1 bg-black/6"></div>
                 </div>
 
-                {/* Password Section */}
-                <form onSubmit={handleAdminSubmit} className="w-full space-y-4 animate-fadeInUp mb-6" style={{ animationDelay: '0.3s' }}>
-                    <div className="relative group">
-                        <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-black/20 group-focus-within:text-black transition-colors" size={14} />
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="ENTER USING PASSWORD"
-                            className="w-full bg-transparent border-b border-black/10 focus:border-black py-4 pl-8 text-[10px] tracking-[0.3em] font-bold uppercase outline-none transition-all placeholder:text-black/20"
-                        />
-                    </div>
+                {/* ─── Password Section ─── */}
+                <div className="w-full">
+                    <form onSubmit={handleAdminSubmit} className="space-y-3">
+                        {/* Visually hidden label for accessibility */}
+                        <label htmlFor="lock-password" className="sr-only">Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-black/15 pointer-events-none" size={14} />
+                            <input
+                                id="lock-password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="ENTER USING PASSWORD"
+                                autoComplete="current-password"
+                                className="w-full bg-transparent border border-black/8 focus:border-black/20 rounded-none py-3.5 pl-10 pr-4 text-[10px] tracking-[0.25em] font-bold uppercase outline-none transition-colors placeholder:text-black/20 placeholder:font-normal min-h-[44px]"
+                            />
+                        </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading || !password}
-                        className="w-full bg-black text-white py-4 text-[10px] tracking-[0.4em] font-bold uppercase flex items-center justify-center gap-3 hover:bg-black/90 transition-all disabled:opacity-20 group"
-                    >
-                        {loading ? (
-                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                        ) : (
-                            <>
-                                ENTER NYNTH
-                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                            </>
-                        )}
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            disabled={loading || !password}
+                            className="w-full bg-black text-white py-3.5 text-[10px] tracking-[0.35em] font-bold uppercase flex items-center justify-center gap-2.5 hover:bg-black/85 active:scale-[0.98] transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed disabled:active:scale-100 min-h-[44px]"
+                        >
+                            {loading ? (
+                                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>
+                                    ENTER NYNTH
+                                    <ArrowRight size={13} strokeWidth={2.5} />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                </div>
 
-                <p className="mt-10 text-[8px] tracking-[0.2em] text-black/30 font-bold uppercase">
-                    &copy; {new Date().getFullYear()} NYNTH WORLD. ALL RIGHTS RESERVED.
+                {/* Footer */}
+                <p className="mt-12 text-[7px] tracking-[0.2em] text-black/20 font-bold uppercase">
+                    &copy; {new Date().getFullYear()} NYNTH WORLD
                 </p>
             </div>
         </div>
