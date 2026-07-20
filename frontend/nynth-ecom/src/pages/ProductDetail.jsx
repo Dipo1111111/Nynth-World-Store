@@ -3,12 +3,13 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { fetchSingleProduct } from "../api/firebaseFunctions";
+import { fetchSingleProduct, fetchRecommendedProducts } from "../api/firebaseFunctions";
 import { Plus, Minus, Check, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
 import SizeGuideModal from "../components/products/SizeGuideModal";
+import ProductCard from "../components/products/ProductCard";
 
 const getColorHex = (colorName) => {
   const map = {
@@ -110,6 +111,9 @@ export default function ProductDetail() {
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
+  // Recommended products
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+
   // Accordion states
   const [isOpenDescription, setIsOpenDescription] = useState(false);
   const [isOpenShipping, setIsOpenShipping] = useState(false);
@@ -143,6 +147,13 @@ export default function ProductDetail() {
     };
     if (id) loadProduct();
   }, [id]);
+
+  // Fetch recommended products when product loads
+  useEffect(() => {
+    if (product) {
+      fetchRecommendedProducts(product, 4).then(setRecommendedProducts);
+    }
+  }, [product?.id]);
 
   // For headwear, ignore sizeStock entirely and use stockQuantity directly
   const isHeadwear = product?.category === "headwear";
@@ -264,6 +275,11 @@ export default function ProductDetail() {
                 {product.title}
               </h1>
               <span className="text-[10px] font-bold tracking-[0.2em] whitespace-nowrap">
+                {product.compareAtPrice && product.compareAtPrice > product.price && (
+                  <span className="line-through text-gray-400 mr-2">
+                    {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                )}
                 {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
@@ -342,6 +358,18 @@ export default function ProductDetail() {
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 14 DAYS RETURN POLICY
               </div>
             </div>
+
+            {/* You May Like */}
+            {recommendedProducts.length > 0 && (
+              <div className="mb-16">
+                <p className="text-[8px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-6">You May Like</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {recommendedProducts.map((p) => (
+                    <ProductCard key={p.id} product={p} displayMode="view" />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Accordions - Simple borders */}
             <div className="border-t border-black/5">
@@ -445,6 +473,11 @@ export default function ProductDetail() {
               {product.title}
             </h1>
             <span className="text-[12px] font-bold tracking-widest whitespace-nowrap">
+              {product.compareAtPrice && product.compareAtPrice > product.price && (
+                <span className="line-through text-gray-400 mr-2">
+                  {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              )}
               {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
@@ -528,6 +561,18 @@ export default function ProductDetail() {
               <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 14 DAYS RETURN POLICY
             </div>
           </div>
+
+          {/* You May Like - Mobile */}
+          {recommendedProducts.length > 0 && (
+            <div className="mb-8">
+              <p className="text-[9px] tracking-[0.25em] font-bold text-gray-400 uppercase mb-4">You May Like</p>
+              <div className="grid grid-cols-2 gap-3">
+                {recommendedProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} displayMode="view" />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Accordions */}
           <div className="border-t border-gray-200">

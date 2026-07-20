@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { addOrder, verifyOrderPayment } from "../api/firebaseFunctions";
+import { addOrder, verifyOrderPayment, validateDiscountCode } from "../api/firebaseFunctions";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -32,6 +32,12 @@ const Checkout = () => {
     deliveryMethod: "home", // New: home or park
   });
   const [shippingFee, setShippingFee] = useState(0);
+
+  // Discount code state
+  const [discountInput, setDiscountInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState(null); // { code, type, value, discountAmount }
+  const [discountError, setDiscountError] = useState("");
+  const [discountLoading, setDiscountLoading] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -99,6 +105,48 @@ const Checkout = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+  };
+
+  // Calculate discount amount based on type
+  const calculateDiscountAmount = (type, value, subtotal) => {
+    if (type === "percentage") {
+      return Math.round(subtotal * (value / 100));
+    }
+    return Math.min(value, subtotal); // Fixed: can't exceed subtotal
+  };
+
+  const discountAmount = appliedDiscount
+    ? calculateDiscountAmount(appliedDiscount.type, appliedDiscount.value, totalAmount)
+    : 0;
+
+  const handleApplyDiscount = async () => {
+    if (!discountInput.trim()) return;
+    setDiscountError("");
+    setDiscountLoading(true);
+
+    try {
+      const result = await validateDiscountCode(discountInput.trim());
+      if (!result.valid) {
+        setDiscountError(result.error);
+        setAppliedDiscount(null);
+      } else {
+        setAppliedDiscount({
+          code: result.code.code,
+          type: result.discountType,
+          value: result.discountValue,
+        });
+        setDiscountError("");
+      }
+    } catch (err) {
+      setDiscountError("Failed to validate code");
+    }
+    setDiscountLoading(false);
+  };
+
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountInput("");
+    setDiscountError("");
   };
 
   const payWithPaystack = (orderId, totalToPay) => {
@@ -174,7 +222,10 @@ const Checkout = () => {
 
     try {
       // Shipping Logic (Dynamic based on city)
-      const grandTotal = totalAmount + shippingFee;
+      const orderDiscount = appliedDiscount
+        ? calculateDiscountAmount(appliedDiscount.type, appliedDiscount.value, totalAmount)
+        : 0;
+      const grandTotal = totalAmount + shippingFee - orderDiscount;
 
       // Create order in Firestore
       const orderData = {
@@ -183,6 +234,8 @@ const Checkout = () => {
         items: cartItems,
         subtotal: totalAmount,
         shippingFee: shippingFee,
+        discountCode: appliedDiscount?.code || null,
+        discountAmount: orderDiscount,
         total: grandTotal,
         payment_status: "pending",
         order_status: "pending", // Start as pending until payment confirmed
@@ -207,7 +260,7 @@ const Checkout = () => {
     }
   };
 
-  const grandTotal = totalAmount + shippingFee;
+  const grandTotal = totalAmount + shippingFee - discountAmount;
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col font-inter">
@@ -439,6 +492,43 @@ const Checkout = () => {
             ))}
           </div>
 
+          {/* Discount Code Input */}
+          <div className="mb-8">
+            <p className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 mb-3">Have a discount code?</p>
+            {appliedDiscount ? (
+              <div className="flex items-center justify-between py-3 px-4 bg-green-50 border border-green-100 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-green-700 font-mono">{appliedDiscount.code}</span>
+                  <span className="text-[9px] text-green-600">
+                    {appliedDiscount.type === "percentage" ? `${appliedDiscount.value}% off` : `${settings.currency_symbol}${appliedDiscount.value.toLocaleString()} off`}
+                  </span>
+                </div>
+                <button onClick={handleRemoveDiscount} className="text-[9px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700">Remove</button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={discountInput}
+                  onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleApplyDiscount())}
+                  placeholder="ENTER CODE"
+                  className="flex-1 px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[11px] tracking-widest uppercase font-mono font-bold bg-transparent"
+                />
+                <button
+                  onClick={handleApplyDiscount}
+                  disabled={discountLoading || !discountInput.trim()}
+                  className="px-5 py-3 text-[9px] font-bold tracking-[0.2em] uppercase border border-black/10 hover:bg-black hover:text-white transition-all disabled:opacity-40"
+                >
+                  {discountLoading ? "..." : "Apply"}
+                </button>
+              </div>
+            )}
+            {discountError && (
+              <p className="text-[9px] text-red-500 mt-2 uppercase tracking-wider">{discountError}</p>
+            )}
+          </div>
+
           <div className="space-y-6 pt-8 border-t border-gray-200">
             <div className="flex justify-between text-[11px] tracking-widest uppercase">
               <span className="text-gray-400">Subtotal</span>
@@ -469,6 +559,13 @@ const Checkout = () => {
               </div>
             </div>
           </div>
+
+          {discountAmount > 0 && (
+            <div className="flex justify-between text-[11px] tracking-widest uppercase py-3">
+              <span className="text-green-600">Discount ({appliedDiscount.code})</span>
+              <span className="font-bold text-green-600">-{settings.currency_symbol}{discountAmount.toLocaleString()}</span>
+            </div>
+          )}
 
           <div className="flex justify-between text-[18px] tracking-[0.1em] font-bold uppercase mt-10 pt-10 border-t border-gray-200">
             <span>Total</span>

@@ -103,6 +103,11 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             </h3>
           </Link>
           <p className="text-[9px] md:text-[10px] font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <span className="line-through text-gray-400 mr-2">
+                {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            )}
             {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
 
@@ -169,6 +174,11 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             {product.title}
           </h3>
           <span className="text-[8px] md:text-[9px] font-bold tracking-[0.15em] uppercase text-black whitespace-nowrap">
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <span className="line-through text-gray-400 mr-1">
+                {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            )}
             {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>

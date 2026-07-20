@@ -141,6 +141,7 @@ export default function AdminProducts() {
   const initialFormState = {
     title: "",
     price: "",
+    compareAtPrice: null,
     description: "",
     category: "tees",
     images: [], // Array of URL strings
@@ -230,6 +231,7 @@ export default function AdminProducts() {
     setFormData({
       title: product.title || "",
       price: product.price || "",
+      compareAtPrice: product.compareAtPrice || null,
       description: product.description || "",
       category: product.category || "tees",
       displayOrder: product.displayOrder, // Preserve existing order
@@ -372,6 +374,7 @@ export default function AdminProducts() {
         availableColors: formData.colors,
         tags: formData.tags,
         price: parseFloat(formData.price),
+        compareAtPrice: formData.compareAtPrice || null,
         displayOrder: formData.displayOrder !== undefined ? formData.displayOrder : 999,
         images: finalImages,
         imageUrl: finalImages[0],
@@ -530,6 +533,17 @@ export default function AdminProducts() {
                     value={formData.price}
                     onChange={e => setFormData({ ...formData, price: e.target.value })}
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Compare at Price (₦) <span className="text-gray-400 text-xs">— optional</span></label>
+                  <input
+                    type="number"
+                    className="w-full border p-3 rounded-lg"
+                    placeholder="e.g. 15000"
+                    value={formData.compareAtPrice || ""}
+                    onChange={e => setFormData({ ...formData, compareAtPrice: e.target.value ? parseFloat(e.target.value) : null })}
+                  />
+                  <p className="text-[11px] text-gray-400">Original price shown with strikethrough. Leave empty to hide.</p>
                 </div>
 
               </div>
