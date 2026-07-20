@@ -829,6 +829,191 @@ export const getAdminAnalytics = async () => {
   }
 };
 
+// --- DISCOUNT CODES CRUD ---
+
+export const addDiscountCode = async (data) => {
+  try {
+    const docRef = await addDoc(collection(db, "discount_codes"), {
+      ...data,
+      code: (data.code || "").toUpperCase(),
+      value: Number(data.value) || 0,
+      isActive: data.isActive !== false,
+      created_at: serverTimestamp(),
+    });
+    return { id: docRef.id, success: true };
+  } catch (error) {
+    console.error("Error adding discount code:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateDiscountCode = async (id, updates) => {
+  try {
+    const finalUpdates = { ...updates, updated_at: serverTimestamp() };
+
+    // Always uppercase the code if it's being updated
+    if (updates.code !== undefined) {
+      finalUpdates.code = updates.code.toUpperCase();
+    }
+
+    await updateDoc(doc(db, "discount_codes", id), finalUpdates);
+    return true;
+  } catch (error) {
+    console.error(`Error updating discount code ${id}:`, error);
+    return false;
+  }
+};
+
+export const deleteDiscountCode = async (id) => {
+  try {
+    await deleteDoc(doc(db, "discount_codes", id));
+    return true;
+  } catch (error) {
+    console.error(`Error deleting discount code ${id}:`, error);
+    return false;
+  }
+};
+
+export const fetchDiscountCodes = async () => {
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, "discount_codes"), orderBy("created_at", "desc"))
+    );
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching discount codes:", error);
+    return [];
+  }
+};
+
+export const validateDiscountCode = async (code) => {
+  try {
+    const q = query(
+      collection(db, "discount_codes"),
+      where("code", "==", (code || "").toUpperCase()),
+      limit(1)
+    );
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return { valid: false, error: "Invalid discount code" };
+    }
+
+    const doc = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+
+    if (!doc.isActive) {
+      return { valid: false, error: "This code is no longer active" };
+    }
+
+    if (doc.expiresAt) {
+      const now = new Date();
+      const expires = doc.expiresAt.seconds
+        ? new Date(doc.expiresAt.seconds * 1000)
+        : new Date(doc.expiresAt);
+
+      if (expires < now) {
+        return { valid: false, error: "This code has expired" };
+      }
+    }
+
+    return {
+      valid: true,
+      code: doc,
+      discountType: doc.type,
+      discountValue: doc.value,
+    };
+  } catch (error) {
+    console.error("Error validating discount code:", error);
+    return { valid: false, error: error.message };
+  }
+};
+
+// --- RECOMMENDED PRODUCTS ---
+
+export const fetchRecommendedProducts = async (product, max = 4) => {
+  try {
+    const results = [];
+    const foundIds = new Set();
+
+    if (product && product.id) {
+      foundIds.add(product.id);
+    }
+
+    // 1. Same category products
+    if (product?.category) {
+      const categoryQ = query(
+        collection(db, "products"),
+        where("category", "==", product.category),
+        limit(max + 1) // +1 because we'll exclude the current product
+      );
+      const categorySnapshot = await getDocs(categoryQ);
+      const categoryProducts = categorySnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((p) => p.isPublic !== false && !foundIds.has(p.id))
+        .slice(0, max - results.length);
+
+      categoryProducts.forEach((p) => {
+        foundIds.add(p.id);
+        results.push(p);
+      });
+    }
+
+    // 2. Tag overlap products (if we still need more)
+    if (results.length < max && product?.tags?.length > 0) {
+      // Try each tag individually to avoid composite index requirements
+      for (const tag of product.tags) {
+        if (results.length >= max) break;
+
+        const tagQ = query(
+          collection(db, "products"),
+          where("tags", "array-contains", tag),
+          limit(max - results.length + foundIds.size)
+        );
+        const tagSnapshot = await getDocs(tagQ);
+        const tagProducts = tagSnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((p) => p.isPublic !== false && !foundIds.has(p.id))
+          .slice(0, max - results.length);
+
+        tagProducts.forEach((p) => {
+          foundIds.add(p.id);
+          results.push(p);
+        });
+      }
+    }
+
+    // 3. Random products from other categories (if still need more)
+    if (results.length < max) {
+      const otherQ = query(
+        collection(db, "products"),
+        limit(max - results.length + foundIds.size)
+      );
+      const otherSnapshot = await getDocs(otherQ);
+
+      // Exclude same-category products
+      const otherProducts = otherSnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter(
+          (p) =>
+            p.isPublic !== false &&
+            !foundIds.has(p.id) &&
+            p.category !== product?.category
+        )
+        .slice(0, max - results.length);
+
+      otherProducts.forEach((p) => {
+        foundIds.add(p.id);
+        results.push(p);
+      });
+    }
+
+    return results;
+  } catch (error) {
+    console.error("Error fetching recommended products:", error);
+    return [];
+  }
+};
+
 export default {
   fetchProducts,
   fetchSingleProduct,
