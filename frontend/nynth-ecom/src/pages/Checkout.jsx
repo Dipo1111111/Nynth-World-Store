@@ -540,19 +540,9 @@ const Checkout = () => {
                 <span className="text-black font-bold uppercase block">
                   {form.city ? `${form.city} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
                 </span>
-                {form.state === "Lagos" && form.city && LAGOS_SHIPPING_DATA[form.city] && (
+                {form.state !== "Lagos" && form.state !== "Abuja" && (
                   <span className="text-[9px] text-gray-400 block mt-1 uppercase">
-                    {LAGOS_SHIPPING_DATA[form.city].speed} [PRISON SPEED]
-                  </span>
-                )}
-                {form.state === "Abuja" && form.city && ABUJA_SHIPPING_DATA[form.city] && (
-                  <span className="text-[9px] text-gray-400 block mt-1 uppercase">
-                    {ABUJA_SHIPPING_DATA[form.city].speed}
-                  </span>
-                )}
-                {form.state !== "Lagos" && (
-                  <span className="text-[9px] text-gray-400 block mt-1 uppercase">
-                    {totalWeight.toFixed(1)}kg Total Weight 
+                    {totalWeight.toFixed(1)}kg Total Weight
                     {totalWeight > 3 && ` (${Math.ceil(totalWeight - 3)}kg excess)`}
                   </span>
                 )}

@@ -359,18 +359,6 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* You May Like */}
-            {recommendedProducts.length > 0 && (
-              <div className="mb-16">
-                <p className="text-[8px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-6">You May Like</p>
-                <div className="grid grid-cols-2 gap-4">
-                  {recommendedProducts.map((p) => (
-                    <ProductCard key={p.id} product={p} displayMode="view" />
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Accordions - Simple borders */}
             <div className="border-t border-black/5">
               <button
@@ -402,6 +390,18 @@ export default function ProductDetail() {
           </div>
         </div>
       </main>
+
+      {/* ====== DESKTOP: You May Like (Full Width Below Product) ====== */}
+      {recommendedProducts.length > 0 && (
+        <section className="hidden lg:block px-16 xl:px-32 pt-16 pb-24 border-t border-black/5">
+          <p className="text-[8px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-8">You May Like</p>
+          <div className="grid grid-cols-4 gap-6 max-w-7xl">
+            {recommendedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} displayMode="view" />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ====== MOBILE: Single Column Layout (<lg) ====== */}
       <main className="lg:hidden pt-[100px] pb-24">

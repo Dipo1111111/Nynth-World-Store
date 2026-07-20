@@ -233,3 +233,53 @@ Last updated: 2026-07-20
 - Runtime verification pending
 - Git commit not yet made
 - Full app audit still deferred from session 3
+
+---
+
+# Session 5 — Abuja District Delivery & Same Day Delivery Text Removal
+
+Last updated: 2026-07-20
+
+## What was built
+
+### 1. Removed "Same Day Delivery" Text from Checkout (Checkout.jsx)
+- Removed the `{LAGOS_SHIPPING_DATA[form.city}.speed} [PRISON SPEED]` span from the shipping summary section (was showing below each Lagos area)
+- Removed the `{ABUJA_SHIPPING_DATA[form.city].speed}` span from the shipping summary section (was showing below each Abuja area)
+- Weight info for interstate orders (non-Lagos, non-Abuja) retained — shows kg and excess weight
+- Shipping summary now only shows: area name, dash, and fee amount — no speed text underneath
+
+### 2. Expanded Abuja District Delivery Prices (locationData.js)
+- Replaced single "University of Abuja" (₦1,500) entry with 21 Abuja area entries:
+  - University of Abuja / Iddo — ₦3,500
+  - Gwagwalada — ₦4,000
+  - Giri — ₦3,500
+  - Lugbe — ₦4,500
+  - Wuse / Jabi / Utako / Maitama — ₦5,000
+  - Asokoro / Guzape — ₦6,000
+  - Kubwa / Gwarinpa / Dawaki / Katampe — ₦5,000
+  - Apo / Lokogoma / Galadimawa / Gaduwa / Garki / Durumi — ₦5,000
+  - Kuje — ₦5,000
+
+## Decisions made
+- Lugbe set at ₦4,500 as default — user mentioned "4500/4000 depending on address" but didn't specify how to split. Left as single entry at 4500 pending clarification.
+- The `speed` property still exists in locationData.js but is no longer displayed anywhere in the UI.
+
+## Files modified
+- `src/pages/Checkout.jsx` — Removed delivery speed text spans from shipping summary
+- `src/data/locationData.js` — Expanded ABUJA_SHIPPING_DATA with full district list
+
+## Current state
+- Both files compile clean (zero diagnostics)
+- Checkout shipping summary shows area + fee only (no speed text)
+- Abuja dropdown in checkout now shows 21 areas instead of 1
+- Speed field in locationData is orphaned (not referenced) — harmless, could be cleaned up later
+
+## Next session starts with
+- Full app UI/UX/security audit still deferred from session 3
+- Git commit pending: `git add -A && git commit -m "Remove delivery speed text from checkout, expand Abuja districts"`
+- Runtime verification of all accumulated changes pending
+
+## Open questions
+- Lugbe pricing: user said "4500/4000 depending on address" — may need splitting into two entries
+- Git commits for session 4 and 5 still not made
+- Full app audit still deferred

@@ -147,7 +147,27 @@ export const LAGOS_SHIPPING_DATA = {
 };
 
 export const ABUJA_SHIPPING_DATA = {
-    "University of Abuja": { price: 1500, speed: "Delivery" },
+    "University of Abuja / Iddo": { price: 3500, speed: "Delivery" },
+    "Gwagwalada": { price: 4000, speed: "Delivery" },
+    "Giri": { price: 3500, speed: "Delivery" },
+    "Lugbe": { price: 4500, speed: "Delivery" },
+    "Wuse": { price: 5000, speed: "Delivery" },
+    "Jabi": { price: 5000, speed: "Delivery" },
+    "Utako": { price: 5000, speed: "Delivery" },
+    "Maitama": { price: 5000, speed: "Delivery" },
+    "Asokoro": { price: 6000, speed: "Delivery" },
+    "Guzape": { price: 6000, speed: "Delivery" },
+    "Kubwa": { price: 5000, speed: "Delivery" },
+    "Gwarinpa": { price: 5000, speed: "Delivery" },
+    "Dawaki": { price: 5000, speed: "Delivery" },
+    "Katampe": { price: 5000, speed: "Delivery" },
+    "Apo": { price: 5000, speed: "Delivery" },
+    "Lokogoma": { price: 5000, speed: "Delivery" },
+    "Galadimawa": { price: 5000, speed: "Delivery" },
+    "Gaduwa": { price: 5000, speed: "Delivery" },
+    "Garki": { price: 5000, speed: "Delivery" },
+    "Durumi": { price: 5000, speed: "Delivery" },
+    "Kuje": { price: 5000, speed: "Delivery" },
 };
 
 export const INTERSTATE_SHIPPING_DATA = {
