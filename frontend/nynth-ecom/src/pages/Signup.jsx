@@ -15,7 +15,7 @@ export default function Signup() {
         <div className="min-h-screen bg-white flex flex-col font-inter">
             <Header />
 
-            <main className="flex-1 flex items-center justify-center section-pad py-20 page-content">
+            <main className="flex-1 flex items-center justify-center section-pad py-20">
                 <div className="w-full max-w-sm">
                     <div className="text-left mb-16">
                         <h1 className="hero-title text-black text-left mb-6">SIGN UP</h1>

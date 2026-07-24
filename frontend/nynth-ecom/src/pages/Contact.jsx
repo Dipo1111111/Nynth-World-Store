@@ -12,7 +12,7 @@ export default function Contact() {
     return (
         <div className="min-h-screen bg-white text-black flex flex-col font-inter">
             <Header />
-            <main className="flex-1 section-pad py-20 md:py-32 page-content">
+            <main className="flex-1 section-pad py-20 md:py-32">
                 <div className="max-w-6xl mx-auto text-center">
                     <h1 className="hero-title text-black mb-20">CONTACT</h1>
 

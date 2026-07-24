@@ -10,7 +10,7 @@ export default function Sustainability() {
     return (
         <div className="min-h-screen bg-white">
             <Header />
-            <main className="section-pad py-20 max-w-4xl mx-auto page-content">
+            <main className="section-pad py-20 max-w-4xl mx-auto">
                 <h1 className="hero-title text-black mb-16 text-left">SUSTAINABILITY</h1>
 
                 <div className="space-y-12 font-inter text-[13px] text-gray-600 leading-[1.8]">

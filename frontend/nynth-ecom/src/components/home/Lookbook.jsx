@@ -48,7 +48,7 @@ export default function Lookbook() {
       />
       <Header />
 
-      <main className="w-full page-content">
+      <main className="w-full">
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[300px] md:auto-rows-[350px] gap-0">
              {[...Array(8)].map((_, i) => (

@@ -10,7 +10,7 @@ export default function OurStory() {
     return (
         <div className="min-h-screen bg-white font-inter">
             <Header />
-            <main className="section-pad py-20 md:py-32 max-w-2xl mx-auto page-content">
+            <main className="section-pad py-20 md:py-32 max-w-2xl mx-auto">
                 <div className="space-y-16 text-black">
                     {/* Header Info */}
                     <div className="space-y-8">

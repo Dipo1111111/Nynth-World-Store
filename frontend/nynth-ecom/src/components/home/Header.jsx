@@ -242,6 +242,14 @@ export default function Header() {
 
       {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Spacer — pushes page content below the fixed navbar.
+          Height = announcement bar (when visible) + navbar. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none"
+        style={{ height: settings?.lock_timer_enabled !== false ? '88px' : '56px' }}
+      />
     </>
   );
 }

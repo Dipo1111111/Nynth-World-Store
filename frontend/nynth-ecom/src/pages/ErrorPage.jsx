@@ -30,7 +30,7 @@ export default function ErrorPage({ status = 500, message }) {
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
-            <main className="flex-1 flex items-center justify-center p-6 page-content">
+            <main className="flex-1 flex items-center justify-center p-6">
                 <div className="max-w-md w-full text-center">
                     <div className={`w-24 h-24 ${content.bg} rounded-3xl flex items-center justify-center mx-auto mb-8`}>
                         {content.icon}

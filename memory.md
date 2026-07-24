@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: 2026-07-24
+Last updated: 2026-07-25
 
 ## What was built (previous session)
 - **LockPage.jsx** — Added duration-based countdown timer. When `lock_timer_enabled` is on, a large MM:SS countdown appears and the password field + "The wait is over" message are hidden until the timer hits zero.
@@ -356,3 +356,97 @@ Files modified:
 - Lugbe pricing: user said "4500/4000 depending on address" — may need splitting
 - Runtime verification of marquee and location toggles pending
 - Full app audit still deferred
+
+---
+
+# Session 7 — Owner's Launch Day Fixes & Structural Cleanup
+
+Last updated: 2026-07-25
+
+## What was built
+
+### 1. Navbar Content Overlap Fix (Task #5)
+- **Problem**: All pages had content hiding behind the fixed `Header` component (`fixed top-0 z-50`) because no pages had top padding to compensate.
+- **Solution**: Added `.page-content` CSS class to `src/index.css`:
+  ```css
+  .page-content { padding-top: 72px; }
+  @media (min-width: 768px) { .page-content { padding-top: 76px; } }
+  ```
+- Applied `page-content` class to the `<main>` element of **16 pages**: Contact, Cart, Checkout (reverted — has own sticky header), Home, OurStory, Sustainability, ShippingReturns, PrivacyPolicy, TermsOfService, ThankYou, Login, Signup, ForgotPassword, Account, ErrorPage, NotFound
+- Also updated Lookbook.jsx to use `page-content` instead of hardcoded `pt-[68px]`
+- **Checkout.jsx** — Uses its own `sticky top-0` header (not the fixed Header), so `page-content` was reverted. No offset needed.
+
+### 2. Countdown Timer Dynamic Day (Task #6)
+- **Problem**: `Header.jsx` line 101 hardcoded `{!isLaunchFinished && <span className="opacity-50 hidden sm:inline">FRIDAY 6PM</span>}` regardless of actual launch date.
+- **Solution**: Added `dropLabel` state, computed dynamically from `settings.launch_date`:
+  - Parses the launch date, extracts day name (SUNDAY–SATURDAY) and time (12h format with AM/PM)
+  - Replaced hardcoded text with `{!isLaunchFinished && dropLabel && <span className="opacity-50 hidden sm:inline">{dropLabel}</span>}`
+
+### 3. Checkout Flow Fixes (Task #8)
+- **Paystack double-execution fix**: Removed duplicate `callback` handler — kept only `onSuccess`. Both were firing on successful payment, potentially causing duplicate order processing.
+- **Paystack loading check**: Changed from `setPaystackLoaded(true)` in useEffect (blindly sets true) to actually checking `window.PaystackPop` with retry polling every 500ms.
+- **Email validation**: Added regex check (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`) before order creation.
+- **Phone validation**: Added Nigerian phone regex (`/^(\+?234|0)[789][01]\d{8}$/`) — accepts +234..., 0..., formats.
+- Added `!form.phone` to required fields check.
+
+### 4. Auth Cleanup (Task #7)
+- **AuthContext.jsx** — Removed all debug `console.log` statements (render logging, persistence logging, auth state changed logging). Kept `console.error` for actual errors.
+- **Account.jsx** — Changed `window.location.href` to `window.location.replace("/")` for more reliable hard redirect after logout. Added `toast.error` on logout failure.
+- **Google Sign-In issue**: The code is structurally correct. The failure is a Firebase Console configuration issue — `nynthworld.com` needs to be in the Authorized domains list in Firebase Console → Authentication → Settings. No code fix needed.
+
+### 5. Google Sign-In Hidden from Login Page
+- **Problem**: Owner wanted "Newman's sign-in page" (the Google auth button) hidden.
+- **Solution**: Removed the Google sign-in button, "Or" divider, and related imports from `Login.jsx`. Login page now shows only "Continue as Guest" + "Create Account" link. Simplified component (removed unused `useState`, `useAuth`, `Loader2`, `toast` imports).
+
+### 6. Studio Location Changed to Abuja
+- **Contact.jsx** — Changed "Lagos Studio" heading to "Abuja Studio" per owner's request.
+
+### 7. Lookbook Mobile Photos Fix
+- **Problem**: Owner reported "photos in lookbook aren't coming out fully on mobile devices."
+- **Lookbook.jsx** — Increased mobile row heights from `auto-rows-[200px]` to `auto-rows-[300px]` (skeleton) and from `auto-rows-[250px]` to `auto-rows-[300px]` (loaded grid). Images use `object-cover` so taller containers show more of each photo.
+
+### 8. Product Filmstrip Redesign
+- **Problem**: Owner said "filmstrip for viewing different angle-pics of a product needs better design."
+- **ProductDetail.jsx** — Desktop thumbnails: increased from `h-14 w-11` to `h-16 w-12`, added `gap-2` spacing (was `gap-1.5`), added `px-4` padding, improved active state with `scale-105` + `border-[1.5px]` + `duration-300`, inactive opacity changed from `opacity-30` to `opacity-30 hover:opacity-70`.
+
+### 9. Build Verification
+- `npx vite build` completed successfully with zero errors. Only pre-existing chunk size warnings.
+
+## Decisions made
+- `page-content` class is the single source of truth for fixed header offset — all pages use it consistently
+- Checkout page is excluded from `page-content` because it has its own sticky header
+- Google sign-in hidden entirely rather than fixing Firebase config — owner's explicit request
+- Paystack: kept only `onSuccess` handler (modern API), removed legacy `callback`
+- Login page simplified to Guest + Signup only (no Google, no email/password sign-in)
+
+## Files modified
+- `src/index.css` — Added `.page-content` class
+- `src/components/home/Header.jsx` — Dynamic countdown day label
+- `src/pages/Checkout.jsx` — Paystack fix, validation, paystackLoaded check
+- `src/context/AuthContext.jsx` — Removed debug console.logs
+- `src/pages/Account.jsx` — Improved logout handler
+- `src/pages/Login.jsx` — Removed Google sign-in, simplified to Guest + Signup
+- `src/pages/Contact.jsx` — Lagos → Abuja Studio
+- `src/components/home/Lookbook.jsx` — Mobile row heights, page-content
+- `src/pages/ProductDetail.jsx` — Filmstrip thumbnail redesign
+- 16 other pages — Added `page-content` class to `<main>` elements
+
+## Current state
+- Build compiles clean (zero errors)
+- All owner observations addressed except:
+  - **Phone area code dropdown** — Phone validation added but no area code dropdown (complex, low priority)
+  - **Email verification** — Format validation added but no send-email flow (needs backend setup)
+  - **Official email @nynthworld.com** — Admin question, not a code fix
+  - **Firebase authorized domains** — Owner must add `nynthworld.com` in Firebase Console for Google sign-in to work
+- All changes committed: `0a344b0`
+
+## Next session starts with
+- `/impeccable polish` for final UI pass before July collection launch (2 days away)
+- Verify marquee, shipping toggles, and countdown timer work at runtime
+- If time permits: phone area code dropdown in checkout
+
+## Open questions
+- Firebase Console: `nynthworld.com` needs to be added to Authorized domains
+- Does the owner want email/password sign-in restored, or is Guest-only intentional?
+- Phone area code dropdown — is this still needed or is basic validation enough?
+- Official email @nynthworld.com — owner needs to set up email hosting separately

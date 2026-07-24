@@ -63,7 +63,7 @@ export default function Home() {
       <SEO />
       <Header />
 
-      <main className="flex-1 w-full bg-[#FCFCFC] page-content">
+      <main className="flex-1 w-full bg-[#FCFCFC]">
         <Marquee />
 
         {/* Simplified Luxury Hero / Featured Section */}

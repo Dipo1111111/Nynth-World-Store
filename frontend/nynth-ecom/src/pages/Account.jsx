@@ -68,7 +68,7 @@ export default function Account() {
         <div className="min-h-screen bg-white flex flex-col font-inter">
             <Header />
 
-            <main className="flex-1 section-pad bg-white page-content">
+            <main className="flex-1 section-pad bg-white">
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col items-start gap-4 mb-20">
                         <h1 className="hero-title text-black text-left">ACCOUNT</h1>
