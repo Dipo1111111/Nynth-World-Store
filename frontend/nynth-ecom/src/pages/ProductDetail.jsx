@@ -213,10 +213,10 @@ export default function ProductDetail() {
       )}
 
       {/* ====== DESKTOP: Two-Column Layout (lg+) ====== */}
-      <main className="hidden lg:grid lg:grid-cols-2 min-h-screen pt-[104px]">
+      <main className="hidden lg:grid lg:grid-cols-2 min-h-screen">
         {/* Left: Edge-to-Edge Image Half */}
-        <div 
-          className="bg-white relative h-[calc(100vh-104px)] flex flex-col items-center justify-center sticky top-[104px]"
+        <div
+          className="bg-white relative h-[calc(100vh-56px)] flex flex-col items-center justify-center sticky top-[56px]"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -408,7 +408,7 @@ export default function ProductDetail() {
       )}
 
       {/* ====== MOBILE: Single Column Layout (<lg) ====== */}
-      <main className="lg:hidden pt-[100px] pb-24">
+      <main className="lg:hidden pb-24">
         {/* Product Image Mobile Carousel */}
         <div 
           className="w-full bg-white relative aspect-[3/4] flex items-center justify-center overflow-hidden group"

@@ -74,7 +74,7 @@ export default function Shop() {
       <SEO title="Shop Collection | NYNTH" description="Premium Minimal Streetwear" url="/shop" />
       <Header />
 
-      <main className="w-full pt-[98px] md:pt-[102px]">
+      <main className="w-full">
         <Marquee />
 
         {/* Full-width Hero Section - Edge to Edge */}
