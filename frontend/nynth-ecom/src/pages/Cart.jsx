@@ -36,7 +36,7 @@ export default function Cart() {
       <div className="min-h-screen bg-white text-black flex flex-col">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center section-pad">
-          <h1 className="font-space text-4xl mb-6">Your bag is empty</h1>
+          <h1 className="text-4xl mb-6">Your bag is empty</h1>
           <p className="font-inter text-gray-500 mb-8 text-center max-w-md">
             Looks like you haven't added anything to your cart yet.
             Explore our latest collections to find your new favorites.
@@ -130,7 +130,7 @@ export default function Cart() {
 
         {/* Order Summary & Checkout strictly at bottom */}
         <div className="mt-auto border-t border-gray-100 pt-6">
-          <Link to="#" className="w-full flex justify-between items-center text-[9px] tracking-[0.2em] font-bold uppercase text-black mb-6 hover:opacity-70">
+          <Link to="/shipping" className="w-full flex justify-between items-center text-[9px] tracking-[0.2em] font-bold uppercase text-black mb-6 hover:opacity-70">
             <span>SHIPPING & RETURNS</span>
             <ArrowRight size={10} />
           </Link>
@@ -146,7 +146,7 @@ export default function Cart() {
             onClick={handleCheckout}
             className="w-full bg-black text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
           >
-            SAFE CHECK OUT
+            CHECKOUT
           </button>
 
         </div>

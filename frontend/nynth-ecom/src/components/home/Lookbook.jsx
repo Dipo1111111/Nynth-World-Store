@@ -49,6 +49,14 @@ export default function Lookbook() {
       <Header />
 
       <main className="w-full">
+        {/* Section Title */}
+        <div className="section-pad py-12 md:py-16 text-center">
+          <span className="text-[9px] md:text-[10px] tracking-[0.4em] text-gray-400 uppercase block mb-4">
+            NYNTH WORLD
+          </span>
+          <h1 className="hero-title text-black">LOOKBOOK</h1>
+        </div>
+
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[300px] md:auto-rows-[350px] gap-0">
              {[...Array(8)].map((_, i) => (
@@ -72,20 +80,6 @@ export default function Lookbook() {
                 </div>
               ))}
             </div>
-
-            {/* Empty state fallback */}
-            {lookbooks.length === 0 && (
-              <div className="h-[60vh] flex items-center justify-center p-8 bg-white">
-                <div className="text-center">
-                  <p className="text-[11px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-4">
-                    The Lookbook is currently empty.
-                  </p>
-                  <p className="text-[9px] tracking-[0.2em] font-bold text-gray-300 uppercase">
-                    Check back soon for our latest collections.
-                  </p>
-                </div>
-              </div>
-            )}
           </section>
         )}
       </main>

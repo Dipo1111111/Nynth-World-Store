@@ -99,7 +99,7 @@ export default function Shop() {
         </section>
 
         {/* Categories Bar - Primary Sticky - Edge to Edge */}
-        <div className="sticky top-[68px] z-40 w-full bg-white border-b border-black/5 flex justify-between items-center py-5 px-6 md:px-10 transition-all duration-300">
+        <div className="sticky top-[55px] z-40 w-full bg-white border-b border-black/5 flex justify-between items-center py-5 px-6 md:px-10 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <span className={`text-[9px] uppercase tracking-[0.2em] font-bold transition-opacity ${displayMode === 'view' ? 'opacity-100' : 'opacity-30'}`}>VIEW</span>
@@ -147,7 +147,7 @@ export default function Shop() {
             </div>
           ) : (
             <section className="w-full px-0">
-              <div className={displayMode === 'view' ? "grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10" : "grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10"}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} displayMode={displayMode} />
                 ))}

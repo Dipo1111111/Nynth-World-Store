@@ -11,10 +11,10 @@ import { Link } from "react-router-dom";
 import ProductCard from "../components/products/ProductCard";
 import Marquee from "../components/common/Marquee";
 
-const categories = ["Explore", "Apparel", "Homeware", "Accessories", "Drinkware", "Polo", "Sleeves"];
+const categories = ["all", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves"];
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState("Explore");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,7 +35,7 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  let filteredProducts = activeCategory === "Explore"
+  let filteredProducts = activeCategory === "all"
     ? [...products]
     : products.filter(p => p.category?.toLowerCase() === activeCategory.toLowerCase());
 
@@ -69,17 +69,14 @@ export default function Home() {
         {/* Simplified Luxury Hero / Featured Section */}
         <section className="bg-white border-b border-gray-100">
           <div className="section-pad py-16 md:py-24 text-center">
-            <span className="font-inter text-[9px] md:text-[10px] tracking-[0.4em] text-gray-400 uppercase mb-4 block animate-fadeIn">
-              Collection 001 / NYNTH
-            </span>
             <h1 className="hero-title text-black mb-8 animate-fadeIn">
-              {activeCategory === "Explore" ? "FEATURED" : activeCategory.toUpperCase()}
+              {activeCategory === "all" ? "FEATURED" : activeCategory === "tees" ? "T-SHIRTS" : activeCategory.toUpperCase()}
             </h1>
           </div>
         </section>
 
         {/* Categories Bar - Sticky to match Shop */}
-        <div className="sticky top-16 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex justify-center gap-8 py-4 md:py-6 overflow-x-auto no-scrollbar px-4 transition-all duration-300">
+        <div className="sticky top-[55px] z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex justify-center gap-8 py-4 md:py-6 overflow-x-auto no-scrollbar px-4 transition-all duration-300">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -90,7 +87,7 @@ export default function Home() {
               className={`text-[10px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${activeCategory === cat ? "text-black underline underline-offset-8" : "text-gray-400 hover:text-black"
                 }`}
             >
-              {cat === "Explore" ? "ALL" : cat.toUpperCase()}
+              {cat === "tees" ? "T-SHIRTS" : cat.toUpperCase()}
             </button>
           ))}
         </div>
