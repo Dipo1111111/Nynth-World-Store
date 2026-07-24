@@ -251,12 +251,16 @@ export default function ProductDetail() {
 
             {/* Thumbnail Navigation - Floating at bottom of grey half */}
             {product.images?.length > 1 && (
-              <div className="absolute bottom-20 flex gap-1.5 overflow-x-auto no-scrollbar max-w-[80%]">
+              <div className="absolute bottom-20 flex gap-2 overflow-x-auto no-scrollbar max-w-[80%] px-4">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => handleManualImageChange(i)}
-                    className={`h-14 w-11 flex-shrink-0 transition-opacity border ${selectedImage === i ? "border-black opacity-100" : "border-transparent opacity-30 hover:opacity-100"}`}
+                    className={`h-16 w-12 flex-shrink-0 transition-all duration-300 ${
+                      selectedImage === i
+                        ? "border-[1.5px] border-black opacity-100 scale-105"
+                        : "border border-transparent opacity-30 hover:opacity-70"
+                    }`}
                   >
                     <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
                   </button>
@@ -344,7 +348,7 @@ export default function ProductDetail() {
             <button
               onClick={handleAddToCart}
               disabled={!anySizeAvailable || !isSizeAvailable || addingToCart}
-              className="w-full bg-[#999999] text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black transition-all duration-500 disabled:opacity-50 mb-10"
+              className="w-full bg-black text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-all duration-500 disabled:opacity-50 mb-10"
             >
               {addingToCart ? "ADDING..." : !anySizeAvailable ? "OUT OF STOCK" : !isSizeAvailable ? "SOLD OUT FOR THIS SIZE" : "ADD TO CART"}
             </button>
@@ -493,9 +497,9 @@ export default function ProductDetail() {
                     onClick={() => {
                       setSelectedColor(color);
                     }}
-                    className={`w-12 h-14 bg-[#f0f0f0] flex items-center justify-center transition-all border-2 ${selectedColor === color ? "border-black" : "border-transparent hover:border-gray-300"}`}
+                    className={`w-12 h-14 bg-white flex items-center justify-center transition-all border ${selectedColor === color ? "border-black border-[1.5px]" : "border-transparent hover:border-black/20"}`}
                   >
-                    <div className="w-6 h-6 rounded-full border border-gray-200" style={{ backgroundColor: getColorHex(color) }} />
+                    <div className="w-5 h-5 border border-black/10" style={{ backgroundColor: getColorHex(color) }} />
                   </button>
                 ))}
               </div>
@@ -528,11 +532,11 @@ export default function ProductDetail() {
                         disabled={isOutOfStock}
                         onClick={() => setSelectedSize(size)}
                         className={`min-w-[48px] py-2.5 px-2 text-[10px] font-bold tracking-widest text-center transition-all border ${
-                          selectedSize === size 
-                            ? "border-black text-black border-2" 
+                          selectedSize === size
+                            ? "border-black bg-black text-white"
                             : isOutOfStock
-                              ? "border-gray-200 text-gray-300 cursor-not-allowed line-through"
-                              : "border-gray-300 text-gray-500 hover:border-gray-500"
+                              ? "border-gray-100 text-gray-300 cursor-not-allowed line-through"
+                              : "border-black/10 text-black hover:border-black"
                         }`}
                       >
                         {size}

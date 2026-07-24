@@ -57,7 +57,7 @@ const ThankYou = () => {
     <div className="min-h-screen bg-white text-black flex flex-col font-inter">
       <Header />
 
-      <main className="flex-1 flex flex-col items-center justify-center section-pad py-20 relative">
+      <main className="flex-1 flex flex-col items-center justify-center section-pad py-20 relative page-content">
         <div className={`max-w-xl w-full text-center transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="w-20 h-20 bg-black flex items-center justify-center mx-auto mb-12">
             <Check size={32} className="text-white" strokeWidth={1} />

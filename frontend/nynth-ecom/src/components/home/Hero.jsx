@@ -31,7 +31,7 @@ export default function Hero() {
             </Link>
             <Link
               to="/lookbook"
-              className="rounded-full px-8 py-4 border-2 border-black text-black font-inter text-base font-medium hover:bg-black hover:text-white transition-all"
+              className="px-8 py-4 border border-black text-black font-inter text-sm font-medium uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all"
             >
               View Lookbook
             </Link>

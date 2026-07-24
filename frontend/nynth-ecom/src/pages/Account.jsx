@@ -43,9 +43,11 @@ export default function Account() {
     const handleLogout = async () => {
         try {
             await logout();
-            window.location.href = "/";
+            // Hard refresh to clear all auth state
+            window.location.replace("/");
         } catch (error) {
             console.error("Failed to logout", error);
+            toast.error("Failed to sign out. Please try again.");
         }
     };
 
@@ -66,7 +68,7 @@ export default function Account() {
         <div className="min-h-screen bg-white flex flex-col font-inter">
             <Header />
 
-            <main className="flex-1 section-pad bg-white">
+            <main className="flex-1 section-pad bg-white page-content">
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col items-start gap-4 mb-20">
                         <h1 className="hero-title text-black text-left">ACCOUNT</h1>

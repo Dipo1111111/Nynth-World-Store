@@ -26,8 +26,6 @@ export function AuthProvider({ children }) {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isAdminLoading, setIsAdminLoading] = useState(false);
 
-    console.log("AuthContext Render. Loading:", loading, "Admin:", isAdmin, "AdminLoading:", isAdminLoading);
-
     // Helper: Check if email is in admin whitelist
     const isAdminEmail = (email) => {
         const adminEmails = import.meta.env.VITE_ADMIN_EMAILS || "";
@@ -135,11 +133,9 @@ export function AuthProvider({ children }) {
     // Auth State Listener
     useEffect(() => {
         setPersistence(auth, browserLocalPersistence)
-            .then(() => console.log("Auth persistence set"))
             .catch((e) => console.error("Persistence error:", e));
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            console.log("Auth State Changed. User:", user?.email);
             setCurrentUser(user);
             
             if (user) {
@@ -151,13 +147,10 @@ export function AuthProvider({ children }) {
             setLoading(false);
         });
 
-        // Failsafe: Increased from 2s to 5s because of Firestore network instability
+        // Failsafe: force render after 5s if auth state hasn't resolved
         const timeout = setTimeout(() => {
             setLoading((prev) => {
-                if (prev) {
-                    console.warn("Auth check timed out. Force rendering.");
-                    return false;
-                }
+                if (prev) return false;
                 return prev;
             });
         }, 5000);

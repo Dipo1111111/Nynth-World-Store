@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: 2026-07-20
+Last updated: 2026-07-24
 
 ## What was built (previous session)
 - **LockPage.jsx** — Added duration-based countdown timer. When `lock_timer_enabled` is on, a large MM:SS countdown appears and the password field + "The wait is over" message are hidden until the timer hits zero.
@@ -282,4 +282,77 @@ Last updated: 2026-07-20
 ## Open questions
 - Lugbe pricing: user said "4500/4000 depending on address" — may need splitting into two entries
 - Git commits for session 4 and 5 still not made
+
+---
+
+# Session 6 — Shipping Toggles, Marquee, Styling Cleanup & Launch Prep
+
+Last updated: 2026-07-24
+
+## What was built
+
+### 1. Admin Shipping Location Toggles
+- **SettingsContext.jsx** — Added `disabled_locations: { lagos: [], abuja: [], interstate: [] }` default, plus `marquee_enabled` and `marquee_text`
+- **Settings.jsx** — Added "Shipping Locations" section with toggle buttons for every Lagos area, Abuja area, and Interstate state. Disabled locations show with `line-through` styling. Grid layout (2-3 columns). Also added `LAGOS_SHIPPING_DATA`, `ABUJA_SHIPPING_DATA`, `INTERSTATE_SHIPPING_DATA` imports.
+- **Checkout.jsx** — Added `enabledLagosAreas`, `enabledAbujaAreas`, `enabledInterstates` filtered lists that exclude disabled locations. Updated all 3 dropdowns (Lagos city, Abuja city, State) to use filtered lists.
+- Stored in Firestore `settings/site_config` as `disabled_locations` object with arrays of location name strings.
+
+### 2. Promotional Marquee Banner
+- **Marquee.jsx** (new) — `src/components/common/Marquee.jsx`. Pure CSS `@keyframes` horizontal scroll animation. 8x text repetition + duplicate set for seamless loop. Respects `prefers-reduced-motion`. Black bg, white text, matches announcement bar aesthetic. Conditionally renders based on `settings.marquee_enabled`.
+- **Settings.jsx** — Added "Promotional Marquee" section with enable toggle and text input. Uses `Megaphone` icon.
+- **Shop.jsx** — `<Marquee />` inserted above the hero section.
+- **Home.jsx** — `<Marquee />` inserted above the hero section.
+
+### 3. Code Quality Cleanup — Styling Standardization
+Files modified:
+- **Home.jsx** — Removed duplicate `<SEO />` tag, removed inline `style={{ animationDelay: '0.2s' }}`
+- **ProductDetail.jsx** — Changed desktop "ADD TO CART" from `bg-[#999999]` to `bg-black`. Changed mobile color picker from `bg-[#f0f0f0] rounded-full` to `bg-white` square (matching desktop). Changed mobile size buttons from `border-gray-300 text-gray-500` to `border-black/10 text-black` (matching desktop). Changed selected size from `border-2` to `bg-black text-white`.
+- **Cart.jsx** — Changed "Start Shopping" button from `rounded-full` to sharp corners, added tracking/uppercase to match shop style.
+- **Hero.jsx** — Changed secondary button from `rounded-full border-2` to sharp `border` with uppercase tracking.
+- **Contact.jsx** — Added missing `<Footer />` component.
+- **Sustainability.jsx** — Removed `rounded-3xl`, standardized all section headings to `text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400`, standardized body text to `text-[13px] text-gray-600 leading-[1.8]`.
+- **ShippingReturns.jsx** — Removed `prose prose-lg`, replaced `text-xl font-bold` headings with standard pattern, added dot indicators for list items, standardized body text.
+- **App.jsx** — Removed debug `console.log("🚀 App.jsx: Component rendering...")`
+- **globals.css** — Added utility classes: `.section-heading`, `.product-title`, `.price-text`, `.btn-nyinth`, `.btn-nyinth-outline`, `.btn-admin`
+- **PRODUCT.md** (new) — Brand register, users, purpose, personality, anti-references, design principles, accessibility
+- **DESIGN.md** (new) — Full design system documentation: color palette, typography scale, spacing, borders/radii, components, layout, animation, elevation
+
+### 4. Launch Safety Audit
+- Build succeeded with zero errors
+- Only pre-existing jsconfig.json deprecation warning (unrelated)
+- All routes compile clean
+
+## Decisions made
+- `disabled_locations` stored as arrays of location name strings in Firestore (not IDs) — matches the existing dropdown value format
+- Marquee uses pure CSS animation (no library) — keeps bundle small
+- Shop page styling is the source of truth — all other pages match it
+- Public buttons = sharp corners, Admin buttons = `rounded-lg`
+- Public inputs = bottom-border only, Admin inputs = full border + rounded-lg
+- Utility classes added to globals.css for consistency but not enforced yet (pages still use inline Tailwind)
+
+## Key files
+- `src/components/common/Marquee.jsx` — New marquee component (NEW)
+- `src/pages/admin/Settings.jsx` — Added shipping locations + marquee sections
+- `src/pages/Checkout.jsx` — Filters disabled locations from dropdowns
+- `src/context/SettingsContext.jsx` — New defaults for disabled_locations, marquee
+- `src/data/locationData.js` — Source data (unchanged, toggles are in settings)
+- `src/styles/globals.css` — New utility classes
+- `PRODUCT.md` — Impeccable design system strategic doc (NEW)
+- `DESIGN.md` — Impeccable design system visual doc (NEW)
+
+## Current state
+- Build compiles clean
+- All 4 features implemented
+- Sessions 4, 5, and 6 changes still uncommitted
+- Launch day is 2 days away (2026-07-26)
+
+## Next session starts with
+- Git commit all accumulated changes: `git add -A && git commit -m "Shipping toggles, marquee banner, styling cleanup, design system docs"`
+- Runtime verification of all new features (marquee, location toggles)
+- Any final launch day polish
+
+## Open questions
+- Git commits for sessions 4, 5, and 6 still not made
+- Lugbe pricing: user said "4500/4000 depending on address" — may need splitting
+- Runtime verification of marquee and location toggles pending
 - Full app audit still deferred

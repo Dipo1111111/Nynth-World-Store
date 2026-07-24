@@ -28,6 +28,9 @@ export function SettingsProvider({ children }) {
         launch_date: "2026-04-03T18:00:00",
         show_size_chart: true,
         size_chart_model_info: "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette — size down if you prefer a more fitted look.",
+        disabled_locations: { lagos: [], abuja: [], interstate: [] },
+        marquee_enabled: false,
+        marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
         size_chart_data: [
           { size: "XS", chest: "81-86", waist: "66-71", length: "68" },
           { size: "S", chest: "86-91", waist: "71-76", length: "70" },

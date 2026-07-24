@@ -124,7 +124,6 @@ function PageTracker() {
 import { Toaster } from "react-hot-toast"; // Added import
 
 function App() {
-  console.log("🚀 App.jsx: Component rendering...");
   const isOffline = useOffline();
   const [isSiteUnlocked, setIsSiteUnlocked] = React.useState(() => {
     return localStorage.getItem('nynth_site_unlocked') === 'true';

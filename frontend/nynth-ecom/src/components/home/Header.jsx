@@ -23,6 +23,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [timeLeftStr, setTimeLeftStr] = useState("");
   const [isLaunchFinished, setIsLaunchFinished] = useState(false);
+  const [dropLabel, setDropLabel] = useState("");
 
   // All hooks declared BEFORE any useEffect
   const { totalItems, isCartOpen, setIsCartOpen } = useCart();
@@ -39,6 +40,17 @@ export default function Header() {
     const updateTimer = () => {
       const now = new Date().getTime();
       const diff = target - now;
+
+      // Compute dynamic drop label from launch date
+      if (!dropLabel) {
+        const launchObj = new Date(launchDate);
+        const dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+        const day = dayNames[launchObj.getDay()];
+        let hours = launchObj.getHours();
+        const ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12 || 12;
+        setDropLabel(`${day} ${hours}${ampm}`);
+      }
 
       if (diff > 0) {
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -98,7 +110,7 @@ export default function Header() {
         <div className="flex items-center justify-center gap-4">
           {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">NEXT DROP IN:</span>}
           <span className="tabular-nums translate-y-[1px]">{timeLeftStr}</span>
-          {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">FRIDAY 6PM</span>}
+          {!isLaunchFinished && dropLabel && <span className="opacity-50 hidden sm:inline">{dropLabel}</span>}
         </div>
       </div>
       )}

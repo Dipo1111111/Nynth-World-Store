@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
+import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../../data/locationData";
 
 export default function AdminSettings() {
     const [settings, setSettings] = useState({
@@ -37,7 +38,10 @@ export default function AdminSettings() {
         lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
         // Product Options
         available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
-        available_sizes: "XS, S, M, L, XL, XXL, XXXL"
+        available_sizes: "XS, S, M, L, XL, XXL, XXXL",
+        disabled_locations: { lagos: [], abuja: [], interstate: [] },
+        marquee_enabled: false,
+        marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000"
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -100,7 +104,10 @@ export default function AdminSettings() {
                         lock_timer_enabled: data.lock_timer_enabled !== undefined ? data.lock_timer_enabled : false,
                         lock_timer_duration_minutes: data.lock_timer_duration_minutes || 5,
                         available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
-                        available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL"
+                        available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL",
+                        disabled_locations: data.disabled_locations || { lagos: [], abuja: [], interstate: [] },
+                        marquee_enabled: data.marquee_enabled !== undefined ? data.marquee_enabled : false,
+                        marquee_text: data.marquee_text || "FREE DELIVERY ON ORDERS OVER ₦50,000"
                     }));
                 }
             } catch (error) {
@@ -522,7 +529,7 @@ export default function AdminSettings() {
                 {/* Shipping Settings */}
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={Truck} title="Shipping Configuration" />
-                    <div className="max-w-xs space-y-2">
+                    <div className="max-w-xs space-y-2 mb-6">
                         <label className="text-sm font-medium text-gray-700">Default Shipping Fee ({settings.currency_symbol})</label>
                         <input
                             name="shipping_fee"
@@ -532,6 +539,152 @@ export default function AdminSettings() {
                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
                         />
                     </div>
+                </div>
+
+                {/* Shipping Location Toggles */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Truck} title="Shipping Locations" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        Toggle delivery locations on or off. Disabled locations will not appear in checkout.
+                    </p>
+
+                    {/* Lagos Areas */}
+                    <div className="mb-8">
+                        <h4 className="text-sm font-bold text-black uppercase tracking-tight mb-3">Lagos Areas</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => {
+                                const isDisabled = (settings.disabled_locations?.lagos || []).includes(area);
+                                return (
+                                    <button
+                                        key={area}
+                                        type="button"
+                                        onClick={() => {
+                                            const current = settings.disabled_locations?.lagos || [];
+                                            const updated = isDisabled
+                                                ? current.filter(a => a !== area)
+                                                : [...current, area];
+                                            setSettings(prev => ({
+                                                ...prev,
+                                                disabled_locations: { ...prev.disabled_locations, lagos: updated }
+                                            }));
+                                        }}
+                                        className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                            isDisabled
+                                                ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+                                                : "border-black/10 text-black bg-white hover:border-black/20"
+                                        }`}
+                                    >
+                                        {area}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Abuja Areas */}
+                    <div className="mb-8">
+                        <h4 className="text-sm font-bold text-black uppercase tracking-tight mb-3">Abuja Areas</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {Object.keys(ABUJA_SHIPPING_DATA).sort().map((area) => {
+                                const isDisabled = (settings.disabled_locations?.abuja || []).includes(area);
+                                return (
+                                    <button
+                                        key={area}
+                                        type="button"
+                                        onClick={() => {
+                                            const current = settings.disabled_locations?.abuja || [];
+                                            const updated = isDisabled
+                                                ? current.filter(a => a !== area)
+                                                : [...current, area];
+                                            setSettings(prev => ({
+                                                ...prev,
+                                                disabled_locations: { ...prev.disabled_locations, abuja: updated }
+                                            }));
+                                        }}
+                                        className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                            isDisabled
+                                                ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+                                                : "border-black/10 text-black bg-white hover:border-black/20"
+                                        }`}
+                                    >
+                                        {area}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Interstate States */}
+                    <div>
+                        <h4 className="text-sm font-bold text-black uppercase tracking-tight mb-3">Interstate States</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {Object.keys(INTERSTATE_SHIPPING_DATA).sort().map((state) => {
+                                const isDisabled = (settings.disabled_locations?.interstate || []).includes(state);
+                                return (
+                                    <button
+                                        key={state}
+                                        type="button"
+                                        onClick={() => {
+                                            const current = settings.disabled_locations?.interstate || [];
+                                            const updated = isDisabled
+                                                ? current.filter(s => s !== state)
+                                                : [...current, state];
+                                            setSettings(prev => ({
+                                                ...prev,
+                                                disabled_locations: { ...prev.disabled_locations, interstate: updated }
+                                            }));
+                                        }}
+                                        className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                            isDisabled
+                                                ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+                                                : "border-black/10 text-black bg-white hover:border-black/20"
+                                        }`}
+                                    >
+                                        {state}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Promotional Marquee */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Megaphone} title="Promotional Marquee" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        A scrolling banner that appears above the hero image on Shop and Home pages.
+                    </p>
+
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Marquee</h4>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="marquee_enabled"
+                                checked={settings.marquee_enabled}
+                                onChange={handleChange}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                        </label>
+                    </div>
+
+                    {settings.marquee_enabled && (
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Marquee Text</label>
+                            <input
+                                name="marquee_text"
+                                value={settings.marquee_text}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Email Section Settings */}

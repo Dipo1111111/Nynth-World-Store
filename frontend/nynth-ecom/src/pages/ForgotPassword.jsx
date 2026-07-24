@@ -31,7 +31,7 @@ export default function ForgotPassword() {
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
 
-            <main className="flex-1 flex items-center justify-center section-pad">
+            <main className="flex-1 flex items-center justify-center section-pad page-content">
                 <div className="w-full max-w-md p-6 sm:p-8">
                     <Link to="/login" className="inline-flex items-center text-sm text-gray-500 hover:text-black mb-8 transition-colors">
                         <ArrowLeft size={16} className="mr-1" /> Back to Login

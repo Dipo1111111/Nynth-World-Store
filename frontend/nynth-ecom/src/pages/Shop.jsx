@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
 import headerBanner from "../assets/header.JPEG";
 import { useSettings } from "../context/SettingsContext";
+import Marquee from "../components/common/Marquee";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -74,6 +75,8 @@ export default function Shop() {
       <Header />
 
       <main className="w-full pt-[98px] md:pt-[102px]">
+        <Marquee />
+
         {/* Full-width Hero Section - Edge to Edge */}
         <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img

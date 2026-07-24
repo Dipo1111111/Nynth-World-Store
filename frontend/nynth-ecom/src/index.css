@@ -141,3 +141,14 @@
 .safe-mb {
   margin-bottom: env(safe-area-inset-bottom);
 }
+
+/* Fixed header offset — use on pages with the fixed Header component */
+.page-content {
+  padding-top: 72px;
+}
+
+@media (min-width: 768px) {
+  .page-content {
+    padding-top: 76px;
+  }
+}

@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import ProductCard from "../components/products/ProductCard";
+import Marquee from "../components/common/Marquee";
 
 const categories = ["Explore", "Apparel", "Homeware", "Accessories", "Drinkware", "Polo", "Sleeves"];
 
@@ -61,16 +62,17 @@ export default function Home() {
     <div className="bg-white min-h-screen">
       <SEO />
       <Header />
-      <SEO />
 
-      <main className="flex-1 w-full bg-[#FCFCFC]">
+      <main className="flex-1 w-full bg-[#FCFCFC] page-content">
+        <Marquee />
+
         {/* Simplified Luxury Hero / Featured Section */}
         <section className="bg-white border-b border-gray-100">
           <div className="section-pad py-16 md:py-24 text-center">
             <span className="font-inter text-[9px] md:text-[10px] tracking-[0.4em] text-gray-400 uppercase mb-4 block animate-fadeIn">
               Collection 001 / NYNTH
             </span>
-            <h1 className="hero-title text-black mb-8 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+            <h1 className="hero-title text-black mb-8 animate-fadeIn">
               {activeCategory === "Explore" ? "FEATURED" : activeCategory.toUpperCase()}
             </h1>
           </div>

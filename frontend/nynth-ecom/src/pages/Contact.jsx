@@ -12,7 +12,7 @@ export default function Contact() {
     return (
         <div className="min-h-screen bg-white text-black flex flex-col font-inter">
             <Header />
-            <main className="flex-1 section-pad py-20 md:py-32">
+            <main className="flex-1 section-pad py-20 md:py-32 page-content">
                 <div className="max-w-6xl mx-auto text-center">
                     <h1 className="hero-title text-black mb-20">CONTACT</h1>
 
@@ -53,7 +53,7 @@ export default function Contact() {
                         </div>
 
                         <div className="pt-12 space-y-4">
-                            <h4 className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">Lagos Studio</h4>
+                            <h4 className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">Abuja Studio</h4>
                             <p className="text-[14px] font-bold tracking-[0.2em] uppercase max-w-xs mx-auto text-gray-800">
                                 {settings.office_address}
                             </p>
@@ -61,6 +61,7 @@ export default function Contact() {
                     </div>
                 </div>
             </main>
+        <Footer />
         </div>
     );
 }

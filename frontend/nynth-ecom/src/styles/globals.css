@@ -213,3 +213,35 @@ html {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* NYNTH Design System Utilities */
+
+/* Section heading - small uppercase tracked */
+.section-heading {
+  @apply text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400;
+}
+
+/* Product title - slightly larger */
+.product-title {
+  @apply text-[11px] font-bold tracking-[0.15em] uppercase leading-tight;
+}
+
+/* Price text */
+.price-text {
+  @apply text-[10px] font-bold tracking-widest;
+}
+
+/* Public button - sharp corners, black bg */
+.btn-nyinth {
+  @apply bg-black text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all;
+}
+
+/* Secondary button - sharp corners, border */
+.btn-nyinth-outline {
+  @apply border border-black text-black py-4 px-8 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-black hover:text-white transition-all;
+}
+
+/* Admin button - rounded corners */
+.btn-admin {
+  @apply bg-black text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-gray-800 transition-colors;
+}

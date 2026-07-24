@@ -20,6 +20,14 @@ const Checkout = () => {
   const { currentUser, isAdmin } = useAuth(); // Get current user and admin status
   const navigate = useNavigate();
 
+  // Filter out disabled locations
+  const disabledLagos = settings?.disabled_locations?.lagos || [];
+  const disabledAbuja = settings?.disabled_locations?.abuja || [];
+  const disabledInterstate = settings?.disabled_locations?.interstate || [];
+  const enabledLagosAreas = Object.keys(LAGOS_SHIPPING_DATA).filter(a => !disabledLagos.includes(a)).sort();
+  const enabledAbujaAreas = Object.keys(ABUJA_SHIPPING_DATA).filter(a => !disabledAbuja.includes(a)).sort();
+  const enabledInterstates = Object.keys(INTERSTATE_SHIPPING_DATA).filter(s => !disabledInterstate.includes(s)).sort();
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -57,9 +65,18 @@ const Checkout = () => {
   const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [isOrderCompleted, setIsOrderCompleted] = useState(false); // New state to prevent redirect loop
 
-  // Paystack Inline script loading REMOVED (using redirect flow)
+  // Check if Paystack script has loaded
   useEffect(() => {
-    setPaystackLoaded(true);
+    const checkPaystack = () => {
+      if (window.PaystackPop) {
+        setPaystackLoaded(true);
+      } else {
+        // Retry until script loads
+        const timer = setTimeout(checkPaystack, 500);
+        return () => clearTimeout(timer);
+      }
+    };
+    checkPaystack();
   }, []);
 
   // Redirect if cart is empty, ONLY if order is not completed
@@ -169,41 +186,24 @@ const Checkout = () => {
         setLoading(false);
         toast.error("Payment window closed.");
       },
-      callback: function (response) {
-        (async () => {
-          console.log("Paystack Success:", response);
-          setIsOrderCompleted(true); // 🛡️ Prevent the "empty cart" redirect to /cart
-
-          // ✅ Mark order as PAID in Firestore so revenue counts on dashboard
-          try {
-            await verifyOrderPayment(orderId, response.reference);
-          } catch (err) {
-            console.error('Payment verification error:', err);
-          }
-
-          // Track success
-          trackConversion("purchase", {
-            order_id: orderId,
-            amount: totalToPay,
-            reference: response.reference
-          });
-
-          clearCart();
-          navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
-        })();
-      },
       onSuccess: function (response) {
-        (async () => {
-          console.log("Paystack Success (onSuccess):", response);
-          setIsOrderCompleted(true);
-          try {
-            await verifyOrderPayment(orderId, response.reference);
-          } catch (err) {
-            console.error('Payment verification error (onSuccess):', err);
-          }
-          clearCart();
-          navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
-        })();
+        setIsOrderCompleted(true);
+        // Mark order as PAID in Firestore
+        verifyOrderPayment(orderId, response.reference)
+          .then(() => {
+            trackConversion("purchase", {
+              order_id: orderId,
+              amount: totalToPay,
+              reference: response.reference
+            });
+            clearCart();
+            navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
+          })
+          .catch((err) => {
+            console.error("Payment verification error:", err);
+            clearCart();
+            navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
+          });
       }
     });
 
@@ -213,8 +213,23 @@ const Checkout = () => {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.firstName || !form.lastName || !form.email || !form.address || !form.city) {
+    if (!form.firstName || !form.lastName || !form.email || !form.address || !form.city || !form.phone) {
       toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    // Validate phone format (Nigerian numbers: +234..., 0..., or 234...)
+    const phoneClean = form.phone.replace(/[\s\-()]/g, "");
+    const phoneRegex = /^(\+?234|0)[789][01]\d{8}$/;
+    if (!phoneRegex.test(phoneClean)) {
+      toast.error("Please enter a valid Nigerian phone number.");
       return;
     }
 
@@ -361,7 +376,7 @@ const Checkout = () => {
                         NYNTH WORLD (TEST)
                       </option>
                     )}
-                    {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => (
+                    {enabledLagosAreas.map((area) => (
                       <option key={area} value={area}>
                         {area.toUpperCase()}
                       </option>
@@ -375,7 +390,7 @@ const Checkout = () => {
                     className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
                   >
                     <option value="">SELECT AREA</option>
-                    {Object.keys(ABUJA_SHIPPING_DATA).sort().map((area) => (
+                    {enabledAbujaAreas.map((area) => (
                       <option key={area} value={area}>
                         {area.toUpperCase()}
                       </option>
@@ -400,7 +415,7 @@ const Checkout = () => {
                   className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
                 >
                   <option value="Lagos">LAGOS</option>
-                  {Object.keys(INTERSTATE_SHIPPING_DATA).sort().map((s) => (
+                  {enabledInterstates.map((s) => (
                     <option key={s} value={s}>
                       {s.toUpperCase()}
                     </option>

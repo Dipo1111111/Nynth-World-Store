@@ -14,7 +14,7 @@ export default function NotFound() {
             />
             <Header />
 
-            <main className="flex-1 flex items-center justify-center section-pad">
+            <main className="flex-1 flex items-center justify-center section-pad page-content">
                 <div className="text-center max-w-lg">
                     <h1 className="font-space text-9xl font-bold mb-4">404</h1>
                     <h2 className="font-space text-2xl md:text-3xl font-bold mb-4">Page Not Found</h2>

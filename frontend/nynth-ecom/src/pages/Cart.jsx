@@ -43,7 +43,7 @@ export default function Cart() {
           </p>
           <Link
             to="/shop"
-            className="bg-black text-white px-8 py-4 rounded-full font-medium hover:scale-105 transition-transform inline-flex items-center gap-2"
+            className="bg-black text-white px-8 py-4 font-medium hover:opacity-90 transition-all inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase font-bold"
           >
             Start Shopping <ArrowRight size={18} />
           </Link>
@@ -58,7 +58,7 @@ export default function Cart() {
       <Header />
       <SEO title="Shopping Bag" />
 
-      <main className="flex-1 w-full max-w-2xl mx-auto px-4 md:px-8 py-20 lg:py-32 flex flex-col min-h-screen">
+      <main className="flex-1 w-full max-w-2xl mx-auto px-4 md:px-8 py-20 lg:py-32 flex flex-col min-h-screen page-content">
         <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
           <h1 className="text-[11px] font-bold tracking-[0.2em] uppercase">YOUR CART ({cartItems.length})</h1>
         </div>
