@@ -15,9 +15,14 @@ export default function ProductCard({ product, displayMode = 'model' }) {
   const isSightMode = displayMode === 'view';
 
   // In model mode, prefer explicit modelImage, then 2nd image. Otherwise use selected.
-  const mainImage = !isSightMode 
+  const mainImage = !isSightMode
     ? (product.modelImage || (product.images?.length > 1 ? product.images[1] : (product.images?.[selectedImageIndex] || product.images?.[0] || "/placeholder.jpg")))
     : (product.images?.[selectedImageIndex] || product.images?.[0] || product.thumbnail || "/placeholder.jpg");
+
+  // Hover image for view mode: show model pic on hover
+  const hoverImage = isSightMode
+    ? (product.modelImage || (product.images?.length > 1 ? product.images[1] : null))
+    : null;
 
   const isOutOfStock = product.stockQuantity <= 0;
 
@@ -70,6 +75,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           to={`/product/${product.id}`}
           className="relative w-full aspect-[3/4] overflow-hidden block bg-[#f5f5f5]"
         >
+          {/* Base image (flat product shot) */}
           <img
             src={mainImage}
             alt={product.title}
@@ -77,6 +83,16 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
+          {/* Hover image (model pic) — fades in on hover */}
+          {hoverImage && (
+            <img
+              src={hoverImage}
+              alt={product.title}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            />
+          )}
           {/* Badges */}
           <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1 pointer-events-none">
             {isOutOfStock ? (
