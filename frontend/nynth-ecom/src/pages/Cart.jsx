@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext.jsx";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
@@ -36,16 +36,12 @@ export default function Cart() {
       <div className="min-h-screen bg-white text-black flex flex-col">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center section-pad">
-          <h1 className="text-4xl mb-6">Your bag is empty</h1>
-          <p className="font-inter text-gray-500 mb-8 text-center max-w-md">
-            Looks like you haven't added anything to your cart yet.
-            Explore our latest collections to find your new favorites.
-          </p>
+          <p className="text-[11px] tracking-[0.3em] uppercase text-gray-400 mb-8 font-bold">YOUR BAG IS EMPTY</p>
           <Link
             to="/shop"
-            className="bg-black text-white px-8 py-4 font-medium hover:opacity-90 transition-all inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase font-bold"
+            className="bg-black text-white px-12 py-4 text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-gray-900 transition-colors"
           >
-            Start Shopping <ArrowRight size={18} />
+            START SHOPPING
           </Link>
         </div>
         <Footer />
@@ -119,7 +115,7 @@ export default function Cart() {
                   </div>
 
                   <p className="text-[9px] md:text-[10px] font-bold tracking-widest text-black">
-                    {settings?.currency_symbol || "₦"}{(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {settings?.currency_symbol || "₦"}{(item.price * item.quantity).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -138,7 +134,7 @@ export default function Cart() {
           <div className="flex flex-col gap-3 mb-6">
             <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
               <span>SUBTOTAL</span>
-              <span>{settings?.currency_symbol || "₦"}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span>{settings?.currency_symbol || "₦"}{subtotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
               <span>SHIPPING</span>
@@ -146,9 +142,9 @@ export default function Cart() {
             </div>
             <div className="h-px bg-black/10 my-1"></div>
             <div className="flex justify-between font-bold text-[11px] tracking-[0.2em] uppercase text-black">
-              <span>SUBTOTAL</span>
+              <span>TOTAL</span>
               <span>
-                {settings?.currency_symbol || "₦"}{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NGN
+                {settings?.currency_symbol || "₦"}{total.toLocaleString()} NGN
               </span>
             </div>
           </div>

@@ -147,7 +147,8 @@ export const LAGOS_SHIPPING_DATA = {
 };
 
 export const ABUJA_SHIPPING_DATA = {
-    "University of Abuja / Iddo": { price: 3500, speed: "Delivery" },
+    "University of Abuja": { price: 3500, speed: "Delivery" },
+    "Iddo": { price: 3500, speed: "Delivery" },
     "Gwagwalada": { price: 4000, speed: "Delivery" },
     "Giri": { price: 3500, speed: "Delivery" },
     "Lugbe": { price: 4500, speed: "Delivery" },

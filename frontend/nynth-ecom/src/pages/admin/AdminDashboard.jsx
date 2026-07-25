@@ -92,7 +92,7 @@ const AdminDashboard = () => {
     
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [globalFilter, setGlobalFilter] = useState("7d");
+    const [globalFilter, setGlobalFilter] = useState("all");
     
     const [liveVisitors, setLiveVisitors] = useState(0);
     const [seenOrderIds, setSeenOrderIds] = useState(new Set());

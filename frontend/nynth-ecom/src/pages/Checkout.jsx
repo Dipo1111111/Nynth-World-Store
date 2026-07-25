@@ -26,7 +26,20 @@ const Checkout = () => {
   const disabledInterstate = settings?.disabled_locations?.interstate || [];
   const enabledLagosAreas = Object.keys(LAGOS_SHIPPING_DATA).filter(a => !disabledLagos.includes(a)).sort();
   const enabledAbujaAreas = Object.keys(ABUJA_SHIPPING_DATA).filter(a => !disabledAbuja.includes(a)).sort();
-  const enabledInterstates = Object.keys(INTERSTATE_SHIPPING_DATA).filter(s => !disabledInterstate.includes(s)).sort();
+  const allAbujaDisabled = enabledAbujaAreas.length === 0;
+  const allLagosDisabled = enabledLagosAreas.length === 0;
+
+  // Build state list: only show states that have at least one enabled area
+  // Remove Abuja from INTERSTATE_SHIPPING_DATA since it's handled separately
+  const enabledInterstates = Object.keys(INTERSTATE_SHIPPING_DATA)
+    .filter(s => s !== "Abuja" && !disabledInterstate.includes(s))
+    .sort();
+
+  // Build available states dropdown options
+  const availableStates = [];
+  if (!allAbujaDisabled) availableStates.push({ value: "Abuja", label: "ABUJA" });
+  if (!allLagosDisabled) availableStates.push({ value: "Lagos", label: "LAGOS" });
+  enabledInterstates.forEach(s => availableStates.push({ value: s, label: s.toUpperCase() }));
 
   const [form, setForm] = useState({
     firstName: "",
@@ -36,7 +49,7 @@ const Checkout = () => {
     phone: "",
     address: "",
     city: "",
-    state: "Lagos",
+    state: availableStates.length > 0 ? availableStates[0].value : "",
     zip: "",
     deliveryMethod: "home", // New: home or park
   });
@@ -122,7 +135,11 @@ const Checkout = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    if (name === "state") {
+      setForm({ ...form, state: value, city: "" });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   // Calculate discount amount based on type
@@ -214,15 +231,36 @@ const Checkout = () => {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.firstName || !form.lastName || !form.email || !form.address || !form.city || !form.phone) {
-      toast.error("Please fill in all required fields.");
+    // Field-by-field validation with specific feedback
+    if (!form.firstName.trim()) {
+      toast.error("FIRST NAME IS REQUIRED");
+      return;
+    }
+    if (!form.lastName.trim()) {
+      toast.error("LAST NAME IS REQUIRED");
+      return;
+    }
+    if (!form.email.trim()) {
+      toast.error("EMAIL IS REQUIRED");
+      return;
+    }
+    if (!form.phone.trim()) {
+      toast.error("PHONE NUMBER IS REQUIRED");
+      return;
+    }
+    if (!form.address.trim()) {
+      toast.error("DELIVERY ADDRESS IS REQUIRED");
+      return;
+    }
+    if (!form.city) {
+      toast.error("PLEASE SELECT YOUR AREA");
       return;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
-      toast.error("Please enter a valid email address.");
+      toast.error("PLEASE ENTER A VALID EMAIL ADDRESS");
       return;
     }
 
@@ -232,13 +270,13 @@ const Checkout = () => {
       // Nigerian numbers: 10 digits starting with 07, 08, or 09
       const ngRegex = /^[789][01]\d{8}$/;
       if (!ngRegex.test(phoneClean)) {
-        toast.error("Please enter a valid Nigerian phone number.");
+        toast.error("ENTER A VALID NIGERIAN PHONE NUMBER (E.G. 801 234 5678)");
         return;
       }
     } else {
       // Other countries: at least 6 digits
       if (phoneClean.length < 6 || !/^\d+$/.test(phoneClean)) {
-        toast.error("Please enter a valid phone number.");
+        toast.error("PLEASE ENTER A VALID PHONE NUMBER");
         return;
       }
     }
@@ -274,6 +312,13 @@ const Checkout = () => {
         throw new Error("Order creation failed.");
       }
 
+      // Paystack requires minimum ₦100
+      if (grandTotal < 100) {
+        toast.error("MINIMUM PAYMENT IS ₦100");
+        setLoading(false);
+        return;
+      }
+
       // Open Paystack popup
       payWithPaystack(orderId, grandTotal);
 
@@ -298,7 +343,7 @@ const Checkout = () => {
           >
             <ArrowLeft size={18} />
           </button>
-          <Logo size="default" className="invert" />
+          <Logo size="default" />
         </div>
         <div className="flex items-center gap-2 text-[10px] tracking-widest uppercase font-bold text-gray-400">
           <Lock size={12} />
@@ -389,40 +434,71 @@ const Checkout = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
+                <select
+                  name="state"
+                  value={form.state}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                >
+                  {availableStates.length === 0 ? (
+                    <option value="">NO DELIVERY AVAILABLE</option>
+                  ) : (
+                    availableStates.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+              <div className="space-y-2">
                 <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">City / Area</label>
                 {form.state === "Lagos" ? (
-                  <select
-                    name="city"
-                    value={form.city}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                  >
-                    <option value="">SELECT AREA</option>
-                    {isAdmin && (
-                      <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
-                        NYNTH WORLD (TEST)
-                      </option>
-                    )}
-                    {enabledLagosAreas.map((area) => (
-                      <option key={area} value={area}>
-                        {area.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+                  allLagosDisabled ? (
+                    <div className="w-full px-4 py-3 border-b border-gray-100 text-[11px] tracking-widest uppercase text-gray-400">
+                      NO AREAS AVAILABLE
+                    </div>
+                  ) : (
+                    <select
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                    >
+                      <option value="">SELECT AREA</option>
+                      {isAdmin && (
+                        <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
+                          NYNTH WORLD (TEST)
+                        </option>
+                      )}
+                      {enabledLagosAreas.map((area) => (
+                        <option key={area} value={area}>
+                          {area.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  )
                 ) : form.state === "Abuja" ? (
-                  <select
-                    name="city"
-                    value={form.city}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                  >
-                    <option value="">SELECT AREA</option>
-                    {enabledAbujaAreas.map((area) => (
-                      <option key={area} value={area}>
-                        {area.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+                  allAbujaDisabled ? (
+                    <div className="w-full px-4 py-3 border-b border-gray-100 text-[11px] tracking-widest uppercase text-gray-400">
+                      NO AREAS AVAILABLE
+                    </div>
+                  ) : (
+                    <select
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                    >
+                      <option value="">SELECT AREA</option>
+                      {enabledAbujaAreas.map((area) => (
+                        <option key={area} value={area}>
+                          {area.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  )
                 ) : (
                   <input
                     name="city"
@@ -432,22 +508,6 @@ const Checkout = () => {
                     placeholder="ENTER CITY"
                   />
                 )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
-                <select
-                  name="state"
-                  value={form.state}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                >
-                  <option value="Lagos">LAGOS</option>
-                  {enabledInterstates.map((s) => (
-                    <option key={s} value={s}>
-                      {s.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
 
@@ -580,7 +640,7 @@ const Checkout = () => {
               <span className="text-gray-400">Shipping</span>
               <div className="text-right">
                 <span className="text-black font-bold uppercase block">
-                  {form.city ? `${form.city} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
+                  {form.city ? `${form.city.toUpperCase()} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
                 </span>
                 {form.state !== "Lagos" && form.state !== "Abuja" && (
                   <span className="text-[9px] text-gray-400 block mt-1 uppercase">

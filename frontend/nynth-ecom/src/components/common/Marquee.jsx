@@ -10,7 +10,7 @@ export default function Marquee() {
   const repeats = 8;
 
   return (
-    <div className="w-full bg-black text-white overflow-hidden py-2" role="marquee" aria-label="Promotional announcement">
+    <div className="w-full bg-red-600 text-white overflow-hidden py-2" role="marquee" aria-label="Promotional announcement">
       <style>{`
         @keyframes marquee-scroll {
           0% { transform: translateX(0); }

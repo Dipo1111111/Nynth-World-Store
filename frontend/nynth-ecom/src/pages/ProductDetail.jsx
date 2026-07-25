@@ -222,7 +222,7 @@ export default function ProductDetail() {
           onTouchEnd={onTouchEnd}
         >
           <div className="w-full h-full flex flex-col items-center justify-center p-12 xl:p-20">
-          <div className="w-full h-full relative flex items-center justify-center">
+          <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
             {/* Sliding Image Container */}
             <div
               className="flex w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"

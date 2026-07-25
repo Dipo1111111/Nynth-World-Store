@@ -102,8 +102,10 @@ export default function Footer() {
                 { name: "T-SHIRTS", to: "/shop?category=tees" },
                 { name: "HOODIES", to: "/shop?category=hoodies" },
                 { name: "HEADWEAR", to: "/shop?category=headwear" },
+                { name: "PANTS", to: "/shop?category=pants" },
                 { name: "SLEEVES", to: "/shop?category=sleeves" },
                 { name: "POLO", to: "/shop?category=polo" },
+                { name: "ACCESSORIES", to: "/shop?category=accessories" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link to={link.to} className="text-[10px] tracking-[0.2em] font-bold text-gray-400 hover:text-black transition-colors uppercase">
@@ -120,8 +122,8 @@ export default function Footer() {
                 { name: "CONTACT", to: "/contact" },
                 { name: "LOOKBOOK", to: "/lookbook" },
                 { name: "SHIPPING & RETURNS", to: "/shipping" },
-                { name: "TRACK ORDER", to: "/account" },
-                { name: "FAQ", to: "/contact" },
+                { name: "MY ACCOUNT", to: "/account" },
+                { name: "CONTACT US", to: "/contact" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link to={link.to} className="text-[10px] tracking-[0.2em] font-bold text-gray-400 hover:text-black transition-colors uppercase">

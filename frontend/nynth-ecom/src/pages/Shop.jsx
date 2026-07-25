@@ -85,7 +85,7 @@ export default function Shop() {
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />
-          <div className={`absolute inset-0 flex items-center justify-center transition-colors duration-700 ${settings.banner_hover_color === 'red' ? 'bg-red-600/0 group-hover:bg-red-600/10' : 'bg-black/0 group-hover:bg-black/10'}`}>
+          <div className={`absolute inset-0 flex items-center justify-center transition-colors duration-500 ${settings.banner_hover_color === 'red' ? 'bg-red-600/0 group-hover:bg-red-600/10' : 'bg-black/0 group-hover:bg-black/10'}`}>
             <button
               onClick={() => {
                 const grid = document.getElementById('product-grid');
@@ -145,6 +145,14 @@ export default function Shop() {
             <div className="flex flex-col items-center justify-center py-20 bg-white h-screen w-full">
               <Loader2 className="h-6 w-6 animate-spin text-black mb-4" />
             </div>
+          ) : error ? (
+            <div className="text-center py-40 uppercase tracking-[0.3em] text-[10px] text-gray-400 bg-white h-full w-full">
+              {error}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-40 uppercase tracking-[0.3em] text-[10px] text-gray-400 bg-white h-full w-full">
+              NO PRODUCTS FOUND
+            </div>
           ) : (
             <section className="w-full px-0">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10">
@@ -160,12 +168,6 @@ export default function Shop() {
                 ))}
               </div>
             </section>
-          )}
-
-          {!loading && filteredProducts.length === 0 && (
-            <div className="text-center py-40 uppercase tracking-[0.3em] text-[10px] text-gray-400 bg-white h-full w-full">
-              NO PRODUCTS FOUND
-            </div>
           )}
         </div>
       </main>
