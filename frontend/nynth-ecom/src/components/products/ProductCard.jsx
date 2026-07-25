@@ -151,7 +151,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
         {/* Quick Add button */}
         <button
           onClick={handleAddToCart}
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-white text-black size-10 rounded-full flex items-center justify-center shadow-xl z-20 hover:bg-black hover:text-white"
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-white text-black size-10 flex items-center justify-center z-20 hover:bg-black hover:text-white"
         >
           <Plus size={16} />
         </button>

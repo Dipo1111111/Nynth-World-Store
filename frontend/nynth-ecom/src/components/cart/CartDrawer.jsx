@@ -115,7 +115,7 @@ const CartItem = ({ item, settings, onClose }) => {
 
                 <div className="flex justify-between items-center">
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-4 bg-gray-50 px-3 py-1.5 rounded-sm">
+                    <div className="flex items-center gap-4 bg-gray-50 px-3 py-1.5">
                         <button
                             onClick={() => updateQuantity(item, Math.max(1, item.quantity - 1))}
                             className="text-black hover:opacity-50 disabled:opacity-20"
@@ -221,7 +221,7 @@ export default function CartDrawer({ isOpen, onClose }) {
 
                         <button
                             onClick={handleCheckout}
-                            className="w-full bg-black text-white py-5 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 transition-colors shadow-sm"
+                            className="w-full bg-black text-white py-5 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 transition-colors"
                         >
                             SECURE CHECKOUT
                         </button>

@@ -1,8 +1,8 @@
 # NYNTH Site Audit — Pre-Launch Consistency Check
 
 **Date:** 2026-07-24
-**Pages audited:** Shop, Product Detail, Checkout, Cart, Cart Drawer, Header, Footer, ThankYou, ShippingReturns
-**Scope:** Layout, structural, and consistency issues only. No design opinions.
+**Pages audited:** Shop, Product Detail, Checkout, Cart, Cart Drawer, Header, Footer, ThankYou, ShippingReturns, ErrorBoundary, ErrorPage, NotFound, ForgotPassword, App
+**Scope:** Layout, structural, and consistency issues. Design system alignment.
 
 ---
 
@@ -134,6 +134,70 @@
 
 ---
 
+## DESIGN SYSTEM CONSISTENCY (Session 2 — Impeccable Audit)
+
+### E1 — ErrorBoundary uses rounded corners + wrong font
+- **File:** `src/components/common/ErrorBoundary.jsx`, lines 26, 29, 37, 44
+- **Problem:** `rounded-full` on icon, `rounded-xl` on buttons, `font-space` class. Site uses sharp corners and Inter font.
+- **Fix:** Removed all border-radius, replaced font-space with site typography.
+
+### E2 — ErrorPage uses rounded corners + wrong font
+- **File:** `src/pages/ErrorPage.jsx`, lines 35, 38, 45, 46
+- **Problem:** `rounded-3xl` on icon, `rounded-2xl` on button, `shadow-lg`, `font-space`. Completely different design language.
+- **Fix:** Sharp corners, site typography, removed shadow.
+
+### E3 — NotFound page uses wrong font + rounded buttons
+- **File:** `src/pages/NotFound.jsx`, lines 19, 20, 35
+- **Problem:** `font-space text-9xl` (massive), `rounded-full` on button, `btn-primary` class has `rounded-full`.
+- **Fix:** Site typography, sharp corners, proper sizing.
+
+### E4 — ForgotPassword uses wrong font + rounded everything
+- **File:** `src/pages/ForgotPassword.jsx`, lines 42, 45, 59, 71, 81
+- **Problem:** `rounded-full` on icon, `font-space` on headings, `rounded-lg` on input, `rounded-xl` on button. Every element has wrong border-radius.
+- **Fix:** Sharp corners, site typography, matching input/button styles.
+
+### E5 — App.jsx admin loader uses `font-space`
+- **File:** `src/App.jsx`, line 61
+- **Problem:** `font-space` class on loading text.
+- **Fix:** Removed font-space.
+
+### E6 — globals.css utility classes have rounded corners
+- **File:** `src/styles/globals.css`, lines 41, 55, 246
+- **Problem:** `.btn-primary` has `rounded-full`, `.card` has `rounded-xl`, `.btn-admin` has `rounded-lg`.
+- **Fix:** Removed all border-radius from utility classes.
+
+### E7 — CartDrawer quantity controls have `rounded-sm`
+- **File:** `src/components/cart/CartDrawer.jsx`, line 118
+- **Problem:** `rounded-sm` on quantity background, Cart page doesn't have it.
+- **Fix:** Removed rounded-sm.
+
+### E8 — CartDrawer checkout button has `shadow-sm`
+- **File:** `src/components/cart/CartDrawer.jsx`, line 224
+- **Problem:** `shadow-sm` on button. Site doesn't use shadows on buttons.
+- **Fix:** Removed shadow.
+
+### E9 — Shop banner button has `shadow-2xl`
+- **File:** `src/pages/Shop.jsx`, line 94
+- **Problem:** `shadow-2xl` on SHOP NOW button. Heavy shadow inconsistent with rest of site.
+- **Fix:** Removed shadow.
+
+### E10 — ProductCard quick-add button has `rounded-full` + `shadow-xl`
+- **File:** `src/components/products/ProductCard.jsx`, line 154
+- **Problem:** `rounded-full shadow-xl` on the quick-add floating button.
+- **Fix:** Removed both.
+
+### E11 — ProductDetail mobile arrows have `rounded-full` + `shadow-sm`
+- **File:** `src/pages/ProductDetail.jsx`, lines 465, 471
+- **Problem:** `rounded-full shadow-sm` on carousel navigation arrows.
+- **Fix:** Removed both.
+
+### E12 — Cart page was crashing (missing import)
+- **File:** `src/pages/Cart.jsx`, line 7
+- **Problem:** `ArrowRight` was removed from imports but still used on line 131. Runtime error → ErrorBoundary catches it → user sees "Something went wrong" page. This was the bug the founder reported.
+- **Fix:** Re-added `ArrowRight` to imports.
+
+---
+
 ## RANKED BY FIX DIFFICULTY
 
 ### QUICK FIXES (under 2 minutes each) — ✅ ALL DONE
@@ -145,6 +209,7 @@
 | C5 | Uppercase city name in shipping summary | ✅ Fixed |
 | S3 | Match banner hover transition durations | ✅ Fixed |
 | F1 | Add PANTS + ACCESSORIES to footer links | ✅ Fixed |
+| E12 | Cart page crash (missing ArrowRight import) | ✅ Fixed |
 
 ### MEDIUM FIXES (5-10 minutes each) — ✅ ALL DONE
 | ID | Issue | Status |
@@ -155,14 +220,29 @@
 | S2 | Fix "NO PRODUCTS FOUND" showing with error | ✅ Fixed |
 | F2 | Rename "TRACK ORDER" → "MY ACCOUNT" | ✅ Fixed |
 | F3 | Rename "FAQ" → "CONTACT US" | ✅ Fixed |
-| CD1 | Match quantity control style (CartDrawer ↔ Cart) | Deferred — minor |
+| CD1 | Match quantity control style (CartDrawer ↔ Cart) | ✅ Fixed |
 | CT3 | Match Cart empty state to site design language | ✅ Fixed |
+
+### DESIGN SYSTEM CONSISTENCY FIXES — ✅ ALL DONE
+| ID | Issue | Status |
+|----|-------|--------|
+| E1 | ErrorBoundary: rounded corners + wrong font | ✅ Fixed |
+| E2 | ErrorPage: rounded corners + wrong font | ✅ Fixed |
+| E3 | NotFound: wrong font + rounded buttons | ✅ Fixed |
+| E4 | ForgotPassword: wrong font + rounded everything | ✅ Fixed |
+| E5 | App.jsx admin loader: font-space | ✅ Fixed |
+| E6 | globals.css utility classes: rounded corners | ✅ Fixed |
+| E7 | CartDrawer: rounded-sm on quantity controls | ✅ Fixed |
+| E8 | CartDrawer: shadow on checkout button | ✅ Fixed |
+| E9 | Shop: shadow-2xl on banner button | ✅ Fixed |
+| E10 | ProductCard: rounded-full + shadow on quick-add | ✅ Fixed |
+| E11 | ProductDetail: rounded-full + shadow on arrows | ✅ Fixed |
 
 ### LARGER FIXES (10-20 minutes each) — NEEDS DECISION
 | ID | Issue | Status |
 |----|-------|--------|
 | S1 | Add mobile category filter bar | ⏳ Needs build — affects mobile browsing |
-| P1 | Change mobile images to object-contain | ⏳ Needs build — changes mobile image crop |
+| P1 | Change mobile images to object-contain | ⏳ Deferred per user request |
 | P2 | Add thumbnail selector on mobile | ⏳ Needs build — adds mobile UI |
 
 ### DEFERRED (post-launch or low priority)
@@ -174,7 +254,7 @@
 
 ---
 
-**Total issues found: 20**
-**Fixed this session: 14**
+**Total issues found: 32**
+**Fixed this session: 25**
 **Deferred: 3**
-**Needs decision: 3**
+**Needs decision: 1 (S1 — mobile category filter)**

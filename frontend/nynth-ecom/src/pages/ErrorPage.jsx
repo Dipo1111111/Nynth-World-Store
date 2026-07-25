@@ -9,20 +9,20 @@ export default function ErrorPage({ status = 500, message }) {
 
     const content = {
         403: {
-            icon: <ShieldAlert size={48} className="text-orange-600" />,
-            title: "Access Denied",
+            icon: <ShieldAlert size={32} className="text-orange-600" />,
+            title: "ACCESS DENIED",
             desc: message || "You don't have permission to view this page. This area is reserved for admins.",
             bg: "bg-orange-50"
         },
         500: {
-            icon: <ServerCrash size={48} className="text-red-600" />,
-            title: "Server Error",
+            icon: <ServerCrash size={32} className="text-red-600" />,
+            title: "SERVER ERROR",
             desc: message || "Our servers are acting up. We've been notified and are looking into it.",
             bg: "bg-red-50"
         }
     }[status] || {
-        icon: <ServerCrash size={48} className="text-gray-600" />,
-        title: "Unexpected Error",
+        icon: <ServerCrash size={32} className="text-gray-600" />,
+        title: "UNEXPECTED ERROR",
         desc: "Something went wrong on our end.",
         bg: "bg-gray-50"
     };
@@ -32,23 +32,23 @@ export default function ErrorPage({ status = 500, message }) {
             <Header />
             <main className="flex-1 flex items-center justify-center p-6">
                 <div className="max-w-md w-full text-center">
-                    <div className={`w-24 h-24 ${content.bg} rounded-3xl flex items-center justify-center mx-auto mb-8`}>
+                    <div className={`w-24 h-24 ${content.bg} flex items-center justify-center mx-auto mb-8`}>
                         {content.icon}
                     </div>
-                    <h1 className="font-space text-4xl font-bold mb-4">{content.title}</h1>
-                    <p className="text-gray-500 mb-10 leading-relaxed">
+                    <h1 className="text-[11px] tracking-[0.3em] font-bold uppercase mb-4">{content.title}</h1>
+                    <p className="text-[10px] tracking-[0.15em] text-gray-400 mb-10 uppercase leading-relaxed">
                         {content.desc}
                     </p>
                     <div className="space-y-4">
                         <Link
                             to="/"
-                            className="flex items-center justify-center gap-2 bg-black text-white px-8 py-4 rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg"
+                            className="flex items-center justify-center gap-2 bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-all"
                         >
-                            <ArrowLeft size={20} />
-                            Return to Shop
+                            <ArrowLeft size={14} />
+                            RETURN TO SHOP
                         </Link>
-                        <p className="text-sm text-gray-400 italic">
-                            Error Code: {status}
+                        <p className="text-[9px] tracking-[0.2em] text-gray-300 uppercase">
+                            ERROR CODE: {status}
                         </p>
                     </div>
                 </div>

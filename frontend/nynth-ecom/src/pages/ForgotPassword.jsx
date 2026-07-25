@@ -33,43 +33,43 @@ export default function ForgotPassword() {
 
             <main className="flex-1 flex items-center justify-center section-pad">
                 <div className="w-full max-w-md p-6 sm:p-8">
-                    <Link to="/login" className="inline-flex items-center text-sm text-gray-500 hover:text-black mb-8 transition-colors">
-                        <ArrowLeft size={16} className="mr-1" /> Back to Login
+                    <Link to="/login" className="inline-flex items-center text-[10px] tracking-[0.2em] text-gray-400 hover:text-black mb-8 transition-colors uppercase font-bold">
+                        <ArrowLeft size={12} className="mr-1" /> BACK TO LOGIN
                     </Link>
 
                     {sent ? (
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
+                            <div className="w-16 h-16 bg-green-50 flex items-center justify-center mx-auto mb-6 text-green-600">
                                 <Mail size={32} />
                             </div>
-                            <h1 className="font-space text-3xl font-bold mb-4">Check your email</h1>
-                            <p className="font-inter text-gray-600 mb-8 leading-relaxed">
-                                We have sent a password reset link to <strong>{email}</strong>.
+                            <h1 className="text-[11px] tracking-[0.3em] font-bold uppercase mb-4">CHECK YOUR EMAIL</h1>
+                            <p className="text-[10px] tracking-[0.15em] text-gray-400 mb-8 uppercase leading-relaxed">
+                                We have sent a password reset link to <strong className="text-black">{email}</strong>.
                             </p>
                             <button
                                 onClick={() => setSent(false)}
-                                className="text-sm font-medium hover:underline"
+                                className="text-[10px] tracking-[0.2em] font-bold uppercase text-gray-400 hover:text-black transition-colors"
                             >
-                                Didn't receive the email? Click to resend
+                                DIDN'T RECEIVE THE EMAIL? CLICK TO RESEND
                             </button>
                         </div>
                     ) : (
                         <>
                             <div className="mb-8">
-                                <h1 className="font-space text-3xl font-bold mb-2">Reset Password</h1>
-                                <p className="font-inter text-gray-600">
+                                <h1 className="text-[11px] tracking-[0.3em] font-bold uppercase mb-2">RESET PASSWORD</h1>
+                                <p className="text-[10px] tracking-[0.15em] text-gray-400 uppercase">
                                     Enter your email address to receive password reset instructions.
                                 </p>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    <label className="block text-[10px] tracking-widest uppercase font-bold text-gray-400 mb-2">EMAIL ADDRESS</label>
                                     <input
                                         type="email"
                                         required
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
-                                        placeholder="you@example.com"
+                                        className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                                        placeholder="YOU@EXAMPLE.COM"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
@@ -78,9 +78,9 @@ export default function ForgotPassword() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-black text-white py-4 rounded-xl font-medium text-lg hover:opacity-90 disabled:opacity-70 transition-all flex items-center justify-center gap-2"
+                                    className="w-full bg-black text-white py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                                 >
-                                    {loading ? <Loader2 className="animate-spin" size={20} /> : "Send Reset Link"}
+                                    {loading ? <Loader2 className="animate-spin" size={16} /> : "SEND RESET LINK"}
                                 </button>
                             </form>
                         </>

@@ -38,7 +38,7 @@
 
 /* Buttons */
 .btn-primary {
-  @apply rounded-full px-6 py-3 font-[family-name:var(--font-inter)] text-sm uppercase bg-black text-white hover:opacity-95;
+  @apply px-6 py-3 font-[family-name:var(--font-inter)] text-[10px] tracking-[0.3em] font-bold uppercase bg-black text-white hover:opacity-90 transition-all;
 }
 
 /* Layout utilities */
@@ -52,7 +52,7 @@
 
 /* Card */
 .card {
-  @apply bg-white border border-gray-200 rounded-xl overflow-hidden;
+  @apply bg-white border border-gray-200 overflow-hidden;
 }
 
 .card-img {
@@ -241,7 +241,7 @@ html {
   @apply border border-black text-black py-4 px-8 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-black hover:text-white transition-all;
 }
 
-/* Admin button - rounded corners */
+/* Admin button - sharp corners */
 .btn-admin {
-  @apply bg-black text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-gray-800 transition-colors;
+  @apply bg-black text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors;
 }

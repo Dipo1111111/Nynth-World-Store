@@ -91,7 +91,7 @@ export default function Shop() {
                 const grid = document.getElementById('product-grid');
                 if (grid) grid.scrollIntoView({ behavior: 'smooth' });
               }}
-              className={`px-10 py-3 text-[10px] tracking-[0.4em] font-bold uppercase transition-all duration-500 shadow-2xl scale-90 md:scale-100 hover:scale-110 ${settings.banner_hover_color === 'red' ? 'bg-white/90 backdrop-blur-md text-black hover:bg-red-600 hover:text-white' : 'bg-white/90 backdrop-blur-md text-black hover:bg-black hover:text-white'}`}
+              className={`px-10 py-3 text-[10px] tracking-[0.4em] font-bold uppercase transition-all duration-500 scale-90 md:scale-100 hover:scale-110 ${settings.banner_hover_color === 'red' ? 'bg-white/90 backdrop-blur-md text-black hover:bg-red-600 hover:text-white' : 'bg-white/90 backdrop-blur-md text-black hover:bg-black hover:text-white'}`}
             >
               SHOP NOW
             </button>

@@ -460,15 +460,15 @@ export default function ProductDetail() {
           {product.images?.length > 1 && (
             <>
               {/* Arrows */}
-              <button 
+              <button
                 onClick={prevImage}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 rounded-full shadow-sm text-black opacity-80 hover:opacity-100"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 text-black opacity-80 hover:opacity-100"
               >
                 <ChevronLeft size={18} />
               </button>
-              <button 
+              <button
                 onClick={nextImage}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 rounded-full shadow-sm text-black opacity-80 hover:opacity-100"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 text-black opacity-80 hover:opacity-100"
               >
                 <ChevronRight size={18} />
               </button>
