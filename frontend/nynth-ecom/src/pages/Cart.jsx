@@ -22,9 +22,9 @@ export default function Cart() {
     0
   );
 
-  // Use shipping fee from settings, fallback to 0 if not loaded yet
-  const shipping = settings?.shipping_fee || 0;
-  const total = subtotal + shipping;
+  // Shipping is calculated at checkout based on delivery location
+  // Don't show a flat rate here — it would be misleading
+  const total = subtotal;
 
   const handleCheckout = () => {
     if (cartItems.length === 0) return;
@@ -135,11 +135,22 @@ export default function Cart() {
             <ArrowRight size={10} />
           </Link>
 
-          <div className="flex justify-between font-bold text-[11px] tracking-[0.2em] uppercase mb-6 text-black">
-            <span>TOTAL</span>
-            <span>
-              {settings?.currency_symbol || "₦"}{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NGN
-            </span>
+          <div className="flex flex-col gap-3 mb-6">
+            <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
+              <span>SUBTOTAL</span>
+              <span>{settings?.currency_symbol || "₦"}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+            <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
+              <span>SHIPPING</span>
+              <span className="text-gray-400">CALCULATED AT CHECKOUT</span>
+            </div>
+            <div className="h-px bg-black/10 my-1"></div>
+            <div className="flex justify-between font-bold text-[11px] tracking-[0.2em] uppercase text-black">
+              <span>SUBTOTAL</span>
+              <span>
+                {settings?.currency_symbol || "₦"}{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NGN
+              </span>
+            </div>
           </div>
 
           <button

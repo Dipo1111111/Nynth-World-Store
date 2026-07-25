@@ -82,11 +82,12 @@ export function AuthProvider({ children }) {
         // Check if user document exists
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
+        const isNewUser = !docSnap.exists();
 
         // Determine role based on email whitelist
         const role = isAdminEmail(user.email) ? "admin" : "customer";
 
-        if (!docSnap.exists()) {
+        if (isNewUser) {
             // Create user doc if it doesn't exist
             const [firstName, ...lastNameParts] = (user.displayName || "").split(" ");
             const lastName = lastNameParts.join(" ");
@@ -107,7 +108,7 @@ export function AuthProvider({ children }) {
             }
         }
 
-        return result;
+        return { ...result, isNewUser };
     }
 
     // Check if user is admin

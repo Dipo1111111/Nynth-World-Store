@@ -137,7 +137,36 @@ function App() {
     <HelmetProvider>
       <SettingsProvider>
         <AuthProvider>
-          <Toaster position="top-center" />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                borderRadius: '0px',
+                background: '#000',
+                color: '#fff',
+                fontSize: '10px',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                fontWeight: 'bold',
+                padding: '14px 20px',
+                boxShadow: 'none',
+                border: 'none',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#fff',
+                  secondary: '#000',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#fff',
+                  secondary: '#000',
+                },
+              },
+            }}
+          />
           {isOffline && (
             <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white py-2 px-4 flex items-center justify-center gap-2 animate-slideDown">
               <WifiOff size={16} />

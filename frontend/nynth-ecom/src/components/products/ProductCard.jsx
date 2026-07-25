@@ -47,16 +47,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
     if (isOutOfStock) return;
     incrementCounter('clicks');
     addToCart(product, 1, product.availableSizes?.[0] || "M", selectedColor);
-    toast.success(`Added to bag`, {
-      style: {
-        borderRadius: '0px',
-        background: '#000',
-        color: '#fff',
-        fontSize: '10px',
-        letterSpacing: '0.2em',
-        textTransform: 'uppercase',
-      },
-    });
+    toast.success(`Added to bag`);
   };
 
   const handleColorSelect = (e, color, index) => {

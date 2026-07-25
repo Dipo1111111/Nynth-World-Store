@@ -21,6 +21,7 @@ export default function AdminSettings() {
         shipping_fee: 0,
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         hero_banner: "",
+        banner_hover_color: "red",
         lock_page_enabled: false,
         lock_epoch: 0,
         lock_timer_enabled: false,
@@ -40,6 +41,8 @@ export default function AdminSettings() {
         available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
         available_sizes: "XS, S, M, L, XL, XXL, XXXL",
         disabled_locations: { lagos: [], abuja: [], interstate: [] },
+        announcement_bar_enabled: false,
+        announcement_bar_text: "NEXT DROP IN:",
         marquee_enabled: false,
         marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000"
     });
@@ -106,6 +109,8 @@ export default function AdminSettings() {
                         available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
                         available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL",
                         disabled_locations: data.disabled_locations || { lagos: [], abuja: [], interstate: [] },
+                        announcement_bar_enabled: data.announcement_bar_enabled !== undefined ? data.announcement_bar_enabled : false,
+                        announcement_bar_text: data.announcement_bar_text || "NEXT DROP IN:",
                         marquee_enabled: data.marquee_enabled !== undefined ? data.marquee_enabled : false,
                         marquee_text: data.marquee_text || "FREE DELIVERY ON ORDERS OVER ₦50,000"
                     }));
@@ -526,6 +531,40 @@ export default function AdminSettings() {
                     </div>
                 </div>
 
+                {/* Banner Hover Color */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Megaphone} title="Banner Hover Style" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        Color of the SHOP NOW button when hovered on the hero banner.
+                    </p>
+                    <div className="flex gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "red" }))}
+                            className={`flex items-center gap-3 px-5 py-3 border transition-all ${
+                                settings.banner_hover_color === 'red'
+                                    ? 'border-red-600 bg-red-50 text-red-600'
+                                    : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+                            }`}
+                        >
+                            <div className="w-4 h-4 rounded-full bg-red-600"></div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">RED</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
+                            className={`flex items-center gap-3 px-5 py-3 border transition-all ${
+                                settings.banner_hover_color === 'black'
+                                    ? 'border-black bg-gray-900 text-white'
+                                    : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+                            }`}
+                        >
+                            <div className="w-4 h-4 rounded-full bg-black"></div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">BLACK</span>
+                        </button>
+                    </div>
+                </div>
+
                 {/* Shipping Settings */}
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={Truck} title="Shipping Configuration" />
@@ -550,7 +589,24 @@ export default function AdminSettings() {
 
                     {/* Lagos Areas */}
                     <div className="mb-8">
-                        <h4 className="text-sm font-bold text-black uppercase tracking-tight mb-3">Lagos Areas</h4>
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Lagos Areas</h4>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const allLagos = Object.keys(LAGOS_SHIPPING_DATA);
+                                    const current = settings.disabled_locations?.lagos || [];
+                                    const allDisabled = allLagos.every(a => current.includes(a));
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        disabled_locations: { ...prev.disabled_locations, lagos: allDisabled ? [] : allLagos }
+                                    }));
+                                }}
+                                className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+                            >
+                                {Object.keys(LAGOS_SHIPPING_DATA).every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                             {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => {
                                 const isDisabled = (settings.disabled_locations?.lagos || []).includes(area);
@@ -583,7 +639,24 @@ export default function AdminSettings() {
 
                     {/* Abuja Areas */}
                     <div className="mb-8">
-                        <h4 className="text-sm font-bold text-black uppercase tracking-tight mb-3">Abuja Areas</h4>
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Abuja Areas</h4>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const allAbuja = Object.keys(ABUJA_SHIPPING_DATA);
+                                    const current = settings.disabled_locations?.abuja || [];
+                                    const allDisabled = allAbuja.every(a => current.includes(a));
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        disabled_locations: { ...prev.disabled_locations, abuja: allDisabled ? [] : allAbuja }
+                                    }));
+                                }}
+                                className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+                            >
+                                {Object.keys(ABUJA_SHIPPING_DATA).every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                             {Object.keys(ABUJA_SHIPPING_DATA).sort().map((area) => {
                                 const isDisabled = (settings.disabled_locations?.abuja || []).includes(area);
@@ -616,7 +689,24 @@ export default function AdminSettings() {
 
                     {/* Interstate States */}
                     <div>
-                        <h4 className="text-sm font-bold text-black uppercase tracking-tight mb-3">Interstate States</h4>
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Interstate States</h4>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const allStates = Object.keys(INTERSTATE_SHIPPING_DATA);
+                                    const current = settings.disabled_locations?.interstate || [];
+                                    const allDisabled = allStates.every(s => current.includes(s));
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        disabled_locations: { ...prev.disabled_locations, interstate: allDisabled ? [] : allStates }
+                                    }));
+                                }}
+                                className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+                            >
+                                {Object.keys(INTERSTATE_SHIPPING_DATA).every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                             {Object.keys(INTERSTATE_SHIPPING_DATA).sort().map((state) => {
                                 const isDisabled = (settings.disabled_locations?.interstate || []).includes(state);
@@ -646,6 +736,45 @@ export default function AdminSettings() {
                             })}
                         </div>
                     </div>
+                </div>
+
+                {/* Announcement Bar */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Megaphone} title="Announcement Bar" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
+                    </p>
+
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Announcement Bar</h4>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="announcement_bar_enabled"
+                                checked={settings.announcement_bar_enabled}
+                                onChange={handleChange}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                        </label>
+                    </div>
+
+                    {settings.announcement_bar_enabled && (
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Bar Text</label>
+                            <input
+                                name="announcement_bar_text"
+                                value={settings.announcement_bar_text}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="NEXT DROP IN:"
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Promotional Marquee */}

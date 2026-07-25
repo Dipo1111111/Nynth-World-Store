@@ -247,6 +247,25 @@ export default function ProductDetail() {
             </div>
             
             {/* Static Arrows or Overlay can go here if needed */}
+
+            {/* Front/Back Numbered Selector */}
+            {product.images?.length >= 2 && (
+              <div className="absolute bottom-4 right-4 z-20 flex gap-1.5">
+                {product.images.slice(0, 4).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleManualImageChange(i)}
+                    className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
+                      selectedImage === i
+                        ? 'bg-black text-white'
+                        : 'bg-white/80 backdrop-blur-sm text-black hover:bg-black hover:text-white'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
             {/* Thumbnail Navigation - Floating at bottom of grey half */}
@@ -454,15 +473,21 @@ export default function ProductDetail() {
                 <ChevronRight size={18} />
               </button>
 
-              {/* Dots */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-white/50 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                {product.images.map((_, i) => (
+              {/* Numbered selector */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                {product.images.slice(0, 4).map((_, i) => (
                   <button
                     key={i}
                     onClick={() => handleManualImageChange(i)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${i === selectedImage ? "bg-black w-4" : "bg-black/30 w-1.5"}`}
+                    className={`w-7 h-7 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
+                      i === selectedImage
+                        ? "bg-black text-white"
+                        : "bg-white/80 backdrop-blur-sm text-black"
+                    }`}
                     aria-label={`Go to slide ${i + 1}`}
-                  />
+                  >
+                    {i + 1}
+                  </button>
                 ))}
               </div>
             </>

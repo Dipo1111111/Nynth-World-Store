@@ -1,11 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 
 export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { currentUser, loading: authLoading } = useAuth();
+
+    // Determine safe redirect target
+    const getRedirectTarget = () => {
+        const from = location.state?.from?.pathname;
+        if (from && !from.startsWith("/login") && !from.startsWith("/signup") && !from.startsWith("/admin")) {
+            return from;
+        }
+        return "/shop";
+    };
+
+    // If already logged in, redirect immediately
+    useEffect(() => {
+        if (currentUser && !authLoading) {
+            navigate(getRedirectTarget(), { replace: true });
+        }
+    }, [currentUser, authLoading, navigate, location]);
+
+    // Don't show login form if already logged in
+    if (currentUser) {
+        return (
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+                <div className="h-6 w-6 animate-spin border-2 border-black border-t-transparent rounded-full" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-inter">
@@ -21,8 +48,10 @@ export default function Login() {
                     </div>
 
                     <div className="flex flex-col gap-4">
+                        {/* Pass the from state through to signup */}
                         <Link
                             to="/signup"
+                            state={{ from: location.state?.from }}
                             className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all text-center"
                         >
                             Create Account
@@ -31,11 +60,7 @@ export default function Login() {
                         <button
                             type="button"
                             onClick={() => {
-                                let originBase = location.state?.from?.pathname || "/shop";
-                                if (originBase.startsWith("/admin") || originBase === "/account") {
-                                    originBase = "/shop";
-                                }
-                                navigate(originBase);
+                                navigate(getRedirectTarget(), { replace: true });
                             }}
                             className="w-full border border-black py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all"
                         >

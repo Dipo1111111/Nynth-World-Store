@@ -104,11 +104,11 @@ export default function Header() {
 
   return (
     <>
-      {/* Announcement Bar — hidden when countdown timer is off */}
-      {settings?.lock_timer_enabled !== false && (
+      {/* Announcement Bar — separate toggle from lock timer */}
+      {settings?.announcement_bar_enabled !== false && (
       <div className="fixed top-0 z-[60] w-full bg-black text-white py-2 text-[8px] md:text-[9px] tracking-[0.4em] font-bold uppercase text-center overflow-hidden">
         <div className="flex items-center justify-center gap-4">
-          {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">NEXT DROP IN:</span>}
+          {!isLaunchFinished && <span className="opacity-50 hidden sm:inline">{settings?.announcement_bar_text || "NEXT DROP IN:"}</span>}
           <span className="tabular-nums translate-y-[1px]">{timeLeftStr}</span>
           {!isLaunchFinished && dropLabel && <span className="opacity-50 hidden sm:inline">{dropLabel}</span>}
         </div>
@@ -116,7 +116,7 @@ export default function Header() {
       )}
 
       <header
-        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top ${settings?.lock_timer_enabled !== false ? 'mt-[30px] md:mt-[32px]' : ''} ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
+        className={`fixed top-0 z-50 w-full transition-all duration-500 py-3 safe-top ${settings?.announcement_bar_enabled !== false ? 'mt-[30px] md:mt-[32px]' : ''} ${isScrolled ? "bg-white border-b border-black/5" : "bg-white/80 backdrop-blur-sm border-transparent"}`}
       >
         <div className="w-full px-6 md:px-10">
           <div className="flex items-center justify-between h-10">
@@ -248,7 +248,7 @@ export default function Header() {
       <div
         aria-hidden="true"
         className="pointer-events-none"
-        style={{ height: settings?.lock_timer_enabled !== false ? '88px' : '56px' }}
+        style={{ height: settings?.announcement_bar_enabled !== false ? '88px' : '56px' }}
       />
     </>
   );

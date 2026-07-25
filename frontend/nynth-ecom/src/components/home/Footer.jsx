@@ -70,23 +70,16 @@ export default function Footer() {
         if (result.message === "ALREADY_ADDED") {
           toast("YOU ARE ALREADY ON THE LIST", {
             icon: "ℹ️",
-            style: { borderRadius: "0px", background: "#000", color: "#fff", fontSize: "10px", letterSpacing: "0.2em" },
           });
         } else {
-          toast.success("YOU'RE ON THE LIST", {
-            style: { borderRadius: "0px", background: "#000", color: "#fff", fontSize: "10px", letterSpacing: "0.2em" },
-          });
+          toast.success("YOU'RE ON THE LIST");
           setEmail("");
         }
       } else {
-        toast.error((result.message || "SOMETHING WENT WRONG").toUpperCase(), {
-          style: { borderRadius: "0px", background: "#000", color: "#fff", fontSize: "10px", letterSpacing: "0.2em" },
-        });
+        toast.error((result.message || "SOMETHING WENT WRONG").toUpperCase());
       }
     } catch {
-      toast.error("SOMETHING WENT WRONG", {
-        style: { borderRadius: "0px", background: "#000", color: "#fff", fontSize: "10px", letterSpacing: "0.2em" },
-      });
+      toast.error("SOMETHING WENT WRONG");
     } finally {
       setLoading(false);
     }

@@ -85,13 +85,13 @@ export default function Shop() {
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
+          <div className={`absolute inset-0 flex items-center justify-center transition-colors duration-700 ${settings.banner_hover_color === 'red' ? 'bg-red-600/0 group-hover:bg-red-600/10' : 'bg-black/0 group-hover:bg-black/10'}`}>
             <button
               onClick={() => {
                 const grid = document.getElementById('product-grid');
                 if (grid) grid.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="bg-white/90 backdrop-blur-md text-black px-10 py-3 rounded-full text-[10px] tracking-[0.4em] font-bold uppercase hover:bg-black hover:text-white transition-all duration-500 shadow-2xl scale-90 md:scale-100 hover:scale-110"
+              className={`px-10 py-3 text-[10px] tracking-[0.4em] font-bold uppercase transition-all duration-500 shadow-2xl scale-90 md:scale-100 hover:scale-110 ${settings.banner_hover_color === 'red' ? 'bg-white/90 backdrop-blur-md text-black hover:bg-red-600 hover:text-white' : 'bg-white/90 backdrop-blur-md text-black hover:bg-black hover:text-white'}`}
             >
               SHOP NOW
             </button>

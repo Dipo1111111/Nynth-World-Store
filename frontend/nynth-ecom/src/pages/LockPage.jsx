@@ -61,9 +61,7 @@ export default function LockPage() {
         if (!waitlistEmail) return;
 
         if (!validateEmail(waitlistEmail)) {
-            toast.error('INVALID EMAIL FORMAT', {
-                style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
-            });
+            toast.error('INVALID EMAIL FORMAT');
             return;
         }
 
@@ -74,21 +72,16 @@ export default function LockPage() {
                 if (result.message === 'ALREADY_ADDED') {
                     toast('YOU ARE ALREADY ON THE WAITLIST', {
                         icon: 'ℹ️',
-                        style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', fontWeight: 'bold' },
                     });
                 } else {
                     navigate('/waitlist-confirmation');
                 }
                 setWaitlistEmail('');
             } else {
-                toast.error(result.message.toUpperCase(), {
-                    style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
-                });
+                toast.error(result.message.toUpperCase());
             }
         } catch (error) {
-            toast.error('SOMETHING WENT WRONG', {
-                style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
-            });
+            toast.error('SOMETHING WENT WRONG');
         } finally {
             setWaitlistLoading(false);
         }
@@ -103,16 +96,12 @@ export default function LockPage() {
                 localStorage.setItem('nynth_site_unlocked', 'true');
                 localStorage.setItem('nynth_lock_epoch', String(settings?.lock_epoch || 0));
                 window.location.reload();
-                toast.success('ACCESS GRANTED', {
-                    style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
-                });
+                toast.success('ACCESS GRANTED');
             }, 800);
         } else {
             setTimeout(() => {
                 setLoading(false);
-                toast.error('ACCESS DENIED', {
-                    style: { borderRadius: '0px', background: '#000', color: '#fff', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase' },
-                });
+                toast.error('ACCESS DENIED');
             }, 500);
         }
     };

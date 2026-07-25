@@ -450,3 +450,75 @@ Last updated: 2026-07-25
 - Does the owner want email/password sign-in restored, or is Guest-only intentional?
 - Phone area code dropdown — is this still needed or is basic validation enough?
 - Official email @nynthworld.com — owner needs to set up email hosting separately
+
+---
+
+# Session 8 — Toast, Auth Flow & Launch Prep
+
+Last updated: 2026-07-25
+
+## What was built
+
+### 1. Toast Styling — Global Sharp Corners (App.jsx)
+- Changed `<Toaster position="top-center" />` to full config with:
+  - `borderRadius: '0px'` — sharp corners matching NYNTH brand
+  - `background: '#000', color: '#fff'` — black bg, white text
+  - `fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase'` — brand typography
+  - `padding: '14px 20px'`, no boxShadow, no border
+  - Success/Error iconTheme: white icons on black
+- Removed all inline `style: { borderRadius: '0px', ... }` overrides from:
+  - ProductCard.jsx (1 toast)
+  - Footer.jsx (4 toasts)
+  - LockPage.jsx (6 toasts)
+
+### 2. Auth Toast Logic — New vs Returning User (AuthContext.jsx, Signup.jsx)
+- **AuthContext.jsx**: `loginWithGoogle()` now returns `{ ...result, isNewUser }` where `isNewUser = !docSnap.exists()`
+- **Signup.jsx**: Checks `result.isNewUser` — shows "Welcome to NYNTH" for new users, "Welcome back" for returning users
+- **Signup.jsx**: Added `useEffect` — if `currentUser` is already set when page loads, immediately redirects to `/shop` (or `location.state.from` if valid)
+- **Login.jsx**: Added same redirect-if-logged-in `useEffect` — prevents auth pages showing when already authenticated
+- Both Login and Signup navigations use `{ replace: true }` — prevents browser back-button loops through auth pages
+
+### 3. Five Architectural Items Saved for Future Sessions
+1. **Unify Home & Shop into one coherent experience** — Currently Home and Shop are separate pages with duplicated logic. Should be one page or one seamless flow.
+2. **Size guide on product cards** — Add size chart/guide accessible directly from the product card grid (not just product detail).
+3. **Cart total accuracy (shipping based on destination)** — Cart currently shows a flat total. Should calculate shipping dynamically based on user's selected delivery location.
+4. **Keyboard navigation (tab order, focus management, Escape)** — Full keyboard accessibility pass: logical tab order, focus trapping in modals, Escape to close overlays.
+5. **Search on Home page** — Add search functionality to the Home page (currently only on Shop page).
+
+## Decisions made
+- Global toast styling in Toaster component — one source of truth, no per-component overrides
+- Auth returns `isNewUser` flag — clean separation between auth logic and UI messaging
+- `{ replace: true }` on all auth redirects — prevents back-button loops
+- Login.jsx and Signup.jsx both redirect if already authenticated — no orphaned auth pages
+
+## Files modified
+- `src/App.jsx` — Global Toaster config with sharp corners
+- `src/context/AuthContext.jsx` — `loginWithGoogle()` returns `isNewUser`
+- `src/pages/Signup.jsx` — Toast message logic, redirect-if-logged-in, replace:true
+- `src/pages/Login.jsx` — Redirect-if-logged-in useEffect
+- `src/components/products/ProductCard.jsx` — Removed inline toast styles
+- `src/components/home/Footer.jsx` — Removed inline toast styles
+- `src/pages/LockPage.jsx` — Removed inline toast styles
+
+## Current state
+- Toast notifications are sharp-cornered, black bg, white text — matches NYNTH brand
+- Auth flow: Login page → Signup page → Google auth → "Welcome to NYNTH" or "Welcome back" → /shop
+- If user is already logged in and hits /login or /signup, they're redirected to /shop immediately
+- 5 architectural items saved in memory.md for future sessions
+
+## Next session starts with
+- Git commit: `git add -A && git commit -m "Toast styling, auth flow fix, landing page polish"`
+- **Remaining tasks from owner's list (Message 7):**
+  - Announcement bar: separate toggle from lock_timer, editable text, on/off
+  - Shipping locations: category-level toggle buttons (toggle all Lagos at once)
+  - Banner hover: 2 color options (RED and BLACK)
+  - Country code dropdown for phone input
+  - Shipping cost: show as separate line in Cart (not hidden in total)
+  - Product front/back image selector: numbered boxes 🟥1 and 🟥2
+- Verify marquee works at runtime (owner confirmed it works now)
+- Full app audit still deferred
+
+## Open questions
+- Announcement bar: should it be separate from lock_page or tied to it?
+- Banner colors: where is the banner component? Need to locate it first
+- Product images: do products actually have a "back" image stored? Need to check data model

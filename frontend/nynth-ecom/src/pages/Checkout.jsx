@@ -32,6 +32,7 @@ const Checkout = () => {
     firstName: "",
     lastName: "",
     email: "",
+    phoneCode: "+234",
     phone: "",
     address: "",
     city: "",
@@ -225,12 +226,21 @@ const Checkout = () => {
       return;
     }
 
-    // Validate phone format (Nigerian numbers: +234..., 0..., or 234...)
+    // Validate phone format
     const phoneClean = form.phone.replace(/[\s\-()]/g, "");
-    const phoneRegex = /^(\+?234|0)[789][01]\d{8}$/;
-    if (!phoneRegex.test(phoneClean)) {
-      toast.error("Please enter a valid Nigerian phone number.");
-      return;
+    if (form.phoneCode === "+234") {
+      // Nigerian numbers: 10 digits starting with 07, 08, or 09
+      const ngRegex = /^[789][01]\d{8}$/;
+      if (!ngRegex.test(phoneClean)) {
+        toast.error("Please enter a valid Nigerian phone number.");
+        return;
+      }
+    } else {
+      // Other countries: at least 6 digits
+      if (phoneClean.length < 6 || !/^\d+$/.test(phoneClean)) {
+        toast.error("Please enter a valid phone number.");
+        return;
+      }
     }
 
     setLoading(true);
@@ -244,7 +254,7 @@ const Checkout = () => {
 
       // Create order in Firestore
       const orderData = {
-        customer: form,
+        customer: { ...form, phone: `${form.phoneCode}${form.phone.replace(/\s/g, '')}` },
         userId: currentUser ? currentUser.uid : null, // Link to user
         items: cartItems,
         subtotal: totalAmount,
@@ -339,14 +349,31 @@ const Checkout = () => {
 
             <div className="space-y-2">
               <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Phone</label>
-              <input
-                name="phone"
-                type="tel"
-                value={form.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
-                placeholder="+234..."
-              />
+              <div className="flex items-end gap-2">
+                <select
+                  name="phoneCode"
+                  value={form.phoneCode}
+                  onChange={handleChange}
+                  className="px-3 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent w-[100px] shrink-0"
+                >
+                  <option value="+234">+234 🇳🇬</option>
+                  <option value="+1">+1 🇺🇸</option>
+                  <option value="+44">+44 🇬🇧</option>
+                  <option value="+27">+27 🇿🇦</option>
+                  <option value="+254">+254 🇰🇪</option>
+                  <option value="+233">+233 🇬🇭</option>
+                  <option value="+971">+971 🇦🇪</option>
+                  <option value="+966">+966 🇸🇦</option>
+                </select>
+                <input
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                  placeholder="801 234 5678"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

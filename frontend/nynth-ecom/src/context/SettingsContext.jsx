@@ -21,6 +21,7 @@ export function SettingsProvider({ children }) {
         shipping_fee: Number(import.meta.env.VITE_DEFAULT_SHIPPING_FEE) || 2500,
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         hero_banner: "",
+        banner_hover_color: "red",
         lock_page_enabled: false,
         lock_epoch: 0,
         lock_timer_enabled: false,
@@ -29,6 +30,8 @@ export function SettingsProvider({ children }) {
         show_size_chart: true,
         size_chart_model_info: "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette — size down if you prefer a more fitted look.",
         disabled_locations: { lagos: [], abuja: [], interstate: [] },
+        announcement_bar_enabled: false,
+        announcement_bar_text: "NEXT DROP IN:",
         marquee_enabled: false,
         marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
         size_chart_data: [
