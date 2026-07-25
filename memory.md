@@ -522,3 +522,127 @@ Last updated: 2026-07-25
 - Announcement bar: should it be separate from lock_page or tied to it?
 - Banner colors: where is the banner component? Need to locate it first
 - Product images: do products actually have a "back" image stored? Need to check data model
+
+---
+
+# Session 9 — Auth Flow Architect Fix, Cart Accuracy & Feature Batch
+
+Last updated: 2026-07-25
+
+## What was built
+
+### 1. Auth Flow — Architectural Fix (Login.jsx, Signup.jsx, AuthContext.jsx)
+- **Root cause identified**: After Google popup closes, `onAuthStateChanged` fires and sets `currentUser`. Signup.jsx useEffect was supposed to redirect, but had a competing `authInProgress` guard that BLOCKED the redirect. Meanwhile, `loginWithGoogle()` was still doing Firestore writes (getDoc, setDoc) — the component was unmounting mid-operation.
+- **Signup.jsx rebuilt**:
+  - Removed `authInProgress` guard from useEffect — `currentUser` check alone triggers redirect
+  - Added `getRedirectTarget()` helper: reads `location.state.from.pathname`, filters out auth/admin pages, defaults to `/shop`
+  - Login.jsx now passes `state={{ from: location.state?.from }}` through `<Link to="/signup">` — the `from` state chains correctly through the whole flow
+  - Shows full-screen spinner (not signup form) while Google popup is open
+  - Silent handling for `auth/popup-closed-by-user` and `auth/cancelled-popup-request` — no error toast when user cancels
+  - Button shows "AUTHENTICATING..." with Loader2 spinner during auth
+  - Added `disabled:opacity-40` on button during loading
+- **Login.jsx rebuilt**:
+  - Added `useEffect` to redirect if `currentUser` is set
+  - Shows spinner (not form) if already logged in
+  - "Create Account" `<Link>` passes `state={{ from: location.state?.from }}` to preserve redirect chain
+  - "Continue as Guest" uses `{ replace: true }` to prevent back-button loops
+  - Added `authLoading` check — doesn't redirect during initial auth resolution
+
+### 2. Toast Styling — Global Sharp Corners (App.jsx)
+- Changed `<Toaster position="top-center" />` to full config:
+  - `borderRadius: '0px'`, `background: '#000'`, `color: '#fff'`
+  - `fontSize: '10px'`, `letterSpacing: '0.2em'`, `textTransform: 'uppercase'`, `fontWeight: 'bold'`
+  - `padding: '14px 20px'`, no boxShadow, no border
+  - Success/Error iconTheme: white icons on black
+- Removed all inline `style: { borderRadius: '0px', ... }` overrides from ProductCard.jsx, Footer.jsx, LockPage.jsx
+
+### 3. Auth Toast Logic — New vs Returning User (AuthContext.jsx)
+- `loginWithGoogle()` now returns `{ ...result, isNewUser }` where `isNewUser = !docSnap.exists()`
+- Signup.jsx checks `result.isNewUser`: "Welcome to NYNTH" for new, "Welcome back" for returning
+
+### 4. Announcement Bar — Separate Toggle (SettingsContext.jsx, Header.jsx, Settings.jsx)
+- New Firestore fields: `announcement_bar_enabled` (boolean), `announcement_bar_text` (string, default "NEXT DROP IN:")
+- Header.jsx now uses `announcement_bar_enabled` instead of `lock_timer_enabled` for the top bar
+- Header spacer div also uses `announcement_bar_enabled` for the offset height
+- Admin Settings.jsx: new "Announcement Bar" section with enable toggle + editable text input
+- Text appears before the countdown: "NEXT DROP IN: 2D 5H 30M 15S"
+
+### 5. Banner Hover Color Options (SettingsContext.jsx, Shop.jsx, Settings.jsx)
+- New Firestore field: `banner_hover_color` ("red" or "black", default "red")
+- Shop.jsx hero banner: SHOP NOW button turns red or black on hover based on setting
+- Shop.jsx banner overlay: subtle red or black tint on hover based on setting
+- Admin Settings.jsx: new "Banner Hover Style" section with RED/BLACK color picker buttons
+
+### 6. Country Code Dropdown — Phone Input (Checkout.jsx)
+- New form field: `phoneCode` (default "+234")
+- Phone input now has dropdown: +234 🇳🇬, +1 🇺🇸, +44 🇬🇧, +27 🇿🇦, +254 🇰🇪, +233 🇬🇭, +971 🇦🇪, +966 🇸🇦
+- Phone validation updated: Nigerian numbers validated as 10 digits starting with 7/8/9; other countries need 6+ digits
+- Order data saves full phone as `${form.phoneCode}${form.phone}` (e.g., "+2348012345678")
+
+### 7. Shipping Cost Display — Cart Shows "Calculated at Checkout" (Cart.jsx)
+- Removed flat `shipping_fee` from cart total — was misleading since real shipping varies by delivery location
+- Cart now shows: SUBTOTAL line, SHIPPING: "CALCULATED AT CHECKOUT", divider, SUBTOTAL total
+- Checkout.jsx remains the source of truth for actual shipping cost (calculates per Lagos/Abuja/Interstate area)
+
+### 8. Product Image Numbered Selector (ProductDetail.jsx)
+- Desktop: numbered boxes (1, 2, 3, 4) in bottom-right corner of main product image
+- Mobile: numbered boxes replace dot indicators below image
+- Active number: `bg-black text-white`, inactive: `bg-white/80 backdrop-blur-sm text-black`
+- Only shows when product has 2+ images
+- Clicking switches between images (same as existing thumbnail/arrow navigation)
+
+### 9. Shipping Locations — Category-Level Toggle Buttons (Settings.jsx)
+- Each section (Lagos, Abuja, Interstate) now has "DISABLE ALL" / "ENABLE ALL" button next to the header
+- One click toggles every area in that category on/off
+- Button text dynamically shows "ENABLE ALL" when all are disabled, "DISABLE ALL" when any are enabled
+
+## Decisions made
+- Auth flow: `from` state chains through Login → Signup → redirect (no state loss between pages)
+- Auth flow: `currentUser` check alone triggers redirect — no `authInProgress` guard
+- Auth flow: popup-cancelled errors are silent — user experience priority
+- Toast: single global Toaster config — no per-component overrides
+- Announcement bar: completely separate from lock timer — independent toggle
+- Banner color: "red" default — brand-appropriate for NYNTH
+- Cart: no flat shipping rate — "CALCULATED AT CHECKOUT" is honest and accurate
+- Product images: numbered boxes (1, 2, 3, 4) not labeled "front/back" — generic for any number of images
+
+## Files modified
+- `src/pages/Login.jsx` — Full rewrite: from-state passthrough, redirect-if-logged-in, spinner states
+- `src/pages/Signup.jsx` — Full rewrite: removed authInProgress guard, getRedirectTarget(), popup-cancelled silent handling
+- `src/context/AuthContext.jsx` — loginWithGoogle() returns isNewUser flag
+- `src/context/SettingsContext.jsx` — Added announcement_bar_enabled, announcement_bar_text, banner_hover_color defaults
+- `src/App.jsx` — Global Toaster config with sharp corners, brand styling
+- `src/components/home/Header.jsx` — Changed lock_timer_enabled → announcement_bar_enabled (3 occurrences)
+- `src/pages/admin/Settings.jsx` — Added Announcement Bar section, Banner Hover Style section, category-level shipping toggles
+- `src/pages/Shop.jsx` — Banner hover color: red or black based on setting
+- `src/pages/Cart.jsx` — Shipping shows "CALCULATED AT CHECKOUT", removed flat rate
+- `src/pages/Checkout.jsx` — Country code dropdown, phone validation per country, phone saved with code
+- `src/pages/ProductDetail.jsx` — Numbered image selector on desktop and mobile
+- `src/components/products/ProductCard.jsx` — Removed inline toast styles
+- `src/components/home/Footer.jsx` — Removed inline toast styles
+- `src/pages/LockPage.jsx` — Removed inline toast styles
+
+## Current state
+- Build compiles clean (zero errors)
+- Auth flow: person icon → /login → "Create Account" → /signup → Google popup → "Welcome to NYNTH"/"Welcome back" → /shop
+- Auth flow: if already logged in, /login and /signup redirect to /shop immediately
+- Toast: sharp corners, black bg, white text, uppercase — all consistent globally
+- Announcement bar: separate toggle with editable text — independent from lock timer
+- Banner hover: red or black — configurable in admin
+- Phone input: country code dropdown with 8 options
+- Cart: shows subtotal + "CALCULATED AT CHECKOUT" + total (no misleading flat shipping)
+- Product images: numbered boxes for multi-image products
+- Shipping locations: "DISABLE ALL" / "ENABLE ALL" per category in admin
+
+## Next session starts with
+- Git commit all accumulated changes (sessions 8 + 9): `git add -A && git commit -m "Auth flow fix, toast styling, announcement bar, banner colors, cart accuracy, product image selector, shipping toggles"`
+- Verify all features at runtime (auth flow, announcement bar, banner color, shipping toggles, product images)
+- **Remaining from owner's original list:**
+  - None of the major items remain — all addressed
+- Full app audit still deferred from session 3
+
+## Open questions
+- Firebase Console: `nynthworld.com` needs to be added to Authorized domains for Google sign-in to work
+- Lugbe pricing: user said "4500/4000 depending on address" — may need splitting
+- Full app audit still deferred
+- The 5 architectural items (unify Home/Shop, size guide, cart accuracy, keyboard nav, home search) are saved for future sessions — cart accuracy now partially addressed (shows "CALCULATED AT CHECKOUT")

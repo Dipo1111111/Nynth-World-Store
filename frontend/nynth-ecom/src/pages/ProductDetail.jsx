@@ -221,27 +221,27 @@ export default function ProductDetail() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div className="w-full h-full flex flex-col items-center justify-center p-20 xl:p-32">
-          <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-center p-12 xl:p-20">
+          <div className="w-full h-full relative flex items-center justify-center">
             {/* Sliding Image Container */}
-            <div 
+            <div
               className="flex w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
               style={{ transform: `translateX(-${selectedImage * 100}%)` }}
             >
               {product.images?.length > 0 ? (
                 product.images.map((img, index) => (
-                  <div key={index} className="w-full h-full flex-shrink-0">
+                  <div key={index} className="w-full h-full flex-shrink-0 flex items-center justify-center">
                     <img
                       src={img}
                       alt={`${product.title} - ${index + 1}`}
                       loading={index === 0 ? "eager" : "lazy"}
-                      className="w-full h-full object-cover transition-scale duration-700"
+                      className="max-w-full max-h-full object-contain transition-scale duration-700"
                     />
                   </div>
                 ))
               ) : (
-                <div className="w-full h-full flex-shrink-0">
-                  <img src={product.thumbnail || "/placeholder.jpg"} alt={product.title} className="w-full h-full object-cover" />
+                <div className="w-full h-full flex-shrink-0 flex items-center justify-center">
+                  <img src={product.thumbnail || "/placeholder.jpg"} alt={product.title} className="max-w-full max-h-full object-contain" />
                 </div>
               )}
             </div>
