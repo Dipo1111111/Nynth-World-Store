@@ -378,7 +378,7 @@ export default function ProductDetail() {
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 3-5 DAYS SHIPPING
               </div>
               <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
-                <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 14 DAYS RETURN POLICY
+                <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 7 DAYS RETURN POLICY
               </div>
             </div>
 
@@ -406,7 +406,14 @@ export default function ProductDetail() {
               </button>
               {isOpenShipping && (
                 <div className="pb-10 text-[10px] leading-[2] text-gray-500 tracking-wide pr-10">
-                  Orders are typically processed within 1-3 business days. We ship worldwide with tracking provided via email. Returns are accepted within 14 days of delivery.
+                  PRE-ORDER
+
+This item is available on a pre-order basis.
+
+Each piece is individually produced after your order is confirmed to ensure the highest quality and attention to detail.
+
+Production: 2–5 business days
+Dispatch: Orders are dispatched within 1–3 business days after production is completed.
                 </div>
               )}
             </div>
@@ -587,23 +594,11 @@ export default function ProductDetail() {
               <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 3-5 DAYS SHIPPING
             </div>
             <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
-              <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 14 DAYS RETURN POLICY
+              <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 7 DAYS RETURN POLICY
             </div>
           </div>
 
-          {/* You May Like - Mobile */}
-          {recommendedProducts.length > 0 && (
-            <div className="mb-8">
-              <p className="text-[9px] tracking-[0.25em] font-bold text-gray-400 uppercase mb-4">You May Like</p>
-              <div className="grid grid-cols-2 gap-3">
-                {recommendedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} displayMode="view" />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Accordions */}
+          {/* Accordions — Description & Shipping before recommendations */}
           <div className="border-t border-gray-200">
             <button
               onClick={() => setIsOpenDescription(!isOpenDescription)}
@@ -627,10 +622,29 @@ export default function ProductDetail() {
             </button>
             {isOpenShipping && (
               <div className="pb-6 text-[11px] leading-[1.8] text-gray-500 tracking-wide">
-                Orders are typically processed within 1-3 business days. We ship worldwide with tracking provided via email. Returns are accepted within 14 days of delivery.
+                PRE-ORDER
+
+This item is available on a pre-order basis.
+
+Each piece is individually produced after your order is confirmed to ensure the highest quality and attention to detail.
+
+Production: 2–5 business days
+Dispatch: Orders are dispatched within 1–3 business days after production is completed.
               </div>
             )}
           </div>
+
+          {/* You May Like - Mobile */}
+          {recommendedProducts.length > 0 && (
+            <div className="mb-8 mt-8">
+              <p className="text-[9px] tracking-[0.25em] font-bold text-gray-400 uppercase mb-4">You May Like</p>
+              <div className="grid grid-cols-2 gap-3">
+                {recommendedProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} displayMode="view" />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
