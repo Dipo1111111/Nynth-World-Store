@@ -172,51 +172,45 @@ export const ABUJA_SHIPPING_DATA = {
 };
 
 export const INTERSTATE_SHIPPING_DATA = {
-    // SOUTH WEST
-    "Ekiti": { home: 6500, park: 6500 },
-    "Ondo": { home: 6500, park: 6500 },
-    "Osun": { home: 6500, park: 6500 },
-    "Oyo": { home: 6500, park: 6500 },
-    "Ogun": { home: 6500, park: 6500 },
+    // ZONE 3 — SOUTH WEST (₦8,500 flat)
+    "Ekiti": { home: 8500, park: 8500 },
+    "Ondo": { home: 8500, park: 8500 },
+    "Osun": { home: 8500, park: 8500 },
+    "Oyo": { home: 8500, park: 8500 },
+    "Ogun": { home: 8500, park: 8500 },
 
-    // SOUTH SOUTH
-    "Akwa Ibom": { home: 8500, park: 7500 },
-    "Cross River": { home: 8500, park: 7500 },
-    "Bayelsa": { home: 8500, park: 7500 },
-    "Rivers": { home: 8500, park: 7500 },
-    "Delta": { home: 8500, park: 7500 },
-    "Edo": { home: 8500, park: 7500 },
+    // ZONE 4 — SOUTH SOUTH + SOUTH EAST (₦9,000 flat)
+    "Akwa Ibom": { home: 9000, park: 9000 },
+    "Cross River": { home: 9000, park: 9000 },
+    "Bayelsa": { home: 9000, park: 9000 },
+    "Rivers": { home: 9000, park: 9000 },
+    "Delta": { home: 9000, park: 9000 },
+    "Edo": { home: 9000, park: 9000 },
+    "Enugu": { home: 9000, park: 9000 },
+    "Anambra": { home: 9000, park: 9000 },
+    "Ebonyi": { home: 9000, park: 9000 },
+    "Imo": { home: 9000, park: 9000 },
+    "Abia": { home: 9000, park: 9000 },
 
-    // SOUTH EAST
-    "Enugu": { home: 8500, park: 7500 },
-    "Anambra": { home: 8500, park: 7500 },
-    "Ebonyi": { home: 8500, park: 7500 },
-    "Imo": { home: 8500, park: 7500 },
-    "Abia": { home: 8500, park: 7500 },
-
-    // NORTH CENTRAL
-    "Niger": { home: 9500, park: 8500 },
-    "Benue": { home: 9500, park: 8500 },
-    "Nasarawa": { home: 9500, park: 8500 },
-    "Plateau": { home: 9500, park: 8500 },
-    "Kogi": { home: 9500, park: 8500 },
-    "Abuja": { home: 9500, park: 8500 },
-    "Kwara": { home: 9500, park: 8500 },
-
-    // NORTH WEST
-    "Jigawa": { home: 9500, park: 8500 },
-    "Kano": { home: 9500, park: 8500 },
-    "Katsina": { home: 9500, park: 8500 },
-    "Kaduna": { home: 9500, park: 8500 },
-    "Zamfara": { home: 9500, park: 8500 },
-    "Sokoto": { home: 9500, park: 8500 },
-    "Kebbi": { home: 9500, park: 8500 },
-
-    // NORTH EAST
-    "Gombe": { home: 9500, park: 8500 },
-    "Bauchi": { home: 9500, park: 8500 },
-    "Yobe": { home: 9500, park: 8500 },
-    "Borno": { home: 9500, park: 8500 },
-    "Adamawa": { home: 9500, park: 8500 },
-    "Taraba": { home: 9500, park: 8500 }
+    // ZONE 2 — NORTH CENTRAL + NORTH WEST + NORTH EAST (₦7,500 flat)
+    "Niger": { home: 7500, park: 7500 },
+    "Benue": { home: 7500, park: 7500 },
+    "Nasarawa": { home: 7500, park: 7500 },
+    "Plateau": { home: 7500, park: 7500 },
+    "Kogi": { home: 7500, park: 7500 },
+    "Abuja": { home: 7500, park: 7500 },
+    "Kwara": { home: 7500, park: 7500 },
+    "Jigawa": { home: 7500, park: 7500 },
+    "Kano": { home: 7500, park: 7500 },
+    "Katsina": { home: 7500, park: 7500 },
+    "Kaduna": { home: 7500, park: 7500 },
+    "Zamfara": { home: 7500, park: 7500 },
+    "Sokoto": { home: 7500, park: 7500 },
+    "Kebbi": { home: 7500, park: 7500 },
+    "Gombe": { home: 7500, park: 7500 },
+    "Bauchi": { home: 7500, park: 7500 },
+    "Yobe": { home: 7500, park: 7500 },
+    "Borno": { home: 7500, park: 7500 },
+    "Adamawa": { home: 7500, park: 7500 },
+    "Taraba": { home: 7500, park: 7500 }
 };

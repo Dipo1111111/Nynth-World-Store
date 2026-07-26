@@ -245,45 +245,47 @@ export default function ProductDetail() {
                 </div>
               )}
             </div>
-            
-            {/* Static Arrows or Overlay can go here if needed */}
 
-            {/* Front/Back Numbered Selector */}
-            {product.images?.length >= 2 && (
-              <div className="absolute bottom-4 right-4 z-20 flex gap-1.5">
-                {product.images.slice(0, 4).map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleManualImageChange(i)}
-                    className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
-                      selectedImage === i
-                        ? 'bg-black text-white'
-                        : 'bg-white/80 backdrop-blur-sm text-black hover:bg-black hover:text-white'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
+
+            {/* Static Arrows or Overlay can go here if needed */}
           </div>
 
-            {/* Thumbnail Navigation - Floating at bottom of grey half */}
+            {/* Bottom Controls — Centered Numbered Selector + Thumbnails */}
             {product.images?.length > 1 && (
-              <div className="absolute bottom-20 flex gap-2 overflow-x-auto no-scrollbar max-w-[80%] px-4">
-                {product.images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleManualImageChange(i)}
-                    className={`h-16 w-12 flex-shrink-0 transition-all duration-300 ${
-                      selectedImage === i
-                        ? "border-[1.5px] border-black opacity-100 scale-105"
-                        : "border border-transparent opacity-30 hover:opacity-70"
-                    }`}
-                  >
-                    <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
-                  </button>
-                ))}
+              <div className="absolute bottom-6 left-0 right-0 z-20 flex flex-col items-center gap-2">
+                {/* Numbered Selector */}
+                <div className="flex gap-1.5">
+                  {product.images.slice(0, 4).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleManualImageChange(i)}
+                      className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
+                        selectedImage === i
+                          ? 'bg-black text-white'
+                          : 'bg-white/80 backdrop-blur-sm text-black hover:bg-black hover:text-white'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Thumbnails */}
+                <div className="flex gap-2 overflow-x-auto no-scrollbar max-w-[80%] px-4">
+                  {product.images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleManualImageChange(i)}
+                      className={`h-16 w-12 flex-shrink-0 transition-all duration-300 ${
+                        selectedImage === i
+                          ? "border-[1.5px] border-black opacity-100 scale-105"
+                          : "border border-transparent opacity-30 hover:opacity-70"
+                      }`}
+                    >
+                      <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>

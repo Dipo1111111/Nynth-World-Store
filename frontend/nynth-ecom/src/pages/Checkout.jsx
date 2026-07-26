@@ -119,15 +119,8 @@ const Checkout = () => {
       setShippingFee(ABUJA_SHIPPING_DATA[form.city].price);
     } else if (INTERSTATE_SHIPPING_DATA[form.state]) {
       const stateData = INTERSTATE_SHIPPING_DATA[form.state];
-      // South West only has home delivery
-      const method = stateData.park === stateData.home ? "home" : form.deliveryMethod;
-      const basePrice = stateData[method] || stateData.home;
-      
-      // Weight logic: 0-3kg is base price, each extra kg is +1500
-      const excessWeight = Math.max(0, Math.ceil(totalWeight - 3));
-      const weightSurcharge = excessWeight * 1500;
-      
-      setShippingFee(basePrice + weightSurcharge);
+      // Flat rate — same price regardless of weight or delivery method
+      setShippingFee(stateData.home);
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
@@ -642,12 +635,6 @@ const Checkout = () => {
                 <span className="text-black font-bold uppercase block">
                   {form.city ? `${form.city.toUpperCase()} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
                 </span>
-                {form.state !== "Lagos" && form.state !== "Abuja" && (
-                  <span className="text-[9px] text-gray-400 block mt-1 uppercase">
-                    {totalWeight.toFixed(1)}kg Total Weight
-                    {totalWeight > 3 && ` (${Math.ceil(totalWeight - 3)}kg excess)`}
-                  </span>
-                )}
               </div>
             </div>
           </div>
