@@ -27,6 +27,19 @@ export default function Shop() {
   const [displayMode, setDisplayMode] = useState("view");
   const { settings } = useSettings();
 
+  // Dynamically preload LCP hero banner — works in both dev and production
+  useEffect(() => {
+    const heroUrl = settings.hero_banner || headerBanner;
+    if (heroUrl && !document.querySelector(`link[rel="preload"][href="${heroUrl}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = heroUrl;
+      link.fetchPriority = 'high';
+      document.head.appendChild(link);
+    }
+  }, [settings.hero_banner]);
+
   useEffect(() => {
     setSearchQuery(searchParams.get("search") || "");
     setSelectedCategory(searchParams.get("category") || "all");
@@ -82,6 +95,8 @@ export default function Shop() {
           <img
             src={settings.hero_banner || headerBanner}
             alt="Collection Hero"
+            loading="eager"
+            fetchPriority="high"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
           />

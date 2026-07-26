@@ -27,6 +27,16 @@ export default defineConfig({
   build: {
     cssMinify: 'lightningcss', // Uses lightningcss to transpile modern CSS features
     cssTarget: ['chrome61', 'safari11', 'edge16', 'firefox60'], // Target older browsers for CSS compatibility
-    target: ['chrome61', 'safari11', 'edge16', 'firefox60']
+    target: ['chrome61', 'safari11', 'edge16', 'firefox60'],
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'charts': ['react-chartjs-2', 'chart.js'],
+          'ui-vendor': ['lucide-react', 'react-hot-toast', 'react-helmet-async'],
+        }
+      }
+    }
   }
 })

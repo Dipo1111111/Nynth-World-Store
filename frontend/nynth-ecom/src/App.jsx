@@ -19,29 +19,29 @@ import { useAuth } from "./context/AuthContext";
 import { doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 
 
-// Public Pages
-import Home from "./pages/Home.jsx";
-import Shop from "./pages/Shop.jsx";
-import Lookbook from "./pages/Lookbook.jsx";
-import ProductDetail from "./pages/ProductDetail.jsx";
-import Cart from "./pages/Cart.jsx";
-import Checkout from "./pages/Checkout.jsx";
-import ThankYou from "./pages/ThankYou.jsx";
-import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
-import TermsOfService from "./pages/TermsOfService.jsx";
-import ShippingReturns from "./pages/ShippingReturns.jsx";
-import Contact from "./pages/Contact.jsx";
-import NotFound from "./pages/NotFound.jsx";
-import Login from "./pages/Login.jsx";
-import Signup from "./pages/Signup.jsx";
-import ForgotPassword from "./pages/ForgotPassword.jsx";
-import Account from "./pages/Account.jsx";
-import OurStory from "./pages/OurStory.jsx";
-import Sustainability from "./pages/Sustainability.jsx";
-import ErrorPage from "./pages/ErrorPage.jsx";
-import UpdateDB from "./pages/UpdateDB.jsx";
-import LockPage from "./pages/LockPage.jsx";
-import WaitlistConfirmation from "./pages/WaitlistConfirmation.jsx";
+// ALL pages lazy-loaded for code splitting
+const Shop = lazy(() => import("./pages/Shop.jsx"));
+const Lookbook = lazy(() => import("./pages/Lookbook.jsx"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail.jsx"));
+const Cart = lazy(() => import("./pages/Cart.jsx"));
+const Checkout = lazy(() => import("./pages/Checkout.jsx"));
+const ThankYou = lazy(() => import("./pages/ThankYou.jsx"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.jsx"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService.jsx"));
+const ShippingReturns = lazy(() => import("./pages/ShippingReturns.jsx"));
+const Contact = lazy(() => import("./pages/Contact.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
+const Login = lazy(() => import("./pages/Login.jsx"));
+const Signup = lazy(() => import("./pages/Signup.jsx"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword.jsx"));
+const Account = lazy(() => import("./pages/Account.jsx"));
+const OurStory = lazy(() => import("./pages/OurStory.jsx"));
+const Sustainability = lazy(() => import("./pages/Sustainability.jsx"));
+const ErrorPage = lazy(() => import("./pages/ErrorPage.jsx"));
+const UpdateDB = lazy(() => import("./pages/UpdateDB.jsx"));
+const LockPage = lazy(() => import("./pages/LockPage.jsx"));
+const WaitlistConfirmation = lazy(() => import("./pages/WaitlistConfirmation.jsx"));
+const Home = lazy(() => import("./pages/Home.jsx"));
 
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -207,15 +207,18 @@ function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
     <CartProvider>
       {shouldShowLock ? (
         <BrowserRouter>
-          <Routes>
-            <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
-            <Route path="*" element={<LockPage />} />
-          </Routes>
+          <Suspense fallback={<AdminLoader />}>
+            <Routes>
+              <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
+              <Route path="*" element={<LockPage />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       ) : (
         <ErrorBoundary>
           <BrowserRouter>
             <PageTracker />
+            <Suspense fallback={<AdminLoader />}>
             <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Navigate to="/shop" replace />} />
@@ -339,6 +342,7 @@ function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
                     {/* 404 Catch-All Route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                  </Suspense>
                 </BrowserRouter>
               </ErrorBoundary>
             )}
