@@ -270,72 +270,19 @@ export const initializePayment = async (paymentData) => {
 
 export const addOrder = async (order) => {
   try {
-    const orderId = await runTransaction(db, async (transaction) => {
-      // 1. Check stock for all items
-      for (const item of order.items) {
-        const productRef = doc(db, "products", item.id);
-        const productDoc = await transaction.get(productRef);
-
-        if (!productDoc.exists()) {
-          throw new Error(`Product ${item.title} does not exist!`);
-        }
-
-        const productData = productDoc.data();
-        
-        // --- IMPROVED STOCK VALIDATION ---
-        
-        // 1. Check if product is disabled/out of stock generally
-        if (productData.inStock === false) {
-          throw new Error(`Item ${item.title || item.name} is completely out of stock!`);
-        }
-
-        // 2. Check specific size stock if applicable
-        if (item.size && productData.sizeStock && productData.sizeStock[item.size] !== undefined) {
-          const availableSizeStock = Number(productData.sizeStock[item.size]) || 0;
-          if (availableSizeStock < item.quantity) {
-            throw new Error(`Not enough stock for ${item.title || item.name} in size ${item.size}. Only ${availableSizeStock} left.`);
-          }
-          
-          // --- STOCK DECREMENT ---
-          const newSizeStock = { ...productData.sizeStock };
-          newSizeStock[item.size] = availableSizeStock - item.quantity;
-          
-          const newGlobalStock = (Number(productData.stockQuantity) || 0) - item.quantity;
-          
-          transaction.update(productRef, {
-            sizeStock: newSizeStock,
-            stockQuantity: Math.max(0, newGlobalStock),
-            inStock: newGlobalStock > 0
-          });
-        } else if (productData.stockQuantity !== undefined) {
-          // Fallback for non-sized products
-          const availableStock = Number(productData.stockQuantity) || 0;
-          if (availableStock < item.quantity) {
-            throw new Error(`Not enough stock for ${item.title || item.name}. Only ${availableStock} left.`);
-          }
-          
-          const newGlobalStock = availableStock - item.quantity;
-          transaction.update(productRef, {
-            stockQuantity: Math.max(0, newGlobalStock),
-            inStock: newGlobalStock > 0
-          });
-        }
-      }
-
-      // 2. Create Order
-      const newOrderRef = doc(collection(db, "orders")); // Generate ID first
-      transaction.set(newOrderRef, {
-        ...order,
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp(),
-        payment_status: order.payment_status || "pending",
-        order_status: order.order_status || "processing",
-      });
-
-      return newOrderRef.id;
+    // Stock validation and decrement is handled by the Paystack webhook.
+    // addOrder only creates the order document — no stock checks here,
+    // because the webhook also decrements stock (double-decrement bug otherwise).
+    const newOrderRef = doc(collection(db, "orders"));
+    await setDoc(newOrderRef, {
+      ...order,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp(),
+      payment_status: order.payment_status || "pending",
+      order_status: order.order_status || "processing",
     });
 
-    return orderId;
+    return newOrderRef.id;
   } catch (error) {
     console.error("Error adding order:", error);
     throw error;
