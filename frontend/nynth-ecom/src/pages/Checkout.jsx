@@ -107,6 +107,12 @@ const Checkout = () => {
   }, 0);
 
   useEffect(() => {
+    // Free delivery on orders over ₦50,000
+    if (totalAmount >= 50000) {
+      setShippingFee(0);
+      return;
+    }
+
     if (form.state === "Lagos") {
       if (form.city === "NYNTH WORLD (TEST)") {
         setShippingFee(0);
@@ -124,7 +130,7 @@ const Checkout = () => {
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
-  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee]);
+  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, totalAmount]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -633,7 +639,10 @@ const Checkout = () => {
               <span className="text-gray-400">Shipping</span>
               <div className="text-right">
                 <span className="text-black font-bold uppercase block">
-                  {form.city ? `${form.city.toUpperCase()} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"}
+                  {shippingFee === 0 && totalAmount >= 50000
+                    ? "FREE DELIVERY"
+                    : form.city ? `${form.city.toUpperCase()} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"
+                  }
                 </span>
               </div>
             </div>

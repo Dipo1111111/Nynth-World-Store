@@ -35,10 +35,10 @@ service cloud.firestore {
 
     // Products Collection:
     // - Public read access
-    // - Authenticated users can write (needed for stock decrement during order creation)
+    // - Anyone can write (needed for stock decrement during guest + authenticated order creation)
     match /products/{productId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if true;
     }
 
     // Orders Collection:
