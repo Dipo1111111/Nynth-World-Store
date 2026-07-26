@@ -679,8 +679,8 @@ export const saveContactMessage = async (messageData) => {
 
 export const getAllOrders = async () => {
   try {
-    // Simplified query to reduce chance of 400 Bad Request/Index issues
-    const q = query(collection(db, "orders"), limit(20));
+    // Fetch all orders, newest first — no artificial limit
+    const q = query(collection(db, "orders"), orderBy("created_at", "desc"));
     const querySnapshot = await getDocs(q);
     const orders = [];
     querySnapshot.forEach((doc) => {

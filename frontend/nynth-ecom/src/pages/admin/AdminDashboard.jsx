@@ -192,22 +192,19 @@ const AdminDashboard = () => {
         const currentBounds = getDateBoundaries(globalFilter, false);
         const prevBounds = getDateBoundaries(globalFilter, true);
 
+        // Only paid orders — everything on this dashboard is paid-only
         const currentOrders = analytics.rawOrders.filter(o => {
             if (!o.created_at?.seconds) return false;
-            // ONLY COUNT PAID ORDERS IN DASHBOARD METRICS
             const isPaid = o.payment_status === 'paid' || o.payment_status === 'success';
             if (!isPaid) return false;
-            
             const d = new Date(o.created_at.seconds * 1000);
             return d >= currentBounds.start && d <= currentBounds.end;
         });
 
         const prevOrders = analytics.rawOrders.filter(o => {
             if (!o.created_at?.seconds) return false;
-            // ONLY COUNT PAID ORDERS IN DASHBOARD METRICS
             const isPaid = o.payment_status === 'paid' || o.payment_status === 'success';
             if (!isPaid) return false;
-
             const d = new Date(o.created_at.seconds * 1000);
             return d >= prevBounds.start && d <= prevBounds.end;
         });
@@ -215,16 +212,15 @@ const AdminDashboard = () => {
         // Metrics
         const sales = currentOrders.reduce((sum, o) => sum + (o.total || 0), 0);
         const prevSales = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-        
-        const currentPaid = currentOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success');
-        const prevPaid = prevOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success');
-        const revenue = currentPaid.reduce((sum, o) => sum + (o.total || 0), 0);
-        const prevRevenue = prevPaid.reduce((sum, o) => sum + (o.total || 0), 0);
+
+        // Revenue = sales (all orders here are already paid)
+        const revenue = sales;
+        const prevRevenue = prevSales;
 
         const ordersCount = currentOrders.length;
         const prevOrdersCount = prevOrders.length;
-        
-        const pendingCount = currentOrders.filter(o => o.order_status !== 'delivered').length;
+
+        const deliveredCount = currentOrders.filter(o => o.order_status === 'delivered').length;
 
         // Top Products Calculation
         const productMap = {};
@@ -258,7 +254,7 @@ const AdminDashboard = () => {
             sales, salesGrowth: calculateGrowth(sales, prevSales),
             revenue, revGrowth: calculateGrowth(revenue, prevRevenue),
             ordersCount, ordersGrowth: calculateGrowth(ordersCount, prevOrdersCount),
-            pendingCount,
+            deliveredCount,
             topProducts,
             salesSpark, revSpark, ordersSpark,
             statusBreakdown,
@@ -458,11 +454,11 @@ const AdminDashboard = () => {
                             <Card className="bg-white border-gray-200 shadow-sm flex-1 flex flex-col justify-center">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Pending orders</p>
-                                        <h3 className="text-2xl font-bold text-gray-900 mt-1">{dashboardData.pendingCount}</h3>
+                                        <p className="text-sm font-medium text-gray-600">Delivered</p>
+                                        <h3 className="text-2xl font-bold text-gray-900 mt-1">{dashboardData.deliveredCount}</h3>
                                     </div>
-                                    <div className="p-3 bg-amber-50 rounded-full border border-amber-100">
-                                        <Truck size={20} className="text-amber-500" />
+                                    <div className="p-3 bg-emerald-50 rounded-full border border-emerald-100">
+                                        <Truck size={20} className="text-emerald-500" />
                                     </div>
                                 </CardContent>
                             </Card>
