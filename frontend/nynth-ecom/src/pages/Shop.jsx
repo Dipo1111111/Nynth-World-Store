@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
 import headerBanner from "../assets/header.JPEG";
 import { useSettings } from "../context/SettingsContext";
+import { getOptimizedImageUrl } from "../api/cloudinary";
 import Marquee from "../components/common/Marquee";
 
 export default function Shop() {
@@ -29,7 +30,7 @@ export default function Shop() {
 
   // Dynamically preload LCP hero banner — works in both dev and production
   useEffect(() => {
-    const heroUrl = settings.hero_banner || headerBanner;
+    const heroUrl = getOptimizedImageUrl(settings.hero_banner) || headerBanner;
     if (heroUrl && !document.querySelector(`link[rel="preload"][href="${heroUrl}"]`)) {
       const link = document.createElement('link');
       link.rel = 'preload';
@@ -93,7 +94,7 @@ export default function Shop() {
         {/* Full-width Hero Section - Edge to Edge */}
         <section className="relative w-full aspect-[21/9] md:aspect-[21/6] bg-[#ebebeb] overflow-hidden group">
           <img
-            src={settings.hero_banner || headerBanner}
+            src={getOptimizedImageUrl(settings.hero_banner) || headerBanner}
             alt="Collection Hero"
             loading="eager"
             fetchPriority="high"

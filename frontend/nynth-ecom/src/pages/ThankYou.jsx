@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Check, ArrowRight, ShoppingBag, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -13,7 +13,6 @@ const ThankYou = () => {
   const reference = searchParams.get("ref");
   const { clearCart } = useCart();
   const [mounted, setMounted] = useState(false);
-  const [cartCleared, setCartCleared] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -59,14 +58,33 @@ const ThankYou = () => {
 
       <main className="flex-1 flex flex-col items-center justify-center section-pad py-20 relative">
         <div className={`max-w-xl w-full text-center transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="w-20 h-20 bg-black flex items-center justify-center mx-auto mb-12">
-            <Check size={32} className="text-white" strokeWidth={1} />
+
+          {/* Green Circled Checkmark */}
+          <div className="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-10 shadow-lg shadow-emerald-500/20">
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
           </div>
 
-          <h1 className="hero-title text-black mb-6">ORDER CONFIRMED</h1>
+          <h1 className="text-[28px] md:text-[36px] font-bold tracking-tight leading-tight mb-4">
+            THANK YOU FOR YOUR ORDER
+          </h1>
 
-          <p className="text-[12px] tracking-[0.2em] text-gray-400 font-bold uppercase mb-12 leading-relaxed">
-            Thank you for shopping with NYNTH. Your order reference is <span className="text-black">{reference || "NY-000000"}</span>.
+          <p className="text-[18px] md:text-[22px] font-semibold tracking-[0.15em] uppercase text-emerald-600 mb-6">
+            Welcome to NYNTH World
+          </p>
+
+          <p className="text-[11px] tracking-[0.2em] text-gray-400 font-bold uppercase mb-14 leading-relaxed max-w-md mx-auto">
+            Your order reference is <span className="text-black">{reference || "NY-000000"}</span>.
             A confirmation email has been sent to your inbox.
           </p>
 

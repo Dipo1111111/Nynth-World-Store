@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 import { Plus, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 import { incrementCounter } from "../../api/firebaseFunctions";
+import { getOptimizedImageUrl } from "../../api/cloudinary";
 
 export default function ProductCard({ product, displayMode = 'model' }) {
   const { settings } = useSettings();
@@ -15,14 +16,18 @@ export default function ProductCard({ product, displayMode = 'model' }) {
   const isSightMode = displayMode === 'view';
 
   // In model mode, prefer explicit modelImage, then 2nd image. Otherwise use selected.
-  const mainImage = !isSightMode
+  const rawMainImage = !isSightMode
     ? (product.modelImage || (product.images?.length > 1 ? product.images[1] : (product.images?.[selectedImageIndex] || product.images?.[0] || "/placeholder.jpg")))
     : (product.images?.[selectedImageIndex] || product.images?.[0] || product.thumbnail || "/placeholder.jpg");
 
   // Hover image for view mode: show model pic on hover
-  const hoverImage = isSightMode
+  const rawHoverImage = isSightMode
     ? (product.modelImage || (product.images?.length > 1 ? product.images[1] : null))
     : null;
+
+  // Optimize Cloudinary URLs to serve WebP/AVIF automatically
+  const mainImage = getOptimizedImageUrl(rawMainImage, { width: 800 });
+  const hoverImage = getOptimizedImageUrl(rawHoverImage, { width: 800 });
 
   const isOutOfStock = product.stockQuantity <= 0;
 
