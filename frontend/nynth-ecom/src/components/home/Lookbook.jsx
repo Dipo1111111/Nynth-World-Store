@@ -58,7 +58,7 @@ export default function Lookbook() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[400px] md:auto-rows-[350px] gap-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense auto-rows-[400px] md:auto-rows-[350px] gap-0">
              {[...Array(8)].map((_, i) => (
                <div key={i} className={`${getGridSpan(i)} bg-gray-50 animate-pulse border-white border-[0.5px]`}></div>
              ))}
@@ -66,7 +66,7 @@ export default function Lookbook() {
         ) : (
           /* COLLAGE GRID - NO SPACE, STUPIDLY CLOSE */
           <section className="w-full bg-white">
-            <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[400px] md:auto-rows-[400px] lg:auto-rows-[500px] gap-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense auto-rows-[400px] md:auto-rows-[400px] lg:auto-rows-[500px] gap-0">
               {lookbooks.map((look, index) => (
                 <div 
                   key={look.id} 
