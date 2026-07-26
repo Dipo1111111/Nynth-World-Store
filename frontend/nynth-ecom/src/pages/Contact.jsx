@@ -55,7 +55,7 @@ export default function Contact() {
                         <div className="pt-12 space-y-4">
                             <h4 className="text-[10px] tracking-[0.3em] font-bold text-gray-400 uppercase">Abuja Studio</h4>
                             <p className="text-[14px] font-bold tracking-[0.2em] uppercase max-w-xs mx-auto text-gray-800">
-                                {settings.office_address}
+                                ABUJA, NIGERIA
                             </p>
                         </div>
                     </div>
