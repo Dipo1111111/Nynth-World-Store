@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Loader2 } from "lucide-react";
@@ -12,7 +12,6 @@ export default function Signup() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Determine safe redirect target — never loop back to auth pages
     const getRedirectTarget = () => {
         const from = location.state?.from?.pathname;
         if (from && !from.startsWith("/login") && !from.startsWith("/signup") && !from.startsWith("/admin")) {
@@ -21,14 +20,12 @@ export default function Signup() {
         return "/shop";
     };
 
-    // Redirect when user becomes authenticated (fires as soon as onAuthStateChanged sets currentUser)
     useEffect(() => {
         if (currentUser) {
             navigate(getRedirectTarget(), { replace: true });
         }
     }, [currentUser, navigate, location]);
 
-    // Don't show signup form if already logged in
     if (currentUser) {
         return (
             <div className="min-h-screen bg-white flex flex-col items-center justify-center">
@@ -44,9 +41,9 @@ export default function Signup() {
             <main className="flex-1 flex items-center justify-center section-pad py-20">
                 <div className="w-full max-w-sm">
                     <div className="text-left mb-16">
-                        <h1 className="hero-title text-black text-left mb-6">SIGN UP</h1>
+                        <h1 className="hero-title text-black text-left mb-6">WELCOME</h1>
                         <p className="text-[12px] tracking-[0.2em] text-gray-400 font-bold uppercase leading-relaxed">
-                            Join the NYNTH community to access exclusive Pieces and track your orders.
+                            Sign in to track orders and access exclusive drops.
                         </p>
                     </div>
 
@@ -63,14 +60,12 @@ export default function Signup() {
                                     } else {
                                         toast.success("Welcome back");
                                     }
-                                    // Direct navigate as backup (in case useEffect timing is off)
                                     navigate(getRedirectTarget(), { replace: true });
                                 } catch (error) {
                                     setLoading(false);
-                                    // Silent for user-cancelled popups
                                     if (error.code !== "auth/popup-closed-by-user" && error.code !== "auth/cancelled-popup-request") {
                                         console.error("Google auth error:", error);
-                                        toast.error("Google Sign Up Failed");
+                                        toast.error("Sign in failed. Please try again.");
                                     }
                                 }
                             }}
@@ -82,14 +77,17 @@ export default function Signup() {
                             ) : (
                                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
                             )}
-                            {loading ? "AUTHENTICATING..." : "SIGN UP WITH GOOGLE"}
+                            {loading ? "AUTHENTICATING..." : "SIGN IN WITH GOOGLE"}
                         </button>
 
                         <p className="text-center text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase mt-8">
-                            Already have an account?{" "}
-                            <Link to="/login" className="text-black hover:underline underline-offset-4">
-                                Sign in
-                            </Link>
+                            OR{" "}
+                            <button
+                                onClick={() => navigate(getRedirectTarget(), { replace: true })}
+                                className="text-black hover:underline underline-offset-4"
+                            >
+                                Continue as Guest
+                            </button>
                         </p>
                     </div>
                 </div>

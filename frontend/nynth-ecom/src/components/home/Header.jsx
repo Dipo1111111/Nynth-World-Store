@@ -84,6 +84,25 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close search on Escape key
+  useEffect(() => {
+    if (!isSearchOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsSearchOpen(false);
+        setSearchQuery("");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isSearchOpen]);
+
+  // Close search on navigation
+  useEffect(() => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+  }, [location.pathname]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -159,7 +178,7 @@ export default function Header() {
             {/* Right: Icons (Far Right) */}
             <div className="flex-1 flex items-center justify-end gap-1 md:gap-3">
               <Link
-                to={currentUser ? "/account" : "/login"}
+                to={currentUser ? "/account" : "/signup"}
                 className="p-1.5 hover:opacity-50 transition-opacity hidden md:flex"
               >
                 <User size={16} className="text-black" strokeWidth={2} />
@@ -177,30 +196,12 @@ export default function Header() {
                 )}
               </button>
 
-              {!isSearchOpen && (
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="p-1.5 hover:opacity-50 transition-opacity"
-                >
-                  <Search size={16} className="text-black" strokeWidth={2} />
-                </button>
-              )}
-
-              {isSearchOpen && (
-                <form onSubmit={handleSearch} className="flex items-center">
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder="SEARCH"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-24 md:w-32 bg-transparent text-[8px] tracking-[0.2em] font-inter focus:outline-none border-b border-black pb-0.5 uppercase font-bold"
-                  />
-                  <button type="button" onClick={() => setIsSearchOpen(false)} className="ml-1">
-                    <X size={12} />
-                  </button>
-                </form>
-              )}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-1.5 hover:opacity-50 transition-opacity"
+              >
+                <Search size={16} className="text-black" strokeWidth={2} />
+              </button>
             </div>
           </div>
         </div>
@@ -231,8 +232,8 @@ export default function Header() {
                   <span>Bag</span>
                   <span className="bg-black text-white px-2 py-0.5 text-[9px]">{totalItems}</span>
                 </Link>
-                <Link to={currentUser ? "/account" : "/login"} onClick={() => setIsMenuOpen(false)} className="block text-[11px] tracking-[0.3em] font-bold uppercase text-black">
-                  {currentUser ? "Account" : "Login"}
+                <Link to={currentUser ? "/account" : "/signup"} onClick={() => setIsMenuOpen(false)} className="block text-[11px] tracking-[0.3em] font-bold uppercase text-black">
+                  {currentUser ? "Account" : "Sign Up"}
                 </Link>
               </div>
             </div>
@@ -242,6 +243,31 @@ export default function Header() {
 
       {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Search Overlay */}
+      {isSearchOpen && (
+        <div className="fixed top-0 left-0 w-full z-[70] bg-white border-b border-black/10 animate-fadeIn">
+          <div className="flex items-center gap-4 px-6 md:px-10 py-4">
+            <Search size={16} className="text-gray-400 shrink-0" strokeWidth={2} />
+            <form onSubmit={handleSearch} className="flex-1 flex items-center">
+              <input
+                autoFocus
+                type="text"
+                placeholder="SEARCH PRODUCTS..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent text-[11px] tracking-[0.2em] font-inter focus:outline-none uppercase font-bold placeholder:text-gray-300"
+              />
+            </form>
+            <button
+              onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+              className="p-1 hover:opacity-50 transition-opacity shrink-0"
+            >
+              <X size={16} strokeWidth={2} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Spacer — pushes page content below the fixed navbar.
           Height = announcement bar (when visible) + navbar. */}
