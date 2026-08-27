@@ -125,7 +125,9 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     };
 
     const applyBulk = (region, group, value) => {
-        const num = parseAmount(value);
+        const trimmed = (value ?? "").toString().trim();
+        if (trimmed === "") return; // empty bulk field = nothing to apply, not an error
+        const num = parseAmount(trimmed);
         if (Number.isNaN(num)) {
             toast.error("Enter a valid amount");
             return;
@@ -144,7 +146,9 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     };
 
     const applyBulkInterstate = (region, group, value) => {
-        const num = parseAmount(value);
+        const trimmed = (value ?? "").toString().trim();
+        if (trimmed === "") return; // empty bulk field = nothing to apply, not an error
+        const num = parseAmount(trimmed);
         if (Number.isNaN(num)) {
             toast.error("Enter a valid amount");
             return;
