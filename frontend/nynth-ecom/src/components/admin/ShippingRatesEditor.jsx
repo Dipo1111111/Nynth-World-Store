@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Pencil, Truck, Save, RotateCcw, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -77,6 +77,13 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     const [saving, setSaving] = useState(false);
     const [editing, setEditing] = useState(null); // `${region}:${key}` or `${region}:${state}:${field}`
     const [bulk, setBulk] = useState({});          // `${region}:${groupId}` -> string
+
+    // Tracks whether there are staged edits not yet published by Save Rates.
+    const baselineRef = useRef(JSON.stringify(settings.shipping_rates ?? EMPTY_SHIPPING_RATES));
+    const [dirty, setDirty] = useState(false);
+    useEffect(() => {
+        setDirty(JSON.stringify(settings.shipping_rates ?? EMPTY_SHIPPING_RATES) !== baselineRef.current);
+    }, [settings.shipping_rates]);
 
     const rates = settings.shipping_rates || EMPTY_SHIPPING_RATES;
     const lagosRates = effectiveLagosRates(settings);
@@ -170,6 +177,8 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
         setSaving(true);
         try {
             await onSaveRates();
+            baselineRef.current = JSON.stringify(settings.shipping_rates ?? EMPTY_SHIPPING_RATES);
+            setDirty(false);
         } finally {
             setSaving(false);
         }
@@ -192,19 +201,24 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                 <div className="flex items-center gap-2">
                     <Truck size={18} className="text-gray-400" />
                     <h3 className="font-bold text-lg">Shipping Rates</h3>
+                    {dirty && (
+                        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Unsaved
+                        </span>
+                    )}
                 </div>
                 <button
                     type="button"
                     onClick={handleSave}
-                    disabled={saving}
-                    className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-60 transition-all"
+                    disabled={saving || !dirty}
+                    className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                     {saving ? <Save size={14} className="animate-pulse" /> : <Save size={14} />}
                     {saving ? "Saving..." : "Save Rates"}
                 </button>
             </div>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                Click the pen icon on any location to edit its price. Use a zone's bulk field to update every area in that zone at once. Changes apply at checkout as soon as you Save Rates.
+                Edit one location with its pen (press Enter to confirm). Or fill a whole zone at once with "Set all". Edits stage below — hit <span className="text-black">Save Rates</span> to publish them to checkout.
             </p>
 
             {/* LAGOS + ABUJA */}
@@ -245,9 +259,11 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             <button
                                                 type="button"
                                                 onClick={() => applyBulk(region, group, bulk[bulkKey])}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
+                                                disabled={(bulk[bulkKey] ?? "").toString().trim() === ""}
+                                                title="Fill every area in this zone with one price"
+                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                                             >
-                                                <Check size={12} /> Apply
+                                                <Check size={12} /> Set all
                                             </button>
                                         </div>
                                     </div>
@@ -322,9 +338,11 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                         <button
                                             type="button"
                                             onClick={() => applyBulkInterstate(null, group, bulk[bulkKey])}
-                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
+                                            disabled={(bulk[bulkKey] ?? "").toString().trim() === ""}
+                                            title="Fill every state in this region with one price"
+                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                                         >
-                                            <Check size={12} /> Apply
+                                            <Check size={12} /> Set all
                                         </button>
                                     </div>
                                 </div>
