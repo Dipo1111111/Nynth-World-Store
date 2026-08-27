@@ -15,6 +15,16 @@ import {
     effectiveInterstateRates
 } from "../../utils/shippingRates";
 
+// Strip currency symbols / thousands separators and parse to a number.
+// Returns NaN when there are no usable digits (e.g. empty, "abc", or "₦").
+const parseAmount = (raw) => {
+    if (raw == null) return NaN;
+    const cleaned = String(raw).replace(/[^0-9.]/g, "");
+    if (cleaned === "" || cleaned === ".") return NaN;
+    const num = Number(cleaned);
+    return Number.isNaN(num) ? NaN : num;
+};
+
 // Inline-editable price chip. region/key identify the override slot.
 function PriceChip({ editingKey, value, isOverridden, onEdit, onCommit, onReset }) {
     const isEditing = editingKey !== null;
@@ -23,7 +33,8 @@ function PriceChip({ editingKey, value, isOverridden, onEdit, onCommit, onReset 
         return (
             <input
                 autoFocus
-                type="number"
+                type="text"
+                inputMode="decimal"
                 defaultValue={value}
                 onBlur={(e) => onCommit(e.target.value)}
                 onKeyDown={(e) => {
@@ -74,27 +85,39 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
 
     // --- writers ----------------------------------------------------------
     const writeSingle = (region, key, value, baseValue) => {
+        if (value === "" || value == null) {
+            setSettings((prev) => {
+                const regionMap = { ...(prev.shipping_rates?.[region] || {}) };
+                delete regionMap[key];
+                return { ...prev, shipping_rates: { ...prev.shipping_rates, [region]: regionMap } };
+            });
+            return;
+        }
+        const num = parseAmount(value);
+        if (Number.isNaN(num)) {
+            toast.error("Enter a valid amount");
+            return;
+        }
         setSettings((prev) => {
             const regionMap = { ...(prev.shipping_rates?.[region] || {}) };
-            if (value === "" || value == null) {
-                delete regionMap[key];
-            } else {
-                const num = Number(value);
-                if (Number.isNaN(num)) return prev;
-                if (num === baseValue) delete regionMap[key];
-                else regionMap[key] = num;
-            }
+            if (num === baseValue) delete regionMap[key];
+            else regionMap[key] = num;
             return { ...prev, shipping_rates: { ...prev.shipping_rates, [region]: regionMap } };
         });
     };
 
     const writeInterstate = (state, field, value) => {
+        const parsed = value === "" || value == null ? null : parseAmount(value);
+        if (parsed !== null && Number.isNaN(parsed)) {
+            toast.error("Enter a valid amount");
+            return;
+        }
         setSettings((prev) => {
             const regionMap = { ...(prev.shipping_rates?.interstate || {}) };
             const base = INTERSTATE_SHIPPING_DATA[state];
             const cur = regionMap[state] || { home: base.home, park: base.park };
-            const home = field === "home" ? (value === "" ? base.home : Number(value)) : cur.home;
-            const park = field === "park" ? (value === "" ? base.park : Number(value)) : cur.park;
+            const home = field === "home" ? (value === "" || value == null ? base.home : parsed) : cur.home;
+            const park = field === "park" ? (value === "" || value == null ? base.park : parsed) : cur.park;
             if (home === base.home && park === base.park) delete regionMap[state];
             else regionMap[state] = { home, park };
             return { ...prev, shipping_rates: { ...prev.shipping_rates, interstate: regionMap } };
@@ -102,8 +125,8 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     };
 
     const applyBulk = (region, group, value) => {
-        const num = Number(value);
-        if (value === "" || Number.isNaN(num)) {
+        const num = parseAmount(value);
+        if (Number.isNaN(num)) {
             toast.error("Enter a valid amount");
             return;
         }
@@ -121,8 +144,8 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     };
 
     const applyBulkInterstate = (region, group, value) => {
-        const num = Number(value);
-        if (value === "" || Number.isNaN(num)) {
+        const num = parseAmount(value);
+        if (Number.isNaN(num)) {
             toast.error("Enter a valid amount");
             return;
         }
@@ -208,7 +231,8 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Set all to</span>
                                             <span className="text-gray-400 text-xs font-bold">{currencySymbol}</span>
                                             <input
-                                                type="number"
+                                                type="text"
+                                                inputMode="decimal"
                                                 value={bulk[bulkKey] || ""}
                                                 onChange={(e) => setBulk((prev) => ({ ...prev, [bulkKey]: e.target.value }))}
                                                 placeholder="₦"
@@ -284,7 +308,8 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                         <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Set all to</span>
                                         <span className="text-gray-400 text-xs font-bold">{currencySymbol}</span>
                                         <input
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
                                             value={bulk[bulkKey] || ""}
                                             onChange={(e) => setBulk((prev) => ({ ...prev, [bulkKey]: e.target.value }))}
                                             placeholder="₦"
