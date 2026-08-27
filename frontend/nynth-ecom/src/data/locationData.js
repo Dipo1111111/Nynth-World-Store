@@ -1,3 +1,12 @@
+// ============================================================================
+// CITY RIDERS LOGISTICS — SHIPPING RATE CARD 2026
+// Ref: CR/2026/FA-001 (updates communicated June 19, 2026)
+// ----------------------------------------------------------------------------
+// Base prices live here. Admin can override any of them from the Admin >
+// Settings > Shipping Rates editor; overrides are merged on top of these
+// base values at checkout time (see src/utils/shippingRates.js).
+// ============================================================================
+
 export const LAGOS_SHIPPING_DATA = {
     // 1. UPDATED LOCATIONS (SAME DAY DELIVERY)
     "Abijo": { price: 5000, speed: "Same Day Delivery" },
@@ -168,49 +177,195 @@ export const ABUJA_SHIPPING_DATA = {
     "Gaduwa": { price: 5000, speed: "Delivery" },
     "Garki": { price: 5000, speed: "Delivery" },
     "Durumi": { price: 5000, speed: "Delivery" },
-    "Kuje": { price: 5000, speed: "Delivery" },
+    "Kuje": { price: 5000, speed: "Delivery" }
 };
 
+// INTERSTATE — 2026 RATE CARD (Out of Lagos)
+// South West ₦6,500 | South East ₦8,500 | South South ₦8,500 (Akwa Ibom /
+// Cross River ₦9,500) | North Central / North West / North East ₦10,000
 export const INTERSTATE_SHIPPING_DATA = {
-    // ZONE 3 — SOUTH WEST (₦8,500 flat)
-    "Ekiti": { home: 8500, park: 8500 },
-    "Ondo": { home: 8500, park: 8500 },
-    "Osun": { home: 8500, park: 8500 },
-    "Oyo": { home: 8500, park: 8500 },
-    "Ogun": { home: 8500, park: 8500 },
+    // SOUTH WEST
+    "Ekiti": { home: 6500, park: 6500 },
+    "Ondo": { home: 6500, park: 6500 },
+    "Osun": { home: 6500, park: 6500 },
+    "Oyo": { home: 6500, park: 6500 },
+    "Ogun": { home: 6500, park: 6500 },
 
-    // ZONE 4 — SOUTH SOUTH + SOUTH EAST (₦9,000 flat)
-    "Akwa Ibom": { home: 9000, park: 9000 },
-    "Cross River": { home: 9000, park: 9000 },
-    "Bayelsa": { home: 9000, park: 9000 },
-    "Rivers": { home: 9000, park: 9000 },
-    "Delta": { home: 9000, park: 9000 },
-    "Edo": { home: 9000, park: 9000 },
-    "Enugu": { home: 9000, park: 9000 },
-    "Anambra": { home: 9000, park: 9000 },
-    "Ebonyi": { home: 9000, park: 9000 },
-    "Imo": { home: 9000, park: 9000 },
-    "Abia": { home: 9000, park: 9000 },
+    // SOUTH EAST
+    "Enugu": { home: 8500, park: 8500 },
+    "Anambra": { home: 8500, park: 8500 },
+    "Ebonyi": { home: 8500, park: 8500 },
+    "Imo": { home: 8500, park: 8500 },
+    "Abia": { home: 8500, park: 8500 },
 
-    // ZONE 2 — NORTH CENTRAL + NORTH WEST + NORTH EAST (₦7,500 flat)
-    "Niger": { home: 7500, park: 7500 },
-    "Benue": { home: 7500, park: 7500 },
-    "Nasarawa": { home: 7500, park: 7500 },
-    "Plateau": { home: 7500, park: 7500 },
-    "Kogi": { home: 7500, park: 7500 },
-    "Abuja": { home: 7500, park: 7500 },
-    "Kwara": { home: 7500, park: 7500 },
-    "Jigawa": { home: 7500, park: 7500 },
-    "Kano": { home: 7500, park: 7500 },
-    "Katsina": { home: 7500, park: 7500 },
-    "Kaduna": { home: 7500, park: 7500 },
-    "Zamfara": { home: 7500, park: 7500 },
-    "Sokoto": { home: 7500, park: 7500 },
-    "Kebbi": { home: 7500, park: 7500 },
-    "Gombe": { home: 7500, park: 7500 },
-    "Bauchi": { home: 7500, park: 7500 },
-    "Yobe": { home: 7500, park: 7500 },
-    "Borno": { home: 7500, park: 7500 },
-    "Adamawa": { home: 7500, park: 7500 },
-    "Taraba": { home: 7500, park: 7500 }
+    // SOUTH SOUTH
+    "Akwa Ibom": { home: 9500, park: 9500 },
+    "Cross River": { home: 9500, park: 9500 },
+    "Bayelsa": { home: 8500, park: 8500 },
+    "Rivers": { home: 8500, park: 8500 },
+    "Delta": { home: 8500, park: 8500 },
+    "Edo": { home: 8500, park: 8500 },
+
+    // NORTH CENTRAL (Abuja handled separately via ABUJA_SHIPPING_DATA)
+    "Niger": { home: 10000, park: 10000 },
+    "Benue": { home: 10000, park: 10000 },
+    "Nasarawa": { home: 10000, park: 10000 },
+    "Plateau": { home: 10000, park: 10000 },
+    "Kogi": { home: 10000, park: 10000 },
+    "Kwara": { home: 10000, park: 10000 },
+
+    // NORTH WEST
+    "Jigawa": { home: 10000, park: 10000 },
+    "Kano": { home: 10000, park: 10000 },
+    "Katsina": { home: 10000, park: 10000 },
+    "Kaduna": { home: 10000, park: 10000 },
+    "Kebbi": { home: 10000, park: 10000 },
+    "Zamfara": { home: 10000, park: 10000 },
+    "Sokoto": { home: 10000, park: 10000 },
+
+    // NORTH EAST
+    "Gombe": { home: 10000, park: 10000 },
+    "Bauchi": { home: 10000, park: 10000 },
+    "Yobe": { home: 10000, park: 10000 },
+    "Borno": { home: 10000, park: 10000 },
+    "Adamawa": { home: 10000, park: 10000 },
+    "Taraba": { home: 10000, park: 10000 }
+};
+
+// ----------------------------------------------------------------------------
+// ZONE / REGION GROUPINGS — used by the admin Shipping Rates editor for
+// grouped (bulk) editing. Each area/state is listed under exactly one group.
+// ----------------------------------------------------------------------------
+
+export const LAGOS_ZONES = [
+    {
+        id: "mainland-a",
+        name: "Mainland Zone A",
+        price: 3000,
+        areas: [
+            "Alapere", "Gbagada", "Ifako Ijaiye", "Ikeja", "Ikosi", "Ketu",
+            "Magodo", "Magodo 1", "Maryland", "Mile 12", "New Garage", "Obawole",
+            "Ogba", "Ogudu", "Ojota", "Ojodu", "Olowoira", "Omole 1", "Omole 2", "Oworo"
+        ]
+    },
+    {
+        id: "mainland-b",
+        name: "Mainland Zone B",
+        price: 3500,
+        areas: [
+            "Anthony", "Idi Araba", "Idi Iroko", "Obanikoro", "Somolu", "Yaba",
+            "Surulere", "Pedro", "Gbagada Phase 1", "Bariga", "Isolo", "Ajao Estate",
+            "Ikeja Airport", "Ago palace", "Costain", "Ebute Metta", "Jibowu",
+            "Fadeyi", "Mushin", "Ilupeju", "Ilasamaja", "Ilasa", "Iddo", "Cement",
+            "LUTH", "Mangoro", "Opic", "Papa Ajao", "Palmgrove", "Oshodi",
+            "Oyingbo", "Onipanu"
+        ]
+    },
+    {
+        id: "mainland-c",
+        name: "Mainland Zone C",
+        price: 4000,
+        areas: [
+            "Abuleegba", "Agege", "Ajegunle", "Akowonjo", "Alaguntan", "Alimosho",
+            "Amuwo", "Apapa", "Ayobo", "Egbeda", "Ejigbo", "Festac", "Idimu",
+            "Igando", "Ijegun", "Ikotun", "Isheri oshun", "Isheri olofin",
+            "Ipaja", "Iyana ipaja", "Meiran", "Mile2", "Shasha", "Satellite"
+        ]
+    },
+    {
+        id: "island-a",
+        name: "Island Zone A",
+        price: 4000,
+        areas: [
+            "Ikate", "Ikoyi", "Ilasan", "Jakande", "Lagos Island", "Marina",
+            "Oniru", "Vi", "Osapa"
+        ]
+    },
+    {
+        id: "island-b",
+        name: "Island Zone B",
+        price: 4000,
+        areas: [
+            "Agungi", "Chevron", "Ikota", "Lekki 2", "Lekkil", "Ologolo", "Orchid", "VGC"
+        ]
+    },
+    {
+        id: "island-c",
+        name: "Island Zone C",
+        price: 5000,
+        areas: [
+            "Abijo", "Ajah", "Awoyaya", "Badore", "Ogombo", "Sangotedo"
+        ]
+    },
+    {
+        id: "extreme-lagos",
+        name: "Extreme Lagos",
+        price: 6000,
+        areas: [
+            "Abule Ado", "Agbara", "Akute", "Alaagbado", "Araga", "Arepo", "Asese",
+            "Badagry", "Dangote Refinery", "Epe Ibeju", "Ikorodu", "Ibafo", "Imota",
+            "Kola", "LASU", "Mowe", "Ojo", "Okokomiako", "Sango Otta", "Shibiti",
+            "Tradefair"
+        ]
+    },
+    {
+        id: "other",
+        name: "Other / Legacy Areas",
+        price: null,
+        areas: [
+            "Abule Oja", "Akoka", "Akute Border", "Alaka Estate", "Computer Village",
+            "Dopemu", "Fagba", "Iganmu", "Ijaiye", "Ijesha Surulere", "Iju",
+            "Ojuelegba", "Baruwa", "Gowon Estate", "Okota", "Obalende",
+            "Osborne Foreshore", "Abraham Adesanya", "Ilaje", "Magboro", "Ijanikin",
+            "Lekki Deep Sea Port"
+        ]
+    }
+];
+
+export const INTERSTATE_REGIONS = [
+    {
+        id: "south-west",
+        name: "South West",
+        price: 6500,
+        states: ["Ekiti", "Ondo", "Osun", "Oyo", "Ogun"]
+    },
+    {
+        id: "south-east",
+        name: "South East",
+        price: 8500,
+        states: ["Enugu", "Anambra", "Ebonyi", "Imo", "Abia"]
+    },
+    {
+        id: "south-south",
+        name: "South South",
+        price: 8500,
+        states: ["Akwa Ibom", "Cross River", "Bayelsa", "Rivers", "Delta", "Edo"]
+    },
+    {
+        id: "north-central",
+        name: "North Central",
+        price: 10000,
+        states: ["Niger", "Benue", "Nasarawa", "Plateau", "Kogi", "Kwara"]
+    },
+    {
+        id: "north-west",
+        name: "North West",
+        price: 10000,
+        states: ["Jigawa", "Kano", "Katsina", "Kaduna", "Kebbi", "Zamfara", "Sokoto"]
+    },
+    {
+        id: "north-east",
+        name: "North East",
+        price: 10000,
+        states: ["Gombe", "Bauchi", "Yobe", "Borno", "Adamawa", "Taraba"]
+    }
+];
+
+// The shape persisted to Firestore (settings.site_config.shipping_rates).
+// Only *changed* values are written; everything else falls back to the base
+// prices above.
+export const EMPTY_SHIPPING_RATES = {
+    lagos: {},
+    abuja: {},
+    interstate: {}
 };

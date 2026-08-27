@@ -12,7 +12,7 @@ import { useSettings } from "../context/SettingsContext";
 import { trackConversion } from "../utils/monitoring";
 
 import Logo from "../components/common/Logo";
-import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../data/locationData";
+import { effectiveLagosRates, effectiveAbujaRates, effectiveInterstateRates } from "../utils/shippingRates";
 
 const Checkout = () => {
   const { settings } = useSettings();
@@ -24,14 +24,20 @@ const Checkout = () => {
   const disabledLagos = settings?.disabled_locations?.lagos || [];
   const disabledAbuja = settings?.disabled_locations?.abuja || [];
   const disabledInterstate = settings?.disabled_locations?.interstate || [];
-  const enabledLagosAreas = Object.keys(LAGOS_SHIPPING_DATA).filter(a => !disabledLagos.includes(a)).sort();
-  const enabledAbujaAreas = Object.keys(ABUJA_SHIPPING_DATA).filter(a => !disabledAbuja.includes(a)).sort();
+
+  // Effective rates = base prices merged with any admin overrides from Firestore
+  const lagosRates = effectiveLagosRates(settings);
+  const abujaRates = effectiveAbujaRates(settings);
+  const interstateRates = effectiveInterstateRates(settings);
+
+  const enabledLagosAreas = Object.keys(lagosRates).filter(a => !disabledLagos.includes(a)).sort();
+  const enabledAbujaAreas = Object.keys(abujaRates).filter(a => !disabledAbuja.includes(a)).sort();
   const allAbujaDisabled = enabledAbujaAreas.length === 0;
   const allLagosDisabled = enabledLagosAreas.length === 0;
 
   // Build state list: only show states that have at least one enabled area
   // Remove Abuja from INTERSTATE_SHIPPING_DATA since it's handled separately
-  const enabledInterstates = Object.keys(INTERSTATE_SHIPPING_DATA)
+  const enabledInterstates = Object.keys(interstateRates)
     .filter(s => s !== "Abuja" && !disabledInterstate.includes(s))
     .sort();
 
@@ -116,21 +122,21 @@ const Checkout = () => {
     if (form.state === "Lagos") {
       if (form.city === "NYNTH WORLD (TEST)") {
         setShippingFee(0);
-      } else if (form.city && LAGOS_SHIPPING_DATA[form.city]) {
-        setShippingFee(LAGOS_SHIPPING_DATA[form.city].price);
+      } else if (form.city && lagosRates[form.city]) {
+        setShippingFee(lagosRates[form.city].price);
       } else {
         setShippingFee(settings.shipping_fee || 0);
       }
-    } else if (form.state === "Abuja" && form.city && ABUJA_SHIPPING_DATA[form.city]) {
-      setShippingFee(ABUJA_SHIPPING_DATA[form.city].price);
-    } else if (INTERSTATE_SHIPPING_DATA[form.state]) {
-      const stateData = INTERSTATE_SHIPPING_DATA[form.state];
+    } else if (form.state === "Abuja" && form.city && abujaRates[form.city]) {
+      setShippingFee(abujaRates[form.city].price);
+    } else if (interstateRates[form.state]) {
+      const stateData = interstateRates[form.state];
       // Flat rate — same price regardless of weight or delivery method
       setShippingFee(stateData.home);
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
-  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, totalAmount]);
+  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, totalAmount, lagosRates, abujaRates, interstateRates]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -526,7 +532,7 @@ const Checkout = () => {
                     <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Home Delivery</span>
                   </label>
                   
-                  {INTERSTATE_SHIPPING_DATA[form.state]?.park !== INTERSTATE_SHIPPING_DATA[form.state]?.home && (
+                  {interstateRates[form.state]?.park !== interstateRates[form.state]?.home && (
                     <label className="flex items-center gap-3 cursor-pointer group">
                       <input
                         type="radio"
@@ -540,7 +546,7 @@ const Checkout = () => {
                     </label>
                   )}
                 </div>
-                {INTERSTATE_SHIPPING_DATA[form.state]?.park === INTERSTATE_SHIPPING_DATA[form.state]?.home && (
+                {interstateRates[form.state]?.park === interstateRates[form.state]?.home && (
                   <p className="text-[9px] text-gray-400 uppercase tracking-widest">Only Home Delivery is available for this state.</p>
                 )}
               </div>

@@ -6,7 +6,8 @@ import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, Image
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
-import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA } from "../../data/locationData";
+import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA, EMPTY_SHIPPING_RATES } from "../../data/locationData";
+import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
 
 export default function AdminSettings() {
     const [settings, setSettings] = useState({
@@ -44,7 +45,8 @@ export default function AdminSettings() {
         announcement_bar_enabled: false,
         announcement_bar_text: "NEXT DROP IN:",
         marquee_enabled: false,
-        marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000"
+        marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
+        shipping_rates: { lagos: {}, abuja: {}, interstate: {} }
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -109,6 +111,7 @@ export default function AdminSettings() {
                         available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
                         available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL",
                         disabled_locations: data.disabled_locations || { lagos: [], abuja: [], interstate: [] },
+                        shipping_rates: data.shipping_rates || { lagos: {}, abuja: {}, interstate: {} },
                         announcement_bar_enabled: data.announcement_bar_enabled !== undefined ? data.announcement_bar_enabled : false,
                         announcement_bar_text: data.announcement_bar_text || "NEXT DROP IN:",
                         marquee_enabled: data.marquee_enabled !== undefined ? data.marquee_enabled : false,
@@ -579,6 +582,22 @@ export default function AdminSettings() {
                         />
                     </div>
                 </div>
+
+                {/* Shipping Rates Editor */}
+                <ShippingRatesEditor
+                    settings={settings}
+                    setSettings={setSettings}
+                    currencySymbol={settings.currency_symbol}
+                    onSaveRates={async () => {
+                        const ok = await updateSettings({ shipping_rates: settings.shipping_rates });
+                        if (ok) {
+                            toast.success("Shipping rates saved");
+                            refreshSettings();
+                        } else {
+                            toast.error("Failed to save shipping rates");
+                        }
+                    }}
+                />
 
                 {/* Shipping Location Toggles */}
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
