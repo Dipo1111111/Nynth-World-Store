@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
@@ -46,6 +46,9 @@ export default function AdminSettings() {
         announcement_bar_text: "NEXT DROP IN:",
         marquee_enabled: false,
         marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
+        free_delivery_enabled: true,
+        free_delivery_threshold: 50000,
+        our_story_content: null,
         shipping_rates: { lagos: {}, abuja: {}, interstate: {} }
     });
     const [loading, setLoading] = useState(true);
@@ -115,7 +118,10 @@ export default function AdminSettings() {
                         announcement_bar_enabled: data.announcement_bar_enabled !== undefined ? data.announcement_bar_enabled : false,
                         announcement_bar_text: data.announcement_bar_text || "NEXT DROP IN:",
                         marquee_enabled: data.marquee_enabled !== undefined ? data.marquee_enabled : false,
-                        marquee_text: data.marquee_text || "FREE DELIVERY ON ORDERS OVER ₦50,000"
+                        marquee_text: data.marquee_text || "FREE DELIVERY ON ORDERS OVER ₦50,000",
+                        free_delivery_enabled: data.free_delivery_enabled !== undefined ? data.free_delivery_enabled : true,
+                        free_delivery_threshold: data.free_delivery_threshold || 50000,
+                        our_story_content: data.our_story_content || null
                     }));
                 }
             } catch (error) {
@@ -583,6 +589,47 @@ export default function AdminSettings() {
                     </div>
                 </div>
 
+                {/* Free Delivery Discount */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={Percent} title="Free Delivery Discount" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
+                    </p>
+
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Free Delivery Discount</h4>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="free_delivery_enabled"
+                                checked={settings.free_delivery_enabled}
+                                onChange={handleChange}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                        </label>
+                    </div>
+
+                    {settings.free_delivery_enabled && (
+                        <div className="max-w-xs space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Minimum Order Amount ({settings.currency_symbol})</label>
+                            <input
+                                name="free_delivery_threshold"
+                                type="number"
+                                value={settings.free_delivery_threshold}
+                                onChange={handleChange}
+                                min="0"
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="50000"
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
+                        </div>
+                    )}
+                </div>
+
                 {/* Shipping Rates Editor */}
                 <ShippingRatesEditor
                     settings={settings}
@@ -995,6 +1042,264 @@ export default function AdminSettings() {
                     </div>
                 </div>
 
+
+                {/* Our Story Editor */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <SectionTitle icon={BookOpen} title="Our Story" />
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+                        Edit the content displayed on the /our-story page. If left empty, the default hardcoded content is shown.
+                    </p>
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Company Name</label>
+                            <input
+                                name="our_story_company"
+                                value={settings.our_story_content?.company || ""}
+                                onChange={(e) => {
+                                    const current = settings.our_story_content || {};
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        our_story_content: { ...current, company: e.target.value }
+                                    }));
+                                }}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                placeholder="NYNTH WORLD LTD"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Founded Date</label>
+                                <input
+                                    name="our_story_founded"
+                                    value={settings.our_story_content?.founded || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, founded: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="Founded October 20, 2022"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">CAC Registration</label>
+                                <input
+                                    name="our_story_cac"
+                                    value={settings.our_story_content?.cac || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, cac: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="Registered with the Corporate Affairs Commission (CAC), October 2, 2025"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Founder Label</label>
+                                <input
+                                    name="our_story_founder_label"
+                                    value={settings.our_story_content?.founder_label || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, founder_label: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="Founder & Chief Executive Officer"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Founder Name</label>
+                                <input
+                                    name="our_story_founder_name"
+                                    value={settings.our_story_content?.founder_name || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, founder_name: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="Yange Newman Terseer"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Belief Statement (Italic)</label>
+                            <textarea
+                                name="our_story_belief"
+                                value={settings.our_story_content?.belief || ""}
+                                onChange={(e) => {
+                                    const current = settings.our_story_content || {};
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        our_story_content: { ...current, belief: e.target.value }
+                                    }));
+                                }}
+                                rows={3}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm italic"
+                                placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Belief Description</label>
+                            <textarea
+                                name="our_story_belief_desc"
+                                value={settings.our_story_content?.belief_desc || ""}
+                                onChange={(e) => {
+                                    const current = settings.our_story_content || {};
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        our_story_content: { ...current, belief_desc: e.target.value }
+                                    }));
+                                }}
+                                rows={2}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+                                placeholder="It is a brand based on mindset.&#10;A standard for people who choose to rise in every situation."
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Origin Story</label>
+                            <textarea
+                                name="our_story_origin"
+                                value={settings.our_story_content?.origin || ""}
+                                onChange={(e) => {
+                                    const current = settings.our_story_content || {};
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        our_story_content: { ...current, origin: e.target.value }
+                                    }));
+                                }}
+                                rows={4}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+                                placeholder="NYNTH started from a real moment.&#10;The Founder was ranked 9th across 9 subjects and told he would not succeed.&#10;That moment did not create doubt. It created a shift in mindset."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Origin Quote Line 1</label>
+                                <input
+                                    name="our_story_quote1"
+                                    value={settings.our_story_content?.quote1 || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, quote1: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
+                                    placeholder="Position is temporary."
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Origin Quote Line 2</label>
+                                <input
+                                    name="our_story_quote2"
+                                    value={settings.our_story_content?.quote2 || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, quote2: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
+                                    placeholder="Mindset is Permanent."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Meaning Section</label>
+                            <textarea
+                                name="our_story_meaning"
+                                value={settings.our_story_content?.meaning || ""}
+                                onChange={(e) => {
+                                    const current = settings.our_story_content || {};
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        our_story_content: { ...current, meaning: e.target.value }
+                                    }));
+                                }}
+                                rows={4}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+                                placeholder="NYNTH is not just a number. It stands for elevation.&#10;It represents people who push past limits,&#10;stay disciplined,&#10;and keep the mindset of staying above."
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Philosophy Section</label>
+                            <textarea
+                                name="our_story_philosophy"
+                                value={settings.our_story_content?.philosophy || ""}
+                                onChange={(e) => {
+                                    const current = settings.our_story_content || {};
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        our_story_content: { ...current, philosophy: e.target.value }
+                                    }));
+                                }}
+                                rows={4}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+                                placeholder="Every NYNTH piece is made with intention.&#10;Not just as clothing, but as identity.&#10;When you see NYNTH, you see a person who keeps going."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Footer Tagline</label>
+                                <input
+                                    name="our_story_tagline"
+                                    value={settings.our_story_content?.tagline || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, tagline: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="BY WINNERS, FOR WINNERS, stay above"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Footer Company Name</label>
+                                <input
+                                    name="our_story_footer_name"
+                                    value={settings.our_story_content?.footer_name || ""}
+                                    onChange={(e) => {
+                                        const current = settings.our_story_content || {};
+                                        setSettings(prev => ({
+                                            ...prev,
+                                            our_story_content: { ...current, footer_name: e.target.value }
+                                        }));
+                                    }}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+                                    placeholder="NYNTH WORLD LTD"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Submit */}
                 <div className="flex justify-end pt-4">

@@ -113,8 +113,10 @@ const Checkout = () => {
   }, 0);
 
   useEffect(() => {
-    // Free delivery on orders over ₦50,000
-    if (totalAmount >= 50000) {
+    // Free delivery on orders over configurable threshold
+    const freeDeliveryEnabled = settings?.free_delivery_enabled !== false;
+    const freeDeliveryThreshold = settings?.free_delivery_threshold || 50000;
+    if (freeDeliveryEnabled && totalAmount >= freeDeliveryThreshold) {
       setShippingFee(0);
       return;
     }
@@ -645,7 +647,7 @@ const Checkout = () => {
               <span className="text-gray-400">Shipping</span>
               <div className="text-right">
                 <span className="text-black font-bold uppercase block">
-                  {shippingFee === 0 && totalAmount >= 50000
+                  {shippingFee === 0 && settings?.free_delivery_enabled !== false && totalAmount >= (settings?.free_delivery_threshold || 50000)
                     ? "FREE DELIVERY"
                     : form.city ? `${form.city.toUpperCase()} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"
                   }

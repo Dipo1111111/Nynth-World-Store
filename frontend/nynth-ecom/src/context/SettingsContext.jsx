@@ -34,6 +34,9 @@ export function SettingsProvider({ children }) {
         announcement_bar_text: "NEXT DROP IN:",
         marquee_enabled: false,
         marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
+        free_delivery_enabled: true,
+        free_delivery_threshold: 50000,
+        our_story_content: null,
         shipping_rates: { lagos: {}, abuja: {}, interstate: {} },
         size_chart_data: [
           { size: "XS", chest: "81-86", waist: "66-71", length: "68" },
