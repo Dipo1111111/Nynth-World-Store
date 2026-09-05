@@ -138,7 +138,7 @@ const Checkout = () => {
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
-  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, totalAmount, lagosRates, abujaRates, interstateRates]);
+  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, settings.free_delivery_enabled, settings.free_delivery_threshold, totalAmount, lagosRates, abujaRates, interstateRates]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
