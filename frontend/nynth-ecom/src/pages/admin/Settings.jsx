@@ -137,7 +137,7 @@ export default function AdminSettings() {
         const { name, value, type, checked } = e.target;
         setSettings(prev => ({
             ...prev,
-            [name]: type === "checkbox" ? checked : (name === "shipping_fee" ? Number(value) : value)
+            [name]: type === "checkbox" ? checked : ((name === "shipping_fee" || name === "free_delivery_threshold") ? Number(value) : value)
         }));
     };
 

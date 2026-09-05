@@ -99,10 +99,15 @@ export default function OurStory() {
                     {/* Footer Statement (Black Box) */}
                     <div className="bg-black text-white p-12 md:p-16 hover:bg-zinc-950 transition-colors duration-500 cursor-default">
                         <p className="text-[14px] md:text-[18px] font-black tracking-[0.1em] uppercase italic leading-relaxed">
-                            {tagline.includes("stay above")
-                                ? <>{tagline.split("stay above")[0]}<span className="opacity-70">stay above</span></>
-                                : tagline
-                            }
+                            {(() => {
+                                const lowerTag = tagline.toLowerCase();
+                                const idx = lowerTag.indexOf("stay above");
+                                if (idx === -1) return tagline;
+                                const before = tagline.substring(0, idx);
+                                const match = tagline.substring(idx, idx + 10);
+                                const after = tagline.substring(idx + 10);
+                                return <>{before}<span className="opacity-70">{match}</span>{after}</>;
+                            })()}
                         </p>
 
                         <div className="mt-12 pt-8 border-t border-white/10 space-y-1">
