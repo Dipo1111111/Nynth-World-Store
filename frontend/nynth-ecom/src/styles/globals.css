@@ -245,3 +245,13 @@ html {
 .btn-admin {
   @apply bg-black text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors;
 }
+/* Prevent iOS Safari from auto-zooming when a form control is focused.
+   Safari zooms the page whenever the focused input's font-size is under 16px,
+   so keep the admin settings controls at 16px+ on small screens. */
+@media (max-width: 767px) {
+    .admin-settings-form input,
+    .admin-settings-form select,
+    .admin-settings-form textarea {
+        font-size: 16px !important;
+    }
+}

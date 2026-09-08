@@ -76,6 +76,25 @@ const mergeSettingsDefaults = (part = {}) => ({
     our_story_content: part.our_story_content || SETTINGS_DEFAULTS.our_story_content,
 });
 
+// Default Our Story content — mirrors /our-story page fallbacks. Pre-fills the
+// editor so fields read as real, editable content instead of empty boxes.
+const STORY_DEFAULTS = {
+    company: "NYNTH WORLD LTD",
+    founded: "Founded October 20, 2022",
+    cac: "Registered with the Corporate Affairs Commission (CAC), October 2, 2025",
+    founder_label: "Founder & Chief Executive Officer",
+    founder_name: "Yange Newman Terseer",
+    belief: "NYNTH WORLD was built on one belief.\nWhere you begin does not define where you finish.",
+    belief_desc: "It is a brand based on mindset.\nA standard for people who choose to rise in every situation.",
+    origin: "NYNTH started from a real moment.\nThe Founder was ranked 9th across 9 subjects and told he would not succeed.\nThat moment did not create doubt. It created a shift in mindset.",
+    quote1: "Position is temporary.",
+    quote2: "Mindset is Permanent.",
+    meaning: "NYNTH is not just a number. It stands for elevation.\nIt represents people who push past limits,\nstay disciplined,\nand keep the mindset of staying above.",
+    philosophy: "Every NYNTH piece is made with intention.\nNot just as clothing, but as identity.\nWhen you see NYNTH, you see a person who keeps going.",
+    tagline: "BY WINNERS, FOR WINNERS, stay above",
+    footer_name: "NYNTH WORLD LTD"
+};
+
 export default function AdminSettings() {
     const [settings, setSettings] = useState(mergeSettingsDefaults());
     const [loading, setLoading] = useState(true);
@@ -217,7 +236,7 @@ export default function AdminSettings() {
 
     return (
         <AdminLayout title="Settings">
-            <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
+            <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
                 {/* Save model explainer */}
                 <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 flex items-start gap-3">
                     <Info size={18} className="text-amber-700 shrink-0 mt-0.5" />
@@ -1094,7 +1113,8 @@ export default function AdminSettings() {
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={BookOpen} title="Our Story" />
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Edit the content displayed on the /our-story page. If left empty, the default hardcoded content is shown.
+                        Edit the content shown on the /our-story page. Fields are pre-filled with the current content —
+                        change what you need, then press <span className="text-black">Save All Settings</span> to publish.
                     </p>
 
                     {/* Helper: uses functional setState to avoid stale closure bugs */}
@@ -1105,7 +1125,7 @@ export default function AdminSettings() {
                                 our_story_content: { ...(prev.our_story_content || {}), [field]: value }
                             }));
                         };
-                        const story = (field) => settings.our_story_content?.[field] || "";
+                        const story = (field) => settings.our_story_content?.[field] || STORY_DEFAULTS[field];
 
                         return (
                             <div className="space-y-6">
