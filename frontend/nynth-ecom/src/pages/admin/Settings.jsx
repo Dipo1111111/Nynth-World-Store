@@ -2,60 +2,108 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, Info, RotateCcw } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
 import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA, EMPTY_SHIPPING_RATES } from "../../data/locationData";
 import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
 
+// Base settings defaults — merged with whatever is persisted in the DB.
+const SETTINGS_DEFAULTS = {
+    site_name: "",
+    support_email: "",
+    support_phone: "",
+    office_address: "",
+    instagram_url: "",
+    twitter_url: "",
+    facebook_url: "",
+    tiktok_url: "",
+    shipping_fee: 0,
+    currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
+    hero_banner: "",
+    banner_hover_color: "red",
+    lock_page_enabled: false,
+    lock_epoch: 0,
+    lock_timer_enabled: false,
+    lock_timer_duration_minutes: 5,
+    launch_date: "2026-04-03T18:00:00",
+    show_size_chart: true,
+    size_chart_model_info: "",
+    size_chart_data: [],
+    // Lock Page Settings
+    lock_password: "WINNERSONLY",
+    lock_title1: "BY WINNERS FOR WINNERS",
+    lock_title2: "STAY ABOVE",
+    lock_waitlist_title: "JOIN THE WAITLIST",
+    lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
+    // Product Options
+    available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
+    available_sizes: "XS, S, M, L, XL, XXL, XXXL",
+    disabled_locations: { lagos: ["Abijo","Abule Ado","Abuleegba","Agbara","Agege","Ago palace","Agungi","Ajah","Ajao Estate","Ajegunle","Akowonjo","Akute","Alaguntan","Alaagbado","Alapere","Alimosho","Amuwo","Anthony","Apapa","Araga","Arepo","Asese","Awoyaya","Ayobo","Badagry","Badore","Bariga","Cement","Chevron","Costain","Dangote Refinery","Ebute Metta","Egbeda","Ejigbo","Epe Ibeju","Fadeyi","Festac","Gbagada","Gbagada Phase 1","Ibafo","Iddo","Idi Araba","Idi Iroko","Idimu","Ifako Ijaiye","Igando","Ijegun","Ikeja","Ikeja Airport","Ikate","Ikorodu","Ikosi","Ikota","Ikotun","Ikoyi","Ilasa","Ilasan","Ilasamaja","Ilupeju","Imota","Ipaja","Isheri olofin","Isheri oshun","Isolo","Iyana ipaja","Jakande","Jibowu","Ketu","Kola","Lagos Island","LASU","Lekki 2","Lekkil","LUTH","Magodo","Magodo 1","Mangoro","Marina","Maryland","Meiran","Mile 12","Mile2","Mowe","Mushin","New Garage","Obanikoro","Obawole","Ogba","Ogombo","Ogudu","Ojo","Ojodu","Ojota","Okokomiako","Ologolo","Olowoira","Omole 1","Omole 2","Onipanu","Oniru","Opic","Orchid","Osapa","Oshodi","Oworo","Oyingbo","Palmgrove","Papa Ajao","Pedro","Sango Otta","Sangotedo","Satellite","Shasha","Shibiti","Somolu","Surulere","Tradefair","VGC","Vi","Yaba","Abule Oja","Akoka","Akute Border","Alaka Estate","Computer Village","Dopemu","Fagba","Iganmu","Ijaiye","Ijesha Surulere","Iju","Ojuelegba","Baruwa","Gowon Estate","Okota","Obalende","Osborne Foreshore","Abraham Adesanya","Ilaje","Magboro","Ijanikin","Lekki Deep Sea Port"], abuja: [], interstate: [] },
+    announcement_bar_enabled: false,
+    announcement_bar_text: "NEXT DROP IN:",
+    marquee_enabled: false,
+    marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
+    free_delivery_enabled: true,
+    free_delivery_threshold: 50000,
+    our_story_content: null,
+    shipping_rates: { lagos: {}, abuja: {}, interstate: {} }
+};
+
+// Merge persisted settings over the defaults, filling gaps so the editor always
+// has a fully-shaped object to compare the unsaved draft against.
+const mergeSettingsDefaults = (part = {}) => ({
+    ...SETTINGS_DEFAULTS,
+    ...part,
+    lock_password: part.lock_password || SETTINGS_DEFAULTS.lock_password,
+    lock_title1: part.lock_title1 || SETTINGS_DEFAULTS.lock_title1,
+    lock_title2: part.lock_title2 || SETTINGS_DEFAULTS.lock_title2,
+    lock_waitlist_title: part.lock_waitlist_title || SETTINGS_DEFAULTS.lock_waitlist_title,
+    lock_waitlist_subtitle: part.lock_waitlist_subtitle || SETTINGS_DEFAULTS.lock_waitlist_subtitle,
+    lock_timer_enabled: part.lock_timer_enabled !== undefined ? part.lock_timer_enabled : SETTINGS_DEFAULTS.lock_timer_enabled,
+    lock_timer_duration_minutes: part.lock_timer_duration_minutes || SETTINGS_DEFAULTS.lock_timer_duration_minutes,
+    available_colors: part.available_colors || SETTINGS_DEFAULTS.available_colors,
+    available_sizes: part.available_sizes || SETTINGS_DEFAULTS.available_sizes,
+    disabled_locations: part.disabled_locations || { lagos: [], abuja: [], interstate: [] },
+    shipping_rates: part.shipping_rates || { lagos: {}, abuja: {}, interstate: {} },
+    announcement_bar_enabled: part.announcement_bar_enabled !== undefined ? part.announcement_bar_enabled : SETTINGS_DEFAULTS.announcement_bar_enabled,
+    announcement_bar_text: part.announcement_bar_text || SETTINGS_DEFAULTS.announcement_bar_text,
+    marquee_enabled: part.marquee_enabled !== undefined ? part.marquee_enabled : SETTINGS_DEFAULTS.marquee_enabled,
+    marquee_text: part.marquee_text || SETTINGS_DEFAULTS.marquee_text,
+    free_delivery_enabled: part.free_delivery_enabled !== undefined ? part.free_delivery_enabled : SETTINGS_DEFAULTS.free_delivery_enabled,
+    free_delivery_threshold: part.free_delivery_threshold || SETTINGS_DEFAULTS.free_delivery_threshold,
+    our_story_content: part.our_story_content || SETTINGS_DEFAULTS.our_story_content,
+});
+
 export default function AdminSettings() {
-    const [settings, setSettings] = useState({
-        site_name: "",
-        support_email: "",
-        support_phone: "",
-        office_address: "",
-        instagram_url: "",
-        twitter_url: "",
-        facebook_url: "",
-        tiktok_url: "",
-        shipping_fee: 0,
-        currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
-        hero_banner: "",
-        banner_hover_color: "red",
-        lock_page_enabled: false,
-        lock_epoch: 0,
-        lock_timer_enabled: false,
-        lock_timer_duration_minutes: 5,
-        launch_date: "2026-04-03T18:00:00",
-        show_size_chart: true,
-        size_chart_model_info: "",
-        size_chart_data: [],
-        // Lock Page Settings
-        lock_password: "WINNERSONLY",
-        lock_title1: "BY WINNERS FOR WINNERS",
-        lock_title2: "STAY ABOVE",
-        lock_waitlist_title: "JOIN THE WAITLIST",
-        lock_waitlist_title: "JOIN THE WAITLIST",
-        lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
-        // Product Options
-        available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
-        available_sizes: "XS, S, M, L, XL, XXL, XXXL",
-        disabled_locations: { lagos: ["Abijo","Abule Ado","Abuleegba","Agbara","Agege","Ago palace","Agungi","Ajah","Ajao Estate","Ajegunle","Akowonjo","Akute","Alaguntan","Alaagbado","Alapere","Alimosho","Amuwo","Anthony","Apapa","Araga","Arepo","Asese","Awoyaya","Ayobo","Badagry","Badore","Bariga","Cement","Chevron","Costain","Dangote Refinery","Ebute Metta","Egbeda","Ejigbo","Epe Ibeju","Fadeyi","Festac","Gbagada","Gbagada Phase 1","Ibafo","Iddo","Idi Araba","Idi Iroko","Idimu","Ifako Ijaiye","Igando","Ijegun","Ikeja","Ikeja Airport","Ikate","Ikorodu","Ikosi","Ikota","Ikotun","Ikoyi","Ilasa","Ilasan","Ilasamaja","Ilupeju","Imota","Ipaja","Isheri olofin","Isheri oshun","Isolo","Iyana ipaja","Jakande","Jibowu","Ketu","Kola","Lagos Island","LASU","Lekki 2","Lekkil","LUTH","Magodo","Magodo 1","Mangoro","Marina","Maryland","Meiran","Mile 12","Mile2","Mowe","Mushin","New Garage","Obanikoro","Obawole","Ogba","Ogombo","Ogudu","Ojo","Ojodu","Ojota","Okokomiako","Ologolo","Olowoira","Omole 1","Omole 2","Onipanu","Oniru","Opic","Orchid","Osapa","Oshodi","Oworo","Oyingbo","Palmgrove","Papa Ajao","Pedro","Sango Otta","Sangotedo","Satellite","Shasha","Shibiti","Somolu","Surulere","Tradefair","VGC","Vi","Yaba","Abule Oja","Akoka","Akute Border","Alaka Estate","Computer Village","Dopemu","Fagba","Iganmu","Ijaiye","Ijesha Surulere","Iju","Ojuelegba","Baruwa","Gowon Estate","Okota","Obalende","Osborne Foreshore","Abraham Adesanya","Ilaje","Magboro","Ijanikin","Lekki Deep Sea Port"], abuja: [], interstate: [] },
-        announcement_bar_enabled: false,
-        announcement_bar_text: "NEXT DROP IN:",
-        marquee_enabled: false,
-        marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
-        free_delivery_enabled: true,
-        free_delivery_threshold: 50000,
-        our_story_content: null,
-        shipping_rates: { lagos: {}, abuja: {}, interstate: {} }
-    });
+    const [settings, setSettings] = useState(mergeSettingsDefaults());
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const { refreshSettings } = useSettings();
     const [isUploading, setIsUploading] = useState(false);
     const [isMerging, setIsMerging] = useState(false);
+    // Snapshot of the last persisted state. Any difference from `settings` is
+    // an unsaved change that has not been published to the storefront.
+    const [savedSnapshot, setSavedSnapshot] = useState(null);
+    const isDirty = savedSnapshot !== null && JSON.stringify(settings) !== JSON.stringify(savedSnapshot);
+
+    // Warn before the admin navigates away with unsaved changes.
+    useEffect(() => {
+        if (!isDirty) return;
+        const handler = (e) => {
+            e.preventDefault();
+            e.returnValue = "";
+        };
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [isDirty]);
+
+    const handleDiscard = () => {
+        if (!savedSnapshot) return;
+        if (!window.confirm("Discard all unsaved changes?")) return;
+        setSettings(JSON.parse(JSON.stringify(savedSnapshot)));
+    };
 
     const handleHeroBannerUpload = async (e) => {
         const file = e.target.files[0];
@@ -69,7 +117,7 @@ export default function AdminSettings() {
             const url = await uploadImage(compressed);
             
             setSettings(prev => ({ ...prev, hero_banner: url }));
-            toast.success("Image uploaded. Remember to Save All Settings.", { id: "upload-status" });
+            toast.success("Image ready — press Save All Settings to publish it.", { id: "upload-status" });
         } catch (error) {
             console.error("Banner upload failed:", error);
             toast.error("Upload failed.", { id: "upload-status" });
@@ -100,29 +148,9 @@ export default function AdminSettings() {
             try {
                 const data = await fetchSettings();
                 if (data) {
-                    setSettings(prev => ({
-                        ...prev,
-                        ...data,
-                        // Ensure defaults if missing in DB
-                        lock_password: data.lock_password || "WINNERSONLY",
-                        lock_title1: data.lock_title1 || "BY WINNERS FOR WINNERS",
-                        lock_title2: data.lock_title2 || "STAY ABOVE",
-                        lock_waitlist_title: data.lock_waitlist_title || "JOIN THE WAITLIST",
-                        lock_waitlist_subtitle: data.lock_waitlist_subtitle || "BE NOTIFIED WHEN WE GO LIVE",
-                        lock_timer_enabled: data.lock_timer_enabled !== undefined ? data.lock_timer_enabled : false,
-                        lock_timer_duration_minutes: data.lock_timer_duration_minutes || 5,
-                        available_colors: data.available_colors || "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
-                        available_sizes: data.available_sizes || "XS, S, M, L, XL, XXL, XXXL",
-                        disabled_locations: data.disabled_locations || { lagos: [], abuja: [], interstate: [] },
-                        shipping_rates: data.shipping_rates || { lagos: {}, abuja: {}, interstate: {} },
-                        announcement_bar_enabled: data.announcement_bar_enabled !== undefined ? data.announcement_bar_enabled : false,
-                        announcement_bar_text: data.announcement_bar_text || "NEXT DROP IN:",
-                        marquee_enabled: data.marquee_enabled !== undefined ? data.marquee_enabled : false,
-                        marquee_text: data.marquee_text || "FREE DELIVERY ON ORDERS OVER ₦50,000",
-                        free_delivery_enabled: data.free_delivery_enabled !== undefined ? data.free_delivery_enabled : true,
-                        free_delivery_threshold: data.free_delivery_threshold || 50000,
-                        our_story_content: data.our_story_content || null
-                    }));
+                    const loaded = mergeSettingsDefaults(data);
+                    setSettings(loaded);
+                    setSavedSnapshot(JSON.parse(JSON.stringify(loaded)));
                 }
             } catch (error) {
                 toast.error("Failed to load settings");
@@ -142,7 +170,7 @@ export default function AdminSettings() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e && typeof e.preventDefault === "function") e.preventDefault();
         setSaving(true);
         try {
             // When enabling lock page, increment epoch to force-lock everyone
@@ -151,11 +179,14 @@ export default function AdminSettings() {
                 : settings;
             const success = await updateSettings(settingsToSave);
             if (success) {
-                // Update local state with the new epoch if it was incremented
+                let nextSnapshot = settings;
                 if (settings.lock_page_enabled) {
-                    setSettings(prev => ({ ...prev, lock_epoch: (prev.lock_epoch || 0) + 1 }));
+                    const nextEpoch = (settings.lock_epoch || 0) + 1;
+                    nextSnapshot = { ...settings, lock_epoch: nextEpoch };
+                    setSettings(nextSnapshot);
                 }
-                toast.success("Settings updated successfully");
+                setSavedSnapshot(JSON.parse(JSON.stringify(nextSnapshot)));
+                toast.success("Settings saved — now live on the storefront");
                 refreshSettings();
             } else {
                 toast.error("Failed to update settings");
@@ -187,6 +218,18 @@ export default function AdminSettings() {
     return (
         <AdminLayout title="Settings">
             <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
+                {/* Save model explainer */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 flex items-start gap-3">
+                    <Info size={18} className="text-amber-700 shrink-0 mt-0.5" />
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Changes are staged until you save</p>
+                        <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                            Nothing here goes live while you edit. When you have unsaved changes, a save bar appears at the
+                            bottom of the screen — press <span className="font-bold">Save All Settings</span> to publish them to your storefront.
+                        </p>
+                    </div>
+                </div>
+
                 {/* General Settings */}
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={Globe} title="General Configuration" />
@@ -543,8 +586,9 @@ export default function AdminSettings() {
                 {/* Banner Hover Color */}
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={Megaphone} title="Banner Hover Style" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Color of the SHOP NOW button when hovered on the hero banner.
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4 leading-relaxed">
+                        Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it —
+                        press <span className="text-black">Save All Settings</span> to publish.
                     </p>
                     <div className="flex gap-3">
                         <button
@@ -638,7 +682,10 @@ export default function AdminSettings() {
                     onSaveRates={async () => {
                         const ok = await updateSettings({ shipping_rates: settings.shipping_rates });
                         if (ok) {
-                            toast.success("Shipping rates saved");
+                            toast.success("Shipping rates saved — now live at checkout");
+                            setSavedSnapshot(prev => prev
+                                ? JSON.parse(JSON.stringify({ ...prev, shipping_rates: settings.shipping_rates }))
+                                : prev);
                             refreshSettings();
                         } else {
                             toast.error("Failed to save shipping rates");
@@ -1217,11 +1264,11 @@ export default function AdminSettings() {
                 </div>
 
                 {/* Submit */}
-                <div className="flex justify-end pt-4">
+                <div className={`flex justify-end pt-4 ${isDirty ? "pb-24" : ""}`}>
                     <button
                         type="submit"
-                        disabled={saving}
-                        className="flex items-center gap-2 bg-black text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-70 transition-all shadow-lg"
+                        disabled={saving || !isDirty}
+                        className="flex items-center gap-2 bg-black text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg"
                     >
                         {saving ? (
                             <Loader2 className="animate-spin" size={20} />
@@ -1232,6 +1279,39 @@ export default function AdminSettings() {
                     </button>
                 </div>
             </form>
+
+            {/* Sticky save bar — appears whenever there are unsaved changes */}
+            {isDirty && (
+                <div className="fixed bottom-0 inset-x-0 z-50 border-t border-amber-200 bg-amber-50/95 backdrop-blur">
+                    <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
+                            <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Unsaved changes</p>
+                        </div>
+                        <p className="hidden sm:block text-xs text-amber-800">Edits go live after you save.</p>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                type="button"
+                                onClick={handleDiscard}
+                                disabled={saving}
+                                className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-900 px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50"
+                            >
+                                <RotateCcw size={13} />
+                                Discard
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                disabled={saving}
+                                className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-lg"
+                            >
+                                {saving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                                {saving ? "Saving..." : "Save All Settings"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
 
     );
