@@ -15,7 +15,8 @@ import {
   orderBy,
   limit,
   increment,
-  writeBatch
+  writeBatch,
+  onSnapshot
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { httpsCallable } from "firebase/functions";
@@ -328,6 +329,46 @@ export const verifyOrderPayment = async (orderId, reference) => {
   */
 };
 
+export const fetchOrder = async (orderId) => {
+  try {
+    const docRef = doc(db, "orders", orderId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+    return { id: docSnap.id, ...docSnap.data() };
+  } catch (error) {
+    console.error(`Error fetching order ${orderId}:`, error);
+    return null;
+  }
+};
+
+export const subscribeOrders = (callback) => {
+  const q = query(collection(db, "orders"), orderBy("created_at", "desc"));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const orders = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      callback(orders);
+    },
+    (error) => {
+      console.error("Error subscribing to orders:", error);
+    }
+  );
+};
+
+export const updateOrderPaymentStatus = async (orderId, status) => {
+  try {
+    const orderRef = doc(db, "orders", orderId);
+    await updateDoc(orderRef, {
+      payment_status: status,
+      updated_at: serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating payment status: ", error);
+    return false;
+  }
+};
+
 // --- ANALYTICS & STATS ---
 
 export const getProductStats = async () => {
@@ -541,17 +582,39 @@ export const sendTriggerEmail = async (to, subject, html) => {
 };
 
 export const sendOrderConfirmation = async (order) => {
-  const subject = `Order Confirmation #${order.id}`;
+  const subject = `Order Confirmation #${order.id || order.orderId || ""}`;
+  const customer = order.customer || {};
+  const money = (n) => `₦${Number(n || 0).toLocaleString()}`;
+  const esc = (str) => String(str == null ? "" : str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const itemsRows = (order.items || []).map((item) => `
+      <tr>
+        <td style="padding:12px;border-top:1px solid #eee;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">${esc(item.name || item.title)} ${item.size && item.color ? `— ${esc(item.size)} / ${esc(item.color)}` : ""} × ${item.quantity || 1}</td>
+        <td style="padding:12px;border-top:1px solid #eee;text-align:right;font-size:13px;font-weight:700;">${money((item.price || 0) * (item.quantity || 1))}</td>
+      </tr>`).join("");
   const html = `
-    <h1>Thank you for your order, ${order.customer.firstName}!</h1>
-    <p>We have received your order and are processing it.</p>
-    <p><strong>Order ID:</strong> ${order.id}</p>
-    <p><strong>Total:</strong> ₦${order.total.toLocaleString()}</p>
-    <br>
-    <p>We will notify you when it ships.</p>
-    <p>The NYNTH Team</p>
+    <div style="background:#0a0a0a;padding:28px;text-align:center;">
+      <span style="font-size:20px;font-weight:800;letter-spacing:.28em;color:#fff;">NYNTH&nbsp;WORLD</span>
+    </div>
+    <div style="padding:36px 28px;font-family:Helvetica,Arial,sans-serif;">
+      <h1 style="font-size:24px;font-weight:800;letter-spacing:.02em;margin:0 0 6px;">CONGRATULATIONS${customer.firstName ? `, ${esc(customer.firstName)}` : ""}!</h1>
+      <p style="font-size:11px;font-weight:700;letter-spacing:.2em;color:#059669;text-transform:uppercase;margin:0 0 18px;">Welcome to NYNTH World</p>
+      <p style="font-size:14px;line-height:1.7;color:#444;">Your payment has been received and your order is now being confirmed. We’ll update you the moment it ships.</p>
+      <p style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.12em;margin:20px 0 4px;">Order Reference</p>
+      <p style="font-size:15px;font-weight:700;font-family:monospace;margin:0 0 24px;">#${esc(order.id || order.orderId || "")}</p>
+      <table cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tr>
+        <td style="padding:10px;border:1px solid #eee;background:#fafafa;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;">Item</td>
+        <td style="padding:10px;border:1px solid #eee;background:#fafafa;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;text-align:right;">Amount</td>
+      </tr>${itemsRows || '<tr><td style="padding:12px;border:1px solid #eee;font-size:13px;">No items.</td></tr>'}</table>
+      <table cellpadding="0" cellspacing="0" width="100%" style="margin-top:16px;">
+        <tr><td style="font-size:13px;color:#666;padding:4px 0;">Subtotal</td><td style="font-size:13px;font-weight:700;text-align:right;padding:4px 0;">${money(order.subtotal)}</td></tr>
+        <tr><td style="font-size:13px;color:#666;padding:4px 0;">Delivery</td><td style="font-size:13px;font-weight:700;text-align:right;padding:4px 0;">${(order.shippingFee || order.shipping_fee) ? money(order.shippingFee || order.shipping_fee) : "FREE"}</td></tr>
+        <tr><td style="font-size:14px;font-weight:800;border-top:1px solid #eee;padding:10px 0 4px;">Total Paid</td><td style="font-size:15px;font-weight:800;text-align:right;border-top:1px solid #eee;padding:10px 0 4px;">${money(order.total)}</td></tr>
+      </table>
+      <p style="font-size:13px;color:#444;margin:24px 0 0;">Delivering to:<br/><strong>${esc(customer.firstName)} ${esc(customer.lastName)}</strong><br/>${esc(customer.address || "")}<br/>${esc(customer.city || "")}${customer.city && customer.state ? ", " : ""}${esc(customer.state || "")}</p>
+      <p style="font-size:13px;color:#555;margin:24px 0 0;">Thank you for shopping with NYNTH WORLD — stay above.<br/><strong>The NYNTH Team</strong></p>
+    </div>
   `;
-  return sendTriggerEmail(order.customer.email, subject, html);
+  return sendTriggerEmail(customer.email, subject, html);
 };
 
 // --- SETTINGS MANAGEMENT ---
@@ -971,8 +1034,12 @@ export default {
   addOrder,
   verifyOrderPayment,
   fetchUserOrders,
+  getOrder: fetchOrder,
+  fetchOrder,
+  subscribeOrders,
   getAllOrders,
   updateOrderStatus,
+  updateOrderPaymentStatus,
   getAdminAnalytics,
   fetchGA4Analytics,
   mergeSubscriberDuplicates,

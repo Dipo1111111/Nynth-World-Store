@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { getAllOrders } from "../../api/firebaseFunctions";
+import { subscribeOrders, updateOrderPaymentStatus } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -20,13 +20,60 @@ import {
     Download,
     Calendar,
     CreditCard,
-    TrendingUp
+    TrendingUp,
+    RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import Logo from "../../components/common/Logo";
 import StatusDropdown from "../../components/admin/StatusDropdown";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../components/ui/select";
 import toast from "react-hot-toast";
+
+const PAYMENT_STATUS_CONFIG = {
+    paid: { label: "Paid", className: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    pending: { label: "Pending", className: "bg-amber-50 text-amber-700 border-amber-100" },
+    failed: { label: "Failed", className: "bg-red-50 text-red-600 border-red-100" },
+    refunded: { label: "Refunded", className: "bg-gray-100 text-gray-500 border-gray-200" },
+};
+
+const PaymentStatusBadge = ({ status }) => {
+    const config = PAYMENT_STATUS_CONFIG[status] || PAYMENT_STATUS_CONFIG.pending;
+    return (
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${config.className}`}>
+            {config.label}
+        </span>
+    );
+};
+
+const PaymentStatusDropdown = ({ status, onStatusChange }) => {
+    const config = PAYMENT_STATUS_CONFIG[status] || PAYMENT_STATUS_CONFIG.pending;
+    return (
+        <Select value={status} onValueChange={(next) => onStatusChange(next)}>
+            <SelectTrigger
+                className={`rounded-full border px-4 py-1 text-xs font-medium ${config.className} hover:opacity-80 transition-opacity w-auto min-w-[110px]`}
+            >
+                <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+                {Object.entries(PAYMENT_STATUS_CONFIG).map(([value, cfg]) => (
+                    <SelectItem key={value} value={value}>
+                        <span className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full ${cfg.className.split(' ')[0]}`} />
+                            {cfg.label}
+                        </span>
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    );
+};
 
 const Orders = () => {
     const { currentUser, logout } = useAuth();
@@ -40,37 +87,25 @@ const Orders = () => {
     // Filters
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
+    const [paymentFilter, setPaymentFilter] = useState("all");
     const [monthFilter, setMonthFilter] = useState("all");
 
     useEffect(() => {
         document.title = "Nynth World Store Admin - Orders";
-        fetchOrders();
+
+        setLoading(true);
+        // Realtime subscription: new/sold orders appear instantly, no refresh needed.
+        const unsub = subscribeOrders((data) => {
+            setOrders(data);
+            setLoading(false);
+        });
+        return () => unsub();
     }, []);
 
     useEffect(() => {
         applyFilters();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [orders, searchTerm, statusFilter, monthFilter]);
-
-    const fetchOrders = async () => {
-        setLoading(true);
-        try {
-            const data = await getAllOrders();
-            // STRICT FILTER: Only show orders that have been PAID
-            const paidOnly = data.filter(o => 
-                o.payment_status === 'paid' || 
-                o.payment_status === 'success' ||
-                o.order_status === 'delivered' // safety for legacy
-            );
-            setOrders(paidOnly);
-            setFilteredOrders(paidOnly);
-        } catch (error) {
-            console.error('Error fetching orders:', error);
-            toast.error('Failed to load orders');
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [orders, searchTerm, statusFilter, paymentFilter, monthFilter]);
 
     const applyFilters = () => {
         let result = [...orders];
@@ -78,17 +113,22 @@ const Orders = () => {
         // Search Filter
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
-            result = result.filter(o => 
-                o.id.toLowerCase().includes(term) || 
+            result = result.filter(o =>
+                o.id.toLowerCase().includes(term) ||
                 o.customer?.firstName?.toLowerCase().includes(term) ||
                 o.customer?.lastName?.toLowerCase().includes(term) ||
                 o.customer?.email?.toLowerCase().includes(term)
             );
         }
 
-        // Status Filter
+        // Fulfillment Status Filter
         if (statusFilter !== "all") {
             result = result.filter(o => (o.order_status || "pending") === statusFilter);
+        }
+
+        // Payment Status Filter
+        if (paymentFilter !== "all") {
+            result = result.filter(o => (o.payment_status || "pending") === paymentFilter);
         }
 
         // Month Filter
@@ -124,6 +164,23 @@ const Orders = () => {
         );
     };
 
+    const handlePaymentStatusChange = (orderId, newStatus) => {
+        setOrders(prevOrders =>
+            prevOrders.map(order =>
+                order.id === orderId
+                    ? { ...order, payment_status: newStatus }
+                    : order
+            )
+        );
+        updateOrderPaymentStatus(orderId, newStatus).then((ok) => {
+            if (ok) {
+                toast.success(`Payment status updated to ${PAYMENT_STATUS_CONFIG[newStatus]?.label || newStatus}`);
+            } else {
+                toast.error('Failed to update payment status');
+            }
+        });
+    };
+
     const handleLogout = async () => {
         try {
             await logout();
@@ -136,12 +193,13 @@ const Orders = () => {
     const downloadCSV = () => {
         if (filteredOrders.length === 0) return;
 
-        const headers = ["Order ID", "Date", "Customer", "Email", "Status", "Total (₦)"];
+        const headers = ["Order ID", "Date", "Customer", "Email", "Payment Status", "Order Status", "Total (₦)"];
         const rows = filteredOrders.map(o => [
             o.id,
             o.created_at?.seconds ? new Date(o.created_at.seconds * 1000).toLocaleDateString() : 'N/A',
             `${o.customer?.firstName} ${o.customer?.lastName}`,
             o.customer?.email,
+            o.payment_status || 'pending',
             o.order_status || 'pending',
             o.total || 0
         ]);
@@ -164,10 +222,13 @@ const Orders = () => {
 
     // Calculate Summary from filtered orders
     const summary = {
-        totalRevenue: filteredOrders.reduce((sum, o) => sum + (o.total || 0), 0),
+        totalRevenue: filteredOrders.reduce((sum, o) => {
+            const paid = o.payment_status === 'paid' || o.payment_status === 'success';
+            return sum + (paid ? (o.total || 0) : 0);
+        }, 0),
         totalOrders: filteredOrders.length,
-        pendingOrders: filteredOrders.filter(o => o.order_status !== 'delivered').length,
-        paidOrders: filteredOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success' || o.order_status === 'delivered').length
+        unpaidOrders: filteredOrders.filter(o => o.payment_status !== 'paid' && o.payment_status !== 'success').length,
+        paidOrders: filteredOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success').length,
     };
 
     // Generate unique months for filter
@@ -214,9 +275,9 @@ const Orders = () => {
                             <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
                                 <Calendar size={16} />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Waitlist/Pending</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Unpaid Orders</span>
                         </div>
-                        <h3 className="text-xl font-bold">{summary.pendingOrders}</h3>
+                        <h3 className="text-xl font-bold">{summary.unpaidOrders}</h3>
                     </CardContent>
                 </Card>
                 <Card className="border-gray-100 shadow-sm bg-white">
@@ -257,6 +318,17 @@ const Orders = () => {
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
+                    </select>
+                    <select 
+                        className="bg-gray-50 border-none rounded-lg text-sm px-3 py-2 focus:ring-1 focus:ring-black/5 min-w-[120px]"
+                        value={paymentFilter}
+                        onChange={(e) => setPaymentFilter(e.target.value)}
+                    >
+                        <option value="all">All Payments</option>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Payment Pending</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
                     </select>
                     <select 
                         className="bg-gray-50 border-none rounded-lg text-sm px-3 py-2 focus:ring-1 focus:ring-black/5 min-w-[120px]"
@@ -317,9 +389,12 @@ const Orders = () => {
                                                 </button>
                                                 <div className="min-w-0 flex-1">
                                                     <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
-                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
-                                                        {order.customer?.firstName} • {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
-                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <PaymentStatusBadge status={order.payment_status || 'pending'} />
+                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">
+                                                            {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
@@ -382,6 +457,19 @@ const Orders = () => {
                                                             </div>
                                                         </div>
 
+                                                        <div>
+                                                            <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
+                                                                <CreditCard size={14} /> Payment
+                                                            </h4>
+                                                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-between">
+<PaymentStatusBadge status={order.payment_status || 'pending'} />
+                                                                 <PaymentStatusDropdown
+                                                                     status={order.payment_status || 'pending'}
+                                                                     onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
+                                                                 />
+                                                            </div>
+                                                        </div>
+
                                                         {/* Order Summary */}
                                                         <div>
                                                             <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
@@ -420,6 +508,7 @@ const Orders = () => {
                                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Customer</th>
                                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
                                         <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Date</th>
                                         <th className="px-4 md:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                                     </tr>
@@ -447,14 +536,17 @@ const Orders = () => {
                                                              <p className="text-xs text-gray-500">{order.customer?.email}</p>
                                                          </div>
                                                      </td>
-                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                                                         <StatusDropdown
-                                                             orderId={order.id}
-                                                             currentStatus={order.order_status || 'pending'}
-                                                             onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
-                                                         />
-                                                     </td>
-                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 hidden sm:table-cell">
+<td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                                                          <StatusDropdown
+                                                              orderId={order.id}
+                                                              currentStatus={order.order_status || 'pending'}
+                                                              onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                                                          />
+                                                      </td>
+                                                      <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                                                          <PaymentStatusBadge status={order.payment_status || 'pending'} />
+                                                      </td>
+                                                      <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 hidden sm:table-cell">
                                                          {order.created_at?.seconds
                                                              ? new Date(order.created_at.seconds * 1000).toLocaleDateString('en-US', {
                                                                  year: 'numeric',
@@ -471,7 +563,7 @@ const Orders = () => {
                                                  {/* Expanded Row */}
                                                  {isExpanded && (
                                                      <tr>
-                                                         <td colSpan="6" className="px-4 md:px-6 py-6 bg-gray-50">
+                                                         <td colSpan="7" className="px-4 md:px-6 py-6 bg-gray-50">
                                                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                                  {/* Order Items */}
                                                                  <div>
@@ -550,15 +642,22 @@ const Orders = () => {
                                                                      {/* Order Summary */}
                                                                      <div>
                                                                          <h4 className="font-semibold mb-4 text-sm md:text-base">Order Status & Summary</h4>
-                                                                         <div className="p-4 bg-white rounded-xl border border-gray-100 space-y-3">
-                                                                             <div className="flex justify-between items-center text-sm">
-                                                                                 <span className="text-gray-500">Order Status</span>
-                                                                                 <StatusDropdown
-                                                                                     orderId={order.id}
-                                                                                     currentStatus={order.order_status || 'pending'}
-                                                                                     onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
-                                                                                 />
-                                                                             </div>
+<div className="p-4 bg-white rounded-xl border border-gray-100 space-y-3">
+                                                                              <div className="flex justify-between items-center text-sm">
+                                                                                  <span className="text-gray-500">Order Status</span>
+                                                                                  <StatusDropdown
+                                                                                      orderId={order.id}
+                                                                                      currentStatus={order.order_status || 'pending'}
+                                                                                      onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                                                                                  />
+                                                                              </div>
+                                                                              <div className="flex justify-between items-center text-sm pt-3 border-t border-gray-50">
+<span className="text-gray-500">Payment Status</span>
+                                                                                   <PaymentStatusDropdown
+                                                                                       status={order.payment_status || 'pending'}
+                                                                                       onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
+                                                                                   />
+                                                                              </div>
                                                                              <div className="space-y-2 pt-3 border-t border-gray-50 font-inter">
                                                                                  <div className="flex justify-between text-xs text-gray-500">
                                                                                      <span>Subtotal</span>

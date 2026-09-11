@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { addOrder, verifyOrderPayment, validateDiscountCode } from "../api/firebaseFunctions";
+import { addOrder, verifyOrderPayment, fetchOrder, validateDiscountCode } from "../api/firebaseFunctions";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -209,7 +209,23 @@ const Checkout = () => {
       },
       onClose: () => {
         setLoading(false);
-        toast.error("Payment window closed.");
+        // Poll the order briefly: user may have paid then closed the popup.
+        // The webhook (or Paystack redirect) will have marked it paid — give
+        // it a few seconds to arrive and land the customer on the ThankYou page.
+        const MAX_ATTEMPTS = 6;
+        let attempt = 0;
+        const poll = async () => {
+          attempt++;
+          const doc = await fetchOrder(orderId);
+          if (doc && (doc.payment_status === "paid" || doc.payment_status === "success")) {
+            clearCart();
+            navigate(`/thank-you?ref=${doc.payment_reference || ""}&orderId=${orderId}`);
+            return;
+          }
+          if (attempt < MAX_ATTEMPTS) setTimeout(poll, 2000);
+        };
+        poll().catch(() => {});
+        toast.error("Payment window closed. If you completed payment, your order is being confirmed — check your email shortly.");
       },
       onSuccess: function (response) {
         setIsOrderCompleted(true);
