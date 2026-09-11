@@ -358,8 +358,11 @@ export const subscribeOrders = (callback) => {
 export const updateOrderPaymentStatus = async (orderId, status) => {
   try {
     const orderRef = doc(db, "orders", orderId);
+    const isPaid = status === 'paid' || status === 'success';
     await updateDoc(orderRef, {
       payment_status: status,
+      // Mirror the Paystack webhook: confirmed payment ⇒ confirmed order.
+      ...(isPaid ? { order_status: "confirmed" } : {}),
       updated_at: serverTimestamp(),
     });
     return true;

@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { getAdminAnalytics, fetchSettings } from "../../api/firebaseFunctions";
+import { subscribeOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { db } from "../../api/firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { 
     Package, 
     TrendingUp, 
@@ -86,39 +86,41 @@ const generateSparklineData = (orders, start, days, valueType = 'sales') => {
     return { dataPoints, labels };
 };
 
+const STATUS_COLORS = {
+    processing: '#fbbf24',
+    pending: '#facc15',
+    confirmed: '#0ea5e9',
+    packaging: '#3b82f6',
+    shipped: '#8b5cf6',
+    delivered: '#10b981',
+    failed: '#f43f5e',
+    cancelled: '#6b7280',
+};
+const STATUS_LABELS = {
+    processing: 'Processing',
+    pending: 'Pending',
+    confirmed: 'Confirmed',
+    packaging: 'Packaging',
+    shipped: 'Shipped',
+    delivered: 'Delivered',
+    failed: 'Payment failed',
+    cancelled: 'Cancelled',
+};
+
+const isPaid = (o) => o.payment_status === 'paid' || o.payment_status === 'success';
+
 const AdminDashboard = () => {
     const { currentUser, logout, isAdmin } = useAuth();
     const navigate = useNavigate();
     
-    const [analytics, setAnalytics] = useState(null);
+    const [orders, setOrders] = useState(null);
     const [loading, setLoading] = useState(true);
     const [globalFilter, setGlobalFilter] = useState("all");
+    const [paymentFilter, setPaymentFilter] = useState("paid");
     
     const [liveVisitors, setLiveVisitors] = useState(0);
-    const [seenOrderIds, setSeenOrderIds] = useState(new Set());
-    const [sessionStartTime] = useState(Date.now());
-
-    // --- FETCH DATA ---
-    const fetchDashboardData = async () => {
-        setLoading(true);
-        try {
-            const [analyticsData] = await Promise.all([
-                getAdminAnalytics(),
-                fetchSettings() // Just caching basically
-            ]);
-            setAnalytics(analyticsData);
-        } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-            toast.error('Failed to load dashboard data');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        document.title = "Nynth World Store Admin";
-        fetchDashboardData();
-    }, []);
+    const alertedStatus = useRef(new Map());
+    const alertsBooted = useRef(false);
 
     // --- LIVE VISITORS ---
     useEffect(() => {
@@ -138,129 +140,181 @@ const AdminDashboard = () => {
         return () => unsubscribe();
     }, []);
 
-// --- REALTIME ORDERS NOTIFICATIONS ---
+    // --- REALTIME ORDERS (single source of truth) ---
     useEffect(() => {
-        if (loading) return;
+        const unsubscribe = subscribeOrders((liveOrders) => {
+            setOrders(liveOrders);
+            setLoading(false);
 
-        // Unified listener for order notifications and dashboard sync
-        const q = query(collection(db, "orders"), orderBy("created_at", "desc"), limit(20));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                const orderData = change.doc.data();
-                const isPaid = orderData.payment_status === 'paid' || orderData.payment_status === 'success';
-                
-                // Only alert on NEWLY PAID orders (either added as paid or modified to paid)
-                if ((change.type === "added" || change.type === "modified") && isPaid) {
-                    const orderId = change.doc.id;
-                    const orderTime = orderData.created_at?.seconds ? orderData.created_at.seconds * 1000 : Date.now();
-
-                    // Only trigger if we haven't seen this PAID order yet in this session
-                    if (!seenOrderIds.has(orderId + "_paid") && orderTime > (sessionStartTime - 30000)) {
-                        setSeenOrderIds(prev => new Set([...prev, orderId + "_paid"]));
-                        triggerSaleAlert(orderData);
-                        fetchDashboardData();
+            if (!alertsBooted.current) {
+                // First snapshot is history — do not alert on everything already there.
+                liveOrders.forEach((o) => {
+                    if (o.created_at?.seconds) {
+                        const ageMs = Date.now() - o.created_at.seconds * 1000;
+                        // Only pre-seed alerts for very recent orders so a reload
+                        // still pings what happened moments ago without spamming.
+                        if (ageMs < 5 * 60 * 1000) {
+                            alertedStatus.current.set(o.id, o.payment_status || "pending");
+                        }
                     }
+                });
+                alertsBooted.current = true;
+                return;
+            }
+
+            liveOrders.forEach((order) => {
+                const orderId = order.id;
+                const status = order.payment_status || "pending";
+                const prev = alertedStatus.current.get(orderId);
+                const createdRecently = order.created_at?.seconds
+                    ? (Date.now() - order.created_at.seconds * 1000) < 10 * 60 * 1000
+                    : false;
+
+                // New order ever seen → alert once.
+                if (!prev && createdRecently) {
+                    alertedStatus.current.set(orderId, status);
+                    if (isPaid(order)) {
+                        triggerSaleAlert(order, "paid");
+                    } else {
+                        triggerSaleAlert(order, "pending");
+                    }
+                    return;
+                }
+
+                // Payment flipped pending → paid live on this screen.
+                if (prev && prev !== status && isPaid(order)) {
+                    alertedStatus.current.set(orderId, status);
+                    triggerSaleAlert(order, "confirmed");
                 }
             });
         });
-        return () => unsubscribe();
-    }, [loading, seenOrderIds, sessionStartTime]);
 
-    const triggerSaleAlert = (order = null) => {
+        return () => unsubscribe();
+    }, []);
+
+    const triggerSaleAlert = (order, kind) => {
         try {
             const audio = new Audio('/sounds/cha-ching.mp3');
             audio.play().catch(e => console.log('Audio playback blocked', e));
         } catch (err) {}
 
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('NYNTH 💰 New Order!', {
-                body: order ? `₦${order.total?.toLocaleString()} from ${order.customer?.firstName}` : "Test alert!",
-                icon: '/favicon.png'
-            });
-        }
+        const customer = order.customer?.firstName || order.customer?.email || "a customer";
+        const amount = `₦${(order.total || 0).toLocaleString()}`;
 
-        toast.success(
-            order ? `🛍️ New order: ₦${order.total?.toLocaleString()} from ${order.customer?.firstName}` : "🔔 Sales alerts are active!",
-            { duration: 5000, position: 'top-right', icon: '💰' }
-        );
+        if (kind === 'paid') {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('NYNTH 💰 Sale confirmed!', {
+                    body: `${amount} collected from ${customer}`,
+                    icon: '/favicon.png'
+                });
+            }
+            toast.success(`💰 Paid: ${amount} from ${customer}`, { duration: 6000, position: 'top-right' });
+        } else if (kind === 'confirmed') {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('NYNTH ✅ Payment confirmed!', {
+                    body: `${amount} from ${customer} is now paid`,
+                    icon: '/favicon.png'
+                });
+            }
+            toast.success(`✅ Payment confirmed: ${amount} from ${customer}`, { duration: 6000, position: 'top-right' });
+        } else {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('NYNTH 🛍️ New order!', {
+                    body: `${amount} from ${customer} — pending payment`,
+                    icon: '/favicon.png'
+                });
+            }
+            toast("🛍️ New order: " + amount + " from " + customer + " (awaiting payment)", { duration: 6000, position: 'top-right', icon: '🧾' });
+        }
     };
 
     // --- DATA CALCULATIONS ---
     const dashboardData = useMemo(() => {
-        if (!analytics?.rawOrders) return null;
+        if (!orders) return null;
 
         const currentBounds = getDateBoundaries(globalFilter, false);
         const prevBounds = getDateBoundaries(globalFilter, true);
 
-        // Only paid orders — everything on this dashboard is paid-only
-        const currentOrders = analytics.rawOrders.filter(o => {
+        // All orders in the period (used for counts, pending + recent browsing);
+        // headline metrics below are calculated from PAID orders only.
+        const currentOrders = orders.filter(o => {
             if (!o.created_at?.seconds) return false;
-            const isPaid = o.payment_status === 'paid' || o.payment_status === 'success';
-            if (!isPaid) return false;
             const d = new Date(o.created_at.seconds * 1000);
             return d >= currentBounds.start && d <= currentBounds.end;
         });
-
-        const prevOrders = analytics.rawOrders.filter(o => {
+        const prevOrders = orders.filter(o => {
             if (!o.created_at?.seconds) return false;
-            const isPaid = o.payment_status === 'paid' || o.payment_status === 'success';
-            if (!isPaid) return false;
             const d = new Date(o.created_at.seconds * 1000);
             return d >= prevBounds.start && d <= prevBounds.end;
         });
 
-        // Metrics
-        const sales = currentOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-        const prevSales = prevOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const currentPaid = currentOrders.filter(isPaid);
+        const currentPending = currentOrders.filter(o => !isPaid(o));
+        const prevPaid = prevOrders.filter(isPaid);
+        const prevPending = prevOrders.filter(o => !isPaid(o));
 
-        // Revenue = sales (all orders here are already paid)
-        const revenue = sales;
-        const prevRevenue = prevSales;
+        // Lead metrics come from PAID orders only — real money in.
+        // Pending orders are surfaced separately, never added into sales.
+        const totalSales = currentPaid.reduce((s, o) => s + (o.total || 0), 0);
+        const prevSales = prevPaid.reduce((s, o) => s + (o.total || 0), 0);
 
-        const ordersCount = currentOrders.length;
-        const prevOrdersCount = prevOrders.length;
+        const pendingValue = currentPending.reduce((s, o) => s + (o.total || 0), 0);
+        const prevPendingValue = prevPending.reduce((s, o) => s + (o.total || 0), 0);
 
-        const deliveredCount = currentOrders.filter(o => o.order_status === 'delivered').length;
+        const paidCount = currentPaid.length;
+        const prevPaidCount = prevPaid.length;
+        const pendingCount = currentPending.length;
+        const deliveredCount = currentPaid.filter(o => o.order_status === 'delivered').length;
+        const prevDeliveredCount = prevPaid.filter(o => o.order_status === 'delivered').length;
 
-        // Top Products Calculation
+        // Top Products — paid orders only
         const productMap = {};
-        currentOrders.forEach(o => {
-            if (o.payment_status === 'paid' || o.payment_status === 'success') {
-                o.items?.forEach(item => {
-                    if (!productMap[item.id]) {
-                        productMap[item.id] = { title: item.title, quantity: 0, revenue: 0, image: item.image || item.thumbnail };
-                    }
-                    productMap[item.id].quantity += (item.quantity || 1);
-                    productMap[item.id].revenue += ((item.price || 0) * (item.quantity || 1));
-                });
-            }
+        currentPaid.forEach(o => {
+            o.items?.forEach(item => {
+                if (!productMap[item.id]) {
+                    productMap[item.id] = { title: item.title || item.name || 'Item', quantity: 0, revenue: 0, image: item.image || item.thumbnail };
+                }
+                productMap[item.id].quantity += (item.quantity || 1);
+                productMap[item.id].revenue += ((item.price || 0) * (item.quantity || 1));
+            });
         });
         const topProducts = Object.values(productMap).sort((a,b) => b.quantity - a.quantity).slice(0, 5);
 
         // Sparklines
-        const sparkDays = currentBounds.days > 30 ? 30 : currentBounds.days; // Cap sparklines to 30p for rendering
-        const salesSpark = generateSparklineData(currentOrders, currentBounds.start, sparkDays, 'sales');
-        const revSpark = generateSparklineData(currentOrders, currentBounds.start, sparkDays, 'revenue');
-        const ordersSpark = generateSparklineData(currentOrders, currentBounds.start, sparkDays, 'count');
+        const sparkDays = currentBounds.days > 30 ? 30 : currentBounds.days;
+        const salesSpark = generateSparklineData(currentPaid, currentBounds.start, sparkDays, 'sales');
+        const ordersSpark = generateSparklineData(currentPaid, currentBounds.start, sparkDays, 'count');
 
-        // Status Breakdown for Doughnut
-        const statusBreakdown = currentOrders.reduce((acc, o) => {
-            const status = o.order_status || 'pending';
+        // Status Breakdown for Doughnut (fulfillment) — paid orders only
+        const statusBreakdown = currentPaid.reduce((acc, o) => {
+            const status = o.order_status || 'processing';
             acc[status] = (acc[status] || 0) + 1;
             return acc;
         }, {});
 
+        // Recent orders — newest first, any payment state, filtered by the chips (default: paid).
+        const sorted = [...currentOrders].sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
+        const recentList = sorted.filter(o => {
+            if (paymentFilter === 'all') return true;
+            if (paymentFilter === 'pending') return !isPaid(o);
+            if (paymentFilter === 'paid') return isPaid(o);
+            if (paymentFilter === 'delivered') return o.order_status === 'delivered';
+            return true;
+        }).slice(0, 6);
+
         return {
-            sales, salesGrowth: calculateGrowth(sales, prevSales),
-            revenue, revGrowth: calculateGrowth(revenue, prevRevenue),
-            ordersCount, ordersGrowth: calculateGrowth(ordersCount, prevOrdersCount),
-            deliveredCount,
+            totalSales, salesGrowth: calculateGrowth(totalSales, prevSales),
+            pendingValue, pendingGrowth: calculateGrowth(pendingValue, prevPendingValue),
+            ordersCount: paidCount, ordersGrowth: calculateGrowth(paidCount, prevPaidCount),
+            paidCount,
+            pendingCount,
+            deliveredCount, deliveredGrowth: calculateGrowth(deliveredCount, prevDeliveredCount),
             topProducts,
-            salesSpark, revSpark, ordersSpark,
+            salesSpark, ordersSpark,
             statusBreakdown,
-            recentList: currentOrders.slice(0, 6)
+            recentList,
         };
-    }, [analytics, globalFilter]);
+    }, [orders, globalFilter, paymentFilter]);
 
     const getSparklineConfig = (dataPoints, color) => ({
         labels: dataPoints.map((_, i) => i.toString()),
@@ -293,16 +347,16 @@ const AdminDashboard = () => {
         layout: { padding: { top: 5, bottom: 0, left: -5, right: -5 } },
     };
 
+    const statusLabels = Object.keys(dashboardData?.statusBreakdown || {}).map(s => STATUS_LABELS[s] || s.charAt(0).toUpperCase() + s.slice(1));
     const statusChartData = {
-        labels: ['Pending', 'Packaging', 'Shipped', 'Delivered'],
+        labels: statusLabels.length ? statusLabels : ['No data'],
         datasets: [{
-            data: [
-                dashboardData?.statusBreakdown?.pending || 0,
-                dashboardData?.statusBreakdown?.packaging || 0,
-                dashboardData?.statusBreakdown?.shipped || 0,
-                dashboardData?.statusBreakdown?.delivered || 0,
-            ],
-            backgroundColor: ['#fbbf24', '#3b82f6', '#8b5cf6', '#10b981'],
+            data: statusLabels.length
+                ? Object.keys(dashboardData.statusBreakdown).map(s => dashboardData.statusBreakdown[s])
+                : [1],
+            backgroundColor: statusLabels.length
+                ? Object.keys(dashboardData.statusBreakdown).map(s => STATUS_COLORS[s] || '#9ca3af')
+                : ['#e5e7eb'],
             borderWidth: 2,
             borderColor: '#ffffff',
             hoverOffset: 4,
@@ -329,6 +383,50 @@ const AdminDashboard = () => {
                 <Icon size={14} className="mr-0.5" />
                 {Math.abs(value).toFixed(1)}%
             </span>
+        );
+    };
+
+    const PAYMENT_PILLS = {
+        pending: "bg-amber-50 text-amber-700",
+        paid: "bg-emerald-50 text-emerald-700",
+        success: "bg-emerald-50 text-emerald-700",
+        failed: "bg-rose-50 text-rose-700",
+        cancelled: "bg-gray-100 text-gray-500",
+        refunded: "bg-gray-100 text-gray-500",
+    };
+
+    const PaymentPill = ({ status }) => {
+        const normalized = isPaid({ payment_status: status }) ? 'paid' : (status || 'pending');
+        return (
+            <span className={`text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded-sm inline-block ${PAYMENT_PILLS[normalized] || PAYMENT_PILLS.pending}`}>
+                {normalized === 'paid' ? 'Paid' : (status || 'pending')}
+            </span>
+        );
+    };
+
+    const FilterChips = ({ value, onChange }) => {
+        const options = [
+            { id: 'all', label: 'All orders' },
+            { id: 'pending', label: '⏳ Pending' },
+            { id: 'paid', label: '✅ Paid' },
+            { id: 'delivered', label: '📦 Delivered' },
+        ];
+        return (
+            <div className="flex flex-wrap items-center gap-1.5">
+                {options.map(option => (
+                    <button
+                        key={option.id}
+                        onClick={() => onChange(option.id)}
+                        className={`px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors ${
+                            value === option.id
+                                ? 'bg-gray-900 text-white border-gray-900'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                        }`}
+                    >
+                        {option.label}
+                    </button>
+                ))}
+            </div>
         );
     };
 
@@ -374,20 +472,23 @@ const AdminDashboard = () => {
                 </div>
             ) : (
                 <>
-                    {/* Top Stats Grid (Shopify Style) */}
+                    {/* Top Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6 md:mb-8">
                         
-                        {/* 1. Total Sales (Gross) */}
+                        {/* 1. Total Sales — paid orders only (real money in) */}
                         <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-5">
-                                <p className="text-sm font-medium text-gray-600 mb-1">Total sales</p>
+                                <p className="text-sm font-medium text-gray-600 mb-1">Total sales (paid)</p>
                                 <div className="flex items-end justify-between mb-4">
-                                    <h3 className="text-2xl font-bold text-gray-900">₦{dashboardData.sales.toLocaleString()}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900">₦{dashboardData.totalSales.toLocaleString()}</h3>
                                     <GrowthBadge value={dashboardData.salesGrowth} />
+                                </div>
+                                <div className="text-xs text-gray-400 font-medium mb-1">
+                                    {dashboardData.paidCount} paid order{dashboardData.paidCount === 1 ? '' : 's'}
                                 </div>
                                 <div className="h-14 w-full mt-3">
                                     {dashboardData.salesSpark.dataPoints.length > 0 ? (
-                                        <Line data={getSparklineConfig(dashboardData.salesSpark.dataPoints, '#8b5cf6')} options={sparkChartOptions} />
+                                        <Line data={getSparklineConfig(dashboardData.salesSpark.dataPoints, '#10b981')} options={sparkChartOptions} />
                                     ) : (
                                         <div className="text-[10px] text-gray-300 flex items-end h-full">No trend data for this period</div>
                                     )}
@@ -395,43 +496,51 @@ const AdminDashboard = () => {
                             </CardContent>
                         </Card>
 
-                        {/* 2. Total Revenue (Net/Paid) */}
-                        <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        {/* 2. Pending payment — surfaced for attention, NEVER added to sales */}
+                        <Card className="bg-white border-amber-200 border shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-5">
-                                <p className="text-sm font-medium text-gray-600 mb-1">Total revenue (Paid)</p>
+                                <p className="text-sm font-medium text-amber-700 mb-1 flex items-center gap-1.5">
+                                    <BellRing size={13} /> Pending payment
+                                </p>
                                 <div className="flex items-end justify-between mb-4">
-                                    <h3 className="text-2xl font-bold text-gray-900">₦{dashboardData.revenue.toLocaleString()}</h3>
-                                    <GrowthBadge value={dashboardData.revGrowth} />
+                                    <h3 className="text-2xl font-bold text-gray-900">₦{dashboardData.pendingValue.toLocaleString()}</h3>
+                                    <GrowthBadge value={dashboardData.pendingGrowth} />
                                 </div>
-                                <div className="h-14 w-full mt-3">
-                                    {dashboardData.revSpark.dataPoints.length > 0 ? (
-                                        <Line data={getSparklineConfig(dashboardData.revSpark.dataPoints, '#10b981')} options={sparkChartOptions} />
-                                    ) : (
-                                        <div className="text-[10px] text-gray-300 flex items-end h-full">No trend data for this period</div>
-                                    )}
+                                <div className="text-xs text-amber-600 font-medium mb-1">
+                                    {dashboardData.pendingCount} order{dashboardData.pendingCount === 1 ? '' : 's'} awaiting payment
+                                </div>
+                                <div className="mt-3">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => navigate('/admin/orders')}
+                                        className="w-full text-xs hover:border-amber-400"
+                                    >
+                                        Review pending orders →
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* 3. Total Orders */}
-                        <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <CardContent className="p-5">
-                                <p className="text-sm font-medium text-gray-600 mb-1">Total orders</p>
-                                <div className="flex items-end justify-between mb-4">
-                                    <h3 className="text-2xl font-bold text-gray-900">{dashboardData.ordersCount.toLocaleString()}</h3>
-                                    <GrowthBadge value={dashboardData.ordersGrowth} />
-                                </div>
-                                <div className="h-14 w-full mt-3">
-                                    {dashboardData.ordersSpark.dataPoints.length > 0 ? (
-                                        <Line data={getSparklineConfig(dashboardData.ordersSpark.dataPoints, '#3b82f6')} options={sparkChartOptions} />
-                                    ) : (
-                                        <div className="text-[10px] text-gray-300 flex items-end h-full">No trend data for this period</div>
+                        {/* 3. Total orders (paid) */}
+                        <Card className="bg-white border-gray-200 shadow-sm flex flex-col justify-center">
+                            <CardContent className="p-4 flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600">Total orders (paid)</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 mt-1">{dashboardData.ordersCount.toLocaleString()}</h3>
+                                    {dashboardData.ordersSpark.dataPoints.length > 0 && (
+                                        <div className="h-8 w-28 mt-1">
+                                            <Line data={getSparklineConfig(dashboardData.ordersSpark.dataPoints, '#8b5cf6')} options={sparkChartOptions} />
+                                        </div>
                                     )}
+                                </div>
+                                <div className="p-3 bg-gray-50 rounded-full border border-gray-100">
+                                    <Package size={20} className="text-gray-400" />
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* 4. Live Visitors / Pending Orders combo */}
+                        {/* 4. Live visitors + Delivered */}
                         <div className="flex flex-col gap-4 md:gap-5">
                             <Card className="bg-white border-gray-200 shadow-sm flex-1 flex flex-col justify-center">
                                 <CardContent className="p-4 flex items-center justify-between">
@@ -445,8 +554,8 @@ const AdminDashboard = () => {
                                         </p>
                                         <h3 className="text-2xl font-bold text-gray-900 mt-1">{liveVisitors}</h3>
                                     </div>
-                                    <div className="p-3 bg-gray-50 rounded-full border border-gray-100">
-                                        <BellRing size={20} className="text-gray-400" />
+                                    <div className="p-3 bg-emerald-50 rounded-full border border-emerald-100">
+                                        <BellRing size={20} className="text-emerald-500" />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -499,13 +608,20 @@ const AdminDashboard = () => {
 
                         {/* Recent Orders List */}
                         <Card className="border-gray-200 shadow-sm lg:col-span-1">
-                            <CardHeader className="border-b border-gray-50 pb-4 flex flex-row items-center justify-between">
-                                <CardTitle className="text-base font-semibold text-gray-900">Recent orders</CardTitle>
-                                <Link to="/admin/orders" className="text-xs font-semibold text-blue-600 hover:underline">View all</Link>
+                            <CardHeader className="border-b border-gray-50 pb-4 flex flex-col gap-3">
+                                <div className="flex flex-row items-center justify-between">
+                                    <CardTitle className="text-base font-semibold text-gray-900">Recent orders</CardTitle>
+                                    <Link to="/admin/orders" className="text-xs font-semibold text-blue-600 hover:underline">View all</Link>
+                                </div>
+                                <FilterChips value={paymentFilter} onChange={setPaymentFilter} />
                             </CardHeader>
                             <CardContent className="p-0">
                                 {dashboardData.recentList.length === 0 ? (
-                                    <div className="p-8 text-center text-sm text-gray-500">No recent orders.</div>
+                                    <div className="p-8 text-center text-sm text-gray-500">
+                                        {paymentFilter === 'all'
+                                            ? 'No recent orders.'
+                                            : `No ${paymentFilter} orders in this period.`}
+                                    </div>
                                 ) : (
                                     <div className="divide-y divide-gray-100">
                                         {dashboardData.recentList.map((order) => (
@@ -518,11 +634,7 @@ const AdminDashboard = () => {
                                                 </div>
                                                 <div className="text-right shrink-0">
                                                     <p className="text-sm font-semibold text-gray-900">₦{order.total?.toLocaleString()}</p>
-                                                    <p className={`text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded-sm inline-block ${
-                                                        order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                                                    }`}>
-                                                        {order.payment_status}
-                                                    </p>
+                                                    <PaymentPill status={order.payment_status} />
                                                 </div>
                                             </div>
                                         ))}
