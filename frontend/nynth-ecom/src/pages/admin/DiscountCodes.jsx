@@ -335,7 +335,7 @@ export default function DiscountCodes() {
                         ? new Date(
                             code.expiresAt.seconds * 1000
                           ).toLocaleDateString()
-                        : "—"}
+                        : "-"}
                     </td>
                     <td className="px-6 py-4">
                       {isExpired(code) ? (

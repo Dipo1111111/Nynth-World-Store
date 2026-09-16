@@ -6,13 +6,14 @@ import { addOrder, verifyOrderPayment, fetchOrder, validateDiscountCode } from "
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { ArrowLeft, Lock, CreditCard } from "lucide-react";
+import { ArrowLeft, Lock, CreditCard, Ticket } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
 import { trackConversion } from "../utils/monitoring";
 
 import Logo from "../components/common/Logo";
 import { effectiveLagosRates, effectiveAbujaRates, effectiveInterstateRates } from "../utils/shippingRates";
+import { hasTickets, hasPhysicalItems, isTicketItem, ticketCount, nonTicketSubtotal, formatEventDate } from "../utils/tickets";
 
 const Checkout = () => {
   const { settings } = useSettings();
@@ -61,6 +62,12 @@ const Checkout = () => {
   });
   const [shippingFee, setShippingFee] = useState(0);
 
+  // Ticket flow flags - tickets are instant e-tickets: no delivery, no location
+  const cartHasTickets = hasTickets(cartItems);
+  const cartHasPhysical = hasPhysicalItems(cartItems);
+  const ticketsOnly = cartHasTickets && !cartHasPhysical;
+  const physicalSubtotal = nonTicketSubtotal(cartItems);
+
   // Discount code state
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(null); // { code, type, value, discountAmount }
@@ -106,17 +113,23 @@ const Checkout = () => {
     }
   }, [cartItems, navigate, isOrderCompleted]);
 
-  // Calculate total weight (default 0.5kg per item if weight not specified)
+  // Calculate total weight (default 0.5kg per item if weight not specified; tickets weigh nothing)
   const totalWeight = cartItems.reduce((acc, item) => {
-    const itemWeight = item.weight || 0.5;
+    const itemWeight = item.weight ?? 0.5;
     return acc + (itemWeight * item.quantity);
   }, 0);
 
   useEffect(() => {
-    // Free delivery on orders over configurable threshold
+    // Tickets are e-tickets - never shipped, never a delivery fee
+    if (!cartHasPhysical) {
+      setShippingFee(0);
+      return;
+    }
+
+    // Free delivery on physical-goods orders over configurable threshold (tickets don't count toward it)
     const freeDeliveryEnabled = settings?.free_delivery_enabled !== false;
     const freeDeliveryThreshold = settings?.free_delivery_threshold ?? 50000;
-    if (freeDeliveryEnabled && totalAmount >= freeDeliveryThreshold) {
+    if (freeDeliveryEnabled && physicalSubtotal >= freeDeliveryThreshold) {
       setShippingFee(0);
       return;
     }
@@ -133,12 +146,12 @@ const Checkout = () => {
       setShippingFee(abujaRates[form.city].price);
     } else if (interstateRates[form.state]) {
       const stateData = interstateRates[form.state];
-      // Flat rate — same price regardless of weight or delivery method
+      // Flat rate - same price regardless of weight or delivery method
       setShippingFee(stateData.home);
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
-  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, settings.free_delivery_enabled, settings.free_delivery_threshold, totalAmount, lagosRates, abujaRates, interstateRates]);
+  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, settings.free_delivery_enabled, settings.free_delivery_threshold, totalAmount, physicalSubtotal, cartHasPhysical, lagosRates, abujaRates, interstateRates]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -204,13 +217,14 @@ const Checkout = () => {
           name: item.name,
           quantity: item.quantity,
           size: item.size,
-          color: item.color
+          color: item.color,
+          category: item.category
         })),
       },
       onClose: () => {
         setLoading(false);
         // Poll the order briefly: user may have paid then closed the popup.
-        // The webhook (or Paystack redirect) will have marked it paid — give
+        // The webhook (or Paystack redirect) will have marked it paid - give
         // it a few seconds to arrive and land the customer on the ThankYou page.
         const MAX_ATTEMPTS = 6;
         let attempt = 0;
@@ -225,7 +239,7 @@ const Checkout = () => {
           if (attempt < MAX_ATTEMPTS) setTimeout(poll, 2000);
         };
         poll().catch(() => {});
-        toast.error("Payment window closed. If you completed payment, your order is being confirmed — check your email shortly.");
+        toast.error("Payment window closed. If you completed payment, your order is being confirmed - check your email shortly.");
       },
       onSuccess: function (response) {
         setIsOrderCompleted(true);
@@ -271,11 +285,11 @@ const Checkout = () => {
       toast.error("PHONE NUMBER IS REQUIRED");
       return;
     }
-    if (!form.address.trim()) {
+    if (cartHasPhysical && !form.address.trim()) {
       toast.error("DELIVERY ADDRESS IS REQUIRED");
       return;
     }
-    if (!form.city) {
+    if (cartHasPhysical && !form.city) {
       toast.error("PLEASE SELECT YOUR AREA");
       return;
     }
@@ -377,7 +391,15 @@ const Checkout = () => {
       <main className="flex-1 max-w-7xl mx-auto w-full grid lg:grid-cols-2">
         {/* Left Column: Form */}
         <div className="p-6 md:p-10 lg:p-16 lg:border-r border-gray-100">
-          <h1 className="text-[12px] tracking-[0.3em] font-bold uppercase mb-12 text-gray-400">Shipping Details</h1>
+          <h1 className="text-[12px] tracking-[0.3em] font-bold uppercase mb-4 text-gray-400">
+            {ticketsOnly ? "Contact Details" : cartHasTickets ? "Contact & Delivery Details" : "Shipping Details"}
+          </h1>
+
+          {cartHasTickets && (
+            <div className="flex items-center gap-2 bg-black text-white px-4 py-3 text-[9px] tracking-[0.25em] font-bold uppercase mb-12">
+              <Ticket size={13} /> {ticketCount(cartItems)} E-TICKET{ticketCount(cartItems) > 1 ? "S" : ""} - {ticketsOnly ? "NO DELIVERY NEEDED · NO FEES" : "THIS CHECKOUT INCLUDES INSTANT E-TICKETS (NO DELIVERY FEE)"}
+            </div>
+          )}
 
           <form onSubmit={handleCheckout} className="space-y-8">
             <div className="grid grid-cols-2 gap-4">
@@ -444,6 +466,7 @@ const Checkout = () => {
               </div>
             </div>
 
+            {cartHasPhysical && (
             <div className="space-y-2">
               <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Delivery Address</label>
               <input
@@ -454,8 +477,11 @@ const Checkout = () => {
                 placeholder="123 STREET NAME"
               />
             </div>
+          )}
 
-            <div className="grid grid-cols-2 gap-4">
+            {cartHasPhysical && (
+              <>
+              <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
                 <select
@@ -568,6 +594,8 @@ const Checkout = () => {
                   <p className="text-[9px] text-gray-400 uppercase tracking-widest">Only Home Delivery is available for this state.</p>
                 )}
               </div>
+              )}
+              </>
             )}
 
             <div className="pt-12">
@@ -608,9 +636,15 @@ const Checkout = () => {
                 </div>
                 <div className="py-1">
                   <h3 className="text-[13px] tracking-widest font-bold uppercase mb-2">{item.name || item.title}</h3>
-                  <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-4">
-                    {item.size} / {item.color}
-                  </p>
+                  {isTicketItem(item) ? (
+                    <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-4 flex items-center gap-1.5">
+                      <Ticket size={11} /> E-TICKET - {item.eventDateTime ? formatEventDate(item.eventDateTime) : "DATE TBC"}{item.venue ? ` · ${item.venue}` : ""}
+                    </p>
+                  ) : (
+                    <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-4">
+                      {item.size} / {item.color}
+                    </p>
+                  )}
                   <p className="text-[12px] font-bold">{settings.currency_symbol}{item.price.toLocaleString()}</p>
                 </div>
               </div>
@@ -663,9 +697,11 @@ const Checkout = () => {
               <span className="text-gray-400">Shipping</span>
               <div className="text-right">
                 <span className="text-black font-bold uppercase block">
-                  {shippingFee === 0 && settings?.free_delivery_enabled !== false && totalAmount >= (settings?.free_delivery_threshold ?? 50000)
-                    ? "FREE DELIVERY"
-                    : form.city ? `${form.city.toUpperCase()} — ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"
+                  {ticketsOnly
+                    ? "FREE - INSTANT E-TICKET"
+                    : shippingFee === 0 && settings?.free_delivery_enabled !== false && physicalSubtotal >= (settings?.free_delivery_threshold ?? 50000)
+                      ? "FREE DELIVERY"
+                      : form.city ? `${form.city.toUpperCase()} - ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"
                   }
                 </span>
               </div>

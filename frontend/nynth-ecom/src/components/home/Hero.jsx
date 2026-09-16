@@ -11,7 +11,7 @@ export default function Hero() {
       <div className="relative section-pad min-h-[90vh] flex flex-col justify-center items-center text-center">
         <div className="max-w-4xl mx-auto">
           <span className="font-inter text-sm font-medium tracking-wider text-gray-600 uppercase mb-6 block">
-            NEED MORE GBP/USD Collection — Now Live
+            NEED MORE GBP/USD Collection - Now Live
           </span>
 
           <h1 className="hero-title text-black mb-8 leading-[1.1]">

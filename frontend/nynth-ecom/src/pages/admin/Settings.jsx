@@ -9,11 +9,12 @@ import headerBanner from "../../assets/header.JPEG";
 import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA, EMPTY_SHIPPING_RATES } from "../../data/locationData";
 import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
 
-// Base settings defaults — merged with whatever is persisted in the DB.
+// Base settings defaults - merged with whatever is persisted in the DB.
 const SETTINGS_DEFAULTS = {
     site_name: "",
     support_email: "",
     support_phone: "",
+    support_whatsapp: "",
     office_address: "",
     instagram_url: "",
     twitter_url: "",
@@ -76,7 +77,7 @@ const mergeSettingsDefaults = (part = {}) => ({
     our_story_content: part.our_story_content || SETTINGS_DEFAULTS.our_story_content,
 });
 
-// Default Our Story content — mirrors /our-story page fallbacks. Pre-fills the
+// Default Our Story content - mirrors /our-story page fallbacks. Pre-fills the
 // editor so fields read as real, editable content instead of empty boxes.
 const STORY_DEFAULTS = {
     company: "NYNTH WORLD LTD",
@@ -136,7 +137,7 @@ export default function AdminSettings() {
             const url = await uploadImage(compressed);
             
             setSettings(prev => ({ ...prev, hero_banner: url }));
-            toast.success("Image ready — press Save All Settings to publish it.", { id: "upload-status" });
+            toast.success("Image ready - press Save All Settings to publish it.", { id: "upload-status" });
         } catch (error) {
             console.error("Banner upload failed:", error);
             toast.error("Upload failed.", { id: "upload-status" });
@@ -205,7 +206,7 @@ export default function AdminSettings() {
                     setSettings(nextSnapshot);
                 }
                 setSavedSnapshot(JSON.parse(JSON.stringify(nextSnapshot)));
-                toast.success("Settings saved — now live on the storefront");
+                toast.success("Settings saved - now live on the storefront");
                 refreshSettings();
             } else {
                 toast.error("Failed to update settings");
@@ -244,7 +245,7 @@ export default function AdminSettings() {
                         <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Changes are staged until you save</p>
                         <p className="text-xs text-amber-800 mt-1 leading-relaxed">
                             Nothing here goes live while you edit. When you have unsaved changes, a save bar appears at the
-                            bottom of the screen — press <span className="font-bold">Save All Settings</span> to publish them to your storefront.
+                            bottom of the screen - press <span className="font-bold">Save All Settings</span> to publish them to your storefront.
                         </p>
                     </div>
                 </div>
@@ -606,7 +607,7 @@ export default function AdminSettings() {
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={Megaphone} title="Banner Hover Style" />
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4 leading-relaxed">
-                        Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it —
+                        Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
                         press <span className="text-black">Save All Settings</span> to publish.
                     </p>
                     <div className="flex gap-3">
@@ -701,7 +702,7 @@ export default function AdminSettings() {
                     onSaveRates={async () => {
                         const ok = await updateSettings({ shipping_rates: settings.shipping_rates });
                         if (ok) {
-                            toast.success("Shipping rates saved — now live at checkout");
+                            toast.success("Shipping rates saved - now live at checkout");
                             setSavedSnapshot(prev => prev
                                 ? JSON.parse(JSON.stringify({ ...prev, shipping_rates: settings.shipping_rates }))
                                 : prev);
@@ -1113,7 +1114,7 @@ export default function AdminSettings() {
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <SectionTitle icon={BookOpen} title="Our Story" />
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Edit the content shown on the /our-story page. Fields are pre-filled with the current content —
+                        Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
                         change what you need, then press <span className="text-black">Save All Settings</span> to publish.
                     </p>
 
@@ -1300,7 +1301,7 @@ export default function AdminSettings() {
                 </div>
             </form>
 
-            {/* Sticky save bar — appears whenever there are unsaved changes */}
+            {/* Sticky save bar - appears whenever there are unsaved changes */}
             {isDirty && (
                 <div className="fixed bottom-0 inset-x-0 z-50 border-t border-amber-200 bg-amber-50/95 backdrop-blur">
                     <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">

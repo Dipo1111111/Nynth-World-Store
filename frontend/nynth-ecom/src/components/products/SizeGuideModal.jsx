@@ -18,7 +18,7 @@ export default function SizeGuideModal({ onClose }) {
         ];
 
     const modelInfo = settings.size_chart_model_info || 
-        "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette — size down if you prefer a more fitted look.";
+        "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette - size down if you prefer a more fitted look.";
 
     return (
         <div

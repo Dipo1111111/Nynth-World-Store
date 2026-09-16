@@ -20,4 +20,4 @@ console.log(`Original: ${(orig/1024).toFixed(0)}KB → Compressed: ${(comp/1024)
 // Replace original
 copyFileSync(output, input);
 unlinkSync(output);
-console.log('Done — header.JPEG replaced with compressed version.');
+console.log('Done - header.JPEG replaced with compressed version.');

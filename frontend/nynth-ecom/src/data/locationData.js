@@ -1,5 +1,5 @@
 // ============================================================================
-// CITY RIDERS LOGISTICS — SHIPPING RATE CARD 2026
+// CITY RIDERS LOGISTICS - SHIPPING RATE CARD 2026
 // Ref: CR/2026/FA-001 (updates communicated June 19, 2026)
 // ----------------------------------------------------------------------------
 // Base prices live here. Admin can override any of them from the Admin >
@@ -180,7 +180,7 @@ export const ABUJA_SHIPPING_DATA = {
     "Kuje": { price: 5000, speed: "Delivery" }
 };
 
-// INTERSTATE — 2026 RATE CARD (Out of Lagos)
+// INTERSTATE - 2026 RATE CARD (Out of Lagos)
 // South West ₦6,500 | South East ₦8,500 | South South ₦8,500 (Akwa Ibom /
 // Cross River ₦9,500) | North Central / North West / North East ₦10,000
 export const INTERSTATE_SHIPPING_DATA = {
@@ -233,7 +233,7 @@ export const INTERSTATE_SHIPPING_DATA = {
 };
 
 // ----------------------------------------------------------------------------
-// ZONE / REGION GROUPINGS — used by the admin Shipping Rates editor for
+// ZONE / REGION GROUPINGS - used by the admin Shipping Rates editor for
 // grouped (bulk) editing. Each area/state is listed under exactly one group.
 // ----------------------------------------------------------------------------
 

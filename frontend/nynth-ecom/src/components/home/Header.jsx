@@ -32,7 +32,7 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Countdown timer — settings is now available
+  // Countdown timer - settings is now available
   useEffect(() => {
     const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
     const target = new Date(launchDate).getTime();
@@ -123,7 +123,7 @@ export default function Header() {
 
   return (
     <>
-      {/* Announcement Bar — separate toggle from lock timer */}
+      {/* Announcement Bar - separate toggle from lock timer */}
       {settings?.announcement_bar_enabled !== false && (
       <div className="fixed top-0 z-[60] w-full bg-black text-white py-2 text-[8px] md:text-[9px] tracking-[0.4em] font-bold uppercase text-center overflow-hidden">
         <div className="flex items-center justify-center gap-4">
@@ -269,7 +269,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* Spacer — pushes page content below the fixed navbar.
+      {/* Spacer - pushes page content below the fixed navbar.
           Height = announcement bar (when visible) + navbar. */}
       <div
         aria-hidden="true"

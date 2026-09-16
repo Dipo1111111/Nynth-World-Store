@@ -1,7 +1,8 @@
-const { onCall, onRequest } = require("firebase-functions/v2/https");
+const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
+const QRCode = require("qrcode");
 
 // Set global options to ensure region alignment
 setGlobalOptions({ region: "us-central1" });
@@ -10,7 +11,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // ---------------------------------------------------------------
-// EMAIL HELPERS (Resend) — order confirmation + admin new-sale alert
+// EMAIL HELPERS (Resend) - order confirmation + admin new-sale alert
 // ---------------------------------------------------------------
 
 const naira = (n) => "₦" + Number(n || 0).toLocaleString("en-NG");
@@ -24,10 +25,13 @@ const orderItemsRows = (items = []) =>
     items
         .map((item) => {
             const name = esc(item.name || item.title || "Item");
-            const options = [item.size || item.selectedSize, item.color || item.selectedColor]
-                .filter(Boolean)
-                .map(esc)
-                .join(" / ");
+            const isTicket = item.category === "tickets";
+            const options = isTicket
+                ? ["E-TICKET", formatEventDateText(item.eventDateTime)].filter(Boolean).join(" · ")
+                : [item.size || item.selectedSize, item.color || item.selectedColor]
+                    .filter(Boolean)
+                    .map(esc)
+                    .join(" / ");
             const image = item.image || item.thumbnail || "";
             const lineTotal = naira((item.price || 0) * (item.quantity || 1));
             return `
@@ -46,6 +50,75 @@ const orderItemsRows = (items = []) =>
             </tr>`;
         })
         .join("");
+
+const formatEventDateText = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    try {
+        return d
+            .toLocaleString("en-GB", {
+                timeZone: "Africa/Lagos",
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+            })
+            .toUpperCase();
+    } catch (e) {
+        return "";
+    }
+};
+
+// Generates one unique e-ticket code per ticket. Codes are the source of truth
+// at the gate - the QR code simply encodes the code for fast scanning.
+function generateTicketCodes(items = []) {
+    const used = new Set();
+    const tickets = [];
+    for (const item of items || []) {
+        if (item.category !== "tickets") continue;
+        const qty = item.quantity || 1;
+        for (let i = 0; i < qty; i++) {
+            let code;
+            do {
+                code = "NWT-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+            } while (used.has(code));
+            used.add(code);
+            tickets.push({
+                code,
+                productId: item.id,
+                title: item.name || item.title || "NYNTH WORLD Event",
+                eventDateTime: item.eventDateTime || null,
+                venue: item.venue || null,
+                price: item.price || 0,
+            });
+        }
+    }
+    return tickets;
+}
+
+// Builds QR data-URLs for tickets in memory. Used by the confirmation email only -
+// Firestore keeps the plain codes, the QR is regenerated on demand.
+async function buildEticketQrs(tickets = []) {
+    const qrByCode = {};
+    for (const t of tickets) {
+        try {
+            qrByCode[t.code] = await QRCode.toDataURL(`NYNTH:${t.code}`, {
+                margin: 1,
+                width: 220,
+                errorCorrectionLevel: "M",
+            });
+        } catch (e) {
+            qrByCode[t.code] = "";
+        }
+    }
+    return qrByCode;
+}
+
+const hasPhysicalItemsInOrder = (items = []) => items.some((i) => i.category !== "tickets");
 
 const emailShell = (title, inner) => `
 <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f5f5f5" style="width:100%;background:#f5f5f5;padding:32px 0;">
@@ -78,7 +151,7 @@ async function getSiteSettings() {
 async function sendResendEmail({ to, subject, html }) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-        console.warn("RESEND_API_KEY not set — skipping transaction email to " + to);
+        console.warn("RESEND_API_KEY not set - skipping transaction email to " + to);
         return { skipped: true };
     }
     const from = process.env.EMAIL_FROM || "NYNTH WORLD <onboarding@resend.dev>";
@@ -98,35 +171,76 @@ async function sendResendEmail({ to, subject, html }) {
     return response.json();
 }
 
-function buildCustomerConfirmationHtml(order, orderId, reference, settings = {}) {
+function buildCustomerConfirmationHtml(order, orderId, reference, settings = {}, extras = {}) {
     const customer = order.customer || {};
     const siteName = settings.site_name || "NYNTH WORLD";
     const currency = settings.currency_symbol || "₦";
     const money = (n) => currency + Number(n || 0).toLocaleString("en-NG");
     const shippingFee = order.shippingFee ?? order.shipping_fee ?? 0;
 
-    const itemsTable = orderItemsRows(order.items || []);
+    const items = order.items || [];
+    const tickets = extras.tickets || order.tickets || [];
+    const qrByCode = extras.qrByCode || {};
+    const hasPhysical = hasPhysicalItemsInOrder(items);
+    const itemsTable = orderItemsRows(items);
+
+    const ticketCards = tickets
+        .map((t) => {
+            const qr = qrByCode[t.code] || "";
+            const when = formatEventDateText(t.eventDateTime);
+            return `
+          <table cellpadding="0" cellspacing="0" width="100%" style="width:100%;background:#0a0a0a;border-radius:10px;margin-bottom:14px;">
+            <tr><td style="padding:22px 24px;">
+              <div style="font-family:Inter,Arial,sans-serif;font-size:9px;letter-spacing:.28em;color:#9ca3af;text-transform:uppercase;font-weight:700;">E-Ticket · Entry Code</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:22px;font-weight:800;letter-spacing:.08em;color:#ffffff;margin-top:6px;">${esc(t.code)}</div>
+              <div style="font-family:Inter,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;color:#ffffff;text-transform:uppercase;margin-top:12px;">${esc(t.title)}</div>
+              <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:#9ca3af;letter-spacing:.06em;margin-top:4px;">${when ? esc(when) : "Date TBC"}${t.venue ? " · " + esc(t.venue) : ""}</div>
+              <table cellpadding="0" cellspacing="0" style="margin-top:16px;">
+                <tr>
+                  ${qr ? `<td style="padding-right:18px;background:#ffffff;border-radius:8px;padding:8px;"><img src="${qr}" width="120" height="120" style="width:120px;height:120px;display:block;" alt="QR" /></td>` : ""}
+                  <td style="vertical-align:middle;">
+                    <div style="font-family:Inter,Arial,sans-serif;font-size:8px;letter-spacing:.2em;color:#9ca3af;text-transform:uppercase;">Show this code</div>
+                    <div style="font-family:Inter,Arial,sans-serif;font-size:8px;letter-spacing:.2em;color:#9ca3af;text-transform:uppercase;margin-top:2px;">at the gate to enter</div>
+                  </td>
+                </tr>
+              </table>
+            </td></tr>
+          </table>`;
+        })
+        .join("");
 
     return emailShell("Order Confirmed", `
-      <h1 style="font-family:Inter,Arial,sans-serif;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:.02em;color:#0a0a0a;margin:0 0 8px;">CONGRATULATIONS${customer.firstName ? ", " + esc(customer.firstName) : ""}!</h1>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.18em;color:#059669;text-transform:uppercase;margin-bottom:18px;">Welcome to ${siteName}</div>
-      <p style="font-family:Inter,Arial,sans-serif;font-size:14px;line-height:1.7;color:#444;margin:0 0 24px;">Your payment went through and your order is now being confirmed. We are packaging it with care and will update you the moment it ships.</p>
+      <h1 style="font-family:Inter,Arial,sans-serif;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:.02em;color:#0a0a0a;margin:0 0 8px;">${tickets.length ? "YOU'RE IN" : "CONGRATULATIONS"}${customer.firstName ? ", " + esc(customer.firstName) : ""}!</h1>
+      <div style="font-family:Inter,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.18em;color:#059669;text-transform:uppercase;margin-bottom:18px;">${tickets.length ? "See you at the show" : "Welcome to " + siteName}</div>
+      <p style="font-family:Inter,Arial,sans-serif;font-size:14px;line-height:1.7;color:#444;margin:0 0 24px;">${
+          tickets.length && !hasPhysical
+              ? "Your payment went through and your e-tickets are below. No delivery, no fees - just show the code (or QR) at the gate to enter."
+              : tickets.length
+                ? "Your payment went through. Your e-tickets are below - show the code (or QR) at the gate. Your merchandise will be shipped separately."
+                : "Your payment went through and your order is now being confirmed. We are packaging it with care and will update you the moment it ships."
+      }</p>
 
       <table cellpadding="0" cellspacing="0" width="100%" style="background:#0a0a0a;border-radius:6px;margin-bottom:28px;">
         <tr>
           <td style="padding:16px 20px;">
             <div style="font-family:Inter,Arial,sans-serif;font-size:9px;letter-spacing:.24em;color:#9ca3af;text-transform:uppercase;">Order Reference</div>
             <div style="font-family:ui-monospace,Menlo,monospace;font-size:16px;font-weight:700;color:#ffffff;margin-top:4px;letter-spacing:.04em;">#${esc(orderId || "")}</div>
-            <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:#9ca3af;margin-top:4px;">Paystack Ref: ${esc(reference || "—")}</div>
+            <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:#9ca3af;margin-top:4px;">Paystack Ref: ${esc(reference || "-")}</div>
           </td>
         </tr>
       </table>
+
+      ${tickets.length ? `
+      <div style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;color:#0a0a0a;text-transform:uppercase;margin-bottom:10px;">Your E-Tickets${tickets.length > 1 ? " (" + tickets.length + ")" : ""}</div>
+      ${ticketCards}
+      ` : ""}
 
       <div style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;color:#0a0a0a;text-transform:uppercase;margin-bottom:10px;">Your Items</div>
       <table cellpadding="0" cellspacing="0" width="100%" style="width:100%;border:1px solid #efefef;border-radius:6px;">
         ${itemsTable || `<tr><td style="padding:16px;color:#999;font-size:13px;">No items recorded.</td></tr>`}
       </table>
 
+      ${hasPhysical ? `
       <div style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;color:#0a0a0a;text-transform:uppercase;margin:28px 0 10px;">Delivery Details</div>
       <table cellpadding="0" cellspacing="0" width="100%" style="width:100%;border:1px solid #efefef;border-radius:6px;">
         <tr><td style="padding:16px 20px;border-bottom:1px solid #efefef;">
@@ -139,20 +253,23 @@ function buildCustomerConfirmationHtml(order, orderId, reference, settings = {})
           <div style="font-size:12px;color:#666;font-family:Inter,Arial,sans-serif;margin-top:2px;">${esc(customer.email || "")}</div>
         </td></tr>
       </table>
+      ` : `
+      <div style="font-family:Inter,Arial,sans-serif;font-size:12px;color:#999;margin-top:22px;letter-spacing:.06em;">An e-ticket needs no delivery - your tickets are in this email. Save it or screenshot your code.</div>
+      `}
 
       <div style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;color:#0a0a0a;text-transform:uppercase;margin:28px 0 10px;">Payment Summary</div>
       <table cellpadding="0" cellspacing="0" width="100%" style="width:100%;border:1px solid #efefef;border-radius:6px;">
         <tr><td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;color:#666;font-family:Inter,Arial,sans-serif;">Subtotal</td>
             <td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;font-weight:700;color:#0a0a0a;text-align:right;font-family:Inter,Arial,sans-serif;white-space:nowrap;">${money(order.subtotal)}</td></tr>
         <tr><td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;color:#666;font-family:Inter,Arial,sans-serif;">Delivery</td>
-            <td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;font-weight:700;color:#0a0a0a;text-align:right;font-family:Inter,Arial,sans-serif;white-space:nowrap;">${shippingFee ? money(shippingFee) : "FREE"}</td></tr>
+            <td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;font-weight:700;color:#0a0a0a;text-align:right;font-family:Inter,Arial,sans-serif;white-space:nowrap;">${shippingFee ? money(shippingFee) : hasPhysical ? "FREE" : "FREE (E-TICKET)"}</td></tr>
         ${order.discountAmount ? `<tr><td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;color:#047857;font-family:Inter,Arial,sans-serif;">Discount${order.discountCode ? " (" + esc(order.discountCode) + ")" : ""}</td>
             <td style="padding:14px 20px;border-bottom:1px solid #efefef;font-size:13px;font-weight:700;color:#047857;text-align:right;font-family:Inter,Arial,sans-serif;white-space:nowrap;">−${money(order.discountAmount)}</td></tr>` : ""}
         <tr><td style="padding:16px 20px;font-size:14px;font-weight:800;color:#0a0a0a;font-family:Inter,Arial,sans-serif;text-transform:uppercase;">Total Paid</td>
             <td style="padding:16px 20px;font-size:16px;font-weight:800;color:#0a0a0a;text-align:right;font-family:Inter,Arial,sans-serif;white-space:nowrap;">${money(order.total)}</td></tr>
       </table>
 
-      <p style="font-family:Inter,Arial,sans-serif;font-size:13px;line-height:1.7;color:#555;margin:28px 0 0;">If you have any questions, just reply to this email — we are happy to help.</p>
+      <p style="font-family:Inter,Arial,sans-serif;font-size:13px;line-height:1.7;color:#555;margin:28px 0 0;">If you have any questions, just reply to this email - we are happy to help.</p>
       <p style="font-family:Inter,Arial,sans-serif;font-size:13px;line-height:1.7;color:#0a0a0a;margin:16px 0 0;font-weight:700;">The ${siteName} Team</p>
     `);
 }
@@ -162,11 +279,13 @@ function buildAdminAlertHtml(order, orderId, reference, settings = {}) {
     const orderItems = order.items || [];
     const currency = settings.currency_symbol || "₦";
     const money = (n) => currency + Number(n || 0).toLocaleString("en-NG");
+    const tickets = order.tickets || [];
+    const hasPhysical = hasPhysicalItemsInOrder(orderItems);
 
     return emailShell("New Sale", `
-      <div style="font-family:Inter,Arial,sans-serif;font-size:9px;letter-spacing:.3em;color:#059669;text-transform:uppercase;font-weight:700;">New order — payment received</div>
+      <div style="font-family:Inter,Arial,sans-serif;font-size:9px;letter-spacing:.3em;color:#059669;text-transform:uppercase;font-weight:700;">New order - payment received</div>
       <h1 style="font-family:Inter,Arial,sans-serif;font-size:34px;line-height:1.1;font-weight:800;color:#0a0a0a;margin:8px 0 4px;">${money(order.total)}</h1>
-      <div style="font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#777;margin-bottom:26px;">Order #${esc(orderId || "")} · Paystack ${esc(reference || "—")}</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#777;margin-bottom:26px;">Order #${esc(orderId || "")} · Paystack ${esc(reference || "-")}${tickets.length ? " · " + tickets.length + " e-ticket" + (tickets.length === 1 ? "" : "s") + " 🎟" : ""}</div>
 
       <table cellpadding="0" cellspacing="0" width="100%" style="width:100%;border:1px solid #efefef;border-radius:6px;margin-bottom:24px;">
         <tr><td style="padding:16px 20px;background:#fafafa;font-size:10px;font-weight:700;letter-spacing:.22em;color:#999;text-transform:uppercase;font-family:Inter,Arial,sans-serif;">Customer</td></tr>
@@ -175,12 +294,16 @@ function buildAdminAlertHtml(order, orderId, reference, settings = {}) {
           <div style="font-size:13px;color:#555;margin-top:3px;font-family:Inter,Arial,sans-serif;">${esc(customer.email || "")} · ${esc(customer.phone || "")}</div>
         </td></tr>
         <tr><td style="padding:16px 20px;">
+          ${hasPhysical ? `
           <div style="font-size:11px;font-weight:700;letter-spacing:.2em;color:#999;text-transform:uppercase;font-family:Inter,Arial,sans-serif;margin-bottom:6px;">Shipping Address</div>
           <div style="font-size:13px;color:#333;font-family:Inter,Arial,sans-serif;line-height:1.6;">${esc(customer.address || "")}<br/>${esc(customer.city || "")}${customer.city && customer.state ? ", " : ""}${esc(customer.state || "")}</div>
+          ` : `
+          <div style="font-size:11px;font-weight:700;letter-spacing:.2em;color:#059669;text-transform:uppercase;font-family:Inter,Arial,sans-serif;">E-ticket order - no delivery needed</div>
+          `}
         </td></tr>
       </table>
 
-      <div style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;color:#0a0a0a;text-transform:uppercase;margin-bottom:10px;">Items</div>
+      <div style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;color:#0a0a0a;text-transform:uppercase;margin-bottom:10px;">Items${tickets.length ? " (tickets auto-delivered)" : ""}</div>
       <table cellpadding="0" cellspacing="0" width="100%" style="width:100%;border:1px solid #efefef;border-radius:6px;">
         ${orderItems.length ? orderItemsRows(order.items) : `<tr><td style="padding:16px;">No items.</td></tr>`}
       </table>
@@ -217,77 +340,21 @@ exports.paystackWebhook = onRequest(
 
         // 2. Handle 'charge.success'
         if (event.event === "charge.success") {
-            const { metadata, reference } = event.data;
-            const orderId = metadata?.orderId;
+            const reference = event.data?.reference;
+            const orderId = event.data?.metadata?.orderId;
 
             if (!orderId) {
                 console.error("No orderId found in metadata");
                 return res.status(400).send("No orderId in metadata");
             }
 
-            let orderRef;
-            let orderData;
-            let orderWasProcessed = false;
-
             try {
-                orderRef = db.collection("orders").doc(orderId);
-                await db.runTransaction(async (transaction) => {
-                    const orderDoc = await transaction.get(orderRef);
-
-                    if (!orderDoc.exists) {
-                        throw new Error(`Order ${orderId} does not exist`);
-                    }
-
-                    orderData = orderDoc.data();
-
-                    // Avoid duplicate processing
-                    if (orderData.payment_status === "paid") {
-                        console.log(`Order ${orderId} already marked as paid.`);
-                        return;
-                    }
-
-                    orderWasProcessed = true;
-
-                    // A. Update Order Status
-                    transaction.update(orderRef, {
-                        payment_status: "paid",
-                        order_status: "confirmed",
-                        payment_reference: reference,
-                        payment_gateway: "paystack",
-                        paid_at: admin.firestore.FieldValue.serverTimestamp(),
-                        updated_at: admin.firestore.FieldValue.serverTimestamp(),
-                    });
-
-                    // B. Decrement Stock
-                    if (orderData.items && Array.isArray(orderData.items)) {
-                        for (const item of orderData.items) {
-                            const productRef = db.collection("products").doc(item.id);
-                            const productDoc = await transaction.get(productRef);
-
-                            if (productDoc.exists) {
-                                const currentStock = productDoc.data().stockQuantity || 0;
-                                const newStock = Math.max(0, currentStock - (item.quantity || 1));
-                                transaction.update(productRef, {
-                                    stockQuantity: newStock,
-                                    inStock: newStock > 0,
-                                    updated_at: admin.firestore.FieldValue.serverTimestamp(),
-                                });
-                            }
-                        }
-                    }
-                });
-
-                console.log(`Successfully processed payment for Order: ${orderId}`);
-
-                // C. Trigger fancy emails — customer confirmation + admin "new sale" alert.
-                // Fire-and-forget: a failure here must never fail the webhook (order is already paid).
-                // Only send when this webhook actually processed the payment (not on a duplicate hit).
-                if (orderWasProcessed) {
-                    sendOrderNotifications(orderRef, orderData, orderId, reference)
-                        .then(() => console.log(`Emails dispatched for order ${orderId}`))
-                        .catch((err) => console.error(`Email dispatch failed for order ${orderId}:`, err.message));
+                const { processed } = await finalizePaidOrder(orderId, reference);
+                if (processed) {
+                    console.log(`Successfully processed payment (webhook) for Order: ${orderId}`);
+                } else {
+                    console.log(`Order ${orderId} already marked as paid - duplicate webhook ignored.`);
                 }
-
                 return res.status(200).send("Success");
             } catch (error) {
                 console.error("Transaction failed: ", error);
@@ -300,10 +367,129 @@ exports.paystackWebhook = onRequest(
     }
 );
 
+// Marks an order as paid inside a transaction: generates e-ticket codes and
+// decrements stock. Idempotent - a second call for an already-paid order is a
+// no-op. Shared by the Paystack webhook and the paystackVerify fallback so both
+// paths behave identically. Returns { processed }.
+async function finalizePaidOrder(orderId, reference) {
+    const orderRef = db.collection("orders").doc(orderId);
+    let processed = false;
+
+    await db.runTransaction(async (transaction) => {
+        const orderDoc = await transaction.get(orderRef);
+
+        if (!orderDoc.exists) {
+            throw new Error(`Order ${orderId} does not exist`);
+        }
+
+        const orderData = orderDoc.data();
+
+        // Avoid duplicate processing
+        if (orderData.payment_status === "paid") {
+            return;
+        }
+
+        processed = true;
+
+        // A. Update Order Status
+        const ticketCodes = orderData.tickets && orderData.tickets.length
+            ? orderData.tickets
+            : generateTicketCodes(orderData.items);
+
+        transaction.update(orderRef, {
+            payment_status: "paid",
+            order_status: "confirmed",
+            payment_reference: reference,
+            payment_gateway: "paystack",
+            tickets: ticketCodes.length ? ticketCodes : admin.firestore.FieldValue.delete(),
+            paid_at: admin.firestore.FieldValue.serverTimestamp(),
+            updated_at: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        // B. Decrement Stock
+        if (orderData.items && Array.isArray(orderData.items)) {
+            for (const item of orderData.items) {
+                const productRef = db.collection("products").doc(item.id);
+                const productDoc = await transaction.get(productRef);
+
+                if (productDoc.exists) {
+                    const currentStock = productDoc.data().stockQuantity || 0;
+                    const newStock = Math.max(0, currentStock - (item.quantity || 1));
+                    transaction.update(productRef, {
+                        stockQuantity: newStock,
+                        inStock: newStock > 0,
+                        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+                    });
+                }
+            }
+        }
+    });
+
+    // C. Trigger emails - fire-and-forget: a failure here must never fail the
+    // payment flow. Only dispatched when this call actually processed the payment.
+    if (processed) {
+        const paidOrder = await orderRef.get();
+        const orderData = paidOrder.exists ? paidOrder.data() : {};
+        sendOrderNotifications(orderRef, orderData, orderId, reference)
+            .then(() => console.log(`Emails dispatched for order ${orderId}`))
+            .catch((err) => console.error(`Email dispatch failed for order ${orderId}:`, err.message));
+    }
+
+    return { processed };
+}
+
+// 2b. Server-side payment verification (popup flow fallback).
+// The Paystack popup calls this from onSuccess. It verifies the transaction
+// against Paystack from the trusted backend, then marks the order paid - so an
+// order never sits at "pending" even if the dashboard webhook was never wired up.
+// Safe for guests: marking paid requires Paystack to confirm the charge, which a
+// client alone can never forge. The order to mark is taken from Paystack's own
+// metadata, never from a client-supplied id.
+exports.paystackVerify = onCall(
+    {
+        secrets: ["PAYSTACK_SECRET_KEY", "RESEND_API_KEY", "EMAIL_FROM", "ADMIN_NOTIFY_EMAIL"],
+    },
+    async (request) => {
+        const reference = request.data && request.data.reference;
+        if (!reference) throw new HttpsError("invalid-argument", "reference is required");
+
+        const secret = process.env.PAYSTACK_SECRET_KEY;
+        if (!secret) throw new HttpsError("unavailable", "PAYSTACK_SECRET_KEY is not configured");
+
+        const response = await fetch(
+            `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+            { headers: { Authorization: `Bearer ${secret}` } }
+        ).catch(() => null);
+
+        if (!response) throw new HttpsError("unavailable", "Could not reach Paystack verification API");
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.status) {
+            throw new HttpsError("unavailable", data.message || "Paystack verification failed");
+        }
+
+        const verified = data.data;
+        if (!verified || verified.status !== "success") {
+            throw new HttpsError(
+                "failed-precondition",
+                `Transaction is ${verified ? verified.status : "unknown"} - order was not paid`
+            );
+        }
+
+        const orderId = verified.metadata && verified.metadata.orderId;
+        if (!orderId) throw new HttpsError("not-found", "No orderId in payment metadata");
+
+        const { processed } = await finalizePaidOrder(orderId, reference);
+        return { success: true, orderId, alreadyPaid: !processed };
+    }
+);
+
 // Sends the customer confirmation + admin new-sale alert and marks them on the order.
 async function sendOrderNotifications(orderRef, orderData, orderId, reference) {
     const settings = await getSiteSettings();
     const customer = orderData.customer || {};
+    const tickets = orderData.tickets || [];
+    const qrByCode = tickets.length ? await buildEticketQrs(tickets) : {};
 
     const notifications = [];
 
@@ -312,8 +498,10 @@ async function sendOrderNotifications(orderRef, orderData, orderId, reference) {
         notifications.push(
             sendResendEmail({
                 to: customer.email,
-                subject: `Your NYNTH order is confirmed — Order #${orderId.slice(0, 8).toUpperCase()}`,
-                html: buildCustomerConfirmationHtml(orderData, orderId, reference, settings),
+                subject: tickets.length
+                    ? `Your NYNTH e-ticket${tickets.length === 1 ? "" : "s"} are here - Order #${orderId.slice(0, 8).toUpperCase()}`
+                    : `Your NYNTH order is confirmed - Order #${orderId.slice(0, 8).toUpperCase()}`,
+                html: buildCustomerConfirmationHtml(orderData, orderId, reference, settings, { tickets, qrByCode }),
             }).then((result) => (result && result.id ? "customer" : "skipped")),
         );
     }
@@ -324,7 +512,7 @@ async function sendOrderNotifications(orderRef, orderData, orderId, reference) {
         notifications.push(
             sendResendEmail({
                 to: String(adminNotifyEmail).trim(),
-                subject: `🔔 New NYNTH sale: ${naira(orderData.total)} — ${customer.firstName || "Customer"}`,
+                subject: `🔔 New NYNTH sale: ${naira(orderData.total)}${tickets.length ? " · " + tickets.length + " ticket" + (tickets.length === 1 ? "" : "s") : ""} - ${customer.firstName || "Customer"}`,
                 html: buildAdminAlertHtml(orderData, orderId, reference, settings),
             }).then((result) => (result && result.id ? "admin" : "skipped")),
         );

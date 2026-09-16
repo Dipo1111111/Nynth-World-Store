@@ -218,7 +218,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                 </button>
             </div>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                Edit one location with its pen (press Enter to confirm). Or fill a whole zone at once with "Set all". Edits stage below — hit <span className="text-black">Save Rates</span> to publish them to checkout.
+                Edit one location with its pen (press Enter to confirm). Or fill a whole zone at once with "Set all". Edits stage below - hit <span className="text-black">Save Rates</span> to publish them to checkout.
             </p>
 
             {/* LAGOS + ABUJA */}

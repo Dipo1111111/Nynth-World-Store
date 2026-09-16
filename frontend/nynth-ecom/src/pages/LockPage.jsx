@@ -128,7 +128,7 @@ export default function LockPage() {
                     </p>
                 </div>
 
-                {/* Launch Countdown — only when timer is ON */}
+                {/* Launch Countdown - only when timer is ON */}
                 {timerEnabled && (
                     <div className="w-full mb-10 flex items-center justify-center gap-5">
                         {[

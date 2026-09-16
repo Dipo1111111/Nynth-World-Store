@@ -42,7 +42,7 @@ export default function ShippingReturns() {
                             We operate a 4-day return policy. This means you have 4 days after receiving your item to request a return.
                         </p>
                         <p className="text-[13px] text-gray-600 leading-[1.8]">
-                            To be eligible, items must be returned in the same condition they were received — unworn, unused, with all tags intact and in original packaging. Proof of purchase is required.
+                            To be eligible, items must be returned in the same condition they were received - unworn, unused, with all tags intact and in original packaging. Proof of purchase is required.
                         </p>
                         <p className="text-[13px] text-gray-600 leading-[1.8]">
                             Returns are only accepted in cases of incorrect items or verified defects. All requests are subject to approval.

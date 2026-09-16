@@ -1,10 +1,11 @@
 // src/components/cart/CartDrawer.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { X, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import { X, Minus, Plus, Trash2, ArrowRight, Ticket } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useSettings } from "../../context/SettingsContext";
 import { fetchSingleProduct } from "../../api/firebaseFunctions";
+import { formatEventDate } from "../../utils/tickets";
 
 const CartItem = ({ item, settings, onClose }) => {
     const { removeFromCart, updateQuantity, updateItemOptions } = useCart();
@@ -73,6 +74,12 @@ const CartItem = ({ item, settings, onClose }) => {
                 <div className="flex justify-between items-center text-[10px] font-bold tracking-widest text-black mb-3">
                     <span>{settings?.currency_symbol || "₦"}{item.price.toLocaleString()}</span>
                 </div>
+
+                {item.category === "tickets" && (
+                    <p className="text-[8px] tracking-[0.15em] uppercase font-bold text-gray-400 mb-3 flex items-center gap-1.5">
+                        <Ticket size={10} className="text-black" /> E-TICKET - {item.eventDateTime ? formatEventDate(item.eventDateTime) : "DATE TBC"}{item.venue ? ` · ${item.venue}` : ""}
+                    </p>
+                )}
 
                 {/* Color Selection */}
                 {availableColors.length > 0 && (

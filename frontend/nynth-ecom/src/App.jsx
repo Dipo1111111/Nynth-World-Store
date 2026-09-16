@@ -6,6 +6,8 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { SettingsProvider } from "./context/SettingsContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import WhatsAppButton from "./components/common/WhatsAppButton";
+import NewsletterPopup from "./components/newsletter/NewsletterPopup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useOffline } from "./hooks/useOffline";
 import { WifiOff, Loader2 } from "lucide-react";
@@ -19,7 +21,7 @@ import { useAuth } from "./context/AuthContext";
 import { doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 
 
-// Public Pages — regular imports (safe, no code-splitting)
+// Public Pages - regular imports (safe, no code-splitting)
 import Home from "./pages/Home.jsx";
 import Shop from "./pages/Shop.jsx";
 import Lookbook from "./pages/Lookbook.jsx";
@@ -77,7 +79,7 @@ const SESSION_ID = (() => {
 function PageTracker() {
   const { pathname } = useLocation();
 
-  // Presence tracking — runs once on mount
+  // Presence tracking - runs once on mount
   useEffect(() => {
     const presenceRef = doc(db, 'presence', SESSION_ID);
 
@@ -216,6 +218,8 @@ function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
         <ErrorBoundary>
           <BrowserRouter>
             <PageTracker />
+            <NewsletterPopup />
+            <WhatsAppButton />
             <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Navigate to="/shop" replace />} />

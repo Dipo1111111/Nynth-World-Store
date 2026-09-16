@@ -1,9 +1,10 @@
 // pages/Shop.jsx
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams, useLocation, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import ProductCard from "../components/products/ProductCard";
+import TicketCard from "../components/products/TicketCard";
 import { fetchProducts } from "../api/firebaseFunctions";
 import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
@@ -28,7 +29,7 @@ export default function Shop() {
   const [displayMode, setDisplayMode] = useState("view");
   const { settings } = useSettings();
 
-  // Dynamically preload LCP hero banner — works in both dev and production
+  // Dynamically preload LCP hero banner - works in both dev and production
   useEffect(() => {
     const heroUrl = getOptimizedImageUrl(settings.hero_banner) || headerBanner;
     if (heroUrl && !document.querySelector(`link[rel="preload"][href="${heroUrl}"]`)) {
@@ -114,6 +115,15 @@ export default function Shop() {
           </div>
         </section>
 
+        {/* Free Delivery Notice - surfaced before the drop-off point */}
+        {selectedCategory !== "tickets" && settings?.free_delivery_enabled !== false && (
+          <div className="bg-black text-white text-center py-3 px-6">
+            <p className="text-[9px] md:text-[10px] tracking-[0.25em] font-bold uppercase">
+              FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()} · CALCULATED AT CHECKOUT
+            </p>
+          </div>
+        )}
+
         {/* Categories Bar - Primary Sticky - Edge to Edge */}
         <div className="sticky top-[55px] z-40 w-full bg-white border-b border-black/5 flex justify-between items-center py-5 px-6 md:px-10 transition-all duration-300">
           <div className="flex items-center gap-4">
@@ -142,7 +152,7 @@ export default function Shop() {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            {["all", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves"].map((cat) => (
+            {["all", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves", "tickets"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
@@ -154,6 +164,46 @@ export default function Shop() {
             ))}
           </div>
         </div>
+
+        {/* Mobile Category Chips - always visible, tickets included */}
+        <div className="md:hidden flex items-center gap-2 overflow-x-auto px-4 py-3 border-b border-black/5 bg-white scrollbar-hide no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {["all", "tickets", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves"].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`shrink-0 px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.2em] border transition-all whitespace-nowrap ${selectedCategory === cat ? "bg-black text-white border-black" : "border-gray-200 text-gray-500 hover:border-black hover:text-black"}`}
+            >
+              {cat === 'tees' ? 't-shirts' : cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Tickets Band - Edge to Edge, Long Glossy Wide Cards */}
+        {filteredProducts.some((p) => p.category === "tickets") && (
+          <section className="w-full">
+            <div className="flex items-center justify-between px-4 md:px-10 py-3 bg-black">
+              <span className="text-[8px] tracking-[0.25em] font-bold uppercase text-white">
+                INSTANT E-TICKETS · NO DELIVERY · NO FEES
+              </span>
+              <Link
+                to={selectedCategory === "tickets" ? "/shop" : "/shop?category=tickets"}
+                className="text-[8px] tracking-[0.25em] font-bold uppercase text-white/60 hover:text-white transition-colors"
+              >
+                {selectedCategory === "tickets" ? "SHOW ALL PRODUCTS" : "VIEW ALL TICKETS"} →
+              </Link>
+            </div>
+            <div className="w-full bg-white px-4 md:px-10 py-8">
+              <div className="grid grid-cols-1 gap-5 max-w-[1200px]">
+                {filteredProducts
+                  .filter((p) => p.category === "tickets")
+                  .slice(0, 3)
+                  .map((p) => (
+                    <TicketCard key={p.id} product={p} wide />
+                  ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Grid Layer - 100% Full Width, 0 Padding, 1px Gaps */}
         <div id="product-grid" className="w-full bg-white min-h-[60vh] scroll-mt-[130px]">
@@ -172,9 +222,13 @@ export default function Shop() {
           ) : (
             <section className="w-full px-0">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} displayMode={displayMode} />
-                ))}
+                {filteredProducts.map((product) =>
+                  product.category === "tickets" ? (
+                    <TicketCard key={product.id} product={product} />
+                  ) : (
+                    <ProductCard key={product.id} product={product} displayMode={displayMode} />
+                  )
+                )}
 
                 {/* Fill all empty slots in the last row to maintain 1px grid lines (only in model mode) */}
                 {displayMode !== 'view' && filteredProducts.length > 0 && Array.from({

@@ -1,5 +1,5 @@
 /* globals.css */
-/* Inter font loaded via <link> in index.html for faster discovery — not CSS @import */
+/* Inter font loaded via <link> in index.html for faster discovery - not CSS @import */
 @import "tailwindcss";
 
 :root {

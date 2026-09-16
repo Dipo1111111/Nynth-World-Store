@@ -4,11 +4,12 @@ import { useCart } from "../context/CartContext.jsx";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowRight, Ticket } from "lucide-react";
 import toast from "react-hot-toast";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
 import { useAuth } from "../context/AuthContext.jsx";
+import { isTicketItem, hasTickets, hasPhysicalItems, ticketCount, formatEventDate } from "../utils/tickets";
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -23,7 +24,7 @@ export default function Cart() {
   );
 
   // Shipping is calculated at checkout based on delivery location
-  // Don't show a flat rate here — it would be misleading
+  // Don't show a flat rate here - it would be misleading
   const total = subtotal;
 
   const handleCheckout = () => {
@@ -59,6 +60,12 @@ export default function Cart() {
           <h1 className="text-[11px] font-bold tracking-[0.2em] uppercase">YOUR CART ({cartItems.length})</h1>
         </div>
 
+        {hasTickets(cartItems) && !hasPhysicalItems(cartItems) && (
+          <div className="bg-black text-white px-4 py-3 text-[8px] tracking-[0.25em] font-bold uppercase mb-8 flex items-center gap-2">
+            <Ticket size={12} /> {ticketCount(cartItems)} E-TICKET{ticketCount(cartItems) > 1 ? "S" : ""} - NO DELIVERY NEEDED · NO FEES
+          </div>
+        )}
+
 
         {/* Cart Items List */}
         <div className="flex-1 flex flex-col gap-6 mb-16">
@@ -92,7 +99,14 @@ export default function Cart() {
                 </div>
 
                 <p className="text-[9px] tracking-[0.1em] text-gray-500 uppercase mb-4">
-                  SIZE: {item.size}
+                  {isTicketItem(item) ? (
+                    <span className="flex flex-col gap-0.5">
+                      <span className="font-bold text-black">E-TICKET</span>
+                      <span>{item.eventDateTime ? formatEventDate(item.eventDateTime) : "DATE TBC"} {item.venue ? `· ${item.venue}` : ""}</span>
+                    </span>
+                  ) : (
+                    <>SIZE: {item.size}{item.color ? ` / ${item.color}` : ""}</>
+                  )}
                 </p>
 
                 <div className="flex justify-between items-end mt-auto">
@@ -131,6 +145,12 @@ export default function Cart() {
             <ArrowRight size={10} />
           </Link>
 
+          {hasPhysicalItems(cartItems) && settings?.free_delivery_enabled !== false && (
+            <p className="text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">
+              FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+            </p>
+          )}
+
           <div className="flex flex-col gap-3 mb-6">
             <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
               <span>SUBTOTAL</span>
@@ -138,7 +158,11 @@ export default function Cart() {
             </div>
             <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
               <span>SHIPPING</span>
-              <span className="text-gray-400">CALCULATED AT CHECKOUT</span>
+              {hasPhysicalItems(cartItems) ? (
+                <span className="text-gray-400">CALCULATED AT CHECKOUT</span>
+              ) : (
+                <span className="text-green-600 font-bold">FREE - E-TICKETS</span>
+              )}
             </div>
             <div className="h-px bg-black/10 my-1"></div>
             <div className="flex justify-between font-bold text-[11px] tracking-[0.2em] uppercase text-black">

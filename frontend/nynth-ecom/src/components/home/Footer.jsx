@@ -90,6 +90,45 @@ export default function Footer() {
 
 
 
+      {/* Newsletter - persistent capture (visible once the popup is dismissed) */}
+      <div className="section-pad bg-[#fafafa] border-b border-black/5">
+        <div className="md:grid md:grid-cols-2 md:gap-16 items-center">
+          <div className="mb-8 md:mb-0">
+            <p className="text-[10px] tracking-[0.3em] font-bold text-black uppercase mb-3">JOIN THE LIST</p>
+            <h3 className="text-[18px] md:text-[22px] font-bold tracking-[0.1em] uppercase leading-tight mb-4">
+              EARLY ACCESS. EXCLUSIVE DROPS. MEMBER-ONLY EXCLUSIVES.
+            </h3>
+            <p className="text-[10px] tracking-[0.05em] leading-[1.9] text-gray-500 max-w-md mb-2">
+              Be the first to see new NYNTH drops the moment they land - before they sell out.
+            </p>
+            <p className="text-[8px] tracking-[0.2em] font-bold text-gray-400 uppercase">
+              NO SPAM · UNSUBSCRIBE ANYTIME
+            </p>
+          </div>
+          <div>
+            <form onSubmit={handleSubscribe} className="flex md:justify-end">
+              <div className="flex w-full max-w-md md:ml-auto md:flex-row flex-col gap-3">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="EMAIL ADDRESS"
+                  className="md:flex-1 px-4 py-3 text-[10px] tracking-[0.2em] uppercase border border-black/10 outline-none placeholder-gray-300"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {loading ? "SIGNING UP..." : "JOIN"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
       {/* Main Footer Links */}
       <div className="section-pad py-10 md:py-14">
         {/* Mobile: stacked accordion. Desktop: 4-col grid */}

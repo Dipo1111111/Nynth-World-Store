@@ -8,7 +8,7 @@ import {
   updateProductOrderBatch,
   uploadImage
 } from "../../api/firebaseFunctions";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical, Eye, EyeOff, Ticket } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -156,6 +156,8 @@ export default function AdminProducts() {
     bestSeller: false,
     modelImage: null,
     displayOrder: 999, // Default for new products
+    eventDateTime: null, // Ticket (event) products only
+    venue: "", // Ticket (event) products only
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -169,6 +171,7 @@ export default function AdminProducts() {
     { value: "pants", label: "PANTS" },
     { value: "polo", label: "POLO" },
     { value: "sleeves", label: "SLEEVES" },
+    { value: "tickets", label: "TICKETS (EVENTS)" },
   ];
 
   const { settings } = useSettings();
@@ -246,6 +249,10 @@ export default function AdminProducts() {
       featured: product.featured || false,
       bestSeller: product.bestSeller || false,
       modelImage: product.modelImage || product.modalImage || null,
+      eventDateTime: product.eventDateTime
+        ? new Date(product.eventDateTime).toLocaleString("sv-SE").slice(0, 16)
+        : "",
+      venue: product.venue || "",
     });
     setIsModalOpen(true);
   };
@@ -368,10 +375,18 @@ export default function AdminProducts() {
 
       toast.loading(editingId ? "Saving changes..." : "Creating product...", { id: "upload-status" });
 
+      const isTicketProduct = formData.category === "tickets";
+
       const payload = {
         ...formData,
-        availableSizes: formData.sizes,
-        availableColors: formData.colors,
+        availableSizes: isTicketProduct ? [] : formData.sizes,
+        availableColors: isTicketProduct ? [] : formData.colors,
+        sizeStock: isTicketProduct ? {} : formData.sizeStock,
+        weight: isTicketProduct ? 0 : formData.weight,
+        eventDateTime: isTicketProduct && formData.eventDateTime
+          ? new Date(formData.eventDateTime).toISOString()
+          : isTicketProduct ? null : (formData.eventDateTime || null),
+        venue: isTicketProduct ? (formData.venue || "") : (formData.venue || null),
         tags: formData.tags,
         price: parseFloat(formData.price),
         compareAtPrice: formData.compareAtPrice || null,
@@ -535,7 +550,7 @@ export default function AdminProducts() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Compare at Price (₦) <span className="text-gray-400 text-xs">— optional</span></label>
+                  <label className="text-sm font-medium">Compare at Price (₦) <span className="text-gray-400 text-xs">- optional</span></label>
                   <input
                     type="number"
                     className="w-full border p-3 rounded-lg"
@@ -571,9 +586,51 @@ export default function AdminProducts() {
                 </select>
               </div>
 
+              {/* Ticket / Event fields */}
+              {formData.category === "tickets" && (
+                <div className="space-y-4 pt-4 border-t border-gray-100 bg-gray-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Ticket size={16} className="text-black" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-black">Event Setup - e-tickets auto-deliver</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Event Date &amp; Time (WAT)</label>
+                      <input
+                        type="datetime-local"
+                        className="w-full border p-3 rounded-lg"
+                        value={formData.eventDateTime || ""}
+                        onChange={e => setFormData({ ...formData, eventDateTime: e.target.value })}
+                      />
+                      <p className="text-[11px] text-gray-400">Drives the countdown, sold-out state and e-ticket date.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Venue</label>
+                      <input
+                        className="w-full border p-3 rounded-lg"
+                        placeholder="e.g. Lagos - Eko Hotel Convention Centre"
+                        value={formData.venue || ""}
+                        onChange={e => setFormData({ ...formData, venue: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Total Tickets Available (Capacity)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      className="w-full border p-3 rounded-lg"
+                      value={formData.stockQuantity}
+                      onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
+                    />
+                    <p className="text-[11px] text-gray-400">Auto-reduced per ticket sold. Hits 0 = SOLD OUT on the storefront.</p>
+                  </div>
+                </div>
+              )}
+
               {/* Variants */}
               <div className="space-y-4 pt-4 border-t border-gray-100">
-                {formData.category !== "headwear" && (
+                {!["headwear", "tickets"].includes(formData.category) && (
                   <div>
                     <label className="text-sm font-medium mb-2 block">Sizes</label>
                     <div className="flex flex-wrap gap-2">
@@ -633,7 +690,7 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              {formData.category !== "headwear" ? (
+              {!["headwear", "tickets"].includes(formData.category) ? (
                 formData.sizes.length > 0 && (
                   <div className="bg-gray-50 p-4 rounded-xl space-y-4">
                     <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/5 shadow-sm">
@@ -703,7 +760,9 @@ export default function AdminProducts() {
                     onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
                   />
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight italic">
-                    * Headwear is treat as One Size. Enter total units available across all expandable strap units.
+                    {formData.category === "tickets"
+                      ? "* Tickets: total capacity. Auto-decreases as tickets sell. Reaching 0 marks the event SOLD OUT."
+                      : "* Headwear is treat as One Size. Enter total units available across all expandable strap units."}
                   </p>
                 </div>
               )}
@@ -833,6 +892,7 @@ export default function AdminProducts() {
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Automatic Total from Sizes</p>
                 </div>
 
+                {formData.category !== "tickets" && (
                 <div className="space-y-2 flex-1">
                   <label className="text-sm font-medium">Weight (kg)</label>
                   <div className="relative">
@@ -848,6 +908,7 @@ export default function AdminProducts() {
                   </div>
                   <p className="text-[11px] text-gray-400">Used for interstate shipping calculations (₦1,500/kg above 3kg).</p>
                 </div>
+              )}
 
                 <div className="flex flex-col justify-end gap-3 pb-2">
                   <label className="flex items-center gap-2 cursor-pointer">

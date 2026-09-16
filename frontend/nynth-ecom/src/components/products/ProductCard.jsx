@@ -79,7 +79,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          {/* Hover image (model pic) — fades in on hover */}
+          {/* Hover image (model pic) - fades in on hover */}
           {hoverImage && (
             <img
               src={hoverImage}
@@ -179,7 +179,7 @@ export default function ProductCard({ product, displayMode = 'model' }) {
         </div>
       </Link>
 
-      {/* Card Info — name + price only, NO subtitle */}
+      {/* Card Info - name + price only, NO subtitle */}
       <div className="pt-3 pb-4 px-3 md:px-4 bg-white">
         <div className="flex justify-between items-start gap-2">
           <h3 className="text-[8px] md:text-[9px] font-bold tracking-[0.15em] uppercase text-black line-clamp-1 flex-1">

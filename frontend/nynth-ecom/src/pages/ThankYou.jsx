@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw, Ticket, Mail } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
+import ProductCard from "../components/products/ProductCard";
+import { fetchOrder, fetchProducts } from "../api/firebaseFunctions";
+import { isTicketItem, ticketCount } from "../utils/tickets";
 
 const REDIRECT_SECONDS = 8;
 
@@ -22,6 +25,34 @@ const ThankYou = () => {
   const [mounted, setMounted] = useState(false);
   const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
   const cleared = useRef(false);
+
+  const [order, setOrder] = useState(null);
+  const [merch, setMerch] = useState([]);
+
+  const orderHasTickets = order?.items?.some((i) => isTicketItem(i)) || false;
+  const orderTicketCount = order ? ticketCount(order.items) : 0;
+
+  // Load the order so ticket buyers get their e-ticket message
+  useEffect(() => {
+    if (orderId) {
+      fetchOrder(orderId)
+        .then((doc) => { if (doc) setOrder(doc); })
+        .catch(() => {});
+    }
+  }, [orderId]);
+
+  // Cross-sell: the whole point of selling tickets - turn every ticket buyer into a brand fan
+  useEffect(() => {
+    let active = true;
+    fetchProducts()
+      .then((all) => {
+        if (!active) return;
+        const others = all.filter((p) => p.category !== "tickets").slice(0, 8);
+        setMerch(others);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   // Clear the cart once
   useEffect(() => {
@@ -80,16 +111,17 @@ const ThankYou = () => {
           </div>
 
           <h1 className="text-[24px] md:text-[34px] font-bold tracking-tight leading-tight mb-3">
-            CONGRATULATIONS!
+            {orderHasTickets ? "YOU'RE IN!" : "CONGRATULATIONS!"}
           </h1>
 
           <p className="text-[18px] md:text-[24px] font-extrabold tracking-[0.12em] uppercase text-emerald-600 mb-5 leading-tight">
-            Welcome to NYNTH World
+            {orderHasTickets ? "See you at the show" : "Welcome to NYNTH World"}
           </p>
 
           <p className="text-[12px] md:text-[14px] text-gray-600 max-w-md mx-auto mb-8 leading-relaxed">
-            Your payment went through and your order is being confirmed.
-            We are packaging it with care and will update you the moment it ships.
+            {orderHasTickets
+              ? `Your payment went through and ${orderTicketCount} e-ticket${orderTicketCount === 1 ? " is" : "s are"} on the way to your inbox - no delivery, no fees, no waiting.`
+              : "Your payment went through and your order is being confirmed. We are packaging it with care and will update you the moment it ships."}
           </p>
 
           {reference && (
@@ -152,6 +184,55 @@ const ThankYou = () => {
           </div>
         </div>
       </main>
+
+      {/* E-ticket confirmation strip */}
+      {orderHasTickets && (
+        <section className="w-full bg-black text-white py-14">
+          <div className="w-full max-w-4xl mx-auto px-5 md:px-10 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-6">
+              <Ticket size={28} />
+            </div>
+            <h2 className="text-[14px] md:text-[20px] font-bold tracking-[0.15em] uppercase mb-3">
+              Your e-ticket{orderTicketCount === 1 ? "" : "s"} are safe with you
+            </h2>
+            <p className="text-[11px] leading-[1.9] text-zinc-400 max-w-xl mb-6">
+              <Mail size={12} className="inline mr-1.5" />
+              Sent straight to the email you used at checkout. Present it at the gate - no printing. While you're here, grab the gear for the night.
+            </p>
+            {order.items
+              .filter((i) => isTicketItem(i))
+              .map((item, idx) => (
+                <div key={idx} className="flex flex-col sm:flex-row items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase font-bold text-zinc-300 mb-1.5">
+                  <span>{item.name || item.title}</span>
+                  {item.eventDateTime && <span className="text-zinc-500">· {new Date(item.eventDateTime).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }).toUpperCase()}</span>}
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
+
+      {/* Cross-sell: ticket buyers → brand traffic */}
+      {merch.length > 0 && (
+        <section className="w-full bg-white pt-16 pb-20">
+          <div className="flex items-end justify-between px-5 md:px-10 mb-8">
+            <div>
+              <p className="text-[8px] tracking-[0.3em] font-bold text-gray-400 uppercase mb-2">Now that you're in</p>
+              <h2 className="text-[13px] md:text-[18px] font-bold tracking-[0.12em] uppercase">Shop the NYNTH collection</h2>
+            </div>
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 text-[9px] tracking-[0.25em] font-bold uppercase hover:opacity-60 transition-opacity"
+            >
+              VIEW ALL <ArrowRight size={12} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 px-5 md:px-10">
+            {merch.map((p) => (
+              <ProductCard key={p.id} product={p} displayMode="view" />
+            ))}
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>

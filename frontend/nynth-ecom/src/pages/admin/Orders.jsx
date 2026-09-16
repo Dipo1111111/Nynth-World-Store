@@ -21,8 +21,10 @@ import {
     Calendar,
     CreditCard,
     TrendingUp,
-    RefreshCw
+    RefreshCw,
+    Ticket,
 } from "lucide-react";
+import { formatEventDate } from "../../utils/tickets";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import Logo from "../../components/common/Logo";
@@ -388,7 +390,12 @@ const Orders = () => {
                                                     {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                                                 </button>
                                                 <div className="min-w-0 flex-1">
-                                                    <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
+                                                        {order.items?.some(i => i.category === "tickets") && (
+                                                            <span className="bg-black text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+                                                        )}
+                                                    </div>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <PaymentStatusBadge status={order.payment_status || 'pending'} />
                                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">
@@ -428,7 +435,14 @@ const Orders = () => {
                                                                     <div className="flex-1 min-w-0">
                                                                         <p className="font-bold text-[11px] truncate uppercase">{item.name || item.title}</p>
                                                                         <p className="text-[9px] text-gray-500 mt-1 uppercase tracking-widest font-bold">
-                                                                            {item.size || item.selectedSize} / {item.color || item.selectedColor}
+                                                                            {item.category === "tickets" ? (
+                                                                                            <span className="inline-flex items-center gap-1">
+                                                                                                <Ticket size={10} className="shrink-0" />
+                                                                                                E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}
+                                                                                            </span>
+                                                                                        ) : (
+                                                                                            `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
+                                                                                        )}
                                                                         </p>
                                                                         <p className="text-[10px] text-gray-500 font-medium mt-1">Qty: {item.quantity}</p>
                                                                     </div>
@@ -438,6 +452,23 @@ const Orders = () => {
                                                                 </div>
                                                             ))}
                                                         </div>
+
+                                                        {order.tickets?.length > 0 && (
+                                                            <div className="mt-3 pt-3 border-t border-gray-100">
+                                                                <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                                                    <Ticket size={14} />
+                                                                    E-Ticket Codes
+                                                                </h4>
+                                                                <div className="space-y-1.5">
+                                                                    {order.tickets.map((t, i) => (
+                                                                        <div key={i} className="flex items-center justify-between gap-2 bg-white rounded-lg border border-gray-100 px-3 py-2">
+                                                                            <span className="font-mono text-[11px] font-bold tracking-wider">{t.code}</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest truncate ml-2">{t.title}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* Contact & Shipping */}
@@ -528,7 +559,12 @@ const Orders = () => {
                                                          </button>
                                                      </td>
                                                      <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                                                         <span className="font-mono text-xs md:text-sm font-medium">#{order.id.slice(0, 8)}</span>
+                                                         <div className="flex items-center gap-2">
+                                                              <span className="font-mono text-xs md:text-sm font-medium">#{order.id.slice(0, 8)}</span>
+                                                              {order.items?.some(i => i.category === "tickets") && (
+                                                                  <span className="bg-black text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+                                                              )}
+                                                          </div>
                                                      </td>
                                                      <td className="px-4 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                                          <div>
@@ -580,7 +616,14 @@ const Orders = () => {
                                                                                  <div className="flex-1 min-w-0">
                                                                                      <p className="font-medium text-sm truncate">{item.name || item.title}</p>
                                                                                      <p className="text-xs text-gray-500 mt-1">
-                                                                                         {item.size || item.selectedSize} / {item.color || item.selectedColor}
+                                                                                         {item.category === "tickets" ? (
+                                                                                            <span className="inline-flex items-center gap-1">
+                                                                                                <Ticket size={10} className="shrink-0" />
+                                                                                                E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}
+                                                                                            </span>
+                                                                                        ) : (
+                                                                                            `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
+                                                                                        )}
                                                                                      </p>
                                                                                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                                                                                  </div>
@@ -588,11 +631,28 @@ const Orders = () => {
                                                                                      <p className="font-medium text-sm">₦{(item.price * item.quantity).toLocaleString()}</p>
                                                                                  </div>
                                                                              </div>
-                                                                         ))}
-                                                                     </div>
-                                                                 </div>
+))}
+                                                                      </div>
 
-                                                                 {/* Customer & Shipping Info */}
+                                                                      {order.tickets?.length > 0 && (
+                                                                          <div className="mt-4 pt-4 border-t border-gray-100">
+                                                                              <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm md:text-base">
+                                                                                  <Ticket size={16} />
+                                                                                  E-Ticket Codes
+                                                                              </h4>
+                                                                              <div className="space-y-2">
+                                                                                  {order.tickets.map((t, i) => (
+                                                                                      <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-lg border border-gray-100 px-3 py-2.5">
+                                                                                          <span className="font-mono text-xs font-bold tracking-wider">{t.code}</span>
+                                                                                          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest truncate">{t.title}</span>
+                                                                                      </div>
+                                                                                  ))}
+                                                                              </div>
+                                                                          </div>
+                                                                      )}
+                                                                  </div>
+
+                                                                  {/* Customer & Shipping Info */}
                                                                  <div className="space-y-6">
                                                                      {/* Shipping Address */}
                                                                      <div>

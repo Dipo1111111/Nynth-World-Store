@@ -272,7 +272,7 @@ export const initializePayment = async (paymentData) => {
 export const addOrder = async (order) => {
   try {
     // Stock validation and decrement is handled by the Paystack webhook.
-    // addOrder only creates the order document — no stock checks here,
+    // addOrder only creates the order document - no stock checks here,
     // because the webhook also decrements stock (double-decrement bug otherwise).
     const newOrderRef = doc(collection(db, "orders"));
     await setDoc(newOrderRef, {
@@ -319,14 +319,19 @@ export const fetchUserOrders = async (userId) => {
 
 
 export const verifyOrderPayment = async (orderId, reference) => {
-  console.warn("⚠️ verifyOrderPayment is deprecated. Payments are now verified securely via Webhooks.");
-  return true; // Return true to allow frontend navigation while webhook processes
-  /* OLD INSECURE LOGIC:
+  // Server-side verification via the paystackVerify cloud function.
+  // Verifies the reference with Paystack from the backend, then marks the order
+  // paid (generates e-ticket codes, decrements stock, sends emails). Safe for
+  // guests - the client can't forge a paid order without Paystack confirming it.
+  if (!reference) return false;
   try {
-    const docRef = doc(db, "orders", orderId);
-    ...
-  } catch (error) { ... }
-  */
+    const verifyPayment = httpsCallable(functions, "paystackVerify");
+    const result = await verifyPayment({ reference, orderId });
+    return result.data?.success === true;
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    return false;
+  }
 };
 
 export const fetchOrder = async (orderId) => {
@@ -591,7 +596,7 @@ export const sendOrderConfirmation = async (order) => {
   const esc = (str) => String(str == null ? "" : str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const itemsRows = (order.items || []).map((item) => `
       <tr>
-        <td style="padding:12px;border-top:1px solid #eee;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">${esc(item.name || item.title)} ${item.size && item.color ? `— ${esc(item.size)} / ${esc(item.color)}` : ""} × ${item.quantity || 1}</td>
+        <td style="padding:12px;border-top:1px solid #eee;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">${esc(item.name || item.title)} ${item.size && item.color ? `- ${esc(item.size)} / ${esc(item.color)}` : ""} × ${item.quantity || 1}</td>
         <td style="padding:12px;border-top:1px solid #eee;text-align:right;font-size:13px;font-weight:700;">${money((item.price || 0) * (item.quantity || 1))}</td>
       </tr>`).join("");
   const html = `
@@ -614,7 +619,7 @@ export const sendOrderConfirmation = async (order) => {
         <tr><td style="font-size:14px;font-weight:800;border-top:1px solid #eee;padding:10px 0 4px;">Total Paid</td><td style="font-size:15px;font-weight:800;text-align:right;border-top:1px solid #eee;padding:10px 0 4px;">${money(order.total)}</td></tr>
       </table>
       <p style="font-size:13px;color:#444;margin:24px 0 0;">Delivering to:<br/><strong>${esc(customer.firstName)} ${esc(customer.lastName)}</strong><br/>${esc(customer.address || "")}<br/>${esc(customer.city || "")}${customer.city && customer.state ? ", " : ""}${esc(customer.state || "")}</p>
-      <p style="font-size:13px;color:#555;margin:24px 0 0;">Thank you for shopping with NYNTH WORLD — stay above.<br/><strong>The NYNTH Team</strong></p>
+      <p style="font-size:13px;color:#555;margin:24px 0 0;">Thank you for shopping with NYNTH WORLD - stay above.<br/><strong>The NYNTH Team</strong></p>
     </div>
   `;
   return sendTriggerEmail(customer.email, subject, html);
@@ -643,7 +648,7 @@ export const fetchSettings = async () => {
         shipping_fee: Number(import.meta.env.VITE_DEFAULT_SHIPPING_FEE) || 2500,
         currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
         show_size_chart: true,
-        size_chart_model_info: "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette — size down if you prefer a more fitted look.",
+        size_chart_model_info: "Our model is 185cm tall and wears a size M. NYNTH pieces are cut to an oversized silhouette - size down if you prefer a more fitted look.",
         size_chart_data: [
           { size: "XS", chest: "81-86", waist: "66-71", length: "68" },
           { size: "S", chest: "86-91", waist: "71-76", length: "70" },
@@ -692,7 +697,7 @@ export const saveContactMessage = async (messageData) => {
 
 export const getAllOrders = async () => {
   try {
-    // Fetch all orders, newest first — no artificial limit
+    // Fetch all orders, newest first - no artificial limit
     const q = query(collection(db, "orders"), orderBy("created_at", "desc"));
     const querySnapshot = await getDocs(q);
     const orders = [];

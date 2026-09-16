@@ -4,12 +4,14 @@ import { useParams, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { fetchSingleProduct, fetchRecommendedProducts } from "../api/firebaseFunctions";
-import { Plus, Minus, Check, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Minus, Check, ShieldCheck, ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
 import SizeGuideModal from "../components/products/SizeGuideModal";
 import ProductCard from "../components/products/ProductCard";
+import EventPage from "../components/tickets/EventPage";
+import { isTicket } from "../utils/tickets";
 
 const getColorHex = (colorName) => {
   const map = {
@@ -56,13 +58,41 @@ export default function ProductDetail() {
   }, [product?.images]);
 
   useEffect(() => {
-    if (product?.images?.length > 1) {
+    if (product?.images?.length > 1 && !showLightbox) {
       startAutoScroll();
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [product, startAutoScroll]);
+  }, [product, startAutoScroll, showLightbox]);
+
+  const openLightbox = (index) => {
+    setSelectedImage(index);
+    setZoomLevel(1);
+    setShowLightbox(true);
+  };
+
+  const closeLightbox = () => {
+    setShowLightbox(false);
+    setZoomLevel(1);
+  };
+
+  useEffect(() => {
+    if (!showLightbox) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showLightbox]);
 
   const handleManualImageChange = (newIndex) => {
     setSelectedImage(newIndex);
@@ -110,6 +140,8 @@ export default function ProductDetail() {
   const [addingToCart, setAddingToCart] = useState(false);
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Recommended products
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -196,6 +228,17 @@ export default function ProductDetail() {
     );
   }
 
+  if (isTicket(product)) {
+    return (
+      <div className="min-h-screen bg-black text-white font-inter">
+        <SEO title={`${product.title} | NYNTH - E-Tickets`} description={product.description} url={`/product/${product.id}`} />
+        <Header />
+        <EventPage product={product} />
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white text-black font-inter">
       <SEO title={`${product.title} | NYNTH`} description={product.description} url={`/product/${product.id}`} />
@@ -231,7 +274,11 @@ export default function ProductDetail() {
               >
                 {product.images?.length > 0 ? (
                   product.images.map((img, index) => (
-                    <div key={index} className="w-full h-full flex-shrink-0 flex items-center justify-center">
+                    <div
+                      key={index}
+                      onClick={() => openLightbox(index)}
+                      className={`w-full h-full flex-shrink-0 flex items-center justify-center ${index === selectedImage ? "cursor-zoom-in" : ""}`}
+                    >
                       <img
                         src={img}
                         alt={`${product.title} - ${index + 1}`}
@@ -249,9 +296,10 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* Bottom Controls — Centered Numbered Selector + Thumbnails */}
+          {/* Bottom Controls - Centered Numbered Selector + Thumbnails */}
           {product.images?.length > 1 && (
             <div className="absolute bottom-6 left-0 right-0 z-20 flex flex-col items-center gap-2">
+              <span className="text-[8px] tracking-[0.25em] font-bold text-black/50 uppercase">Click image to zoom</span>
               {/* Numbered Selector */}
               <div className="flex gap-1.5">
                 {product.images.slice(0, 4).map((_, i) => (
@@ -363,6 +411,13 @@ export default function ProductDetail() {
               </div>
             )}
  
+            {/* Model info - from settings */}
+            {settings.size_chart_model_info && product.category !== "headwear" && (
+              <p className="text-[8px] tracking-[0.18em] uppercase leading-relaxed text-gray-400 -mt-6 mb-10">
+                MODEL: {settings.size_chart_model_info}
+              </p>
+            )}
+
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
@@ -374,6 +429,11 @@ export default function ProductDetail() {
 
             {/* Shipping Badges - Simple minimalist */}
             <div className="space-y-3 mb-16">
+              {settings?.free_delivery_enabled !== false && (
+                <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
+                  <div className="w-1.5 h-1.5 rounded-full bg-black"></div> FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+                </div>
+              )}
               <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 3-5 DAYS SHIPPING
               </div>
@@ -448,7 +508,11 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
           >
             {product.images?.length > 0 ? (
               product.images.map((img, index) => (
-                <div key={index} className="w-full h-full flex-shrink-0">
+                <div
+                  key={index}
+                  onClick={() => openLightbox(index)}
+                  className={`w-full h-full flex-shrink-0 ${index === selectedImage ? "cursor-zoom-in" : ""}`}
+                >
                   <img
                     src={img}
                     alt={`${product.title} - ${index + 1}`}
@@ -464,6 +528,10 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
             )}
           </div>
           
+          <span className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 text-[8px] tracking-[0.25em] font-bold text-black/50 bg-white/70 backdrop-blur-sm px-3 py-1 uppercase pointer-events-none">
+            Tap to zoom
+          </span>
+
           {product.images?.length > 1 && (
             <>
               {/* Arrows */}
@@ -579,6 +647,13 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
               </div>
             )}
  
+            {/* Model info - from settings */}
+            {settings.size_chart_model_info && product.category !== "headwear" && (
+              <p className="text-[8px] tracking-[0.18em] uppercase leading-relaxed text-gray-400 mb-6">
+                MODEL: {settings.size_chart_model_info}
+              </p>
+            )}
+
             {/* Add to Cart (in-flow for mobile) */}
             <button
               onClick={handleAddToCart}
@@ -590,6 +665,11 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
 
           {/* Shipping Badges */}
           <div className="space-y-3 mb-8">
+            {settings?.free_delivery_enabled !== false && (
+              <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
+                <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+              </div>
+            )}
             <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
               <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 3-5 DAYS SHIPPING
             </div>
@@ -598,7 +678,7 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
             </div>
           </div>
 
-          {/* Accordions — Description & Shipping before recommendations */}
+          {/* Accordions - Description & Shipping before recommendations */}
           <div className="border-t border-gray-200">
             <button
               onClick={() => setIsOpenDescription(!isOpenDescription)}
@@ -647,6 +727,79 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
           )}
         </div>
       </main>
+
+      {/* Lightbox Viewer */}
+      {showLightbox && (
+        <div
+          className="fixed inset-0 z-[10000] bg-black flex flex-col"
+          onClick={closeLightbox}
+        >
+          {/* Top bar */}
+          <div className="relative flex items-center justify-between px-4 py-3 bg-black text-white shrink-0">
+            <span className="text-[9px] tracking-[0.25em] font-bold uppercase">
+              {selectedImage + 1} / {product.images?.length || 1}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); setZoomLevel(z => Math.max(1, +(z - 0.5).toFixed(2))); }}
+                aria-label="Zoom out"
+                disabled={zoomLevel <= 1}
+                className="p-2 hover:bg-white/10 disabled:opacity-30 transition-colors"
+              >
+                <ZoomOut size={16} />
+              </button>
+              <span className="text-[10px] font-bold tracking-wider">{zoomLevel * 100}%</span>
+              <button
+                onClick={(e) => { e.stopPropagation(); setZoomLevel(z => Math.min(4, +(z + 0.5).toFixed(2))); }}
+                aria-label="Zoom in"
+                disabled={zoomLevel >= 4}
+                className="p-2 hover:bg-white/10 disabled:opacity-30 transition-colors"
+              >
+                <ZoomIn size={16} />
+              </button>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
+              aria-label="Close zoom viewer"
+              className="p-2 hover:bg-white/10 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Scrollable / pannable image area */}
+          <div className="flex-1 overflow-auto flex items-center justify-center p-6 select-none">
+            <img
+              src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
+              alt={`${product.title} - zoom`}
+              draggable={false}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full h-full object-contain transition-[width] duration-200"
+              style={{ width: `${zoomLevel * 100}%`, maxWidth: `${zoomLevel * 100}vw` }}
+            />
+          </div>
+
+          {/* Bottom navigation (arrows) - only show when more than one image */}
+          {product.images?.length > 1 && (
+            <div className="absolute z-10 inset-y-0 left-0 right-0 flex justify-between items-center px-4 pointer-events-none">
+              <button
+                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                className="pointer-events-auto w-10 h-10 flex items-center justify-center bg-black/50 text-white hover:bg-black/80 transition-colors"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                className="pointer-events-auto w-10 h-10 flex items-center justify-center bg-black/50 text-white hover:bg-black/80 transition-colors"
+                aria-label="Next image"
+              >
+                <ChevronRight size={22} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <Footer />
 

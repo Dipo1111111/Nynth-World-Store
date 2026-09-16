@@ -33,8 +33,10 @@ export const CartProvider = ({ children }) => {
   // Add item to cart
   const addToCart = useCallback((product, quantity = 1, selectedSize = null, selectedColor = null) => {
     setCartItems((prevItems) => {
-      const size = selectedSize || product.selectedSize || product.size || "M";
-      const color = selectedColor || product.selectedColor || product.color || "Black";
+      // Tickets are a distinct category - no size/color options, zero weight.
+      const isTicket = product.category === "tickets";
+      const size = isTicket ? "" : (selectedSize || product.selectedSize || product.size || "M");
+      const color = isTicket ? "" : (selectedColor || product.selectedColor || product.color || "Black");
       
       const existingItemIndex = prevItems.findIndex(
         (item) =>
@@ -57,6 +59,13 @@ export const CartProvider = ({ children }) => {
       if (existingItemIndex >= 0) {
         const updatedCart = [...prevItems];
         updatedCart[existingItemIndex].quantity += quantity;
+        // Ensure ticket metadata survives a merge
+        if (isTicket) {
+          updatedCart[existingItemIndex].category = "tickets";
+          updatedCart[existingItemIndex].eventDateTime = product.eventDateTime || product.eventDateTimeISO;
+          updatedCart[existingItemIndex].venue = product.venue;
+          updatedCart[existingItemIndex].weight = 0;
+        }
         return updatedCart;
       } else {
         return [
@@ -69,6 +78,11 @@ export const CartProvider = ({ children }) => {
             size: size,
             color: color,
             image: product.image || (product.images && product.images[0]) || product.imageUrl || product.thumbnail || "/placeholder.jpg",
+            // Ticket metadata - category is the single discriminator; tickets weigh nothing.
+            category: product.category || null,
+            eventDateTime: isTicket ? (product.eventDateTime || product.eventDateTimeISO) : null,
+            venue: isTicket ? product.venue : null,
+            weight: isTicket ? 0 : (product.weight || 0.5),
           },
         ];
       }

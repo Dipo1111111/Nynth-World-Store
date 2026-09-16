@@ -147,7 +147,7 @@ const AdminDashboard = () => {
             setLoading(false);
 
             if (!alertsBooted.current) {
-                // First snapshot is history — do not alert on everything already there.
+                // First snapshot is history - do not alert on everything already there.
                 liveOrders.forEach((o) => {
                     if (o.created_at?.seconds) {
                         const ageMs = Date.now() - o.created_at.seconds * 1000;
@@ -220,7 +220,7 @@ const AdminDashboard = () => {
         } else {
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('NYNTH 🛍️ New order!', {
-                    body: `${amount} from ${customer} — pending payment`,
+                    body: `${amount} from ${customer} - pending payment`,
                     icon: '/favicon.png'
                 });
             }
@@ -253,7 +253,7 @@ const AdminDashboard = () => {
         const prevPaid = prevOrders.filter(isPaid);
         const prevPending = prevOrders.filter(o => !isPaid(o));
 
-        // Lead metrics come from PAID orders only — real money in.
+        // Lead metrics come from PAID orders only - real money in.
         // Pending orders are surfaced separately, never added into sales.
         const totalSales = currentPaid.reduce((s, o) => s + (o.total || 0), 0);
         const prevSales = prevPaid.reduce((s, o) => s + (o.total || 0), 0);
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
         const deliveredCount = currentPaid.filter(o => o.order_status === 'delivered').length;
         const prevDeliveredCount = prevPaid.filter(o => o.order_status === 'delivered').length;
 
-        // Top Products — paid orders only
+        // Top Products - paid orders only
         const productMap = {};
         currentPaid.forEach(o => {
             o.items?.forEach(item => {
@@ -285,14 +285,14 @@ const AdminDashboard = () => {
         const salesSpark = generateSparklineData(currentPaid, currentBounds.start, sparkDays, 'sales');
         const ordersSpark = generateSparklineData(currentPaid, currentBounds.start, sparkDays, 'count');
 
-        // Status Breakdown for Doughnut (fulfillment) — paid orders only
+        // Status Breakdown for Doughnut (fulfillment) - paid orders only
         const statusBreakdown = currentPaid.reduce((acc, o) => {
             const status = o.order_status || 'processing';
             acc[status] = (acc[status] || 0) + 1;
             return acc;
         }, {});
 
-        // Recent orders — newest first, any payment state, filtered by the chips (default: paid).
+        // Recent orders - newest first, any payment state, filtered by the chips (default: paid).
         const sorted = [...currentOrders].sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
         const recentList = sorted.filter(o => {
             if (paymentFilter === 'all') return true;
@@ -475,7 +475,7 @@ const AdminDashboard = () => {
                     {/* Top Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6 md:mb-8">
                         
-                        {/* 1. Total Sales — paid orders only (real money in) */}
+                        {/* 1. Total Sales - paid orders only (real money in) */}
                         <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-5">
                                 <p className="text-sm font-medium text-gray-600 mb-1">Total sales (paid)</p>
@@ -496,7 +496,7 @@ const AdminDashboard = () => {
                             </CardContent>
                         </Card>
 
-                        {/* 2. Pending payment — surfaced for attention, NEVER added to sales */}
+                        {/* 2. Pending payment - surfaced for attention, NEVER added to sales */}
                         <Card className="bg-white border-amber-200 border shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-5">
                                 <p className="text-sm font-medium text-amber-700 mb-1 flex items-center gap-1.5">

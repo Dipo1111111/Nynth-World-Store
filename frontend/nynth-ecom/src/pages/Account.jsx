@@ -4,8 +4,9 @@ import { db } from "../api/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { LogOut, Package, User, MapPin, ChevronRight, ShoppingBag } from "lucide-react";
+import { LogOut, Package, User, MapPin, ChevronRight, ShoppingBag, Ticket } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { formatEventDate } from "../utils/tickets";
 import { Link } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
@@ -191,9 +192,21 @@ export default function Account() {
                                                             <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
                                                                 <div className="col-span-2">
                                                                     <p className="text-[12px] tracking-widest font-bold uppercase truncate">{item.name || item.title}</p>
-                                                                    <p className="text-[10px] text-gray-400 tracking-wider uppercase font-bold mt-1">
-                                                                        {item.size || item.selectedSize} / {item.color || item.selectedColor}
-                                                                    </p>
+                                                                    {item.category === "tickets" ? (
+                                                                        <>
+                                                                            <p className="text-[10px] text-gray-400 tracking-wider uppercase font-bold mt-1 flex items-center gap-1">
+                                                                                <Ticket size={11} className="shrink-0" />
+                                                                                E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}
+                                                                            </p>
+                                                                            {order.tickets?.filter(t => t.productId === item.id).map((t, i) => (
+                                                                                <p key={i} className="text-[10px] font-mono font-bold tracking-widest mt-1">{t.code}</p>
+                                                                            ))}
+                                                                        </>
+                                                                    ) : (
+                                                                        <p className="text-[10px] text-gray-400 tracking-wider uppercase font-bold mt-1">
+                                                                            {item.size || item.selectedSize} / {item.color || item.selectedColor}
+                                                                        </p>
+                                                                    )}
                                                                 </div>
                                                                 <p className="text-[11px] font-bold tracking-widest text-center">QTY: {item.quantity}</p>
                                                                 <p className="text-[11px] font-bold tracking-widest text-right">₦{(item.price * item.quantity).toLocaleString()}</p>
