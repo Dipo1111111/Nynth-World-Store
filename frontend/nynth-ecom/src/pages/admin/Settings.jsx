@@ -14,7 +14,7 @@ const SETTINGS_DEFAULTS = {
     site_name: "",
     support_email: "",
     support_phone: "",
-    support_whatsapp: "",
+    support_whatsapp: "2348158115858",
     office_address: "",
     instagram_url: "",
     twitter_url: "",
