@@ -47,6 +47,8 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState("");
 
   const timerRef = React.useRef(null);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   const startAutoScroll = React.useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -140,8 +142,6 @@ export default function ProductDetail() {
   const [addingToCart, setAddingToCart] = useState(false);
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
-  const [showLightbox, setShowLightbox] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Recommended products
   const [recommendedProducts, setRecommendedProducts] = useState([]);

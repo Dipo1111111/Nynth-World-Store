@@ -193,7 +193,7 @@ export default function Shop() {
               </Link>
             </div>
             <div className="w-full bg-white px-4 md:px-10 py-8">
-              <div className="grid grid-cols-1 gap-5 max-w-[1200px]">
+              <div className="grid grid-cols-1 gap-5 w-full">
                 {filteredProducts
                   .filter((p) => p.category === "tickets")
                   .slice(0, 3)

@@ -373,6 +373,19 @@ export default function AdminProducts() {
         return;
       }
 
+      if (formData.category === "tickets") {
+        if (!formData.eventDateTime) {
+          toast.error("EVENT DATE & TIME IS REQUIRED FOR TICKETS");
+          setIsSubmitting(false);
+          return;
+        }
+        if (!formData.venue.trim()) {
+          toast.error("VENUE IS REQUIRED FOR TICKETS");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       toast.loading(editingId ? "Saving changes..." : "Creating product...", { id: "upload-status" });
 
       const isTicketProduct = formData.category === "tickets";
@@ -628,9 +641,11 @@ export default function AdminProducts() {
                 </div>
               )}
 
-              {/* Variants */}
+              {/* Variants - apparel & headwear only. Tickets are single-format:
+                  no sizes, no colors, no merchandising badges. */}
+              {formData.category !== "tickets" && (
               <div className="space-y-4 pt-4 border-t border-gray-100">
-                {!["headwear", "tickets"].includes(formData.category) && (
+                {formData.category !== "headwear" && (
                   <div>
                     <label className="text-sm font-medium mb-2 block">Sizes</label>
                     <div className="flex flex-wrap gap-2">
@@ -689,8 +704,9 @@ export default function AdminProducts() {
                   </div>
                 </div>
               </div>
+              )}
 
-              {!["headwear", "tickets"].includes(formData.category) ? (
+              {formData.category !== "headwear" && formData.category !== "tickets" ? (
                 formData.sizes.length > 0 && (
                   <div className="bg-gray-50 p-4 rounded-xl space-y-4">
                     <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/5 shadow-sm">
@@ -748,7 +764,7 @@ export default function AdminProducts() {
                     </div>
                   </div>
                 )
-              ) : (
+              ) : formData.category === "headwear" ? (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Total Units In Stock</label>
                   <input
@@ -760,12 +776,10 @@ export default function AdminProducts() {
                     onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
                   />
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight italic">
-                    {formData.category === "tickets"
-                      ? "* Tickets: total capacity. Auto-decreases as tickets sell. Reaching 0 marks the event SOLD OUT."
-                      : "* Headwear is treat as One Size. Enter total units available across all expandable strap units."}
+                    * Headwear is treat as One Size. Enter total units available across all expandable strap units.
                   </p>
                 </div>
-              )}
+              ) : null}
 
               {/* Images */}
               <div className="space-y-2 pt-4 border-t border-gray-100">
@@ -877,6 +891,7 @@ export default function AdminProducts() {
 
               {/* Inventory Management */}
               <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4 border-t border-gray-100">
+                {formData.category !== "tickets" && (
                 <div className="space-y-2 flex-1">
                   <label className="text-sm font-medium">Stock Quantity</label>
                   <div className="relative">
@@ -891,6 +906,7 @@ export default function AdminProducts() {
                   </div>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Automatic Total from Sizes</p>
                 </div>
+                )}
 
                 {formData.category !== "tickets" && (
                 <div className="space-y-2 flex-1">
@@ -921,6 +937,7 @@ export default function AdminProducts() {
                     <span className="text-sm font-medium">Featured</span>
                   </label>
 
+                  {formData.category !== "tickets" && (
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -930,6 +947,7 @@ export default function AdminProducts() {
                     />
                     <span className="text-sm font-medium">Best Seller</span>
                   </label>
+                  )}
                 </div>
               </div>
 
