@@ -8,8 +8,14 @@
 import { supabase } from "./supabase";
 import { uploadImageToCloudinary, uploadMultipleImagesToCloudinary } from "./cloudinary";
 
-const rowToProduct = (r) => ({ id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, ...(r.data ?? {}), name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: r.created_at });
-const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, created_at: r.created_at });
+const toTimestamp = (v) => {
+  if (!v) return null;
+  if (typeof v === 'object' && v.seconds) return v;
+  const ms = v instanceof Date ? v.getTime() : new Date(v).getTime();
+  return isNaN(ms) ? null : { seconds: Math.floor(ms / 1000) };
+};
+const rowToProduct = (r) => ({ id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, ...(r.data ?? {}), name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
+const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, created_at: toTimestamp(r.created_at) });
 
 // --- PRODUCTS CRUD ---
 export const addProduct = async (product) => {
