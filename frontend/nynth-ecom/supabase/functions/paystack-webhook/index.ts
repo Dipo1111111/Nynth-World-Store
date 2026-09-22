@@ -60,8 +60,12 @@ Deno.serve(async (req) => {
         if (p) await supabase.from("products").update({ stock_quantity: Math.max(0, (p.stock_quantity ?? 0) - (item.quantity || 1)) }).eq("id", item.id);
       }
       const adminTo = Deno.env.get("ADMIN_NOTIFY_EMAIL") ?? "";
-      if (order.customer?.email) sendResend(order.customer.email, "Your NYNTH order is confirmed — #" + orderId.slice(0, 8).toUpperCase(), "<p>Thanks " + (order.customer?.firstName ?? "") + "! Total " + naira(order.total) + ". Tickets: " + codes.map((t: any) => t.code).join(", ") + "</p>").catch(console.error);
-      if (adminTo) sendResend(adminTo, "New NYNTH sale: " + naira(order.total), "<p>Order #" + orderId + " paid. Ref " + reference + "</p>").catch(console.error);
+      let customerSent = false, adminSent = false;
+      if (order.customer?.email) { try { await sendResend(order.customer.email, "Your NYNTH order is confirmed — #" + orderId.slice(0, 8).toUpperCase(), "<p>Thanks " + (order.customer?.firstName ?? "") + "! Total " + naira(order.total) + ". Tickets: " + codes.map((t: any) => t.code).join(", ") + "</p>"); customerSent = true; } catch(e) { console.error(e); } }
+      if (adminTo) { try { await sendResend(adminTo, "New NYNTH sale: " + naira(order.total), "<p>Order #" + orderId + " paid. Ref " + reference + "</p>"); adminSent = true; } catch(e) { console.error(e); } }
+      if (customerSent || adminSent) {
+        await supabase.from("orders").update({ customer_confirmation_sent_at: customerSent ? new Date().toISOString() : null, admin_notification_sent_at: adminSent ? new Date().toISOString() : null }).eq("id", orderId);
+      }
     }
     return new Response("Success", { status: 200 });
   } catch (e) { console.error(e); return new Response("Transaction failed", { status: 500 }); }

@@ -12,19 +12,19 @@ import toast from 'react-hot-toast';
 const STATUS_CONFIG = {
     pending: {
         label: 'Order Pending',
-        className: 'bg-orange-50 text-orange-600 border-orange-100'
+        className: 'bg-gray-50 text-gray-600 border-orange-100'
     },
     packaging: {
         label: 'In Packaging',
-        className: 'bg-indigo-50 text-indigo-600 border-indigo-100'
+        className: 'bg-gray-50 text-gray-600 border-indigo-100'
     },
     shipped: {
         label: 'En Route / Shipped',
-        className: 'bg-blue-50 text-blue-600 border-blue-100'
+        className: 'bg-gray-50 text-gray-600 border-blue-100'
     },
     delivered: {
         label: 'Delivered',
-        className: 'bg-emerald-50 text-emerald-600 border-emerald-100'
+        className: 'bg-gray-50 text-green-500 border-emerald-100'
     },
     cancelled: {
         label: 'Cancelled',
@@ -66,7 +66,7 @@ export const StatusDropdown = ({ orderId, currentStatus, onStatusChange }) => {
             disabled={isUpdating}
         >
             <SelectTrigger
-                className={`rounded-full border px-4 py-1 text-xs font-medium ${currentConfig.className} hover:opacity-80 transition-opacity w-auto min-w-[120px]`}
+                className={`rounded-lg border px-4 py-1 text-xs font-medium ${currentConfig.className} hover:opacity-80 transition-opacity w-auto min-w-[120px]`}
             >
                 <SelectValue />
             </SelectTrigger>
@@ -74,7 +74,7 @@ export const StatusDropdown = ({ orderId, currentStatus, onStatusChange }) => {
                 {Object.entries(STATUS_CONFIG).map(([value, config]) => (
                     <SelectItem key={value} value={value}>
                         <span className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${config.className.split(' ')[0]}`} />
+                            <span className={`w-2 h-2 rounded-lg ${config.className.split(' ')[0]}`} />
                             {config.label}
                         </span>
                     </SelectItem>

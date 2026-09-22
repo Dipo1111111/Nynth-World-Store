@@ -39,7 +39,7 @@ export default function AdminLayout({ children, title }) {
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
                     <Link to="/" className="flex items-center gap-2 group">
                         <Logo size="sm" />
-                        <span className="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold tracking-widest ml-1">ADMIN</span>
+                        <span className="bg-black text-white px-2 py-0.5 font-bold tracking-widest ml-1">ADMIN</span>
                     </Link>
                     <button 
                         onClick={toggleMobileMenu} 
@@ -76,7 +76,7 @@ export default function AdminLayout({ children, title }) {
                     </Link>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-500 hover:bg-gray-50 transition-colors"
                     >
                         <LogOut size={18} />
                         Logout
@@ -98,7 +98,7 @@ export default function AdminLayout({ children, title }) {
                 <header className="bg-white border-b border-gray-100 p-4 md:hidden flex items-center justify-between sticky top-0 z-30 shadow-sm">
                     <Link to="/" className="flex items-center gap-2">
                         <Logo size="xs" />
-                        <span className="text-[8px] bg-black text-white px-1.5 py-0.5 rounded-full font-bold tracking-widest">ADMIN</span>
+                        <span className="text-[8px] bg-black text-white px-1.5 py-0.5 font-bold tracking-widest">ADMIN</span>
                     </Link>
                     <button 
                         onClick={toggleMobileMenu} 
@@ -112,7 +112,7 @@ export default function AdminLayout({ children, title }) {
                 <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
                     {title && (
                         <div className="mb-6 md:mb-8">
-                            <h1 className="font-space text-2xl md:text-3xl font-bold">{title}</h1>
+                            <h1 className="text-2xl md:text-3xl font-bold">{title}</h1>
                         </div>
                     )}
                     {children}

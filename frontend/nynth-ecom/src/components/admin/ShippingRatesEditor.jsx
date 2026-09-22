@@ -260,14 +260,14 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     ];
 
     return (
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                     <Truck size={18} className="text-gray-400" />
                     <h3 className="font-bold text-lg">Shipping Rates</h3>
                     {dirty && (
                         <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Unsaved
+                            <span className="w-1.5 h-1.5 rounded-lg bg-amber-500" /> Unsaved
                         </span>
                     )}
                 </div>
@@ -304,7 +304,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 </span>
                                             )}
                                             {editedCount > 0 && (
-                                                <span className="text-[9px] font-bold uppercase tracking-widest text-black bg-gray-900 px-2 py-0.5 rounded text-white">
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-black bg-black px-2 py-0.5 rounded text-white">
                                                     {editedCount} edited
                                                 </span>
                                             )}
@@ -372,7 +372,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                             type="button"
                                                             onClick={() => toggleArea(region, area)}
                                                             title={off ? `Enable ${area} at checkout` : `Disable ${area} at checkout (price kept)`}
-                                                            className={`shrink-0 rounded-full p-1 transition-colors ${off ? "bg-gray-200 text-gray-400 hover:bg-green-100 hover:text-green-700" : "bg-green-100 text-green-700 hover:bg-gray-200 hover:text-gray-500"}`}
+                                                            className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-gray-200 text-gray-400 hover:bg-green-100 hover:text-green-700" : "bg-green-100 text-green-700 hover:bg-gray-200 hover:text-gray-500"}`}
                                                         >
                                                             <Power size={11} />
                                                         </button>
@@ -468,7 +468,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             base {currencySymbol}{group.price.toLocaleString()}
                                         </span>
                                         {editedCount > 0 && (
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-black bg-gray-900 px-2 py-0.5 rounded text-white">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest text-black bg-black px-2 py-0.5 rounded text-white">
                                                 {editedCount} edited
                                             </span>
                                         )}
@@ -536,7 +536,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                         type="button"
                                                         onClick={() => toggleArea("interstate", state)}
                                                         title={off ? `Enable ${state} at checkout` : `Disable ${state} at checkout (price kept)`}
-                                                        className={`shrink-0 rounded-full p-1 transition-colors ${off ? "bg-gray-200 text-gray-400 hover:bg-green-100 hover:text-green-700" : "bg-green-100 text-green-700 hover:bg-gray-200 hover:text-gray-500"}`}
+                                                        className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-gray-200 text-gray-400 hover:bg-green-100 hover:text-green-700" : "bg-green-100 text-green-700 hover:bg-gray-200 hover:text-gray-500"}`}
                                                     >
                                                         <Power size={11} />
                                                     </button>
@@ -636,7 +636,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                     return (
                                         <div key={state} className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${off ? "border-gray-100 bg-gray-50 opacity-60" : "border-black/10 bg-white"}`}>
                                             <span className="flex items-center gap-1.5 min-w-0 mr-2">
-                                                <button type="button" onClick={() => toggleArea("interstate", state)} className={`shrink-0 rounded-full p-1 transition-colors ${off ? "bg-gray-200 text-gray-400" : "bg-green-100 text-green-700"}`}>
+                                                <button type="button" onClick={() => toggleArea("interstate", state)} className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-gray-200 text-gray-400" : "bg-green-100 text-green-700"}`}>
                                                     <Power size={11} />
                                                 </button>
                                                 <span className={`truncate ${off ? "text-gray-300 line-through" : "text-gray-700"}`}>{state}</span>

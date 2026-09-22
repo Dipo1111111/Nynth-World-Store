@@ -11,1331 +11,1331 @@ import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
 
 // Base settings defaults - merged with whatever is persisted in the DB.
 const SETTINGS_DEFAULTS = {
-    site_name: "",
-    support_email: "",
-    support_phone: "",
-    support_whatsapp: "2348158115858",
-    office_address: "",
-    instagram_url: "",
-    twitter_url: "",
-    facebook_url: "",
-    tiktok_url: "",
-    shipping_fee: 0,
-    currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
-    hero_banner: "",
-    banner_hover_color: "red",
-    lock_page_enabled: false,
-    lock_epoch: 0,
-    lock_timer_enabled: false,
-    lock_timer_duration_minutes: 5,
-    launch_date: "2026-04-03T18:00:00",
-    show_size_chart: true,
-    size_chart_model_info: "",
-    size_chart_data: [],
-    // Lock Page Settings
-    lock_password: "WINNERSONLY",
-    lock_title1: "BY WINNERS FOR WINNERS",
-    lock_title2: "STAY ABOVE",
-    lock_waitlist_title: "JOIN THE WAITLIST",
-    lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
-    // Product Options
-    available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
-    available_sizes: "XS, S, M, L, XL, XXL, XXXL",
-    disabled_locations: { lagos: ["Abijo","Abule Ado","Abuleegba","Agbara","Agege","Ago palace","Agungi","Ajah","Ajao Estate","Ajegunle","Akowonjo","Akute","Alaguntan","Alaagbado","Alapere","Alimosho","Amuwo","Anthony","Apapa","Araga","Arepo","Asese","Awoyaya","Ayobo","Badagry","Badore","Bariga","Cement","Chevron","Costain","Dangote Refinery","Ebute Metta","Egbeda","Ejigbo","Epe Ibeju","Fadeyi","Festac","Gbagada","Gbagada Phase 1","Ibafo","Iddo","Idi Araba","Idi Iroko","Idimu","Ifako Ijaiye","Igando","Ijegun","Ikeja","Ikeja Airport","Ikate","Ikorodu","Ikosi","Ikota","Ikotun","Ikoyi","Ilasa","Ilasan","Ilasamaja","Ilupeju","Imota","Ipaja","Isheri olofin","Isheri oshun","Isolo","Iyana ipaja","Jakande","Jibowu","Ketu","Kola","Lagos Island","LASU","Lekki 2","Lekkil","LUTH","Magodo","Magodo 1","Mangoro","Marina","Maryland","Meiran","Mile 12","Mile2","Mowe","Mushin","New Garage","Obanikoro","Obawole","Ogba","Ogombo","Ogudu","Ojo","Ojodu","Ojota","Okokomiako","Ologolo","Olowoira","Omole 1","Omole 2","Onipanu","Oniru","Opic","Orchid","Osapa","Oshodi","Oworo","Oyingbo","Palmgrove","Papa Ajao","Pedro","Sango Otta","Sangotedo","Satellite","Shasha","Shibiti","Somolu","Surulere","Tradefair","VGC","Vi","Yaba","Abule Oja","Akoka","Akute Border","Alaka Estate","Computer Village","Dopemu","Fagba","Iganmu","Ijaiye","Ijesha Surulere","Iju","Ojuelegba","Baruwa","Gowon Estate","Okota","Obalende","Osborne Foreshore","Abraham Adesanya","Ilaje","Magboro","Ijanikin","Lekki Deep Sea Port"], abuja: [], interstate: [] },
-    announcement_bar_enabled: false,
-    announcement_bar_text: "NEXT DROP IN:",
-    marquee_enabled: false,
-    marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
-    free_delivery_enabled: true,
-    free_delivery_threshold: 50000,
-    our_story_content: null,
-    shipping_rates: { lagos: {}, abuja: {}, interstate: {} },
-    custom_shipping_locations: { lagos: {}, abuja: {}, interstate: {} }
+ site_name: "",
+ support_email: "",
+ support_phone: "",
+ support_whatsapp: "2348158115858",
+ office_address: "",
+ instagram_url: "",
+ twitter_url: "",
+ facebook_url: "",
+ tiktok_url: "",
+ shipping_fee: 0,
+ currency_symbol: import.meta.env.VITE_CURRENCY_SYMBOL || "₦",
+ hero_banner: "",
+ banner_hover_color: "red",
+ lock_page_enabled: false,
+ lock_epoch: 0,
+ lock_timer_enabled: false,
+ lock_timer_duration_minutes: 5,
+ launch_date: "2026-04-03T18:00:00",
+ show_size_chart: true,
+ size_chart_model_info: "",
+ size_chart_data: [],
+ // Lock Page Settings
+ lock_password: "WINNERSONLY",
+ lock_title1: "BY WINNERS FOR WINNERS",
+ lock_title2: "STAY ABOVE",
+ lock_waitlist_title: "JOIN THE WAITLIST",
+ lock_waitlist_subtitle: "BE NOTIFIED WHEN WE GO LIVE",
+ // Product Options
+ available_colors: "Black, White, Grey, Navy, Beige, Red, Blue, Green, Olive, Brown, Burgundy, Pink, Yellow, Purple",
+ available_sizes: "XS, S, M, L, XL, XXL, XXXL",
+ disabled_locations: { lagos: ["Abijo","Abule Ado","Abuleegba","Agbara","Agege","Ago palace","Agungi","Ajah","Ajao Estate","Ajegunle","Akowonjo","Akute","Alaguntan","Alaagbado","Alapere","Alimosho","Amuwo","Anthony","Apapa","Araga","Arepo","Asese","Awoyaya","Ayobo","Badagry","Badore","Bariga","Cement","Chevron","Costain","Dangote Refinery","Ebute Metta","Egbeda","Ejigbo","Epe Ibeju","Fadeyi","Festac","Gbagada","Gbagada Phase 1","Ibafo","Iddo","Idi Araba","Idi Iroko","Idimu","Ifako Ijaiye","Igando","Ijegun","Ikeja","Ikeja Airport","Ikate","Ikorodu","Ikosi","Ikota","Ikotun","Ikoyi","Ilasa","Ilasan","Ilasamaja","Ilupeju","Imota","Ipaja","Isheri olofin","Isheri oshun","Isolo","Iyana ipaja","Jakande","Jibowu","Ketu","Kola","Lagos Island","LASU","Lekki 2","Lekkil","LUTH","Magodo","Magodo 1","Mangoro","Marina","Maryland","Meiran","Mile 12","Mile2","Mowe","Mushin","New Garage","Obanikoro","Obawole","Ogba","Ogombo","Ogudu","Ojo","Ojodu","Ojota","Okokomiako","Ologolo","Olowoira","Omole 1","Omole 2","Onipanu","Oniru","Opic","Orchid","Osapa","Oshodi","Oworo","Oyingbo","Palmgrove","Papa Ajao","Pedro","Sango Otta","Sangotedo","Satellite","Shasha","Shibiti","Somolu","Surulere","Tradefair","VGC","Vi","Yaba","Abule Oja","Akoka","Akute Border","Alaka Estate","Computer Village","Dopemu","Fagba","Iganmu","Ijaiye","Ijesha Surulere","Iju","Ojuelegba","Baruwa","Gowon Estate","Okota","Obalende","Osborne Foreshore","Abraham Adesanya","Ilaje","Magboro","Ijanikin","Lekki Deep Sea Port"], abuja: [], interstate: [] },
+ announcement_bar_enabled: false,
+ announcement_bar_text: "NEXT DROP IN:",
+ marquee_enabled: false,
+ marquee_text: "FREE DELIVERY ON ORDERS OVER ₦50,000",
+ free_delivery_enabled: true,
+ free_delivery_threshold: 50000,
+ our_story_content: null,
+ shipping_rates: { lagos: {}, abuja: {}, interstate: {} },
+ custom_shipping_locations: { lagos: {}, abuja: {}, interstate: {} }
 };
 
 // Merge persisted settings over the defaults, filling gaps so the editor always
 // has a fully-shaped object to compare the unsaved draft against.
 const mergeSettingsDefaults = (part = {}) => ({
-    ...SETTINGS_DEFAULTS,
-    ...part,
-    lock_password: part.lock_password || SETTINGS_DEFAULTS.lock_password,
-    lock_title1: part.lock_title1 || SETTINGS_DEFAULTS.lock_title1,
-    lock_title2: part.lock_title2 || SETTINGS_DEFAULTS.lock_title2,
-    lock_waitlist_title: part.lock_waitlist_title || SETTINGS_DEFAULTS.lock_waitlist_title,
-    lock_waitlist_subtitle: part.lock_waitlist_subtitle || SETTINGS_DEFAULTS.lock_waitlist_subtitle,
-    lock_timer_enabled: part.lock_timer_enabled !== undefined ? part.lock_timer_enabled : SETTINGS_DEFAULTS.lock_timer_enabled,
-    lock_timer_duration_minutes: part.lock_timer_duration_minutes || SETTINGS_DEFAULTS.lock_timer_duration_minutes,
-    available_colors: part.available_colors || SETTINGS_DEFAULTS.available_colors,
-    available_sizes: part.available_sizes || SETTINGS_DEFAULTS.available_sizes,
-    disabled_locations: part.disabled_locations || { lagos: [], abuja: [], interstate: [] },
-    shipping_rates: part.shipping_rates || { lagos: {}, abuja: {}, interstate: {} },
-    custom_shipping_locations: part.custom_shipping_locations || { lagos: {}, abuja: {}, interstate: {} },
-    announcement_bar_enabled: part.announcement_bar_enabled !== undefined ? part.announcement_bar_enabled : SETTINGS_DEFAULTS.announcement_bar_enabled,
-    announcement_bar_text: part.announcement_bar_text || SETTINGS_DEFAULTS.announcement_bar_text,
-    marquee_enabled: part.marquee_enabled !== undefined ? part.marquee_enabled : SETTINGS_DEFAULTS.marquee_enabled,
-    marquee_text: part.marquee_text || SETTINGS_DEFAULTS.marquee_text,
-    free_delivery_enabled: part.free_delivery_enabled !== undefined ? part.free_delivery_enabled : SETTINGS_DEFAULTS.free_delivery_enabled,
-    free_delivery_threshold: part.free_delivery_threshold || SETTINGS_DEFAULTS.free_delivery_threshold,
-    our_story_content: part.our_story_content || SETTINGS_DEFAULTS.our_story_content,
+ ...SETTINGS_DEFAULTS,
+ ...part,
+ lock_password: part.lock_password || SETTINGS_DEFAULTS.lock_password,
+ lock_title1: part.lock_title1 || SETTINGS_DEFAULTS.lock_title1,
+ lock_title2: part.lock_title2 || SETTINGS_DEFAULTS.lock_title2,
+ lock_waitlist_title: part.lock_waitlist_title || SETTINGS_DEFAULTS.lock_waitlist_title,
+ lock_waitlist_subtitle: part.lock_waitlist_subtitle || SETTINGS_DEFAULTS.lock_waitlist_subtitle,
+ lock_timer_enabled: part.lock_timer_enabled !== undefined ? part.lock_timer_enabled : SETTINGS_DEFAULTS.lock_timer_enabled,
+ lock_timer_duration_minutes: part.lock_timer_duration_minutes || SETTINGS_DEFAULTS.lock_timer_duration_minutes,
+ available_colors: part.available_colors || SETTINGS_DEFAULTS.available_colors,
+ available_sizes: part.available_sizes || SETTINGS_DEFAULTS.available_sizes,
+ disabled_locations: part.disabled_locations || { lagos: [], abuja: [], interstate: [] },
+ shipping_rates: part.shipping_rates || { lagos: {}, abuja: {}, interstate: {} },
+ custom_shipping_locations: part.custom_shipping_locations || { lagos: {}, abuja: {}, interstate: {} },
+ announcement_bar_enabled: part.announcement_bar_enabled !== undefined ? part.announcement_bar_enabled : SETTINGS_DEFAULTS.announcement_bar_enabled,
+ announcement_bar_text: part.announcement_bar_text || SETTINGS_DEFAULTS.announcement_bar_text,
+ marquee_enabled: part.marquee_enabled !== undefined ? part.marquee_enabled : SETTINGS_DEFAULTS.marquee_enabled,
+ marquee_text: part.marquee_text || SETTINGS_DEFAULTS.marquee_text,
+ free_delivery_enabled: part.free_delivery_enabled !== undefined ? part.free_delivery_enabled : SETTINGS_DEFAULTS.free_delivery_enabled,
+ free_delivery_threshold: part.free_delivery_threshold || SETTINGS_DEFAULTS.free_delivery_threshold,
+ our_story_content: part.our_story_content || SETTINGS_DEFAULTS.our_story_content,
 });
 
 // Default Our Story content - mirrors /our-story page fallbacks. Pre-fills the
 // editor so fields read as real, editable content instead of empty boxes.
 const STORY_DEFAULTS = {
-    company: "NYNTH WORLD LTD",
-    founded: "Founded October 20, 2022",
-    cac: "Registered with the Corporate Affairs Commission (CAC), October 2, 2025",
-    founder_label: "Founder & Chief Executive Officer",
-    founder_name: "Yange Newman Terseer",
-    belief: "NYNTH WORLD was built on one belief.\nWhere you begin does not define where you finish.",
-    belief_desc: "It is a brand based on mindset.\nA standard for people who choose to rise in every situation.",
-    origin: "NYNTH started from a real moment.\nThe Founder was ranked 9th across 9 subjects and told he would not succeed.\nThat moment did not create doubt. It created a shift in mindset.",
-    quote1: "Position is temporary.",
-    quote2: "Mindset is Permanent.",
-    meaning: "NYNTH is not just a number. It stands for elevation.\nIt represents people who push past limits,\nstay disciplined,\nand keep the mindset of staying above.",
-    philosophy: "Every NYNTH piece is made with intention.\nNot just as clothing, but as identity.\nWhen you see NYNTH, you see a person who keeps going.",
-    tagline: "BY WINNERS, FOR WINNERS, stay above",
-    footer_name: "NYNTH WORLD LTD"
+ company: "NYNTH WORLD LTD",
+ founded: "Founded October 20, 2022",
+ cac: "Registered with the Corporate Affairs Commission (CAC), October 2, 2025",
+ founder_label: "Founder & Chief Executive Officer",
+ founder_name: "Yange Newman Terseer",
+ belief: "NYNTH WORLD was built on one belief.\nWhere you begin does not define where you finish.",
+ belief_desc: "It is a brand based on mindset.\nA standard for people who choose to rise in every situation.",
+ origin: "NYNTH started from a real moment.\nThe Founder was ranked 9th across 9 subjects and told he would not succeed.\nThat moment did not create doubt. It created a shift in mindset.",
+ quote1: "Position is temporary.",
+ quote2: "Mindset is Permanent.",
+ meaning: "NYNTH is not just a number. It stands for elevation.\nIt represents people who push past limits,\nstay disciplined,\nand keep the mindset of staying above.",
+ philosophy: "Every NYNTH piece is made with intention.\nNot just as clothing, but as identity.\nWhen you see NYNTH, you see a person who keeps going.",
+ tagline: "BY WINNERS, FOR WINNERS, stay above",
+ footer_name: "NYNTH WORLD LTD"
 };
 
 export default function AdminSettings() {
-    const [settings, setSettings] = useState(mergeSettingsDefaults());
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const { refreshSettings } = useSettings();
-    const [isUploading, setIsUploading] = useState(false);
-    const [isMerging, setIsMerging] = useState(false);
-    // Snapshot of the last persisted state. Any difference from `settings` is
-    // an unsaved change that has not been published to the storefront.
-    const [savedSnapshot, setSavedSnapshot] = useState(null);
-    const isDirty = savedSnapshot !== null && JSON.stringify(settings) !== JSON.stringify(savedSnapshot);
+ const [settings, setSettings] = useState(mergeSettingsDefaults());
+ const [loading, setLoading] = useState(true);
+ const [saving, setSaving] = useState(false);
+ const { refreshSettings } = useSettings();
+ const [isUploading, setIsUploading] = useState(false);
+ const [isMerging, setIsMerging] = useState(false);
+ // Snapshot of the last persisted state. Any difference from `settings` is
+ // an unsaved change that has not been published to the storefront.
+ const [savedSnapshot, setSavedSnapshot] = useState(null);
+ const isDirty = savedSnapshot !== null && JSON.stringify(settings) !== JSON.stringify(savedSnapshot);
 
-    // Warn before the admin navigates away with unsaved changes.
-    useEffect(() => {
-        if (!isDirty) return;
-        const handler = (e) => {
-            e.preventDefault();
-            e.returnValue = "";
-        };
-        window.addEventListener("beforeunload", handler);
-        return () => window.removeEventListener("beforeunload", handler);
-    }, [isDirty]);
+ // Warn before the admin navigates away with unsaved changes.
+ useEffect(() => {
+ if (!isDirty) return;
+ const handler = (e) => {
+ e.preventDefault();
+ e.returnValue = "";
+ };
+ window.addEventListener("beforeunload", handler);
+ return () => window.removeEventListener("beforeunload", handler);
+ }, [isDirty]);
 
-    const handleDiscard = () => {
-        if (!savedSnapshot) return;
-        if (!window.confirm("Discard all unsaved changes?")) return;
-        setSettings(JSON.parse(JSON.stringify(savedSnapshot)));
-    };
+ const handleDiscard = () => {
+ if (!savedSnapshot) return;
+ if (!window.confirm("Discard all unsaved changes?")) return;
+ setSettings(JSON.parse(JSON.stringify(savedSnapshot)));
+ };
 
-    const handleHeroBannerUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+ const handleHeroBannerUpload = async (e) => {
+ const file = e.target.files[0];
+ if (!file) return;
 
-        try {
-            setIsUploading(true);
-            toast.loading("Uploading Hero Banner...", { id: "upload-status" });
-            
-            const compressed = await compressImage(file, { maxSizeMB: 2, maxWidthOrHeight: 2500 });
-            const url = await uploadImage(compressed);
-            
-            setSettings(prev => ({ ...prev, hero_banner: url }));
-            toast.success("Image ready - press Save All Settings to publish it.", { id: "upload-status" });
-        } catch (error) {
-            console.error("Banner upload failed:", error);
-            toast.error("Upload failed.", { id: "upload-status" });
-        } finally {
-            setIsUploading(false);
-            e.target.value = "";
-        }
-    };
+ try {
+ setIsUploading(true);
+ toast.loading("Uploading Hero Banner...", { id: "upload-status" });
+ 
+ const compressed = await compressImage(file, { maxSizeMB: 2, maxWidthOrHeight: 2500 });
+ const url = await uploadImage(compressed);
+ 
+ setSettings(prev => ({ ...prev, hero_banner: url }));
+ toast.success("Image ready - press Save All Settings to publish it.", { id: "upload-status" });
+ } catch (error) {
+ console.error("Banner upload failed:", error);
+ toast.error("Upload failed.", { id: "upload-status" });
+ } finally {
+ setIsUploading(false);
+ e.target.value = "";
+ }
+ };
 
-    const handleMerge = async () => {
-        if (!window.confirm("This will find all duplicate emails and merge them into single entries (keeping the oldest signup). Proceed?")) return;
-        
-        setIsMerging(true);
-        try {
-            const result = await mergeSubscriberDuplicates();
-            if (result.success) {
-                toast.success(`Succesfully merged ${result.mergedCount} duplicates.`);
-            }
-        } catch (error) {
-            toast.error("Failed to merge duplicates");
-        } finally {
-            setIsMerging(false);
-        }
-    };
+ const handleMerge = async () => {
+ if (!window.confirm("This will find all duplicate emails and merge them into single entries (keeping the oldest signup). Proceed?")) return;
+ 
+ setIsMerging(true);
+ try {
+ const result = await mergeSubscriberDuplicates();
+ if (result.success) {
+ toast.success(`Succesfully merged ${result.mergedCount} duplicates.`);
+ }
+ } catch (error) {
+ toast.error("Failed to merge duplicates");
+ } finally {
+ setIsMerging(false);
+ }
+ };
 
-    useEffect(() => {
-        const loadSettings = async () => {
-            try {
-                const data = await fetchSettings();
-                if (data) {
-                    const loaded = mergeSettingsDefaults(data);
-                    setSettings(loaded);
-                    setSavedSnapshot(JSON.parse(JSON.stringify(loaded)));
-                }
-            } catch (error) {
-                toast.error("Failed to load settings");
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadSettings();
-    }, []);
+ useEffect(() => {
+ const loadSettings = async () => {
+ try {
+ const data = await fetchSettings();
+ if (data) {
+ const loaded = mergeSettingsDefaults(data);
+ setSettings(loaded);
+ setSavedSnapshot(JSON.parse(JSON.stringify(loaded)));
+ }
+ } catch (error) {
+ toast.error("Failed to load settings");
+ } finally {
+ setLoading(false);
+ }
+ };
+ loadSettings();
+ }, []);
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setSettings(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : ((name === "shipping_fee" || name === "free_delivery_threshold") ? Number(value) : value)
-        }));
-    };
+ const handleChange = (e) => {
+ const { name, value, type, checked } = e.target;
+ setSettings(prev => ({
+ ...prev,
+ [name]: type === "checkbox" ? checked : ((name === "shipping_fee" || name === "free_delivery_threshold") ? Number(value) : value)
+ }));
+ };
 
-    const handleSubmit = async (e) => {
-        if (e && typeof e.preventDefault === "function") e.preventDefault();
-        setSaving(true);
-        try {
-            // When enabling lock page, increment epoch to force-lock everyone
-            const settingsToSave = settings.lock_page_enabled
-                ? { ...settings, lock_epoch: (settings.lock_epoch || 0) + 1 }
-                : settings;
-            const success = await updateSettings(settingsToSave);
-            if (success) {
-                let nextSnapshot = settings;
-                if (settings.lock_page_enabled) {
-                    const nextEpoch = (settings.lock_epoch || 0) + 1;
-                    nextSnapshot = { ...settings, lock_epoch: nextEpoch };
-                    setSettings(nextSnapshot);
-                }
-                setSavedSnapshot(JSON.parse(JSON.stringify(nextSnapshot)));
-                toast.success("Settings saved - now live on the storefront");
-                refreshSettings();
-            } else {
-                toast.error("Failed to update settings");
-            }
-        } catch (error) {
-            toast.error("Error updating settings");
-        } finally {
-            setSaving(false);
-        }
-    };
+ const handleSubmit = async (e) => {
+ if (e && typeof e.preventDefault === "function") e.preventDefault();
+ setSaving(true);
+ try {
+ // When enabling lock page, increment epoch to force-lock everyone
+ const settingsToSave = settings.lock_page_enabled
+ ? { ...settings, lock_epoch: (settings.lock_epoch || 0) + 1 }
+ : settings;
+ const success = await updateSettings(settingsToSave);
+ if (success) {
+ let nextSnapshot = settings;
+ if (settings.lock_page_enabled) {
+ const nextEpoch = (settings.lock_epoch || 0) + 1;
+ nextSnapshot = { ...settings, lock_epoch: nextEpoch };
+ setSettings(nextSnapshot);
+ }
+ setSavedSnapshot(JSON.parse(JSON.stringify(nextSnapshot)));
+ toast.success("Settings saved - now live on the storefront");
+ refreshSettings();
+ } else {
+ toast.error("Failed to update settings");
+ }
+ } catch (error) {
+ toast.error("Error updating settings");
+ } finally {
+ setSaving(false);
+ }
+ };
 
-    if (loading) {
-        return (
-            <AdminLayout title="Settings">
-                <div className="flex items-center justify-center h-64">
-                    <Loader2 className="animate-spin text-gray-400" size={32} />
-                </div>
-            </AdminLayout>
-        );
-    }
+ if (loading) {
+ return (
+ <AdminLayout title="Settings">
+ <div className="flex items-center justify-center h-64">
+ <Loader2 className="animate-spin text-gray-400" size={32} />
+ </div>
+ </AdminLayout>
+ );
+ }
 
-    const SectionTitle = ({ icon: Icon, title }) => (
-        <div className="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
-            <Icon size={18} className="text-gray-400" />
-            <h3 className="font-bold text-lg">{title}</h3>
-        </div>
-    );
+ const SectionTitle = ({ icon: Icon, title }) => (
+ <div className="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
+ <Icon size={18} className="text-gray-400" />
+ <h3 className="font-bold text-lg">{title}</h3>
+ </div>
+ );
 
-    return (
-        <AdminLayout title="Settings">
-            <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
-                {/* Save model explainer */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 flex items-start gap-3">
-                    <Info size={18} className="text-amber-700 shrink-0 mt-0.5" />
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Changes are staged until you save</p>
-                        <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                            Nothing here goes live while you edit. When you have unsaved changes, a save bar appears at the
-                            bottom of the screen - press <span className="font-bold">Save All Settings</span> to publish them to your storefront.
-                        </p>
-                    </div>
-                </div>
+ return (
+ <AdminLayout title="Settings">
+ <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
+ {/* Save model explainer */}
+ <div className="bg-amber-50 border border-gray-200 rounded-lg px-5 py-4 flex items-start gap-3">
+ <Info size={18} className="text-amber-700 shrink-0 mt-0.5" />
+ <div>
+ <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Changes are staged until you save</p>
+ <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+ Nothing here goes live while you edit. When you have unsaved changes, a save bar appears at the
+ bottom of the screen - press <span className="font-bold">Save All Settings</span> to publish them to your storefront.
+ </p>
+ </div>
+ </div>
 
-                {/* General Settings */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Globe} title="General Configuration" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Site Name</label>
-                            <input
-                                name="site_name"
-                                value={settings.site_name}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="NYNTH"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Currency Symbol</label>
-                            <input
-                                name="currency_symbol"
-                                value={settings.currency_symbol}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="₦"
-                            />
-                        </div>
-                    </div>
-                </div>
+ {/* General Settings */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Globe} title="General Configuration" />
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Site Name</label>
+ <input
+ name="site_name"
+ value={settings.site_name}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="NYNTH"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Currency Symbol</label>
+ <input
+ name="currency_symbol"
+ value={settings.currency_symbol}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="₦"
+ />
+ </div>
+ </div>
+ </div>
 
-                {/* PRODUCT VARIANT OPTIONS */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={PackageIcon} title="Product Variant Options" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Manage the preset options available when creating or editing products. Separate items with commas.
-                    </p>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Available Colors</label>
-                            <textarea
-                                name="available_colors"
-                                value={settings.available_colors}
-                                onChange={handleChange}
-                                rows={3}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
-                                placeholder="Black, White, Red..."
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Available Sizes</label>
-                            <textarea
-                                name="available_sizes"
-                                value={settings.available_sizes}
-                                onChange={handleChange}
-                                rows={2}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
-                                placeholder="XS, S, M, L, XL..."
-                            />
-                        </div>
-                    </div>
-                </div>
+ {/* PRODUCT VARIANT OPTIONS */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={PackageIcon} title="Product Variant Options" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ Manage the preset options available when creating or editing products. Separate items with commas.
+ </p>
+ <div className="space-y-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Available Colors</label>
+ <textarea
+ name="available_colors"
+ value={settings.available_colors}
+ onChange={handleChange}
+ rows={3}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
+ placeholder="Black, White, Red..."
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Available Sizes</label>
+ <textarea
+ name="available_sizes"
+ value={settings.available_sizes}
+ onChange={handleChange}
+ rows={2}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
+ placeholder="XS, S, M, L, XL..."
+ />
+ </div>
+ </div>
+ </div>
 
-                {/* LOCK PAGE CONFIGURATION */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={MapPin} title="Lock Page Configuration" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Control the content and access for the pre-launch/maintenance page.
-                    </p>
-                    
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
-                        <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Lock Page</h4>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                name="lock_page_enabled"
-                                checked={settings.lock_page_enabled}
-                                onChange={handleChange}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
+ {/* LOCK PAGE CONFIGURATION */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={MapPin} title="Lock Page Configuration" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ Control the content and access for the pre-launch/maintenance page.
+ </p>
+ 
+ <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="space-y-1">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Lock Page</h4>
+ <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
+ </div>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input
+ type="checkbox"
+ name="lock_page_enabled"
+ checked={settings.lock_page_enabled}
+ onChange={handleChange}
+ className="sr-only peer"
+ />
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ </label>
+ </div>
 
-                    {/* Timer Toggle */}
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
-                        <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Countdown Timer</h4>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                name="lock_timer_enabled"
-                                checked={settings.lock_timer_enabled}
-                                onChange={handleChange}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
+ {/* Timer Toggle */}
+ <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="space-y-1">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Countdown Timer</h4>
+ <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
+ </div>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input
+ type="checkbox"
+ name="lock_timer_enabled"
+ checked={settings.lock_timer_enabled}
+ onChange={handleChange}
+ className="sr-only peer"
+ />
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ </label>
+ </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Launch Countdown Date</label>
-                            <input
-                                type="datetime-local"
-                                name="launch_date"
-                                value={settings.launch_date ? settings.launch_date.substring(0, 16) : ""}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
-                            />
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Countdown Duration (minutes)</label>
-                            <input
-                                type="number"
-                                name="lock_timer_duration_minutes"
-                                value={settings.lock_timer_duration_minutes}
-                                onChange={handleChange}
-                                min="1"
-                                max="999"
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
-                            />
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Lock Password</label>
-                            <input
-                                name="lock_password"
-                                value={settings.lock_password}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
-                                placeholder="WINNERSONLY"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Title Line 1</label>
-                            <input
-                                name="lock_title1"
-                                value={settings.lock_title1}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="BY WINNERS FOR WINNERS"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Title Line 2 (Faded)</label>
-                            <input
-                                name="lock_title2"
-                                value={settings.lock_title2}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="STAY ABOVE"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Waitlist Section Title</label>
-                            <input
-                                name="lock_waitlist_title"
-                                value={settings.lock_waitlist_title}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="JOIN THE WAITLIST"
-                            />
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-medium text-gray-700">Waitlist Section Subtitle</label>
-                            <input
-                                name="lock_waitlist_subtitle"
-                                value={settings.lock_waitlist_subtitle}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="BE NOTIFIED WHEN WE GO LIVE"
-                            />
-                        </div>
-                    </div>
-                </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Launch Countdown Date</label>
+ <input
+ type="datetime-local"
+ name="launch_date"
+ value={settings.launch_date ? settings.launch_date.substring(0, 16) : ""}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+ />
+ <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Countdown Duration (minutes)</label>
+ <input
+ type="number"
+ name="lock_timer_duration_minutes"
+ value={settings.lock_timer_duration_minutes}
+ onChange={handleChange}
+ min="1"
+ max="999"
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+ />
+ <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Lock Password</label>
+ <input
+ name="lock_password"
+ value={settings.lock_password}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+ placeholder="WINNERSONLY"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Title Line 1</label>
+ <input
+ name="lock_title1"
+ value={settings.lock_title1}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="BY WINNERS FOR WINNERS"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Title Line 2 (Faded)</label>
+ <input
+ name="lock_title2"
+ value={settings.lock_title2}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="STAY ABOVE"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Waitlist Section Title</label>
+ <input
+ name="lock_waitlist_title"
+ value={settings.lock_waitlist_title}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="JOIN THE WAITLIST"
+ />
+ </div>
+ <div className="space-y-2 md:col-span-2">
+ <label className="text-sm font-medium text-gray-700">Waitlist Section Subtitle</label>
+ <input
+ name="lock_waitlist_subtitle"
+ value={settings.lock_waitlist_subtitle}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="BE NOTIFIED WHEN WE GO LIVE"
+ />
+ </div>
+ </div>
+ </div>
 
-                {/* Contact Information */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Mail} title="Contact Information" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Support Email</label>
-                            <div className="relative">
-                                <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
-                                <input
-                                    name="support_email"
-                                    type="email"
-                                    value={settings.support_email}
-                                    onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                    placeholder="support@nynth.com"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Support Phone</label>
-                            <div className="relative">
-                                <Phone size={16} className="absolute left-3 top-3 text-gray-400" />
-                                <input
-                                    name="support_phone"
-                                    value={settings.support_phone}
-                                    onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                    placeholder="+234..."
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Support WhatsApp</label>
-                            <div className="relative">
-                                <Share2 size={16} className="absolute left-3 top-3 text-gray-400" />
-                                <input
-                                    name="support_whatsapp"
-                                    value={settings.support_whatsapp}
-                                    onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                    placeholder="+234..."
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-medium text-gray-700">Office Address</label>
-                            <div className="relative">
-                                <MapPin size={16} className="absolute left-3 top-3 text-gray-400" />
-                                <input
-                                    name="office_address"
-                                    value={settings.office_address}
-                                    onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                    placeholder="123 Street, Lagos"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ {/* Contact Information */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Mail} title="Contact Information" />
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Support Email</label>
+ <div className="relative">
+ <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
+ <input
+ name="support_email"
+ type="email"
+ value={settings.support_email}
+ onChange={handleChange}
+ className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="support@nynth.com"
+ />
+ </div>
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Support Phone</label>
+ <div className="relative">
+ <Phone size={16} className="absolute left-3 top-3 text-gray-400" />
+ <input
+ name="support_phone"
+ value={settings.support_phone}
+ onChange={handleChange}
+ className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="+234..."
+ />
+ </div>
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Support WhatsApp</label>
+ <div className="relative">
+ <Share2 size={16} className="absolute left-3 top-3 text-gray-400" />
+ <input
+ name="support_whatsapp"
+ value={settings.support_whatsapp}
+ onChange={handleChange}
+ className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="+234..."
+ />
+ </div>
+ </div>
+ <div className="space-y-2 md:col-span-2">
+ <label className="text-sm font-medium text-gray-700">Office Address</label>
+ <div className="relative">
+ <MapPin size={16} className="absolute left-3 top-3 text-gray-400" />
+ <input
+ name="office_address"
+ value={settings.office_address}
+ onChange={handleChange}
+ className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="123 Street, Lagos"
+ />
+ </div>
+ </div>
+ </div>
+ </div>
 
-                {/* Social Media */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Share2} title="Social Media Links" />
-                    <div className="grid grid-cols-1 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Instagram URL</label>
-                            <input
-                                name="instagram_url"
-                                value={settings.instagram_url}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="https://instagram.com/..."
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">X (Twitter) URL</label>
-                            <input
-                                name="twitter_url"
-                                value={settings.twitter_url}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="https://x.com/..."
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Facebook URL</label>
-                            <input
-                                name="facebook_url"
-                                value={settings.facebook_url}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="https://facebook.com/..."
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">TikTok URL</label>
-                            <input
-                                name="tiktok_url"
-                                value={settings.tiktok_url || ""}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="https://tiktok.com/..."
-                            />
-                        </div>
-                    </div>
-                </div>
+ {/* Social Media */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Share2} title="Social Media Links" />
+ <div className="grid grid-cols-1 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Instagram URL</label>
+ <input
+ name="instagram_url"
+ value={settings.instagram_url}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="https://instagram.com/..."
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">X (Twitter) URL</label>
+ <input
+ name="twitter_url"
+ value={settings.twitter_url}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="https://x.com/..."
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Facebook URL</label>
+ <input
+ name="facebook_url"
+ value={settings.facebook_url}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="https://facebook.com/..."
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">TikTok URL</label>
+ <input
+ name="tiktok_url"
+ value={settings.tiktok_url || ""}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="https://tiktok.com/..."
+ />
+ </div>
+ </div>
+ </div>
 
-                {/* Google Analytics Settings */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">GA4 Property ID</label>
-                            <input
-                                name="ga_property_id"
-                                value={settings.ga_property_id || ""}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-sm"
-                                placeholder="e.g. 123456789"
-                            />
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
-                                Required for the Admin Dashboard to pull real-time metrics. <br/>
-                                Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+ {/* Google Analytics Settings */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
+ <div className="space-y-4">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">GA4 Property ID</label>
+ <input
+ name="ga_property_id"
+ value={settings.ga_property_id || ""}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-sm"
+ placeholder="e.g. 123456789"
+ />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+ Required for the Admin Dashboard to pull real-time metrics. <br/>
+ Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
+ </p>
+ </div>
+ </div>
+ </div>
 
-                {/* Brand Assets Section */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-black/5">
-                            <span className="text-[10px] font-bold text-black uppercase tracking-widest leading-none">Currently Active Banner</span>
-                            {!settings.hero_banner && (
-                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest bg-white px-2 py-1 rounded border border-black/5">Default System Asset</span>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-black/5">
-                                <img 
-                                    src={settings.hero_banner || headerBanner} 
-                                    className="w-full h-full object-cover transition-opacity duration-300" 
-                                    alt="Hero Preview" 
-                                />
-                                {settings.hero_banner && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setSettings(prev => ({ ...prev, hero_banner: "" }))}
-                                        className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full hover:bg-black transition-colors shadow-lg"
-                                        title="Reset to Default"
-                                    >
-                                        <X size={18} />
-                                    </button>
-                                )}
-                            </div>
-                            <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-gray-50 transition-all cursor-pointer group">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleHeroBannerUpload}
-                                    disabled={isUploading}
-                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                />
-                                <Upload size={24} className="text-gray-400 mb-2 group-hover:text-black transition-colors" />
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-black">
-                                    {isUploading ? "Uploading..." : "Replace Header Image"}
-                                </span>
-                                <p className="text-[10px] text-gray-400 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ {/* Brand Assets Section */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
+ <div className="space-y-4">
+ <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-black/5">
+ <span className="text-[10px] font-bold text-black uppercase tracking-widest leading-none">Currently Active Banner</span>
+ {!settings.hero_banner && (
+ <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest bg-white px-2 py-1 rounded border border-black/5">Default System Asset</span>
+ )}
+ </div>
+ <div className="flex flex-col gap-4">
+ <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-black/5">
+ <img 
+ src={settings.hero_banner || headerBanner} 
+ className="w-full h-full object-cover transition-opacity duration-300" 
+ alt="Hero Preview" 
+ />
+ {settings.hero_banner && (
+ <button
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, hero_banner: "" }))}
+ className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-lg hover:bg-black transition-colors shadow-sm"
+ title="Reset to Default"
+ >
+ <X size={18} />
+ </button>
+ )}
+ </div>
+ <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-gray-50 transition-all cursor-pointer group">
+ <input
+ type="file"
+ accept="image/*"
+ onChange={handleHeroBannerUpload}
+ disabled={isUploading}
+ className="absolute inset-0 opacity-0 cursor-pointer"
+ />
+ <Upload size={24} className="text-gray-400 mb-2 group-hover:text-black transition-colors" />
+ <span className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-black">
+ {isUploading ? "Uploading..." : "Replace Header Image"}
+ </span>
+ <p className="text-[10px] text-gray-400 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                {/* Banner Hover Color */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Megaphone} title="Banner Hover Style" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4 leading-relaxed">
-                        Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
-                        press <span className="text-black">Save All Settings</span> to publish.
-                    </p>
-                    <div className="flex gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "red" }))}
-                            className={`flex items-center gap-3 px-5 py-3 border transition-all ${
-                                settings.banner_hover_color === 'red'
-                                    ? 'border-red-600 bg-red-50 text-red-600'
-                                    : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
-                            }`}
-                        >
-                            <div className="w-4 h-4 rounded-full bg-red-600"></div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest">RED</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
-                            className={`flex items-center gap-3 px-5 py-3 border transition-all ${
-                                settings.banner_hover_color === 'black'
-                                    ? 'border-black bg-gray-900 text-white'
-                                    : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
-                            }`}
-                        >
-                            <div className="w-4 h-4 rounded-full bg-black"></div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest">BLACK</span>
-                        </button>
-                    </div>
-                </div>
+ {/* Banner Hover Color */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Megaphone} title="Banner Hover Style" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4 leading-relaxed">
+ Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
+ press <span className="text-black">Save All Settings</span> to publish.
+ </p>
+ <div className="flex gap-3">
+ <button
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "red" }))}
+ className={`flex items-center gap-3 px-5 py-3 border transition-all ${
+ settings.banner_hover_color === 'red'
+ ? 'border-red-600 bg-gray-50 text-red-500'
+ : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+ }`}
+ >
+ <div className="w-4 h-4 rounded-lg bg-red-600"></div>
+ <span className="text-[10px] font-bold uppercase tracking-widest">RED</span>
+ </button>
+ <button
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
+ className={`flex items-center gap-3 px-5 py-3 border transition-all ${
+ settings.banner_hover_color === 'black'
+ ? 'border-black bg-black text-white'
+ : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+ }`}
+ >
+ <div className="w-4 h-4 rounded-lg bg-black"></div>
+ <span className="text-[10px] font-bold uppercase tracking-widest">BLACK</span>
+ </button>
+ </div>
+ </div>
 
-                {/* Shipping Settings */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Truck} title="Shipping Configuration" />
-                    <div className="max-w-xs space-y-2 mb-6">
-                        <label className="text-sm font-medium text-gray-700">Default Shipping Fee ({settings.currency_symbol})</label>
-                        <input
-                            name="shipping_fee"
-                            type="number"
-                            value={settings.shipping_fee}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                        />
-                    </div>
-                </div>
+ {/* Shipping Settings */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Truck} title="Shipping Configuration" />
+ <div className="max-w-xs space-y-2 mb-6">
+ <label className="text-sm font-medium text-gray-700">Default Shipping Fee ({settings.currency_symbol})</label>
+ <input
+ name="shipping_fee"
+ type="number"
+ value={settings.shipping_fee}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ />
+ </div>
+ </div>
 
-                {/* Free Delivery Discount */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Percent} title="Free Delivery Discount" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
-                    </p>
+ {/* Free Delivery Discount */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Percent} title="Free Delivery Discount" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
+ </p>
 
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
-                        <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Free Delivery Discount</h4>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                name="free_delivery_enabled"
-                                checked={settings.free_delivery_enabled}
-                                onChange={handleChange}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
+ <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="space-y-1">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Free Delivery Discount</h4>
+ <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
+ </div>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input
+ type="checkbox"
+ name="free_delivery_enabled"
+ checked={settings.free_delivery_enabled}
+ onChange={handleChange}
+ className="sr-only peer"
+ />
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ </label>
+ </div>
 
-                    {settings.free_delivery_enabled && (
-                        <div className="max-w-xs space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Minimum Order Amount ({settings.currency_symbol})</label>
-                            <input
-                                name="free_delivery_threshold"
-                                type="number"
-                                value={settings.free_delivery_threshold}
-                                onChange={handleChange}
-                                min="0"
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="50000"
-                            />
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
-                        </div>
-                    )}
-                </div>
+ {settings.free_delivery_enabled && (
+ <div className="max-w-xs space-y-2">
+ <label className="text-sm font-medium text-gray-700">Minimum Order Amount ({settings.currency_symbol})</label>
+ <input
+ name="free_delivery_threshold"
+ type="number"
+ value={settings.free_delivery_threshold}
+ onChange={handleChange}
+ min="0"
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="50000"
+ />
+ <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
+ </div>
+ )}
+ </div>
 
-                {/* Shipping Rates Editor */}
-                <ShippingRatesEditor
-                    settings={settings}
-                    setSettings={setSettings}
-                    currencySymbol={settings.currency_symbol}
-                    onSaveRates={async () => {
-                        const ok = await updateSettings({ shipping_rates: settings.shipping_rates });
-                        if (ok) {
-                            toast.success("Shipping rates saved - now live at checkout");
-                            setSavedSnapshot(prev => prev
-                                ? JSON.parse(JSON.stringify({ ...prev, shipping_rates: settings.shipping_rates }))
-                                : prev);
-                            refreshSettings();
-                        } else {
-                            toast.error("Failed to save shipping rates");
-                        }
-                    }}
-                />
+ {/* Shipping Rates Editor */}
+ <ShippingRatesEditor
+ settings={settings}
+ setSettings={setSettings}
+ currencySymbol={settings.currency_symbol}
+ onSaveRates={async () => {
+ const ok = await updateSettings({ shipping_rates: settings.shipping_rates });
+ if (ok) {
+ toast.success("Shipping rates saved - now live at checkout");
+ setSavedSnapshot(prev => prev
+ ? JSON.parse(JSON.stringify({ ...prev, shipping_rates: settings.shipping_rates }))
+ : prev);
+ refreshSettings();
+ } else {
+ toast.error("Failed to save shipping rates");
+ }
+ }}
+ />
 
-                {/* Shipping Location Toggles */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Truck} title="Shipping Locations" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Toggle delivery locations on or off. Disabled locations will not appear in checkout.
-                    </p>
+ {/* Shipping Location Toggles */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Truck} title="Shipping Locations" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ Toggle delivery locations on or off. Disabled locations will not appear in checkout.
+ </p>
 
-                    {/* Lagos Areas */}
-                    <div className="mb-8">
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Lagos Areas</h4>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const allLagos = [...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})];
-                                    const current = settings.disabled_locations?.lagos || [];
-                                    const allDisabled = allLagos.every(a => current.includes(a));
-                                    setSettings(prev => ({
-                                        ...prev,
-                                        disabled_locations: { ...prev.disabled_locations, lagos: allDisabled ? [] : allLagos }
-                                    }));
-                                }}
-                                className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
-                            >
-                                {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].sort().map((area) => {
-                                const isDisabled = (settings.disabled_locations?.lagos || []).includes(area);
-                                return (
-                                    <button
-                                        key={area}
-                                        type="button"
-                                        onClick={() => {
-                                            const current = settings.disabled_locations?.lagos || [];
-                                            const updated = isDisabled
-                                                ? current.filter(a => a !== area)
-                                                : [...current, area];
-                                            setSettings(prev => ({
-                                                ...prev,
-                                                disabled_locations: { ...prev.disabled_locations, lagos: updated }
-                                            }));
-                                        }}
-                                        className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                            isDisabled
-                                                ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
-                                                : "border-black/10 text-black bg-white hover:border-black/20"
-                                        }`}
-                                    >
-                                        {area}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
+ {/* Lagos Areas */}
+ <div className="mb-8">
+ <div className="flex items-center justify-between mb-3">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Lagos Areas</h4>
+ <button
+ type="button"
+ onClick={() => {
+ const allLagos = [...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})];
+ const current = settings.disabled_locations?.lagos || [];
+ const allDisabled = allLagos.every(a => current.includes(a));
+ setSettings(prev => ({
+ ...prev,
+ disabled_locations: { ...prev.disabled_locations, lagos: allDisabled ? [] : allLagos }
+ }));
+ }}
+ className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+ >
+ {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+ </button>
+ </div>
+ <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+ {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].sort().map((area) => {
+ const isDisabled = (settings.disabled_locations?.lagos || []).includes(area);
+ return (
+ <button
+ key={area}
+ type="button"
+ onClick={() => {
+ const current = settings.disabled_locations?.lagos || [];
+ const updated = isDisabled
+ ? current.filter(a => a !== area)
+ : [...current, area];
+ setSettings(prev => ({
+ ...prev,
+ disabled_locations: { ...prev.disabled_locations, lagos: updated }
+ }));
+ }}
+ className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
+ isDisabled
+ ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+ : "border-black/10 text-black bg-white hover:border-black/20"
+ }`}
+ >
+ {area}
+ </button>
+ );
+ })}
+ </div>
+ </div>
 
-                    {/* Abuja Areas */}
-                    <div className="mb-8">
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Abuja Areas</h4>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const allAbuja = [...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})];
-                                    const current = settings.disabled_locations?.abuja || [];
-                                    const allDisabled = allAbuja.every(a => current.includes(a));
-                                    setSettings(prev => ({
-                                        ...prev,
-                                        disabled_locations: { ...prev.disabled_locations, abuja: allDisabled ? [] : allAbuja }
-                                    }));
-                                }}
-                                className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
-                            >
-                                {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].sort().map((area) => {
-                                const isDisabled = (settings.disabled_locations?.abuja || []).includes(area);
-                                return (
-                                    <button
-                                        key={area}
-                                        type="button"
-                                        onClick={() => {
-                                            const current = settings.disabled_locations?.abuja || [];
-                                            const updated = isDisabled
-                                                ? current.filter(a => a !== area)
-                                                : [...current, area];
-                                            setSettings(prev => ({
-                                                ...prev,
-                                                disabled_locations: { ...prev.disabled_locations, abuja: updated }
-                                            }));
-                                        }}
-                                        className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                            isDisabled
-                                                ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
-                                                : "border-black/10 text-black bg-white hover:border-black/20"
-                                        }`}
-                                    >
-                                        {area}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
+ {/* Abuja Areas */}
+ <div className="mb-8">
+ <div className="flex items-center justify-between mb-3">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Abuja Areas</h4>
+ <button
+ type="button"
+ onClick={() => {
+ const allAbuja = [...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})];
+ const current = settings.disabled_locations?.abuja || [];
+ const allDisabled = allAbuja.every(a => current.includes(a));
+ setSettings(prev => ({
+ ...prev,
+ disabled_locations: { ...prev.disabled_locations, abuja: allDisabled ? [] : allAbuja }
+ }));
+ }}
+ className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+ >
+ {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+ </button>
+ </div>
+ <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+ {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].sort().map((area) => {
+ const isDisabled = (settings.disabled_locations?.abuja || []).includes(area);
+ return (
+ <button
+ key={area}
+ type="button"
+ onClick={() => {
+ const current = settings.disabled_locations?.abuja || [];
+ const updated = isDisabled
+ ? current.filter(a => a !== area)
+ : [...current, area];
+ setSettings(prev => ({
+ ...prev,
+ disabled_locations: { ...prev.disabled_locations, abuja: updated }
+ }));
+ }}
+ className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
+ isDisabled
+ ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+ : "border-black/10 text-black bg-white hover:border-black/20"
+ }`}
+ >
+ {area}
+ </button>
+ );
+ })}
+ </div>
+ </div>
 
-                    {/* Interstate States */}
-                    <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Interstate States</h4>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const allStates = [...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})];
-                                    const current = settings.disabled_locations?.interstate || [];
-                                    const allDisabled = allStates.every(s => current.includes(s));
-                                    setSettings(prev => ({
-                                        ...prev,
-                                        disabled_locations: { ...prev.disabled_locations, interstate: allDisabled ? [] : allStates }
-                                    }));
-                                }}
-                                className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
-                            >
-                                {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].sort().map((state) => {
-                                const isDisabled = (settings.disabled_locations?.interstate || []).includes(state);
-                                return (
-                                    <button
-                                        key={state}
-                                        type="button"
-                                        onClick={() => {
-                                            const current = settings.disabled_locations?.interstate || [];
-                                            const updated = isDisabled
-                                                ? current.filter(s => s !== state)
-                                                : [...current, state];
-                                            setSettings(prev => ({
-                                                ...prev,
-                                                disabled_locations: { ...prev.disabled_locations, interstate: updated }
-                                            }));
-                                        }}
-                                        className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                            isDisabled
-                                                ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
-                                                : "border-black/10 text-black bg-white hover:border-black/20"
-                                        }`}
-                                    >
-                                        {state}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
+ {/* Interstate States */}
+ <div>
+ <div className="flex items-center justify-between mb-3">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Interstate States</h4>
+ <button
+ type="button"
+ onClick={() => {
+ const allStates = [...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})];
+ const current = settings.disabled_locations?.interstate || [];
+ const allDisabled = allStates.every(s => current.includes(s));
+ setSettings(prev => ({
+ ...prev,
+ disabled_locations: { ...prev.disabled_locations, interstate: allDisabled ? [] : allStates }
+ }));
+ }}
+ className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+ >
+ {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+ </button>
+ </div>
+ <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+ {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].sort().map((state) => {
+ const isDisabled = (settings.disabled_locations?.interstate || []).includes(state);
+ return (
+ <button
+ key={state}
+ type="button"
+ onClick={() => {
+ const current = settings.disabled_locations?.interstate || [];
+ const updated = isDisabled
+ ? current.filter(s => s !== state)
+ : [...current, state];
+ setSettings(prev => ({
+ ...prev,
+ disabled_locations: { ...prev.disabled_locations, interstate: updated }
+ }));
+ }}
+ className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
+ isDisabled
+ ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+ : "border-black/10 text-black bg-white hover:border-black/20"
+ }`}
+ >
+ {state}
+ </button>
+ );
+ })}
+ </div>
+ </div>
+ </div>
 
-                {/* Announcement Bar */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Megaphone} title="Announcement Bar" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
-                    </p>
+ {/* Announcement Bar */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Megaphone} title="Announcement Bar" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
+ </p>
 
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
-                        <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Announcement Bar</h4>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                name="announcement_bar_enabled"
-                                checked={settings.announcement_bar_enabled}
-                                onChange={handleChange}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
+ <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="space-y-1">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Announcement Bar</h4>
+ <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
+ </div>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input
+ type="checkbox"
+ name="announcement_bar_enabled"
+ checked={settings.announcement_bar_enabled}
+ onChange={handleChange}
+ className="sr-only peer"
+ />
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ </label>
+ </div>
 
-                    {settings.announcement_bar_enabled && (
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Bar Text</label>
-                            <input
-                                name="announcement_bar_text"
-                                value={settings.announcement_bar_text}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="NEXT DROP IN:"
-                            />
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
-                        </div>
-                    )}
-                </div>
+ {settings.announcement_bar_enabled && (
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Bar Text</label>
+ <input
+ name="announcement_bar_text"
+ value={settings.announcement_bar_text}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="NEXT DROP IN:"
+ />
+ <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
+ </div>
+ )}
+ </div>
 
-                {/* Promotional Marquee */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Megaphone} title="Promotional Marquee" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        A scrolling banner that appears above the hero image on Shop and Home pages.
-                    </p>
+ {/* Promotional Marquee */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Megaphone} title="Promotional Marquee" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ A scrolling banner that appears above the hero image on Shop and Home pages.
+ </p>
 
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
-                        <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Marquee</h4>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                name="marquee_enabled"
-                                checked={settings.marquee_enabled}
-                                onChange={handleChange}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
+ <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="space-y-1">
+ <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Marquee</h4>
+ <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
+ </div>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input
+ type="checkbox"
+ name="marquee_enabled"
+ checked={settings.marquee_enabled}
+ onChange={handleChange}
+ className="sr-only peer"
+ />
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ </label>
+ </div>
 
-                    {settings.marquee_enabled && (
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Marquee Text</label>
-                            <input
-                                name="marquee_text"
-                                value={settings.marquee_text}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
-                            />
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
-                        </div>
-                    )}
-                </div>
+ {settings.marquee_enabled && (
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Marquee Text</label>
+ <input
+ name="marquee_text"
+ value={settings.marquee_text}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
+ />
+ <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
+ </div>
+ )}
+ </div>
 
-                {/* Email Section Settings */}
-                <div className="bg-white p-6 rounded-xl border border-red-100 shadow-sm">
-                    <SectionTitle icon={Mail} title="Email Section Settings" />
-                    <div className="space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="space-y-1">
-                                <h4 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Database Cleanup</h4>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
-                                    Merge duplicate subscriber entries to maintain a clean mailing list.
-                                </p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={handleMerge}
-                                disabled={isMerging}
-                                className="px-6 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
-                            >
-                                {isMerging ? "Cleaning..." : "Clean Duplicates"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+ {/* Email Section Settings */}
+ <div className="bg-white p-6 rounded-lg border border-red-100 shadow-sm">
+ <SectionTitle icon={Mail} title="Email Section Settings" />
+ <div className="space-y-4">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+ <div className="space-y-1">
+ <h4 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Database Cleanup</h4>
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+ Merge duplicate subscriber entries to maintain a clean mailing list.
+ </p>
+ </div>
+ <button
+ type="button"
+ onClick={handleMerge}
+ disabled={isMerging}
+ className="px-6 py-2 bg-gray-50 text-red-500 border border-red-100 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
+ >
+ {isMerging ? "Cleaning..." : "Clean Duplicates"}
+ </button>
+ </div>
+ </div>
+ </div>
 
-                {/* Size Chart Settings */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={Ruler} title="Size Chart Configuration" />
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div>
-                                <h4 className="text-sm font-bold uppercase tracking-widest text-black">Enable Size Chart</h4>
-                                <p className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
-                                className={`w-12 h-6 rounded-full transition-colors relative ${settings.show_size_chart ? 'bg-black' : 'bg-gray-200'}`}
-                            >
-                                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
-                            </button>
-                        </div>
+ {/* Size Chart Settings */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={Ruler} title="Size Chart Configuration" />
+ <div className="space-y-6">
+ <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+ <div>
+ <h4 className="text-sm font-bold uppercase tracking-widest text-black">Enable Size Chart</h4>
+ <p className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
+ </div>
+ <button
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
+ className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-black' : 'bg-gray-200'}`}
+ >
+ <div className={`absolute top-1 w-4 h-4 rounded-lg bg-white transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
+ </button>
+ </div>
 
-                        {settings.show_size_chart && (
-                            <>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold uppercase tracking-widest text-black">Model & Sizing Info</label>
-                                    <textarea
-                                        name="size_chart_model_info"
-                                        value={settings.size_chart_model_info}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors text-[11px] leading-relaxed"
-                                        placeholder="Our model is 185cm tall and wears a size M..."
-                                    />
-                                </div>
+ {settings.show_size_chart && (
+ <>
+ <div className="space-y-2">
+ <label className="text-sm font-bold uppercase tracking-widest text-black">Model & Sizing Info</label>
+ <textarea
+ name="size_chart_model_info"
+ value={settings.size_chart_model_info}
+ onChange={handleChange}
+ rows={3}
+ className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors text-[11px] leading-relaxed"
+ placeholder="Our model is 185cm tall and wears a size M..."
+ />
+ </div>
 
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-sm font-bold uppercase tracking-widest text-black">Measurement Table</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => setSettings(prev => ({
-                                                ...prev,
-                                                size_chart_data: [...(prev.size_chart_data || []), { size: "", chest: "", waist: "", length: "" }]
-                                            }))}
-                                            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
-                                        >
-                                            <Plus size={12} /> Add Row
-                                        </button>
-                                    </div>
+ <div className="space-y-4">
+ <div className="flex justify-between items-center">
+ <label className="text-sm font-bold uppercase tracking-widest text-black">Measurement Table</label>
+ <button
+ type="button"
+ onClick={() => setSettings(prev => ({
+ ...prev,
+ size_chart_data: [...(prev.size_chart_data || []), { size: "", chest: "", waist: "", length: "" }]
+ }))}
+ className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
+ >
+ <Plus size={12} /> Add Row
+ </button>
+ </div>
 
-                                    <div className="overflow-x-auto border border-gray-100 rounded-lg">
-                                        <table className="w-full text-left">
-                                            <thead className="bg-gray-50 border-b border-gray-100">
-                                                <tr>
-                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Size</th>
-                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Chest (cm)</th>
-                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Waist (cm)</th>
-                                                    <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Length (cm)</th>
-                                                    <th className="p-3 w-10"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-50">
-                                                {(settings.size_chart_data || []).map((row, idx) => (
-                                                    <tr key={idx}>
-                                                        <td className="p-2">
-                                                            <input
-                                                                value={row.size}
-                                                                onChange={(e) => {
-                                                                    const newData = [...settings.size_chart_data];
-                                                                    newData[idx].size = e.target.value;
-                                                                    setSettings({ ...settings, size_chart_data: newData });
-                                                                }}
-                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] font-bold uppercase text-center"
-                                                                placeholder="M"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <input
-                                                                value={row.chest}
-                                                                onChange={(e) => {
-                                                                    const newData = [...settings.size_chart_data];
-                                                                    newData[idx].chest = e.target.value;
-                                                                    setSettings({ ...settings, size_chart_data: newData });
-                                                                }}
-                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
-                                                                placeholder="91-97"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <input
-                                                                value={row.waist}
-                                                                onChange={(e) => {
-                                                                    const newData = [...settings.size_chart_data];
-                                                                    newData[idx].waist = e.target.value;
-                                                                    setSettings({ ...settings, size_chart_data: newData });
-                                                                }}
-                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
-                                                                placeholder="76-81"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <input
-                                                                value={row.length}
-                                                                onChange={(e) => {
-                                                                    const newData = [...settings.size_chart_data];
-                                                                    newData[idx].length = e.target.value;
-                                                                    setSettings({ ...settings, size_chart_data: newData });
-                                                                }}
-                                                                className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
-                                                                placeholder="72"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    const newData = settings.size_chart_data.filter((_, i) => i !== idx);
-                                                                    setSettings({ ...settings, size_chart_data: newData });
-                                                                }}
-                                                                className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                                                            >
-                                                                <Trash2 size={14} />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                        {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
-                                            <div className="p-8 text-center bg-gray-50/50">
-                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">No measurement rows added</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
+ <div className="overflow-x-auto border border-gray-100 rounded-lg">
+ <table className="w-full text-left">
+ <thead className="bg-gray-50 border-b border-gray-100">
+ <tr>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Size</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Chest (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Waist (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Length (cm)</th>
+ <th className="p-3 w-10"></th>
+ </tr>
+ </thead>
+ <tbody className="divide-y divide-gray-50">
+ {(settings.size_chart_data || []).map((row, idx) => (
+ <tr key={idx}>
+ <td className="p-2">
+ <input
+ value={row.size}
+ onChange={(e) => {
+ const newData = [...settings.size_chart_data];
+ newData[idx].size = e.target.value;
+ setSettings({ ...settings, size_chart_data: newData });
+ }}
+ className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] font-bold uppercase text-center"
+ placeholder="M"
+ />
+ </td>
+ <td className="p-2">
+ <input
+ value={row.chest}
+ onChange={(e) => {
+ const newData = [...settings.size_chart_data];
+ newData[idx].chest = e.target.value;
+ setSettings({ ...settings, size_chart_data: newData });
+ }}
+ className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+ placeholder="91-97"
+ />
+ </td>
+ <td className="p-2">
+ <input
+ value={row.waist}
+ onChange={(e) => {
+ const newData = [...settings.size_chart_data];
+ newData[idx].waist = e.target.value;
+ setSettings({ ...settings, size_chart_data: newData });
+ }}
+ className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+ placeholder="76-81"
+ />
+ </td>
+ <td className="p-2">
+ <input
+ value={row.length}
+ onChange={(e) => {
+ const newData = [...settings.size_chart_data];
+ newData[idx].length = e.target.value;
+ setSettings({ ...settings, size_chart_data: newData });
+ }}
+ className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+ placeholder="72"
+ />
+ </td>
+ <td className="p-2">
+ <button
+ type="button"
+ onClick={() => {
+ const newData = settings.size_chart_data.filter((_, i) => i !== idx);
+ setSettings({ ...settings, size_chart_data: newData });
+ }}
+ className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+ >
+ <Trash2 size={14} />
+ </button>
+ </td>
+ </tr>
+ ))}
+ </tbody>
+ </table>
+ {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
+ <div className="p-8 text-center bg-gray-50/50">
+ <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">No measurement rows added</p>
+ </div>
+ )}
+ </div>
+ </div>
+ </>
+ )}
+ </div>
+ </div>
 
 
-                {/* Our Story Editor */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <SectionTitle icon={BookOpen} title="Our Story" />
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
-                        Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
-                        change what you need, then press <span className="text-black">Save All Settings</span> to publish.
-                    </p>
+ {/* Our Story Editor */}
+ <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <SectionTitle icon={BookOpen} title="Our Story" />
+ <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
+ change what you need, then press <span className="text-black">Save All Settings</span> to publish.
+ </p>
 
-                    {/* Helper: uses functional setState to avoid stale closure bugs */}
-                    {(() => {
-                        const updateStory = (field, value) => {
-                            setSettings(prev => ({
-                                ...prev,
-                                our_story_content: { ...(prev.our_story_content || {}), [field]: value }
-                            }));
-                        };
-                        const story = (field) => settings.our_story_content?.[field] || STORY_DEFAULTS[field];
+ {/* Helper: uses functional setState to avoid stale closure bugs */}
+ {(() => {
+ const updateStory = (field, value) => {
+ setSettings(prev => ({
+ ...prev,
+ our_story_content: { ...(prev.our_story_content || {}), [field]: value }
+ }));
+ };
+ const story = (field) => settings.our_story_content?.[field] || STORY_DEFAULTS[field];
 
-                        return (
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Company Name</label>
-                                    <input
-                                        value={story("company")}
-                                        onChange={(e) => updateStory("company", e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                        placeholder="NYNTH WORLD LTD"
-                                    />
-                                </div>
+ return (
+ <div className="space-y-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Company Name</label>
+ <input
+ value={story("company")}
+ onChange={(e) => updateStory("company", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="NYNTH WORLD LTD"
+ />
+ </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Founded Date</label>
-                                        <input
-                                            value={story("founded")}
-                                            onChange={(e) => updateStory("founded", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                            placeholder="Founded October 20, 2022"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">CAC Registration</label>
-                                        <input
-                                            value={story("cac")}
-                                            onChange={(e) => updateStory("cac", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                            placeholder="Registered with the Corporate Affairs Commission (CAC), October 2, 2025"
-                                        />
-                                    </div>
-                                </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Founded Date</label>
+ <input
+ value={story("founded")}
+ onChange={(e) => updateStory("founded", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="Founded October 20, 2022"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">CAC Registration</label>
+ <input
+ value={story("cac")}
+ onChange={(e) => updateStory("cac", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="Registered with the Corporate Affairs Commission (CAC), October 2, 2025"
+ />
+ </div>
+ </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Founder Label</label>
-                                        <input
-                                            value={story("founder_label")}
-                                            onChange={(e) => updateStory("founder_label", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                            placeholder="Founder & Chief Executive Officer"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Founder Name</label>
-                                        <input
-                                            value={story("founder_name")}
-                                            onChange={(e) => updateStory("founder_name", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                            placeholder="Yange Newman Terseer"
-                                        />
-                                    </div>
-                                </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Founder Label</label>
+ <input
+ value={story("founder_label")}
+ onChange={(e) => updateStory("founder_label", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="Founder & Chief Executive Officer"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Founder Name</label>
+ <input
+ value={story("founder_name")}
+ onChange={(e) => updateStory("founder_name", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="Yange Newman Terseer"
+ />
+ </div>
+ </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Belief Statement (Italic)</label>
-                                    <textarea
-                                        value={story("belief")}
-                                        onChange={(e) => updateStory("belief", e.target.value)}
-                                        rows={3}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm italic"
-                                        placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
-                                    />
-                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
-                                </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Belief Statement (Italic)</label>
+ <textarea
+ value={story("belief")}
+ onChange={(e) => updateStory("belief", e.target.value)}
+ rows={3}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm italic"
+ placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
+ />
+ <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
+ </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Belief Description</label>
-                                    <textarea
-                                        value={story("belief_desc")}
-                                        onChange={(e) => updateStory("belief_desc", e.target.value)}
-                                        rows={2}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
-                                        placeholder="It is a brand based on mindset.&#10;A standard for people who choose to rise in every situation."
-                                    />
-                                </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Belief Description</label>
+ <textarea
+ value={story("belief_desc")}
+ onChange={(e) => updateStory("belief_desc", e.target.value)}
+ rows={2}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ placeholder="It is a brand based on mindset.&#10;A standard for people who choose to rise in every situation."
+ />
+ </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Origin Story</label>
-                                    <textarea
-                                        value={story("origin")}
-                                        onChange={(e) => updateStory("origin", e.target.value)}
-                                        rows={4}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
-                                        placeholder="NYNTH started from a real moment.&#10;The Founder was ranked 9th across 9 subjects and told he would not succeed.&#10;That moment did not create doubt. It created a shift in mindset."
-                                    />
-                                </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Origin Story</label>
+ <textarea
+ value={story("origin")}
+ onChange={(e) => updateStory("origin", e.target.value)}
+ rows={4}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ placeholder="NYNTH started from a real moment.&#10;The Founder was ranked 9th across 9 subjects and told he would not succeed.&#10;That moment did not create doubt. It created a shift in mindset."
+ />
+ </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Origin Quote Line 1</label>
-                                        <input
-                                            value={story("quote1")}
-                                            onChange={(e) => updateStory("quote1", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
-                                            placeholder="Position is temporary."
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Origin Quote Line 2</label>
-                                        <input
-                                            value={story("quote2")}
-                                            onChange={(e) => updateStory("quote2", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
-                                            placeholder="Mindset is Permanent."
-                                        />
-                                    </div>
-                                </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Origin Quote Line 1</label>
+ <input
+ value={story("quote1")}
+ onChange={(e) => updateStory("quote1", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
+ placeholder="Position is temporary."
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Origin Quote Line 2</label>
+ <input
+ value={story("quote2")}
+ onChange={(e) => updateStory("quote2", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
+ placeholder="Mindset is Permanent."
+ />
+ </div>
+ </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Meaning Section</label>
-                                    <textarea
-                                        value={story("meaning")}
-                                        onChange={(e) => updateStory("meaning", e.target.value)}
-                                        rows={4}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
-                                        placeholder="NYNTH is not just a number. It stands for elevation.&#10;It represents people who push past limits,&#10;stay disciplined,&#10;and keep the mindset of staying above."
-                                    />
-                                </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Meaning Section</label>
+ <textarea
+ value={story("meaning")}
+ onChange={(e) => updateStory("meaning", e.target.value)}
+ rows={4}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ placeholder="NYNTH is not just a number. It stands for elevation.&#10;It represents people who push past limits,&#10;stay disciplined,&#10;and keep the mindset of staying above."
+ />
+ </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Philosophy Section</label>
-                                    <textarea
-                                        value={story("philosophy")}
-                                        onChange={(e) => updateStory("philosophy", e.target.value)}
-                                        rows={4}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
-                                        placeholder="Every NYNTH piece is made with intention.&#10;Not just as clothing, but as identity.&#10;When you see NYNTH, you see a person who keeps going."
-                                    />
-                                </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Philosophy Section</label>
+ <textarea
+ value={story("philosophy")}
+ onChange={(e) => updateStory("philosophy", e.target.value)}
+ rows={4}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ placeholder="Every NYNTH piece is made with intention.&#10;Not just as clothing, but as identity.&#10;When you see NYNTH, you see a person who keeps going."
+ />
+ </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Footer Tagline</label>
-                                        <input
-                                            value={story("tagline")}
-                                            onChange={(e) => updateStory("tagline", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                            placeholder="BY WINNERS, FOR WINNERS, stay above"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Footer Company Name</label>
-                                        <input
-                                            value={story("footer_name")}
-                                            onChange={(e) => updateStory("footer_name", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
-                                            placeholder="NYNTH WORLD LTD"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })()}
-                </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Footer Tagline</label>
+ <input
+ value={story("tagline")}
+ onChange={(e) => updateStory("tagline", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="BY WINNERS, FOR WINNERS, stay above"
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-gray-700">Footer Company Name</label>
+ <input
+ value={story("footer_name")}
+ onChange={(e) => updateStory("footer_name", e.target.value)}
+ className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ placeholder="NYNTH WORLD LTD"
+ />
+ </div>
+ </div>
+ </div>
+ );
+ })()}
+ </div>
 
-                {/* Submit */}
-                <div className={`flex justify-end pt-4 ${isDirty ? "pb-24" : ""}`}>
-                    <button
-                        type="submit"
-                        disabled={saving || !isDirty}
-                        className="flex items-center gap-2 bg-black text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg"
-                    >
-                        {saving ? (
-                            <Loader2 className="animate-spin" size={20} />
-                        ) : (
-                            <Save size={20} />
-                        )}
-                        {saving ? "Saving Changes..." : "Save All Settings"}
-                    </button>
-                </div>
-            </form>
+ {/* Submit */}
+ <div className={`flex justify-end pt-4 ${isDirty ? "pb-24" : ""}`}>
+ <button
+ type="submit"
+ disabled={saving || !isDirty}
+ className="flex items-center gap-2 bg-black text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+ >
+ {saving ? (
+ <Loader2 className="animate-spin" size={20} />
+ ) : (
+ <Save size={20} />
+ )}
+ {saving ? "Saving Changes..." : "Save All Settings"}
+ </button>
+ </div>
+ </form>
 
-            {/* Sticky save bar - appears whenever there are unsaved changes */}
-            {isDirty && (
-                <div className="fixed bottom-0 inset-x-0 z-50 border-t border-amber-200 bg-amber-50/95 backdrop-blur">
-                    <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
-                            <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Unsaved changes</p>
-                        </div>
-                        <p className="hidden sm:block text-xs text-amber-800">Edits go live after you save.</p>
-                        <div className="flex items-center gap-2 shrink-0">
-                            <button
-                                type="button"
-                                onClick={handleDiscard}
-                                disabled={saving}
-                                className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-900 px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50"
-                            >
-                                <RotateCcw size={13} />
-                                Discard
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                disabled={saving}
-                                className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-lg"
-                            >
-                                {saving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
-                                {saving ? "Saving..." : "Save All Settings"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </AdminLayout>
+ {/* Sticky save bar - appears whenever there are unsaved changes */}
+ {isDirty && (
+ <div className="fixed bottom-0 inset-x-0 z-50 border-t border-gray-200 bg-amber-50/95 backdrop-blur">
+ <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+ <div className="flex items-center gap-2.5 min-w-0">
+ <span className="w-2 h-2 rounded-lg bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
+ <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Unsaved changes</p>
+ </div>
+ <p className="hidden sm:block text-xs text-amber-800">Edits go live after you save.</p>
+ <div className="flex items-center gap-2 shrink-0">
+ <button
+ type="button"
+ onClick={handleDiscard}
+ disabled={saving}
+ className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-900 px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50"
+ >
+ <RotateCcw size={13} />
+ Discard
+ </button>
+ <button
+ type="button"
+ onClick={handleSubmit}
+ disabled={saving}
+ className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-sm"
+ >
+ {saving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+ {saving ? "Saving..." : "Save All Settings"}
+ </button>
+ </div>
+ </div>
+ </div>
+ )}
+ </AdminLayout>
 
-    );
+ );
 }
