@@ -82,14 +82,17 @@ function PageTracker() {
   useEffect(() => {
     const writePresence = () => {
       supabase.from("presence").upsert({
-        session: SESSION_ID,
-        page: window.location.pathname,
-        last_seen: new Date().toISOString(),
-      }, { onConflict: "session" }).then(() => { }).catch(() => { });
+        id: SESSION_ID,
+        data: {
+          session: SESSION_ID,
+          page: window.location.pathname,
+          last_seen: new Date().toISOString(),
+        },
+      }, { onConflict: "id" }).then(() => { }).catch(() => { });
     };
 
     const removePresence = () => {
-      supabase.from("presence").delete().eq("session", SESSION_ID).then(() => { }).catch(() => { });
+      supabase.from("presence").delete().eq("id", SESSION_ID).then(() => { }).catch(() => { });
     };
 
     writePresence();
@@ -113,7 +116,7 @@ function PageTracker() {
     incrementCounter('visits');
 
     // Update presence page when route changes
-    supabase.from("presence").update({ page: pathname, last_seen: new Date().toISOString() }).eq("session", SESSION_ID).then(() => { }).catch(() => { });
+    supabase.from("presence").update({ data: { page: pathname, last_seen: new Date().toISOString() } }).eq("id", SESSION_ID).then(() => { }).catch(() => { });
   }, [pathname]);
 
   return null;
