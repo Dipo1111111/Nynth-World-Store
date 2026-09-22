@@ -15,10 +15,9 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { logPageView } from "./utils/monitoring";
 import { incrementCounter } from "./api/firebaseFunctions";
-import { db } from "./api/firebase";
+import { supabase } from "./api/supabase";
 import { useSettings } from "./context/SettingsContext";
 import { useAuth } from "./context/AuthContext";
-import { doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 
 
 // Public Pages - regular imports (safe, no code-splitting)
@@ -81,18 +80,16 @@ function PageTracker() {
 
   // Presence tracking - runs once on mount
   useEffect(() => {
-    const presenceRef = doc(db, 'presence', SESSION_ID);
-
     const writePresence = () => {
-      setDoc(presenceRef, {
+      supabase.from("presence").upsert({
         session: SESSION_ID,
         page: window.location.pathname,
-        last_seen: serverTimestamp(),
-      }, { merge: true }).catch(() => { });
+        last_seen: new Date().toISOString(),
+      }, { onConflict: "session" }).then(() => { }).catch(() => { });
     };
 
     const removePresence = () => {
-      deleteDoc(presenceRef).catch(() => { });
+      supabase.from("presence").delete().eq("session", SESSION_ID).then(() => { }).catch(() => { });
     };
 
     writePresence();
@@ -116,8 +113,7 @@ function PageTracker() {
     incrementCounter('visits');
 
     // Update presence page when route changes
-    const presenceRef = doc(db, 'presence', SESSION_ID);
-    setDoc(presenceRef, { page: pathname, last_seen: serverTimestamp() }, { merge: true }).catch(() => { });
+    supabase.from("presence").update({ page: pathname, last_seen: new Date().toISOString() }).eq("session", SESSION_ID).then(() => { }).catch(() => { });
   }, [pathname]);
 
   return null;

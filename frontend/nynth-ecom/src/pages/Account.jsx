@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../api/firebase";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { fetchUserOrders, subscribeOrders } from "../api/firebaseFunctions";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { LogOut, Package, User, MapPin, ChevronRight, ShoppingBag, Ticket } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { formatEventDate } from "../utils/tickets";
 import { Link } from "react-router-dom";
-import { doc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { Badge } from "../components/ui/badge";
 
@@ -20,23 +18,16 @@ export default function Account() {
     useEffect(() => {
         if (!currentUser) return;
 
-        // Real-time listener for user orders
-        const q = query(
-            collection(db, "orders"),
-            where("userId", "==", currentUser.uid)
-        );
+        const loadOrders = () => fetchUserOrders(currentUser.id)
+            .then((ordersData) => {
+                const sorted = [...ordersData].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                setOrders(sorted);
+            })
+            .catch((error) => console.error("Error fetching orders:", error))
+            .finally(() => setLoading(false));
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const ordersData = snapshot.docs
-                .map(doc => ({ id: doc.id, ...doc.data() }))
-                .sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
-
-            setOrders(ordersData);
-            setLoading(false);
-        }, (error) => {
-            console.error("Error fetching orders:", error);
-            setLoading(false);
-        });
+        loadOrders();
+        const unsubscribe = subscribeOrders(() => loadOrders());
 
         return () => unsubscribe();
     }, [currentUser]);
