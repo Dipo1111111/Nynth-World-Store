@@ -181,7 +181,7 @@ export default function AdminLookbooks() {
  }
  }}
  >
- <div className="bg-white rounded-lg w-full max-w-lg p-8 shadow-sm animate-in zoom-in-95 duration-300">
+ <div className="bg-white rounded-lg w-full max-w-lg p-8 shadow-xl animate-in zoom-in-95 duration-300">
  <div className="flex justify-between items-center mb-8">
  <h2 className="text-2xl font-bold ">Upload Visual</h2>
  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -251,7 +251,7 @@ export default function AdminLookbooks() {
  {/* DELETE CONFIRMATION MODAL */}
  {deleteConfirmId && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
- <div className="bg-white rounded-lg w-full max-w-sm p-10 text-center shadow-sm animate-in zoom-in-95 duration-200">
+ <div className="bg-white rounded-lg w-full max-w-sm p-10 text-center shadow-xl animate-in zoom-in-95 duration-200">
  <div className="w-20 h-20 bg-red-50 rounded-lg flex items-center justify-center mx-auto mb-8">
  <AlertTriangle className="text-red-500" size={32} strokeWidth={1.5} />
  </div>
