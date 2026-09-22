@@ -1,10 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { subscribeOrders } from "../../api/firebaseFunctions";
+import { subscribeOrders, subscribePresence } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { db } from "../../api/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
 import { 
     Package, 
     TrendingUp, 
@@ -124,19 +122,7 @@ const AdminDashboard = () => {
 
     // --- LIVE VISITORS ---
     useEffect(() => {
-        const TWO_MINUTES = 2 * 60 * 1000;
-        const presenceRef = collection(db, 'presence');
-
-        const unsubscribe = onSnapshot(presenceRef, (snapshot) => {
-            const now = Date.now();
-            let active = 0;
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const lastSeen = data.last_seen?.toMillis?.() || 0;
-                if ((now - lastSeen) < TWO_MINUTES) active++;
-            });
-            setLiveVisitors(active);
-        });
+        const unsubscribe = subscribePresence(setLiveVisitors);
         return () => unsubscribe();
     }, []);
 

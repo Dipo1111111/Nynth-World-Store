@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { db } from "../api/firebase";
-import { collection, getDocs, deleteDoc, doc, writeBatch } from 'firebase/firestore';
+import { wipeTable, seedOrders as seedSampleOrders } from "../api/firebaseFunctions";
 
 export default function UpdateDB() {
     const [status, setStatus] = useState("Idle. Use with caution!");
@@ -17,81 +16,14 @@ export default function UpdateDB() {
     ];
 
     const wipeCollection = async (collectionName) => {
-        const colRef = collection(db, collectionName);
-        const snapshot = await getDocs(colRef);
-        const batch = writeBatch(db);
-
-        snapshot.docs.forEach((d) => {
-            batch.delete(d.ref);
-        });
-
-        await batch.commit();
-        return snapshot.size;
+        return await wipeTable(collectionName);
     };
 
     const seedOrders = async () => {
         setLoading(true);
-        setStatus("Fetching products to seed orders...");
-
+        setStatus("Seeding 15 sample orders...");
         try {
-            const productsSnapshot = await getDocs(collection(db, "products"));
-            const products = productsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            if (products.length === 0) {
-                throw new Error("No products found. Please add products before seeding orders.");
-            }
-
-            setStatus("Seeding 15 sample orders...");
-            const batch = writeBatch(db);
-
-            for (let i = 0; i < 15; i++) {
-                const product = products[Math.floor(Math.random() * products.length)];
-                const quantity = Math.floor(Math.random() * 2) + 1;
-                const name = SAMPLE_NAMES[Math.floor(Math.random() * SAMPLE_NAMES.length)];
-                const city = SAMPLE_CITIES[Math.floor(Math.random() * SAMPLE_CITIES.length)];
-                const channel = SAMPLE_CHANNELS[Math.floor(Math.random() * SAMPLE_CHANNELS.length)];
-
-                // Create dates over the last 30 days
-                const date = new Date();
-                date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-
-                const orderId = `NY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-                const orderRef = doc(db, "orders", orderId);
-
-                const orderData = {
-                    customer: {
-                        firstName: name.first,
-                        lastName: name.last,
-                        email: `${name.first.toLowerCase()}@example.com`,
-                        phone: "08012345678",
-                        address: "123 Sample Street",
-                        city: city,
-                        state: "LAGOS"
-                    },
-                    items: [{
-                        id: product.id,
-                        title: product.title || product.name,
-                        price: product.price || 25000,
-                        quantity: quantity,
-                        selectedSize: "M",
-                        selectedColor: "Black",
-                        image: product.image || (product.images && product.images[0]) || ""
-                    }],
-                    subtotal: (product.price || 25000) * quantity,
-                    shippingFee: 2500,
-                    total: ((product.price || 25000) * quantity) + 2500,
-                    payment_status: Math.random() > 0.3 ? "paid" : "pending",
-                    order_status: Math.random() > 0.5 ? "delivered" : "processing",
-                    payment_method: "paystack",
-                    channel: channel,
-                    created_at: date,
-                    updated_at: date
-                };
-
-                batch.set(orderRef, orderData);
-            }
-
-            await batch.commit();
+            await seedSampleOrders();
             setStatus("SUCCESS: Seeded 15 sample orders.");
         } catch (e) {
             console.error(e);

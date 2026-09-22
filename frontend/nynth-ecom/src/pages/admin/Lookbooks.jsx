@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchLookbooks, uploadImage } from "../../api/firebaseFunctions";
-import { db } from "../../api/firebase";
-import { collection, addDoc, deleteDoc, doc, serverTimestamp, onSnapshot, getDocs } from "firebase/firestore";
+import { fetchLookbooks, uploadImage, addLookbook, deleteLookbook, subscribeLookbooks } from "../../api/firebaseFunctions";
 import { Loader2, Plus, Trash2, Upload, CheckCircle, X, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
@@ -29,15 +27,8 @@ export default function AdminLookbooks() {
     const loadLookbooks = async (isManual = false) => {
         try {
             setLoading(true);
-            const snapshot = await getDocs(collection(db, "lookbooks"));
-            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            data.sort((a, b) => {
-                const dateA = a.created_at?.seconds || 0;
-                const dateB = b.created_at?.seconds || 0;
-                return dateB - dateA;
-            });
-            
+            const data = await fetchLookbooks();
+
             setLookbooks(data);
             if (isManual) toast.success("Refreshed!");
         } catch (error) {
@@ -50,28 +41,7 @@ export default function AdminLookbooks() {
 
     useEffect(() => {
         setLoading(true);
-        const q = collection(db, "lookbooks");
-        const unsubscribe = onSnapshot(q, 
-            (snapshot) => {
-                const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                data.sort((a, b) => {
-                    const dateA = a.created_at?.seconds || 0;
-                    const dateB = b.created_at?.seconds || 0;
-                    return dateB - dateA;
-                });
-                setLookbooks(data);
-                setLoading(false);
-            },
-            (error) => {
-                console.error("Firestore Sync Error (Lookbooks):", error);
-                if (error.code === 'permission-denied' || error.code === 'failed-precondition') {
-                    loadLookbooks();
-                } else {
-                    toast.error("Real-time sync failed.");
-                    setLoading(false);
-                }
-            }
-        );
+        const unsubscribe = subscribeLookbooks(() => loadLookbooks(true));
         return () => unsubscribe();
     }, []);
 
@@ -109,10 +79,7 @@ export default function AdminLookbooks() {
             }
 
             setSubmitStep("saving");
-            await addDoc(collection(db, "lookbooks"), {
-                image: finalImageUrl,
-                created_at: serverTimestamp()
-            });
+            await addLookbook({ image: finalImageUrl });
 
             toast.success("Look added successfully!");
             setIsModalOpen(false);
@@ -129,7 +96,7 @@ export default function AdminLookbooks() {
         if (!deleteConfirmId) return;
         try {
             setIsDeleting(true);
-            await deleteDoc(doc(db, "lookbooks", deleteConfirmId));
+            await deleteLookbook(deleteConfirmId);
             toast.success("Look deleted");
             setDeleteConfirmId(null);
         } catch (error) {

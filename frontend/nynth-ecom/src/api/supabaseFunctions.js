@@ -118,6 +118,58 @@ export const fetchFeaturedLookbooks = async () => {
   const { data } = await supabase.from("lookbooks").select("*").eq("featured", true);
   return (data ?? []).map((r) => ({ id: r.id, ...r.data, title: r.title }));
 };
+export const addLookbook = async ({ image }) => {
+  const { data, error } = await supabase.from("lookbooks").insert({ id: crypto.randomUUID(), title: null, featured: false, data: { image } }).select("id").single();
+  if (error) throw error;
+  return data.id;
+};
+export const deleteLookbook = async (id) => {
+  const { error } = await supabase.from("lookbooks").delete().eq("id", id);
+  return !error;
+};
+export const subscribeLookbooks = (callback) => {
+  const ch = supabase.channel("lookbooks-admin").on("postgres_changes", { event: "*", schema: "public", table: "lookbooks" }, () => fetchLookbooks().then(callback)).subscribe();
+  return () => supabase.removeChannel(ch);
+};
+
+// --- UPDATE-DB cleanup (dev utility; mirrors Firestore wipeCollection) ---
+export const wipeTable = async (tableName) => {
+  const { data } = await supabase.from(tableName).select("*");
+  if ((data ?? []).length === 0) return 0;
+  const { error } = await supabase.from(tableName).delete().in("id", (data ?? []).map((r) => r.id));
+  return error ? 0 : (data ?? []).length;
+};
+export const wipeAllTables = async (tables = ["orders", "users", "contact_messages", "newsletter_subscriptions"]) => {
+  const results = {};
+  for (const t of tables) results[t] = await wipeTable(t);
+  return results;
+};
+export const seedOrders = async () => {
+  const { data: products } = await supabase.from("products").select("*");
+  if (!products || products.length === 0) throw new Error("No products found.");
+  const SAMPLE_CHANNELS = ['Instagram', 'WhatsApp', 'Direct', 'Organic Search'];
+  const SAMPLE_CITIES = ['Ikeja', 'Lekki', 'Victoria Island', 'Surulere', 'Ajah'];
+  const SAMPLE_NAMES = [
+    { first: 'Emeka', last: 'Okonkwo' }, { first: 'Zainab', last: 'Bello' },
+    { first: 'Chidi', last: 'Eze' }, { first: 'Tunde', last: 'Bakare' },
+    { first: 'Folake', last: 'Adeyemi' }
+  ];
+  const rows = [];
+  for (let i = 0; i < 15; i++) {
+    const p = products[Math.floor(Math.random() * products.length)];
+    const qty = Math.floor(Math.random() * 2) + 1;
+    const name = SAMPLE_NAMES[Math.floor(Math.random() * SAMPLE_NAMES.length)];
+    const city = SAMPLE_CITIES[Math.floor(Math.random() * SAMPLE_CITIES.length)];
+    const channel = SAMPLE_CHANNELS[Math.floor(Math.random() * SAMPLE_CHANNELS.length)];
+    const date = new Date(); date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+    const image = p.image || (p.data?.images && p.data.images[0]) || "";
+    const title = p.title || p.name || "";
+    const price = Number(p.price) || 25000;
+    rows.push({ id: `NY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, user_id: null, customer: { firstName: name.first, lastName: name.last, email: `${name.first.toLowerCase()}@example.com`, phone: "08012345678", address: "123 Sample Street", city, state: "LAGOS" }, items: [{ id: p.id, title, price, quantity: qty, selectedSize: "M", selectedColor: "Black", image }], subtotal: price * qty, shipping_fee: 2500, discount_amount: 0, discount_code: null, total: price * qty + 2500, payment_status: Math.random() > 0.3 ? "paid" : "pending", order_status: Math.random() > 0.5 ? "delivered" : "processing", payment_method: "paystack", channel, created_at: date.toISOString(), updated_at: date.toISOString() });
+  }
+  const { error } = await supabase.from("orders").insert(rows);
+  if (error) throw error;
+};
 
 // --- IMAGES (Cloudinary unchanged) ---
 export const uploadImage = (file) => uploadImageToCloudinary(file);
@@ -158,6 +210,21 @@ export const fetchOrder = async (orderId) => {
 export const subscribeOrders = (callback) => {
   const ch = supabase.channel("orders-admin").on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => getAllOrders().then(callback)).subscribe();
   return () => supabase.removeChannel(ch);
+};
+export const subscribePresence = (callback) => {
+  const ch = supabase.channel("presence-admin").on("postgres_changes", { event: "*", schema: "public", table: "presence" }, () => fetchPresence().then(callback)).subscribe();
+  return () => supabase.removeChannel(ch);
+};
+const fetchPresence = async () => {
+  const { data } = await supabase.from("presence").select("data, updated_at");
+  const now = Date.now();
+  const TWO_MINUTES = 2 * 60 * 1000;
+  let active = 0;
+  (data ?? []).forEach((row) => {
+    const lastSeen = row.data?.last_seen ? new Date(row.data.last_seen).getTime() : 0;
+    if ((now - lastSeen) < TWO_MINUTES) active++;
+  });
+  return active;
 };
 export const updateOrderPaymentStatus = async (orderId, status) => {
   const { error } = await supabase.from("orders").update({ payment_status: status }).eq("id", orderId);
