@@ -25,3 +25,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Service-account keys + local secrets (NEVER commit)
+.secrets/
+*firebase-adminsdk*.json
+service-account*.json
+.env.vercel

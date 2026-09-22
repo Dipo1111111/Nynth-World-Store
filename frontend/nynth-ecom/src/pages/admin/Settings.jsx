@@ -49,7 +49,8 @@ const SETTINGS_DEFAULTS = {
     free_delivery_enabled: true,
     free_delivery_threshold: 50000,
     our_story_content: null,
-    shipping_rates: { lagos: {}, abuja: {}, interstate: {} }
+    shipping_rates: { lagos: {}, abuja: {}, interstate: {} },
+    custom_shipping_locations: { lagos: {}, abuja: {}, interstate: {} }
 };
 
 // Merge persisted settings over the defaults, filling gaps so the editor always
@@ -68,6 +69,7 @@ const mergeSettingsDefaults = (part = {}) => ({
     available_sizes: part.available_sizes || SETTINGS_DEFAULTS.available_sizes,
     disabled_locations: part.disabled_locations || { lagos: [], abuja: [], interstate: [] },
     shipping_rates: part.shipping_rates || { lagos: {}, abuja: {}, interstate: {} },
+    custom_shipping_locations: part.custom_shipping_locations || { lagos: {}, abuja: {}, interstate: {} },
     announcement_bar_enabled: part.announcement_bar_enabled !== undefined ? part.announcement_bar_enabled : SETTINGS_DEFAULTS.announcement_bar_enabled,
     announcement_bar_text: part.announcement_bar_text || SETTINGS_DEFAULTS.announcement_bar_text,
     marquee_enabled: part.marquee_enabled !== undefined ? part.marquee_enabled : SETTINGS_DEFAULTS.marquee_enabled,
@@ -727,7 +729,7 @@ export default function AdminSettings() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const allLagos = Object.keys(LAGOS_SHIPPING_DATA);
+                                    const allLagos = [...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})];
                                     const current = settings.disabled_locations?.lagos || [];
                                     const allDisabled = allLagos.every(a => current.includes(a));
                                     setSettings(prev => ({
@@ -737,11 +739,11 @@ export default function AdminSettings() {
                                 }}
                                 className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
                             >
-                                {Object.keys(LAGOS_SHIPPING_DATA).every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+                                {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
                             </button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {Object.keys(LAGOS_SHIPPING_DATA).sort().map((area) => {
+                            {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].sort().map((area) => {
                                 const isDisabled = (settings.disabled_locations?.lagos || []).includes(area);
                                 return (
                                     <button
@@ -777,7 +779,7 @@ export default function AdminSettings() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const allAbuja = Object.keys(ABUJA_SHIPPING_DATA);
+                                    const allAbuja = [...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})];
                                     const current = settings.disabled_locations?.abuja || [];
                                     const allDisabled = allAbuja.every(a => current.includes(a));
                                     setSettings(prev => ({
@@ -787,11 +789,11 @@ export default function AdminSettings() {
                                 }}
                                 className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
                             >
-                                {Object.keys(ABUJA_SHIPPING_DATA).every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+                                {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
                             </button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {Object.keys(ABUJA_SHIPPING_DATA).sort().map((area) => {
+                            {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].sort().map((area) => {
                                 const isDisabled = (settings.disabled_locations?.abuja || []).includes(area);
                                 return (
                                     <button
@@ -827,7 +829,7 @@ export default function AdminSettings() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const allStates = Object.keys(INTERSTATE_SHIPPING_DATA);
+                                    const allStates = [...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})];
                                     const current = settings.disabled_locations?.interstate || [];
                                     const allDisabled = allStates.every(s => current.includes(s));
                                     setSettings(prev => ({
@@ -837,11 +839,11 @@ export default function AdminSettings() {
                                 }}
                                 className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
                             >
-                                {Object.keys(INTERSTATE_SHIPPING_DATA).every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
+                                {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
                             </button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {Object.keys(INTERSTATE_SHIPPING_DATA).sort().map((state) => {
+                            {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].sort().map((state) => {
                                 const isDisabled = (settings.disabled_locations?.interstate || []).includes(state);
                                 return (
                                     <button
