@@ -18,16 +18,20 @@ export function AuthProvider({ children }) {
     return list.includes(String(email).toLowerCase());
   };
 
-  async function ensureProfile(user) {
-    const role = isAdminEmail(user.email) ? "admin" : "customer";
-    const { data } = await supabase.from("users").select("role").eq("id", user.id).maybeSingle();
-    if (!data) {
-      await supabase.from("users").insert({ id: user.id, email: user.email, first_name: user.user_metadata?.firstName ?? null, last_name: user.user_metadata?.lastName ?? null, role, photo_url: user.user_metadata?.avatar_url ?? null });
-    } else if (data.role !== role) {
-      await supabase.from("users").update({ role }).eq("id", user.id);
-    }
-    return role;
-  }
+   async function ensureProfile(user) {
+     const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
+     const isAdmin = adminEmails.includes(String(user.email).toLowerCase());
+     const role = isAdmin ? "admin" : "customer";
+     const { data } = await supabase.from("users").select("role").eq("id", user.id).maybeSingle();
+     if (!data) {
+       await supabase.from("users").insert({ id: user.id, email: user.email, first_name: user.user_metadata?.firstName ?? null, last_name: user.user_metadata?.lastName ?? null, role, photo_url: user.user_metadata?.avatar_url ?? null });
+     } else if (isAdmin && data.role !== "admin") {
+       await supabase.from("users").update({ role: "admin" }).eq("id", user.id);
+     } else if (!isAdmin && data.role !== "customer" && data.role !== "admin") {
+       await supabase.from("users").update({ role }).eq("id", user.id);
+     }
+     return role;
+   }
 
   async function signup(email, password, firstName, lastName) {
     const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { firstName, lastName, displayName: firstName + " " + lastName } } });

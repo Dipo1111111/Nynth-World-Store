@@ -431,29 +431,42 @@ export default function AdminProducts() {
  }
  };
 
- const handleDelete = async (id) => {
- if (confirm("Are you sure you want to delete this product?")) {
- await deleteProduct(id);
- toast.success("Product deleted");
- loadProducts();
- }
- };
+  const handleDelete = async (id) => {
+   if (confirm("Are you sure you want to delete this product?")) {
+   try {
+   const success = await deleteProduct(id);
+   if (success) {
+   toast.success("Product deleted");
+   loadProducts();
+   } else {
+   toast.error("Failed to delete product");
+   }
+    } catch (error) {
+    console.error(error);
+    toast.error(error.message || "Failed to delete product");
+    }
+   }
+   };
 
- const handleTogglePublic = async (product) => {
- const newStatus = product.isPublic === false ? true : false;
- const actionText = newStatus ? 'show' : 'hide';
- 
- if (confirm(`Are you sure you want to ${actionText} "${product.title || product.name}" on the storefront?`)) {
- try {
- await updateProduct(product.id, { isPublic: newStatus });
- toast.success(newStatus ? "Product is now visible on the store" : "Product is hidden from the store");
- setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isPublic: newStatus } : p));
- } catch (error) {
- console.error(error);
- toast.error("Failed to update visibility");
- }
- }
- };
+  const handleTogglePublic = async (product) => {
+   const newStatus = product.isPublic === false ? true : false;
+   const actionText = newStatus ? 'show' : 'hide';
+   
+   if (confirm(`Are you sure you want to ${actionText} "${product.title || product.name}" on the storefront?`)) {
+   try {
+   const success = await updateProduct(product.id, { isPublic: newStatus });
+   if (success) {
+   toast.success(newStatus ? "Product is now visible on the store" : "Product is hidden from the store");
+   setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isPublic: newStatus } : p));
+   } else {
+   toast.error("Failed to update visibility");
+   }
+    } catch (error) {
+    console.error(error);
+    toast.error(error.message || "Failed to update visibility");
+    }
+   }
+   };
 
  return (
  <AdminLayout title="Products">

@@ -36,8 +36,7 @@ export const fetchSingleProduct = async (id, { admin = false } = {}) => {
   const p = rowToProduct(data);
   return admin ? p : (p.isPublic !== false ? p : null);
 };
-export const updateProduct = async (id, updates) => {
-  try {
+ export const updateProduct = async (id, updates) => {
     const patch = { updated_at: new Date().toISOString() };
     if (updates.name !== undefined) patch.name = updates.name;
     if (updates.title !== undefined) patch.title = updates.title;
@@ -49,22 +48,23 @@ export const updateProduct = async (id, updates) => {
     if (updates.bestSeller !== undefined) patch.best_seller = updates.bestSeller;
     if (updates.tags !== undefined) patch.tags = updates.tags;
     if (updates.displayOrder !== undefined) patch.display_order = updates.displayOrder;
-    const { error } = await supabase.from("products").update(patch).eq("id", id);
+    const { data, error } = await supabase.from("products").update(patch).eq("id", id).select("id");
     if (error) throw error;
+    if (!data || data.length === 0) throw new Error("Update failed — no rows affected. Check that you are an admin and authenticated.");
     return true;
-  } catch (e) { console.error("Error updating product " + id + ":", e); return false; }
-};
-export const deleteProduct = async (id) => {
-  const { error } = await supabase.from("products").delete().eq("id", id);
-  if (error) { console.error("Error deleting product " + id + ":", error); return false; }
-  return true;
-};
-export const updateProductOrderBatch = async (productsArray) => {
-  try {
-    await Promise.all(productsArray.map((p, i) => supabase.from("products").update({ display_order: i }).eq("id", p.id)));
+  };
+ export const deleteProduct = async (id) => {
+    const { data, error } = await supabase.from("products").delete().eq("id", id).select("id");
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error("Delete failed — no rows affected. Check that you are an admin and authenticated.");
     return true;
-  } catch (e) { console.error("Batch update error:", e); return false; }
-};
+  };
+ export const updateProductOrderBatch = async (productsArray) => {
+    const results = await Promise.all(productsArray.map((p, i) => supabase.from("products").update({ display_order: i }).eq("id", p.id).select("id")));
+    const failed = results.filter((r) => !r.error && (!r.data || r.data.length === 0));
+    if (failed.length > 0) throw new Error("Batch update failed — some rows affected by RLS. Check admin permissions.");
+    return true;
+  };
 
 // --- FILTERING ---
 export const fetchFeaturedProducts = async (max = 6) => {
