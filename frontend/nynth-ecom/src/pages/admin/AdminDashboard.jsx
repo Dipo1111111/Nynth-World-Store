@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { subscribeOrders, subscribePresence } from "../../api/firebaseFunctions";
+import { subscribeOrders, subscribePresence, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { 
@@ -128,6 +128,7 @@ const AdminDashboard = () => {
 
     // --- REALTIME ORDERS (single source of truth) ---
     useEffect(() => {
+        getAllOrders().then(data => { setOrders(data); setLoading(false); }).catch(() => setLoading(false));
         const unsubscribe = subscribeOrders((liveOrders) => {
             setOrders(liveOrders);
             setLoading(false);

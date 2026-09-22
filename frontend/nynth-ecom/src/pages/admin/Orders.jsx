@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { subscribeOrders, updateOrderPaymentStatus } from "../../api/firebaseFunctions";
+import { subscribeOrders, getAllOrders, updateOrderPaymentStatus } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -96,11 +96,9 @@ const Orders = () => {
         document.title = "Nynth World Store Admin - Orders";
 
         setLoading(true);
+        getAllOrders().then(data => { setOrders(data); setLoading(false); }).catch(() => setLoading(false));
         // Realtime subscription: new/sold orders appear instantly, no refresh needed.
-        const unsub = subscribeOrders((data) => {
-            setOrders(data);
-            setLoading(false);
-        });
+        const unsub = subscribeOrders((data) => { setOrders(data); setLoading(false); });
         return () => unsub();
     }, []);
 

@@ -41,6 +41,7 @@ export default function AdminLookbooks() {
 
     useEffect(() => {
         setLoading(true);
+        loadLookbooks();
         const unsubscribe = subscribeLookbooks(() => loadLookbooks(true));
         return () => unsubscribe();
     }, []);
