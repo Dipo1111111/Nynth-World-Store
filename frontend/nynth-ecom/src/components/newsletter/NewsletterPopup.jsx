@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 const SEEN_KEY = "nynth_newsletter_popup_seen";
 
 // Routes where an interrupting popup would hurt the flow.
-const SKIP_PREFIXES = ["/checkout", "/thank-you", "/admin", "/login", "/signup", "/account", "/update-db", "/waitlist-confirmation"];
+const SKIP_PREFIXES = ["/checkout", "/thank-you", "/admin", "/login", "/signup", "/account", "/waitlist-confirmation"];
 
 export default function NewsletterPopup() {
   const { pathname } = useLocation();

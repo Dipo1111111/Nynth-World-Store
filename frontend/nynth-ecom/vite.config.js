@@ -31,7 +31,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'charts': ['react-chartjs-2', 'chart.js'],
           'ui-vendor': ['lucide-react', 'react-hot-toast', 'react-helmet-async'],

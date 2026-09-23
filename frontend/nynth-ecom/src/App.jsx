@@ -40,7 +40,6 @@ import Account from "./pages/Account.jsx";
 import OurStory from "./pages/OurStory.jsx";
 import Sustainability from "./pages/Sustainability.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
-import UpdateDB from "./pages/UpdateDB.jsx";
 import LockPage from "./pages/LockPage.jsx";
 import WaitlistConfirmation from "./pages/WaitlistConfirmation.jsx";
 
@@ -226,7 +225,6 @@ function AppContent({ isSiteUnlocked }) {
                     <Route path="/lookbook" element={<Lookbook />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/cart" element={<Cart />} />
-                    <Route path="/update-db" element={<UpdateDB />} />
 
                     {/* Auth Routes */}
                     <Route path="/login" element={<Login />} />
