@@ -27,6 +27,8 @@ import ProductDetail from "./pages/ProductDetail.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import ThankYou from "./pages/ThankYou.jsx";
+import TicketPass from "./pages/TicketPass.jsx";
+import OrderDetails from "./pages/OrderDetails.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import TermsOfService from "./pages/TermsOfService.jsx";
 import ShippingReturns from "./pages/ShippingReturns.jsx";
@@ -242,6 +244,15 @@ function AppContent({ isSiteUnlocked }) {
                     />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/thank-you" element={<ThankYou />} />
+                    <Route path="/ticket/:code" element={<TicketPass />} />
+                    <Route
+                      path="/account/orders/:id"
+                      element={
+                        <ProtectedRoute>
+                          <OrderDetails />
+                        </ProtectedRoute>
+                      }
+                    />
 
                     {/* Legal & Support Routes */}
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />

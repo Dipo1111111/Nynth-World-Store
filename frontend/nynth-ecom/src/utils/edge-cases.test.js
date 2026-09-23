@@ -13,7 +13,7 @@ import {
     hasPhysicalItems,
     nonTicketSubtotal,
 } from "./tickets";
-import { getLagosPrice, effectiveLagosRates } from "./shippingRates";
+import { getLagosPrice, effectiveLagosRates, cartNeedsShipping } from "./shippingRates";
 import { getAuthErrorMessage, withRetry } from "./errorHandlers";
 import { cn } from "../lib/utils";
 
@@ -94,6 +94,18 @@ describe("shipping: settings that are half missing", () => {
         const rates = effectiveLagosRates(null);
         const firstArea = Object.keys(rates)[0];
         expect(getLagosPrice(firstArea, { shipping_rates: { lagos: { [firstArea]: "2500" } } })).toBe(2500);
+    });
+
+    it("fee applies when ANY item needs delivery, none when all are free", () => {
+        const shippable = { category: "tees", deliveryFeeEnabled: true };
+        const freebie = { category: "tees", deliveryFeeEnabled: false };
+        const ticket = { category: "tickets" };
+        const legacy = { category: "hoodies" };
+        expect(cartNeedsShipping([freebie, shippable])).toBe(true);
+        expect(cartNeedsShipping([freebie])).toBe(false);
+        expect(cartNeedsShipping([ticket])).toBe(false);
+        expect(cartNeedsShipping([legacy])).toBe(true);
+        expect(cartNeedsShipping([])).toBe(false);
     });
 });
 

@@ -26,6 +26,13 @@ const safeRates = (settings) =>
 const safeCustom = (settings) =>
     (settings && settings.custom_shipping_locations) || { lagos: {}, abuja: {}, interstate: {} };
 
+// Per-product delivery switch: an item needs delivery unless it is a ticket
+// or its product has delivery fee toggled off. Fee applies when ANY item
+// needs it, so a free product plus a shippable one still charges delivery.
+export function cartNeedsShipping(items = []) {
+    return items.some((i) => i?.category !== "tickets" && i?.deliveryFeeEnabled !== false);
+}
+
 // --- Lagos ----------------------------------------------------------------
 export function effectiveLagosRates(settings) {
     const overrides = safeRates(settings).lagos || {};

@@ -152,9 +152,10 @@ export default function AdminProducts() {
  stockQuantity: 0,
  sizeStock: {}, // { "S": 10, "M": 5 }
  weight: 0,
- inStock: true,
- featured: false,
- bestSeller: false,
+  inStock: true,
+  featured: false,
+  bestSeller: false,
+  deliveryFeeEnabled: true, // per-product delivery fee switch (tickets default off)
  modelImage: null,
  displayOrder: 999, // Default for new products
  eventDateTime: null, // Ticket (event) products only
@@ -247,8 +248,9 @@ export default function AdminProducts() {
  sizeStock: product.sizeStock || {},
  weight: product.weight || 0,
  inStock: product.inStock !== false,
- featured: product.featured || false,
- bestSeller: product.bestSeller || false,
+  featured: product.featured || false,
+  bestSeller: product.bestSeller || false,
+  deliveryFeeEnabled: product.deliveryFeeEnabled ?? product.category !== "tickets",
  modelImage: product.modelImage || product.modalImage || null,
  eventDateTime: product.eventDateTime
  ? new Date(product.eventDateTime).toLocaleString("sv-SE").slice(0, 16)
@@ -393,6 +395,7 @@ export default function AdminProducts() {
 
  const payload = {
  ...formData,
+ deliveryFeeEnabled: formData.deliveryFeeEnabled ?? formData.category !== "tickets",
  availableSizes: isTicketProduct ? [] : formData.sizes,
  availableColors: isTicketProduct ? [] : formData.colors,
  sizeStock: isTicketProduct ? {} : formData.sizeStock,
@@ -966,17 +969,26 @@ export default function AdminProducts() {
  <span className="text-sm font-medium">Featured</span>
  </label>
 
- {formData.category !== "tickets" && (
- <label className="flex items-center gap-2 cursor-pointer">
- <input
- type="checkbox"
- checked={formData.bestSeller}
- onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
- className="w-4 h-4 rounded border-white/32 accent-[#EDEAE2]"
- />
- <span className="text-sm font-medium">Best Seller</span>
- </label>
- )}
+  {formData.category !== "tickets" && (
+  <label className="flex items-center gap-2 cursor-pointer">
+  <input
+  type="checkbox"
+  checked={formData.bestSeller}
+  onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
+  className="w-4 h-4 rounded border-white/32 accent-[#EDEAE2]"
+  />
+  <span className="text-sm font-medium">Best Seller</span>
+  </label>
+  )}
+  <label className="flex items-center gap-2 cursor-pointer" title="When off, this product never adds a delivery fee at checkout">
+  <input
+  type="checkbox"
+  checked={formData.deliveryFeeEnabled ?? formData.category !== "tickets"}
+  onChange={e => setFormData({ ...formData, deliveryFeeEnabled: e.target.checked })}
+  className="w-4 h-4 rounded border-white/32 accent-[#EDEAE2]"
+  />
+  <span className="text-sm font-medium">Enable Delivery Fee</span>
+  </label>
  </div>
  </div>
 

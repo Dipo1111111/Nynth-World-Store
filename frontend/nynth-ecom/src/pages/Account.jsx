@@ -134,8 +134,8 @@ export default function Account() {
                                             <div key={order.id} className="border border-gray-100 p-8 hover:border-black transition-all group">
                                                 <div className="flex flex-col md:flex-row justify-between md:items-start gap-8 mb-10 pb-8 border-b border-gray-100">
                                                     <div className="space-y-4">
-                                                        <div className="flex items-center gap-4">
-                                                            <span className="text-[13px] tracking-widest font-bold uppercase">ID: {order.id.slice(0, 8)}</span>
+                                                        <div className="flex items-center gap-4 flex-wrap">
+                                                            <Link to={`/account/orders/${order.id}`} className="text-[13px] tracking-widest font-bold uppercase underline underline-offset-4 decoration-black/20 hover:decoration-black">ID: {order.id.slice(0, 8)}</Link>
                                                             <span className={`text-[9px] tracking-[0.2em] font-bold uppercase px-3 py-1 ${order.order_status === 'delivered' ? 'bg-green-50 text-green-700' :
                                                                 order.order_status === 'shipped' ? 'bg-blue-50 text-blue-700' :
                                                                     'bg-gray-100 text-gray-700'

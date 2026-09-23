@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
 
 import Logo from "../components/common/Logo";
-import { effectiveLagosRates, effectiveAbujaRates, effectiveInterstateRates } from "../utils/shippingRates";
+import { effectiveLagosRates, effectiveAbujaRates, effectiveInterstateRates, cartNeedsShipping } from "../utils/shippingRates";
 import { hasTickets, hasPhysicalItems, isTicketItem, ticketCount, nonTicketSubtotal, formatEventDate } from "../utils/tickets";
 
 const Checkout = () => {
@@ -110,6 +110,12 @@ const Checkout = () => {
       return;
     }
 
+    // Per-product switch: only products with delivery enabled can trigger a fee
+    if (!cartNeedsShipping(cartItems)) {
+      setShippingFee(0);
+      return;
+    }
+
     // Free delivery on physical-goods orders over configurable threshold (tickets don't count toward it)
     const freeDeliveryEnabled = settings?.free_delivery_enabled !== false;
     const freeDeliveryThreshold = settings?.free_delivery_threshold ?? 50000;
@@ -135,7 +141,7 @@ const Checkout = () => {
     } else {
       setShippingFee(settings.shipping_fee || 0);
     }
-  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, settings.free_delivery_enabled, settings.free_delivery_threshold, totalAmount, physicalSubtotal, cartHasPhysical, lagosRates, abujaRates, interstateRates]);
+  }, [form.city, form.state, form.deliveryMethod, totalWeight, settings.shipping_fee, settings.free_delivery_enabled, settings.free_delivery_threshold, totalAmount, physicalSubtotal, cartHasPhysical, cartItems, lagosRates, abujaRates, interstateRates]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

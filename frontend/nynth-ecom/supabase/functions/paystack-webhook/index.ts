@@ -66,8 +66,10 @@ Deno.serve(async (req) => {
       const adminList = adminTo.split(",").map((s) => s.trim()).filter(Boolean);
       let customerSent = false, adminSent = false;
       const shortId = orderId.slice(0, 8).toUpperCase();
+      const storeUrl = (Deno.env.get("STORE_URL") || "https://www.nynthworld.com").replace(/\/+$/, "");
       const ticketBlock = codes.length
         ? `<p style="margin:16px 0 0">Your ticket codes: <strong>${codes.map((t: any) => t.code).join(", ")}</strong></p>`
+          + codes.map((t: any) => `<p style="margin:4px 0 0"><a href="${storeUrl}/ticket/${t.code}">Open your pass for ${t.code}</a></p>`).join("")
         : "";
       const customerHtml = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111111;line-height:1.6">`
         + `<p style="font-size:11px;letter-spacing:3px;font-weight:bold;margin:0">NYNTH WORLD</p>`

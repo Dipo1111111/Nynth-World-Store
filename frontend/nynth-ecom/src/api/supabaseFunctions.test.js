@@ -376,3 +376,12 @@ describe("storefront visibility rule (hidden and sold-out never list)", () => {
     expect(ids).toContain("live");
   });
 });
+
+describe("per-product delivery fee switch", () => {
+  it("addProduct persists the delivery fee flag into the product data", async () => {
+    h.setQuery({ data: { id: "p3" }, error: null });
+    await addProduct({ name: "Bonus Tee", price: 10000, deliveryFeeEnabled: false });
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.data.deliveryFeeEnabled).toBe(false);
+  });
+});
