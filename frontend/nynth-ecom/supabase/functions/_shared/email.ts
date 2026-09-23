@@ -16,7 +16,7 @@ export function ticketCodes(items: any[] = []) {
 export async function sendResend(to: string, subject: string, html: string) {
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) { console.warn("RESEND_API_KEY not set — skipping email to " + to); return { skipped: true }; }
-  const from = Deno.env.get("EMAIL_FROM") || "NYNTH WORLD <onboarding@resend.dev>";
+  const from = Deno.env.get("EMAIL_FROM") || "NYNTH WORLD <hello@nynthworld.com>";
   const res = await fetch("https://api.resend.com/emails", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + key }, body: JSON.stringify({ from, to, subject, html }) });
   if (!res.ok) throw new Error("Resend error " + res.status);
   return res.json();
