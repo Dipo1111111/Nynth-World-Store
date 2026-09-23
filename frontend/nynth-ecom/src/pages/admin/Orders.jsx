@@ -11,10 +11,9 @@ import {
     User,
     Search,
     Download,
-    Calendar,
     CreditCard,
-    TrendingUp,
     Ticket,
+    TrendingUp,
 } from "lucide-react";
 import { formatEventDate } from "../../utils/tickets";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -37,6 +36,24 @@ const PAYMENT_STATUS_CONFIG = {
     refunded: { label: "Refunded", className: "bg-slate-500/[0.18] text-slate-400 border-slate-500/30" },
 };
 
+const PAYMENT_STATUSES = Object.keys(PAYMENT_STATUS_CONFIG);
+
+const FULFILLMENT_STATUSES = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "processing", label: "Processing" },
+    { value: "packaging", label: "Packaging" },
+    { value: "shipped", label: "Shipped" },
+    { value: "delivered", label: "Delivered" },
+    { value: "cancelled", label: "Cancelled" },
+];
+
+const TEST_SCOPE = [
+    { value: "live", label: "Live" },
+    { value: "test", label: "Test" },
+    { value: "all", label: "All" },
+];
+
 const PaymentStatusBadge = ({ status }) => {
     const config = PAYMENT_STATUS_CONFIG[status] || PAYMENT_STATUS_CONFIG.pending;
     return (
@@ -51,7 +68,7 @@ const TestBadge = () => (
 );
 
 const ETicketBadge = () => (
-    <span className="bg-[#0c0c0c] text-white text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+    <span className="bg-white/10 text-[#EDEAE2]/75 border border-white/10 text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
 );
 
 const PaymentStatusDropdown = ({ status, onStatusChange }) => {
@@ -64,24 +81,23 @@ const PaymentStatusDropdown = ({ status, onStatusChange }) => {
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
-                {Object.entries(PAYMENT_STATUS_CONFIG).map(([value, cfg]) => (
-                    <SelectItem key={value} value={value}>
-                        <span className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${cfg.className.split(' ')[0]}`} />
-                            {cfg.label}
-                        </span>
-                    </SelectItem>
-                ))}
+                {PAYMENT_STATUSES.map((value) => {
+                    const cfg = PAYMENT_STATUS_CONFIG[value];
+                    return (
+                        <SelectItem key={value} value={value}>
+                            <span className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${cfg.className.split(' ')[0]}`} />
+                                {cfg.label}
+                            </span>
+                        </SelectItem>
+                    );
+                })}
             </SelectContent>
         </Select>
     );
 };
 
-const StatIcon = ({ icon: Icon, className }) => (
-    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${className}`}>
-        <Icon size={17} strokeWidth={2} />
-    </div>
-);
+const SECTION_LABEL = "text-[11px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/60 mb-4 flex items-center gap-2";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -240,6 +256,21 @@ const Orders = () => {
     const unpaidRef = useCountUp(summary.unpaidOrders);
     const paidRef = useCountUp(summary.paidOrders);
 
+    // Status counts for the filter tabs — scoped to the Live/Test view so the
+    // ledger reads true to what is on the page right now.
+    const scopedOrders = orders.filter(o =>
+        testFilter === "all" ? true : testFilter === "live" ? !o.isTest : o.isTest
+    );
+    const statusCounts = FULFILLMENT_STATUSES.reduce((acc, s) => {
+        acc[s.value] = 0;
+        return acc;
+    }, {});
+    scopedOrders.forEach(o => {
+        const st = o.order_status || "pending";
+        statusCounts[st] = (statusCounts[st] || 0) + 1;
+    });
+    statusCounts.all = scopedOrders.length;
+
     // Generate unique months for filter
     const months = Array.from(new Set(orders.map(o => {
         if (!o.created_at?.seconds) return null;
@@ -252,114 +283,129 @@ const Orders = () => {
         return new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
     };
 
+    const secondaryMetrics = [
+        { label: "Orders", ref: ordersRef },
+        { label: "Open", ref: unpaidRef },
+        { label: "Completed", ref: paidRef },
+    ];
+
     return (
         <AdminLayout title="Orders">
-            {/* Bookkeeping Summary Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <Card hover className="border-white/10">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Net Revenue</span>
-                            <StatIcon icon={TrendingUp} className="bg-emerald-500/[0.14] text-emerald-300" />
+            {/* Ledger matter — one dominant number, ruled secondary counts, no icon chips */}
+            <div className="mb-10">
+                <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="min-w-0">
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl md:text-3xl text-[#EDEAE2]/55 font-semibold leading-none">₦</span>
+                            <span
+                                ref={revenueRef}
+                                className="text-[40px] md:text-[56px] leading-none font-extrabold tracking-[-0.03em] tabular-nums text-[#EDEAE2]"
+                            >0</span>
                         </div>
-                        <h3 className="text-xl font-bold text-[#EDEAE2]">
-                            <span className="text-sm text-[#EDEAE2]/55 font-semibold">₦</span>
-                            <span ref={revenueRef}>0</span>
-                        </h3>
-                    </CardContent>
-                </Card>
-                <Card hover className="border-white/10">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Total Orders</span>
-                            <StatIcon icon={Package} className="bg-violet-500/[0.14] text-violet-300" />
-                        </div>
-                        <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={ordersRef}>0</span></h3>
-                    </CardContent>
-                </Card>
-                <Card hover className="border-white/10">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Unpaid Orders</span>
-                            <StatIcon icon={Calendar} className="bg-amber-500/[0.14] text-amber-300" />
-                        </div>
-                        <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={unpaidRef}>0</span></h3>
-                    </CardContent>
-                </Card>
-                <Card hover className="border-white/10">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Completed Sales</span>
-                            <StatIcon icon={CreditCard} className="bg-sky-500/[0.14] text-sky-300" />
-                        </div>
-                        <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={paidRef}>0</span></h3>
-                    </CardContent>
-                </Card>
+                        <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#EDEAE2]/42">
+                            Net revenue · paid · live orders
+                        </p>
+                    </div>
+
+                    <div className="flex items-stretch overflow-x-auto pb-1 lg:pb-0 -mb-1 lg:mb-0">
+                        {secondaryMetrics.map((m, i) => (
+                            <React.Fragment key={m.label}>
+                                {i > 0 && <div className="mx-6 md:mx-9 w-px shrink-0 self-stretch bg-white/10" />}
+                                <div className="shrink-0">
+                                    <p className="text-3xl md:text-4xl font-extrabold leading-none tracking-[-0.02em] tabular-nums text-[#EDEAE2]">
+                                        <span ref={m.ref}>0</span>
+                                    </p>
+                                    <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[#EDEAE2]/42">
+                                        {m.label}
+                                    </p>
+                                </div>
+                            </React.Fragment>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            {/* Filters & Search */}
-            <div className="admin-toolbar mb-6">
-                <div className="flex-1 min-w-[220px] relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={17} />
-                    <input
-                        type="text"
-                        placeholder="Search by Order ID or Customer..."
-                        className="w-full pl-10 pr-4 py-2 bg-[#131316] border border-white/14 rounded-lg text-sm focus-ring placeholder:text-[#EDEAE2]/42"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+            {/* Commander row — segmented scope, search, selects, export */}
+            <div className="mb-8">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+                    <div className="segmented-control shrink-0">
+                        {TEST_SCOPE.map((o) => (
+                            <button
+                                key={o.value}
+                                aria-pressed={testFilter === o.value}
+                                onClick={() => setTestFilter(o.value)}
+                                className={`segmented-control__item ${testFilter === o.value ? "segmented-control__item--active" : ""}`}
+                            >
+                                {o.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex-1 min-w-[200px] relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={17} />
+                        <input
+                            type="text"
+                            placeholder="Search by order ID or customer..."
+                            className="w-full pl-10 pr-4 py-2 bg-[#131316] border border-white/14 rounded-lg text-sm focus-ring placeholder:text-[#EDEAE2]/42"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <select
+                            className="admin-control cursor-pointer"
+                            value={paymentFilter}
+                            onChange={(e) => setPaymentFilter(e.target.value)}
+                            aria-label="Payment status filter"
+                        >
+                            <option value="all">All payments</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Payment pending</option>
+                            <option value="failed">Failed</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
+                        <select
+                            className="admin-control cursor-pointer"
+                            value={monthFilter}
+                            onChange={(e) => setMonthFilter(e.target.value)}
+                            aria-label="Month filter"
+                        >
+                            <option value="all">All months</option>
+                            {months.map(m => (
+                                <option key={m} value={m}>{getMonthName(m)}</option>
+                            ))}
+                        </select>
+                        <Button variant="outline" className="gap-2 shrink-0" onClick={downloadCSV}>
+                            <Download size={15} />
+                            <span className="hidden sm:inline">Export CSV</span>
+                        </Button>
+                    </div>
                 </div>
-                <select
-                    className="admin-control cursor-pointer"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="packaging">Packaging</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-                <select
-                    className="admin-control cursor-pointer"
-                    value={paymentFilter}
-                    onChange={(e) => setPaymentFilter(e.target.value)}
-                >
-                    <option value="all">All Payments</option>
-                    <option value="paid">Paid</option>
-                    <option value="pending">Payment Pending</option>
-                    <option value="failed">Failed</option>
-                    <option value="refunded">Refunded</option>
-                </select>
-                <select
-                    className="admin-control cursor-pointer"
-                    value={testFilter}
-                    onChange={(e) => setTestFilter(e.target.value)}
-                >
-                    <option value="live">Live orders</option>
-                    <option value="test">Test orders</option>
-                    <option value="all">All orders</option>
-                </select>
-                <select
-                    className="admin-control cursor-pointer"
-                    value={monthFilter}
-                    onChange={(e) => setMonthFilter(e.target.value)}
-                >
-                    <option value="all">All Months</option>
-                    {months.map(m => (
-                        <option key={m} value={m}>{getMonthName(m)}</option>
-                    ))}
-                </select>
-                <Button
-                    variant="outline"
-                    className="gap-2"
-                    onClick={downloadCSV}
-                >
-                    <Download size={15} />
-                    <span className="hidden sm:inline">Export CSV</span>
-                </Button>
+
+                {/* Fulfillment status tabs with live counts */}
+                <div className="mt-4 border-t border-white/[0.08] pt-3 flex items-center gap-5 md:gap-6 overflow-x-auto">
+                    {FULFILLMENT_STATUSES.map((s) => {
+                        const active = statusFilter === s.value;
+                        return (
+                            <button
+                                key={s.value}
+                                onClick={() => setStatusFilter(s.value)}
+                                aria-pressed={active}
+                                className={`shrink-0 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors focus-ring ${
+                                    active
+                                        ? "text-[#EDEAE2] border-b-2 border-[#EDEAE2]"
+                                        : "text-[#EDEAE2]/42 hover:text-[#EDEAE2]/75 border-b-2 border-transparent"
+                                }`}
+                            >
+                                {s.label}
+                                <span className={`ml-1.5 tabular-nums font-medium ${active ? "text-[#EDEAE2]/65" : "text-[#EDEAE2]/40"}`}>
+                                    {statusCounts[s.value] || 0}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {loading ? (
@@ -388,8 +434,15 @@ const Orders = () => {
             ) : (
                 <Card className="border-white/10">
                     <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="text-base md:text-lg uppercase tracking-wide">Records ({filteredOrders.length})</CardTitle>
-                        <p className="text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest hidden sm:block">Scroll through transaction history</p>
+                        <div className="flex items-baseline gap-3">
+                            <CardTitle className="text-sm md:text-base uppercase tracking-[0.16em]">Orders</CardTitle>
+                            <span className="text-xs tabular-nums font-bold text-[#EDEAE2]/42">
+                                {filteredOrders.length}
+                            </span>
+                        </div>
+                        <p className="text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest hidden sm:block">
+                            Realtime · live feed
+                        </p>
                     </CardHeader>
                     <CardContent className="p-0">
                         {/* Mobile Card View */}
@@ -403,6 +456,7 @@ const Orders = () => {
                                                 <button
                                                     onClick={() => toggleOrderExpansion(order.id)}
                                                     className="w-8 h-8 rounded-lg bg-white/[0.09] flex items-center justify-center text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors shrink-0"
+                                                    aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                 >
                                                     {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                                                 </button>
@@ -421,7 +475,7 @@ const Orders = () => {
                                                 </div>
                                             </div>
                                             <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
-                                                <span className="font-bold text-sm leading-none mt-1">₦{order.total?.toLocaleString()}</span>
+                                                <span className="font-bold text-sm leading-none mt-1 tabular-nums">₦{order.total?.toLocaleString()}</span>
                                                 <div className="scale-[0.8] origin-right -mr-2">
                                                     <StatusDropdown
                                                         orderId={order.id}
@@ -438,7 +492,7 @@ const Orders = () => {
                                                 <div className="grid grid-cols-1 gap-6">
                                                     {/* Order Items */}
                                                     <div>
-                                                        <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                                        <h4 className={SECTION_LABEL}>
                                                             <Package size={14} />
                                                             Order Items
                                                         </h4>
@@ -463,7 +517,7 @@ const Orders = () => {
                                                                         <p className="text-[10px] text-[#EDEAE2]/55 font-medium mt-1">Qty: {item.quantity}</p>
                                                                     </div>
                                                                     <div className="text-right pt-1 flex flex-col justify-between">
-                                                                        <p className="font-bold text-xs">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                                                        <p className="font-bold text-xs tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
                                                             ))}
@@ -522,18 +576,18 @@ const Orders = () => {
                                                             <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
                                                                 <TrendingUp size={14} /> Summary
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-3 font-inter">
+                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-3">
                                                                 <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
                                                                     <span>Subtotal</span>
-                                                                    <span className="text-right">₦{order.subtotal?.toLocaleString()}</span>
+                                                                    <span className="text-right tabular-nums">₦{order.subtotal?.toLocaleString()}</span>
                                                                 </div>
                                                                 <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
                                                                     <span>Shipping</span>
-                                                                    <span className="text-right">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                    <span className="text-right tabular-nums">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
                                                                 </div>
-                                                                <div className="flex justify-between font-bold text-sm pt-3 border-t border-white/14 uppercase">
-                                                                    <span>Total</span>
-                                                                    <span className="text-right">₦{order.total?.toLocaleString()}</span>
+                                                                <div className="flex justify-between items-baseline font-bold pt-3 border-t border-white/14">
+                                                                    <span className="text-[11px] uppercase tracking-widest">Total</span>
+                                                                    <span className="text-right text-lg font-extrabold tabular-nums tracking-tight">₦{order.total?.toLocaleString()}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -546,14 +600,14 @@ const Orders = () => {
                             })}
                         </div>
 
-                        {/* Desktop Table View */}
+                        {/* Desktop Ledger View */}
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full admin-table">
-                                <thead className="bg-white/[0.05]">
+                                <thead>
                                     <tr className="border-b border-white/10">
                                         <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 w-12"></th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Order ID</th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hidden md:table-cell">Customer</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Order</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hidden xl:table-cell">Customer</th>
                                         <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Status</th>
                                         <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Payment</th>
                                         <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hidden sm:table-cell">Date</th>
@@ -570,22 +624,21 @@ const Orders = () => {
                                                         <button
                                                             onClick={() => toggleOrderExpansion(order.id)}
                                                             className="text-[#EDEAE2]/42 hover:text-[#EDEAE2]/65 transition-colors"
+                                                            aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                         >
                                                             {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                                                         </button>
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="font-mono text-xs md:text-sm font-medium">#{order.id.slice(0, 8)}</span>
+                                                            <span className="font-mono text-xs md:text-sm font-medium tracking-tight">#{order.id.slice(0, 8)}</span>
                                                             {order.isTest && <TestBadge />}
                                                             {order.items?.some(i => i.category === "tickets") && <ETicketBadge />}
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                                        <div>
-                                                            <p className="font-medium text-sm">{order.customer?.firstName} {order.customer?.lastName}</p>
-                                                            <p className="text-xs text-[#EDEAE2]/55">{order.customer?.email}</p>
-                                                        </div>
+                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap hidden xl:table-cell">
+                                                        <p className="font-medium text-sm text-[#EDEAE2]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                                        <p className="text-xs text-[#EDEAE2]/45">{order.customer?.email}</p>
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <StatusDropdown
@@ -597,7 +650,7 @@ const Orders = () => {
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <PaymentStatusBadge status={order.payment_status || 'pending'} />
                                                     </td>
-                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-[#EDEAE2]/55 hidden sm:table-cell">
+                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-[#EDEAE2]/55 tabular-nums hidden sm:table-cell">
                                                         {order.created_at?.seconds
                                                             ? new Date(order.created_at.seconds * 1000).toLocaleDateString('en-US', {
                                                                 year: 'numeric',
@@ -606,20 +659,20 @@ const Orders = () => {
                                                             })
                                                             : 'N/A'}
                                                     </td>
-                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-right font-medium text-sm md:text-base">
+                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-right font-bold tabular-nums text-sm md:text-base tracking-tight">
                                                         ₦{order.total?.toLocaleString()}
                                                     </td>
                                                 </tr>
 
-                                                {/* Expanded Row */}
+                                                {/* Expanded Detail Sheet */}
                                                 {isExpanded && (
                                                     <tr>
                                                         <td colSpan="7" className="px-4 md:px-6 py-6 bg-white/[0.02]">
-                                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
                                                                 {/* Order Items */}
-                                                                <div>
-                                                                    <h4 className="font-semibold mb-4 flex items-center gap-2 text-sm md:text-base">
-                                                                        <Package size={16} />
+                                                                <div className="lg:col-span-3">
+                                                                    <h4 className={`${SECTION_LABEL}`}>
+                                                                        <Package size={15} />
                                                                         Order Items
                                                                     </h4>
                                                                     <div className="space-y-3">
@@ -629,7 +682,7 @@ const Orders = () => {
                                                                                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                                 </div>
                                                                                 <div className="flex-1 min-w-0">
-                                                                                    <p className="font-medium text-sm truncate">{item.name || item.title}</p>
+                                                                                    <p className="font-medium text-sm text-[#EDEAE2]/90 truncate">{item.name || item.title}</p>
                                                                                     <p className="text-xs text-[#EDEAE2]/55 mt-1">
                                                                                         {item.category === "tickets" ? (
                                                                                             <span className="inline-flex items-center gap-1">
@@ -643,16 +696,16 @@ const Orders = () => {
                                                                                     <p className="text-xs text-[#EDEAE2]/55">Qty: {item.quantity}</p>
                                                                                 </div>
                                                                                 <div className="text-right">
-                                                                                    <p className="font-medium text-sm">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                                                                    <p className="font-medium text-sm tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
                                                                                 </div>
                                                                             </div>
                                                                         ))}
                                                                     </div>
 
                                                                     {order.tickets?.length > 0 && (
-                                                                        <div className="mt-4 pt-4 border-t border-white/10">
-                                                                            <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm md:text-base">
-                                                                                <Ticket size={16} />
+                                                                        <div className="mt-6 pt-5 border-t border-white/10">
+                                                                            <h4 className={`${SECTION_LABEL}`}>
+                                                                                <Ticket size={15} />
                                                                                 E-Ticket Codes
                                                                             </h4>
                                                                             <div className="space-y-2">
@@ -667,32 +720,30 @@ const Orders = () => {
                                                                     )}
                                                                 </div>
 
-                                                                {/* Customer & Shipping Info */}
-                                                                <div className="space-y-6">
-                                                                    {/* Shipping Address */}
+                                                                {/* Dispatch sheet — shipping, contact, money */}
+                                                                <div className="lg:col-span-2 space-y-6">
                                                                     <div>
-                                                                        <h4 className="font-semibold mb-4 flex items-center gap-2 text-sm md:text-base">
-                                                                            <MapPin size={16} />
-                                                                            Shipping Address
+                                                                        <h4 className={`${SECTION_LABEL}`}>
+                                                                            <MapPin size={15} />
+                                                                            Shipping
                                                                         </h4>
                                                                         <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-2">
-                                                                            <p className="font-medium text-sm">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                                                            <p className="font-medium text-sm text-[#EDEAE2]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.address}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.city}, {order.customer?.state}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.country}</p>
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* Contact Info */}
                                                                     <div>
-                                                                        <h4 className="font-semibold mb-4 flex items-center gap-2 text-sm md:text-base">
-                                                                            <User size={16} />
-                                                                            Contact Information
+                                                                        <h4 className={`${SECTION_LABEL}`}>
+                                                                            <User size={15} />
+                                                                            Contact
                                                                         </h4>
                                                                         <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-3">
-                                                                            <div className="flex items-center justify-between">
-                                                                                <div className="flex items-center gap-2 text-sm">
-                                                                                    <Mail size={14} className="text-[#EDEAE2]/42" />
+                                                                            <div className="flex items-center justify-between gap-3">
+                                                                                <div className="flex items-center gap-2 text-sm min-w-0">
+                                                                                    <Mail size={14} className="text-[#EDEAE2]/42 shrink-0" />
                                                                                     <span className="truncate">{order.customer?.email}</span>
                                                                                 </div>
                                                                                 {order.customer?.email && (
@@ -714,12 +765,14 @@ const Orders = () => {
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* Order Summary */}
                                                                     <div>
-                                                                        <h4 className="font-semibold mb-4 text-sm md:text-base">Order Status & Summary</h4>
+                                                                        <h4 className={`${SECTION_LABEL}`}>
+                                                                            <CreditCard size={15} />
+                                                                            Status & Money
+                                                                        </h4>
                                                                         <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-3">
                                                                             <div className="flex justify-between items-center text-sm">
-                                                                                <span className="text-[#EDEAE2]/55">Order Status</span>
+                                                                                <span className="text-[#EDEAE2]/55">Fulfillment</span>
                                                                                 <StatusDropdown
                                                                                     orderId={order.id}
                                                                                     currentStatus={order.order_status || 'pending'}
@@ -727,24 +780,24 @@ const Orders = () => {
                                                                                 />
                                                                             </div>
                                                                             <div className="flex justify-between items-center text-sm pt-3 border-t border-white/[0.06]">
-                                                                                <span className="text-[#EDEAE2]/55">Payment Status</span>
+                                                                                <span className="text-[#EDEAE2]/55">Payment</span>
                                                                                 <PaymentStatusDropdown
                                                                                     status={order.payment_status || 'pending'}
                                                                                     onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
                                                                                 />
                                                                             </div>
-                                                                            <div className="space-y-2 pt-3 border-t border-white/[0.06] font-inter">
+                                                                            <div className="space-y-2 pt-3 border-t border-white/[0.06]">
                                                                                 <div className="flex justify-between text-xs text-[#EDEAE2]/55">
                                                                                     <span>Subtotal</span>
-                                                                                    <span>₦{order.subtotal?.toLocaleString()}</span>
+                                                                                    <span className="tabular-nums">₦{order.subtotal?.toLocaleString()}</span>
                                                                                 </div>
                                                                                 <div className="flex justify-between text-xs text-[#EDEAE2]/55">
-                                                                                    <span>Shipping Fee</span>
-                                                                                    <span>₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                                    <span>Shipping</span>
+                                                                                    <span className="tabular-nums">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
                                                                                 </div>
-                                                                                <div className="flex justify-between font-bold text-base pt-2 border-t border-white/14">
-                                                                                    <span>Grand Total</span>
-                                                                                    <span>₦{order.total?.toLocaleString()}</span>
+                                                                                <div className="flex justify-between items-baseline pt-3 border-t border-white/14">
+                                                                                    <span className="text-[11px] font-bold uppercase tracking-widest text-[#EDEAE2]/80">Total</span>
+                                                                                    <span className="text-right text-xl font-extrabold tabular-nums tracking-tight text-[#EDEAE2]">₦{order.total?.toLocaleString()}</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
