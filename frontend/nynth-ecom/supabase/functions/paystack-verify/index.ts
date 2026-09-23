@@ -5,6 +5,12 @@
 // ADMIN_NOTIFY_EMAIL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+};
+
 function naira(n: number) { return "\u20A6" + Number(n || 0).toLocaleString("en-NG"); }
 
 function ticketCodes(items: any[] = []) {
@@ -32,19 +38,20 @@ async function sendResend(to: string, subject: string, html: string) {
 }
 
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const { reference } = await req.json().catch(() => ({}));
-  if (!reference) return Response.json({ error: "reference required" }, { status: 400 });
+  if (!reference) return Response.json({ error: "reference required" }, { status: 400, headers: corsHeaders });
   const secret = Deno.env.get("PAYSTACK_SECRET_KEY") ?? "";
   const res = await fetch("https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference), { headers: { Authorization: "Bearer " + secret } });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok || !body.status || body.data?.status !== "success") return Response.json({ error: body.message ?? "verification failed" }, { status: 400 });
+  if (!res.ok || !body.status || body.data?.status !== "success") return Response.json({ error: body.message ?? "verification failed" }, { status: 400, headers: corsHeaders });
   const orderId = body.data?.metadata?.orderId;
-  if (!orderId) return Response.json({ error: "No orderId in metadata" }, { status: 404 });
+  if (!orderId) return Response.json({ error: "No orderId in metadata" }, { status: 404, headers: corsHeaders });
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   try {
     const { data: order } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
-    if (!order) return Response.json({ error: "order not found" }, { status: 404 });
-    if (order.payment_status === "paid") return Response.json({ success: true, orderId, alreadyPaid: true });
+    if (!order) return Response.json({ error: "order not found" }, { status: 404, headers: corsHeaders });
+    if (order.payment_status === "paid") return Response.json({ success: true, orderId, alreadyPaid: true }, { headers: corsHeaders });
     const codes = ticketCodes(order.items);
     await supabase.from("orders").update({ payment_status: "paid", order_status: "confirmed", payment_reference: reference, tickets: codes.length ? codes : order.tickets, paid_at: new Date().toISOString() }).eq("id", orderId);
     for (const item of order.items ?? []) {
@@ -58,6 +65,6 @@ Deno.serve(async (req) => {
     if (customerSent || adminSent) {
       await supabase.from("orders").update({ customer_confirmation_sent_at: customerSent ? new Date().toISOString() : null, admin_notification_sent_at: adminSent ? new Date().toISOString() : null }).eq("id", orderId);
     }
-    return Response.json({ success: true, orderId, alreadyPaid: false });
-  } catch (e) { console.error(e); return Response.json({ error: "Transaction failed" }, { status: 500 }); }
+    return Response.json({ success: true, orderId, alreadyPaid: false }, { headers: corsHeaders });
+  } catch (e) { console.error(e); return Response.json({ error: "Transaction failed" }, { status: 500, headers: corsHeaders }); }
 });
