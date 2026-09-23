@@ -17,7 +17,12 @@ const toTimestamp = (v) => {
 // Coerce to a finite number; NaN/undefined -> 0 so PostgREST never rejects with 400.
 const finalNumber = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 const rowToProduct = (r) => ({ ...(r.data ?? {}), id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
-const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, created_at: toTimestamp(r.created_at) });
+const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, isTest: r.is_test === true, created_at: toTimestamp(r.created_at) });
+
+// Test-mode detection: the storefront runs on Paystack test keys until launch, so
+// an order created under those keys is test traffic. Server (edge) re-stamps this
+// authoritatively from its own secret key when it finalizes the payment.
+const PAYSTACK_IS_TEST = (import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "").startsWith("pk_test_");
 
 // --- PRODUCTS CRUD ---
 export const addProduct = async (product) => {
@@ -185,7 +190,7 @@ export const seedOrders = async () => {
     const image = p.image || (p.data?.images && p.data.images[0]) || "";
     const title = p.title || p.name || "";
     const price = Number(p.price) || 25000;
-    rows.push({ id: `NY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, user_id: null, customer: { firstName: name.first, lastName: name.last, email: `${name.first.toLowerCase()}@example.com`, phone: "08012345678", address: "123 Sample Street", city, state: "LAGOS" }, items: [{ id: p.id, title, price, quantity: qty, selectedSize: "M", selectedColor: "Black", image }], subtotal: price * qty, shipping_fee: 2500, discount_amount: 0, discount_code: null, total: price * qty + 2500, payment_status: Math.random() > 0.3 ? "paid" : "pending", order_status: Math.random() > 0.5 ? "delivered" : "processing", payment_method: "paystack", channel, created_at: date.toISOString(), updated_at: date.toISOString() });
+    rows.push({ id: `NY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, user_id: null, customer: { firstName: name.first, lastName: name.last, email: `${name.first.toLowerCase()}@example.com`, phone: "08012345678", address: "123 Sample Street", city, state: "LAGOS" }, items: [{ id: p.id, title, price, quantity: qty, selectedSize: "M", selectedColor: "Black", image }], subtotal: price * qty, shipping_fee: 2500, discount_amount: 0, discount_code: null, total: price * qty + 2500, payment_status: Math.random() > 0.3 ? "paid" : "pending", order_status: Math.random() > 0.5 ? "delivered" : "processing", payment_method: "paystack", is_test: true, channel, created_at: date.toISOString(), updated_at: date.toISOString() });
   }
   const { error } = await supabase.from("orders").insert(rows);
   if (error) throw error;
@@ -214,7 +219,7 @@ export const addOrder = async (order) => {
   // which guests (user_id = null) can never pass -> PostgREST 400/42501. Insert without
   // returning instead, and hand the id back for Paystack metadata + verification.
   const id = order.id ?? crypto.randomUUID();
-  const { error } = await supabase.from("orders").insert({ id, user_id: order.userId ?? user?.id ?? null, customer: order.customer ?? {}, items: order.items ?? [], subtotal: finalNumber(order.subtotal), shipping_fee: finalNumber(order.shippingFee ?? order.shipping_fee), discount_amount: finalNumber(order.discountAmount), discount_code: order.discountCode ?? null, total: finalNumber(order.total), payment_status: "pending", order_status: "pending" });
+  const { error } = await supabase.from("orders").insert({ id, user_id: order.userId ?? user?.id ?? null, customer: order.customer ?? {}, items: order.items ?? [], subtotal: finalNumber(order.subtotal), shipping_fee: finalNumber(order.shippingFee ?? order.shipping_fee), discount_amount: finalNumber(order.discountAmount), discount_code: order.discountCode ?? null, total: finalNumber(order.total), payment_status: "pending", order_status: "pending", is_test: order.isTest ?? PAYSTACK_IS_TEST });
   if (error) throw error;
   return id;
 };

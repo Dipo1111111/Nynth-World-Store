@@ -128,8 +128,11 @@ const AdminDashboard = () => {
 
  // --- REALTIME ORDERS (single source of truth) ---
  useEffect(() => {
- getAllOrders().then(data => { setOrders(data); setLoading(false); }).catch(() => setLoading(false));
+ getAllOrders().then(data => { setOrders(data.filter(o => !o.isTest)); setLoading(false); }).catch(() => setLoading(false));
  const unsubscribe = subscribeOrders((liveOrders) => {
+ // Test-mode orders never count in the dashboard: no stats, no cha-ching, no
+ // notifications. They belong in the Orders list, badged TEST.
+ liveOrders = liveOrders.filter(o => !o.isTest);
  setOrders(liveOrders);
  setLoading(false);
 

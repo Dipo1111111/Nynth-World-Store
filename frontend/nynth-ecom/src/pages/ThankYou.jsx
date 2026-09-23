@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowRight, RotateCcw, Ticket, Mail } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowRight, Ticket, Mail } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -11,11 +11,8 @@ import { fetchOrder, fetchProducts, verifyOrderPayment } from "../api/firebaseFu
 import { trackConversion } from "../utils/monitoring";
 import { isTicketItem, ticketCount } from "../utils/tickets";
 
-const REDIRECT_SECONDS = 8;
-
 const ThankYou = () => {
   const { currentUser } = useAuth();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   // Support both popup flow (ref=xxx) and Paystack redirect flow (reference=xxx / trxref=xxx)
@@ -24,7 +21,6 @@ const ThankYou = () => {
 
   const { clearCart } = useCart();
   const [mounted, setMounted] = useState(false);
-  const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
   const cleared = useRef(false);
 
   const [order, setOrder] = useState(null);
@@ -78,7 +74,6 @@ const ThankYou = () => {
       clearCart();
     }
   }, [reference, clearCart]);
-
   // Celebration: confetti + mount animation
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -97,21 +92,6 @@ const ThankYou = () => {
     }, 250);
     return () => clearInterval(interval);
   }, []);
-
-  // Auto-redirect countdown
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate("/shop", { replace: true });
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col font-inter">
@@ -175,29 +155,6 @@ const ThankYou = () => {
               Continue Shopping
               <ArrowRight size={14} />
             </Link>
-          </div>
-
-          {/* Auto-redirect countdown */}
-          <div className="mt-14 flex flex-col items-center gap-4">
-            <div className="relative w-14 h-14">
-              <svg viewBox="0 0 56 56" className="w-full h-full -rotate-90">
-                <circle cx="28" cy="28" r="24" fill="none" stroke="#efefef" strokeWidth="3" />
-                <circle
-                  cx="28" cy="28" r="24" fill="none" stroke="#000" strokeWidth="3"
-                  strokeDasharray={150.8}
-                  strokeDashoffset={150.8 * (1 - countdown / REDIRECT_SECONDS)}
-                  className="transition-all duration-1000 ease-linear"
-                />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-[14px] font-extrabold text-black">{countdown}</span>
-            </div>
-            <p className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold">Redirecting to shop</p>
-            <button
-              onClick={() => navigate("/shop", { replace: true })}
-              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-black hover:text-gray-600 transition-colors"
-            >
-              <RotateCcw size={12} /> Go to shop now
-            </button>
           </div>
         </div>
       </main>

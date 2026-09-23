@@ -40,6 +40,8 @@ async function validSignature(secret: string, raw: string, sig: string) {
 
 Deno.serve(async (req) => {
   const secret = Deno.env.get("PAYSTACK_SECRET_KEY") ?? "";
+  // Authoritative test-mode stamp: sk_test_ keys fund only Paystack's sandbox.
+  const isTest = secret.startsWith("sk_test_");
   const raw = await req.text();
   const sig = req.headers.get("x-paystack-signature") ?? "";
   if (!secret || !(await validSignature(secret, raw, sig))) return new Response("Invalid signature", { status: 401 });
@@ -54,7 +56,7 @@ Deno.serve(async (req) => {
     if (!order) return new Response("Order not found", { status: 404 });
     if (order.payment_status !== "paid") {
       const codes = order.tickets?.length ? order.tickets : ticketCodes(order.items);
-      await supabase.from("orders").update({ payment_status: "paid", order_status: "confirmed", payment_reference: reference, payment_gateway: "paystack", tickets: codes.length ? codes : order.tickets, paid_at: new Date().toISOString() }).eq("id", orderId);
+      await supabase.from("orders").update({ payment_status: "paid", order_status: "confirmed", payment_reference: reference, payment_gateway: "paystack", is_test: isTest, tickets: codes.length ? codes : order.tickets, paid_at: new Date().toISOString() }).eq("id", orderId);
       for (const item of order.items ?? []) {
         const { data: p } = await supabase.from("products").select("stock_quantity").eq("id", item.id).maybeSingle();
         if (p) await supabase.from("products").update({ stock_quantity: Math.max(0, (p.stock_quantity ?? 0) - (item.quantity || 1)) }).eq("id", item.id);
@@ -66,6 +68,10 @@ Deno.serve(async (req) => {
       if (customerSent || adminSent) {
         await supabase.from("orders").update({ customer_confirmation_sent_at: customerSent ? new Date().toISOString() : null, admin_notification_sent_at: adminSent ? new Date().toISOString() : null }).eq("id", orderId);
       }
+    } else {
+      // Already finalized earlier — still correct the mode stamp (covers orders
+      // created before the is_test column existed).
+      await supabase.from("orders").update({ is_test: isTest }).eq("id", orderId);
     }
     return new Response("Success", { status: 200 });
   } catch (e) { console.error(e); return new Response("Transaction failed", { status: 500 }); }

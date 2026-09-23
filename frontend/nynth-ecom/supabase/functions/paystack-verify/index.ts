@@ -42,6 +42,8 @@ export async function handler(req: Request): Promise<Response> {
   const { reference } = await req.json().catch(() => ({}));
   if (!reference) return Response.json({ error: "reference required" }, { status: 400, headers: corsHeaders });
   const secret = Deno.env.get("PAYSTACK_SECRET_KEY") ?? "";
+  // Authoritative test-mode stamp: sk_test_ keys fund only Paystack's sandbox.
+  const isTest = secret.startsWith("sk_test_");
   const res = await fetch("https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference), { headers: { Authorization: "Bearer " + secret } });
   const body = await res.json().catch(() => ({}));
   if (!res.ok || !body.status || body.data?.status !== "success") return Response.json({ error: body.message ?? "verification failed" }, { status: 400, headers: corsHeaders });
@@ -53,7 +55,7 @@ export async function handler(req: Request): Promise<Response> {
     if (!order) return Response.json({ error: "order not found" }, { status: 404, headers: corsHeaders });
     if (order.payment_status === "paid") return Response.json({ success: true, orderId, alreadyPaid: true }, { headers: corsHeaders });
     const codes = ticketCodes(order.items);
-    await supabase.from("orders").update({ payment_status: "paid", order_status: "confirmed", payment_reference: reference, tickets: codes.length ? codes : order.tickets, paid_at: new Date().toISOString() }).eq("id", orderId);
+    await supabase.from("orders").update({ payment_status: "paid", order_status: "confirmed", payment_reference: reference, is_test: isTest, tickets: codes.length ? codes : order.tickets, paid_at: new Date().toISOString() }).eq("id", orderId);
     for (const item of order.items ?? []) {
       const { data: p } = await supabase.from("products").select("stock_quantity").eq("id", item.id).maybeSingle();
       if (p) await supabase.from("products").update({ stock_quantity: Math.max(0, (p.stock_quantity ?? 0) - (item.quantity || 1)) }).eq("id", item.id);

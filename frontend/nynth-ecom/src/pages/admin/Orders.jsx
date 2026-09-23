@@ -54,6 +54,10 @@ const PaymentStatusBadge = ({ status }) => {
  );
 };
 
+const TestBadge = () => (
+ <span className="bg-amber-100 text-amber-700 text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">TEST</span>
+);
+
 const PaymentStatusDropdown = ({ status, onStatusChange }) => {
  const config = PAYMENT_STATUS_CONFIG[status] || PAYMENT_STATUS_CONFIG.pending;
  return (
@@ -91,6 +95,7 @@ const Orders = () => {
  const [statusFilter, setStatusFilter] = useState("all");
  const [paymentFilter, setPaymentFilter] = useState("all");
  const [monthFilter, setMonthFilter] = useState("all");
+ const [testFilter, setTestFilter] = useState("live");
 
  useEffect(() => {
  document.title = "Nynth World Store Admin - Orders";
@@ -105,10 +110,17 @@ const Orders = () => {
  useEffect(() => {
  applyFilters();
  // eslint-disable-next-line react-hooks/exhaustive-deps
- }, [orders, searchTerm, statusFilter, paymentFilter, monthFilter]);
+ }, [orders, searchTerm, statusFilter, paymentFilter, monthFilter, testFilter]);
 
  const applyFilters = () => {
  let result = [...orders];
+
+ // Test/Live Filter (default: live only — test traffic never counts as normal)
+ if (testFilter === "live") {
+ result = result.filter(o => !o.isTest);
+ } else if (testFilter === "test") {
+ result = result.filter(o => o.isTest);
+ }
 
  // Search Filter
  if (searchTerm) {
@@ -220,15 +232,17 @@ const Orders = () => {
  toast.success("CSV Downloaded");
  };
 
- // Calculate Summary from filtered orders
+ // Calculate Summary — always LIVE orders only. Test traffic is badged and
+// inspectable but never counted in the bookkeeping numbers.
+ const liveOrders = filteredOrders.filter(o => !o.isTest);
  const summary = {
- totalRevenue: filteredOrders.reduce((sum, o) => {
+ totalRevenue: liveOrders.reduce((sum, o) => {
  const paid = o.payment_status === 'paid' || o.payment_status === 'success';
  return sum + (paid ? (o.total || 0) : 0);
  }, 0),
- totalOrders: filteredOrders.length,
- unpaidOrders: filteredOrders.filter(o => o.payment_status !== 'paid' && o.payment_status !== 'success').length,
- paidOrders: filteredOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success').length,
+ totalOrders: liveOrders.length,
+ unpaidOrders: liveOrders.filter(o => o.payment_status !== 'paid' && o.payment_status !== 'success').length,
+ paidOrders: liveOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success').length,
  };
 
  // Generate unique months for filter
@@ -332,6 +346,15 @@ const Orders = () => {
  </select>
  <select 
  className="bg-gray-50 border-none rounded-lg text-sm px-3 py-2 focus:ring-1 focus:ring-black/5 min-w-[120px]"
+ value={testFilter}
+ onChange={(e) => setTestFilter(e.target.value)}
+ >
+ <option value="live">Live orders</option>
+ <option value="test">Test orders</option>
+ <option value="all">All orders</option>
+ </select>
+ <select 
+ className="bg-gray-50 border-none rounded-lg text-sm px-3 py-2 focus:ring-1 focus:ring-black/5 min-w-[120px]"
  value={monthFilter}
  onChange={(e) => setMonthFilter(e.target.value)}
  >
@@ -390,6 +413,7 @@ const Orders = () => {
  <div className="min-w-0 flex-1">
  <div className="flex items-center gap-2">
  <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
+ {order.isTest && <TestBadge />}
  {order.items?.some(i => i.category === "tickets") && (
  <span className="bg-black text-white text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
  )}
@@ -559,6 +583,7 @@ const Orders = () => {
  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
  <div className="flex items-center gap-2">
  <span className="font-mono text-xs md:text-sm font-medium">#{order.id.slice(0, 8)}</span>
+ {order.isTest && <TestBadge />}
  {order.items?.some(i => i.category === "tickets") && (
  <span className="bg-black text-white text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
  )}

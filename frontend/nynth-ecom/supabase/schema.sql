@@ -76,6 +76,7 @@ create table if not exists public.orders (
   payment_status text not null default 'pending' check (payment_status in ('pending','paid','failed')),
   order_status text not null default 'pending' check (order_status in ('pending','confirmed','shipped','delivered','cancelled')),
   payment_reference text,
+  is_test boolean not null default false, -- test-mode traffic never counts as live
   payment_gateway text not null default 'paystack',
   paid_at timestamptz,
   customer_confirmation_sent_at timestamptz,

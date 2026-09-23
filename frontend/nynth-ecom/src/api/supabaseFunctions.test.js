@@ -112,6 +112,20 @@ describe("finalNumber guard (checkout NaN-total bug)", () => {
     expect(payload.order_status).toBe("pending");
   });
 
+  it("stamps is_test from the order payload so the UI can separate test traffic", async () => {
+    h.setInvoke({ data: null, error: null });
+    h.setAuthUser(null);
+    await addOrder({ items: [], total: 100, isTest: true });
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.is_test).toBe(true);
+
+    h.reset();
+    h.setInvoke({ data: null, error: null });
+    await addOrder({ items: [], total: 100, isTest: false });
+    const payload2 = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload2.is_test).toBe(false);
+  });
+
   it("falls back to the signed-in user id when no order.userId", async () => {
     h.setInvoke({ data: null, error: null });
     h.setAuthUser({ id: "user-123" });
@@ -142,12 +156,19 @@ describe("rowToProduct (stale data snapshot bug)", () => {
 
 describe("rowToOrder", () => {
   it("reads money fields as numbers and maps firebase-style aliases", async () => {
-    h.setQuery({ data: [{ id: "o1", user_id: null, customer: {}, items: [], tickets: [], subtotal: "1500", shipping_fee: "2500", discount_amount: null, discount_code: null, total: "4000", payment_status: "pending", order_status: "pending", payment_reference: null, paid_at: null }], error: null });
+    h.setQuery({ data: [{ id: "o1", user_id: null, customer: {}, items: [], tickets: [], subtotal: "1500", shipping_fee: "2500", discount_amount: null, discount_code: null, total: "4000", payment_status: "pending", order_status: "pending", payment_reference: null, paid_at: null, is_test: false }], error: null });
     const [o] = await getAllOrders();
     expect(o.subtotal).toBe(1500);
     expect(o.shippingFee).toBe(2500);
     expect(o.shipping_fee).toBe(2500);
     expect(o.total).toBe(4000);
+    expect(o.isTest).toBe(false);
+  });
+
+  it("maps is_test true so admin can badge/exclude test traffic", async () => {
+    h.setQuery({ data: [{ id: "o2", is_test: true, items: [], tickets: [], customer: {} }], error: null });
+    const [o] = await getAllOrders();
+    expect(o.isTest).toBe(true);
   });
 
   it("returns an empty object for a missing order", async () => {

@@ -77,6 +77,7 @@ Deno.test("finalizes a pending order after a successful Paystack charge", async 
     assertEquals(json.alreadyPaid, false);
     assertEquals(json.orderId, "ord-9");
     assert(patches.some((p) => p.payment_status === "paid" && p.order_status === "confirmed"));
+    assert(patches.some((p) => p.is_test === true), "order finalized under sk_test_ keys must be stamped is_test so test traffic never counts as live");
     assertEquals(resendCalls, 2, "customer + admin confirmation emails should both be attempted");
   } finally {
     (globalThis as any).fetch = realFetch;
