@@ -56,11 +56,12 @@ export default function AdminLayout({ children, title }) {
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
-        <div className="min-h-screen admin-paper flex">
+        <div className="min-h-screen admin-app admin-paper flex">
             {/* Sidebar — ink rail */}
             <aside
                 className={`
-                    w-64 bg-[#0c0c0c] text-white fixed inset-y-0 left-0 z-40 flex flex-col
+                    w-64 bg-[#0b0b0c] text-white fixed inset-y-0 left-0 z-40 flex flex-col
+                    border-r border-white/[0.07]
                     transition-transform duration-300 ease-out md:translate-x-0
                     ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
                 `}
@@ -99,8 +100,8 @@ export default function AdminLayout({ children, title }) {
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ease-out ${
                                                 active
-                                                    ? "bg-white text-black shadow-card"
-                                                    : "text-white/55 hover:text-white hover:bg-white/[0.07] hover:translate-x-0.5"
+                                                    ? "bg-[#131316] text-[#EDEAE2] shadow-card"
+                                                    : "text-white/55 hover:text-white hover:bg-white/[0.14] hover:translate-x-0.5"
                                             }`}
                                         >
                                             <item.icon
@@ -132,14 +133,14 @@ export default function AdminLayout({ children, title }) {
                     </div>
                     <Link
                         to="/"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-white/55 hover:text-white hover:bg-white/[0.07] transition-all duration-150"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-white/55 hover:text-white hover:bg-white/[0.14] transition-all duration-150"
                     >
                         <Home size={16} strokeWidth={1.8} />
                         View Store
                     </Link>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-white/55 hover:text-white hover:bg-white/[0.07] transition-all duration-150"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-white/55 hover:text-white hover:bg-white/[0.14] transition-all duration-150"
                     >
                         <LogOut size={16} strokeWidth={1.8} />
                         Sign Out
@@ -176,7 +177,9 @@ export default function AdminLayout({ children, title }) {
                     <div className="animate-admin-fade-up">
                         {title && (
                             <div className="mb-6 md:mb-8">
-                                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{title}</h1>
+                                <h1 className="text-[30px] leading-[1.05] md:text-[40px] font-extrabold tracking-[-0.02em]">
+                                    {title}
+                                </h1>
                             </div>
                         )}
                         {children}

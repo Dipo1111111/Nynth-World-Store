@@ -163,23 +163,23 @@ const AbandonedCheckouts = () => {
  <AdminLayout title="Abandoned Checkouts">
  {/* Bookkeeping Summary Row */}
  <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
- <Card hover className="border-black/[0.06]">
+ <Card hover className="border-white/10">
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Abandoned</span>
- <StatIcon icon={Package} className="bg-amber-50 text-amber-600" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Total Abandoned</span>
+ <StatIcon icon={Package} className="bg-amber-500/[0.14] text-amber-300" />
  </div>
- <h3 className="text-xl font-bold text-gray-900"><span ref={abandonedRef}>0</span></h3>
+ <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={abandonedRef}>0</span></h3>
  </CardContent>
  </Card>
- <Card hover className="border-black/[0.06]">
+ <Card hover className="border-white/10">
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Potential Revenue Lost</span>
- <StatIcon icon={TrendingUp} className="bg-rose-50 text-rose-600" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Potential Revenue Lost</span>
+ <StatIcon icon={TrendingUp} className="bg-rose-500/[0.14] text-rose-300" />
  </div>
- <h3 className="text-xl font-bold text-gray-900">
- <span className="text-sm text-gray-500 font-semibold">₦</span>
+ <h3 className="text-xl font-bold text-[#EDEAE2]">
+ <span className="text-sm text-[#EDEAE2]/55 font-semibold">₦</span>
  <span ref={revenueRef}>0</span>
  </h3>
  </CardContent>
@@ -189,11 +189,11 @@ const AbandonedCheckouts = () => {
  {/* Filters & Search */}
  <div className="admin-toolbar mb-6">
  <div className="flex-1 min-w-[200px] relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={17} />
  <input
  type="text"
  placeholder="Search by Order ID or Customer..."
- className="w-full pl-10 pr-4 py-2 bg-white border border-black/[0.08] rounded-lg text-sm focus-ring placeholder:text-gray-400"
+ className="w-full pl-10 pr-4 py-2 bg-[#131316] border border-white/14 rounded-lg text-sm focus-ring placeholder:text-[#EDEAE2]/42"
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
  />
@@ -228,39 +228,39 @@ const AbandonedCheckouts = () => {
  {loading ? (
  <div className="flex items-center justify-center h-64">
  <div className="text-center">
- <div className="animate-spin rounded-full h-12 w-12 border-2 border-black/10 border-t-black mx-auto mb-4"></div>
- <p className="text-gray-500">Loading orders...</p>
+ <div className="animate-spin rounded-full h-12 w-12 border-2 border-white/18 border-t-white/18 mx-auto mb-4"></div>
+ <p className="text-[#EDEAE2]/55">Loading orders...</p>
  </div>
  </div>
  ) : filteredOrders.length === 0 ? (
- <Card className="border-black/[0.06]">
+ <Card className="border-white/10">
  <CardContent className="flex flex-col items-center justify-center py-16">
- <div className="w-16 h-16 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-4">
- <Package className="h-8 w-8 text-gray-300" />
+ <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+ <Package className="h-8 w-8 text-[#EDEAE2]/35" />
  </div>
  <h3 className="text-lg font-medium mb-2">No orders found</h3>
- <p className="text-gray-500 text-sm">Try adjusting your search or filters.</p>
+ <p className="text-[#EDEAE2]/55 text-sm">Try adjusting your search or filters.</p>
  </CardContent>
  </Card>
  ) : (
- <Card className="border-black/[0.06]">
+ <Card className="border-white/10">
  <CardHeader className="flex flex-row items-center justify-between">
  <CardTitle className="text-base md:text-lg uppercase tracking-wide">Records ({filteredOrders.length})</CardTitle>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hidden sm:block">Scroll through transaction history</p>
+ <p className="text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest hidden sm:block">Scroll through transaction history</p>
  </CardHeader>
  <CardContent className="p-0">
  {/* Mobile Card View */}
- <div className="md:hidden divide-y divide-black/[0.04]">
+ <div className="md:hidden divide-y divide-white/[0.08]">
  {filteredOrders.map((order) => {
  const isExpanded = expandedOrders.has(order.id);
  const hasTickets = order.items?.some(i => i.category === "tickets");
  return (
- <div key={order.id} className="p-4 bg-white flex flex-col gap-3">
+ <div key={order.id} className="p-4 bg-[#131316] flex flex-col gap-3">
  <div className="flex items-start justify-between gap-2">
  <div className="flex items-center gap-2 min-w-0 flex-1">
  <button
  onClick={() => toggleOrderExpansion(order.id)}
- className="focus-ring w-8 h-8 rounded-lg bg-black/[0.04] flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors shrink-0"
+ className="focus-ring w-8 h-8 rounded-lg bg-white/[0.09] flex items-center justify-center text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors shrink-0"
  >
  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
  </button>
@@ -271,11 +271,11 @@ const AbandonedCheckouts = () => {
  <span className="bg-[#0c0c0c] text-white text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
  )}
  </div>
- <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
+ <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-0.5 truncate">
  {order.customer?.firstName} • {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
  </p>
  {order.customer?.email && (
- <p className="text-[10px] text-gray-400 mt-0.5 truncate lowercase">
+ <p className="text-[10px] text-[#EDEAE2]/42 mt-0.5 truncate lowercase">
  {order.customer.email}
  </p>
  )}
@@ -283,13 +283,13 @@ const AbandonedCheckouts = () => {
  </div>
  <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
  <span className="font-bold text-sm leading-none mt-1">₦{order.total?.toLocaleString()}</span>
- <span className="text-xs text-rose-500 font-bold uppercase tracking-widest">ABANDONED</span>
+ <span className="text-xs text-rose-300 font-bold uppercase tracking-widest">ABANDONED</span>
  </div>
  </div>
 
  {/* Expanded Row Content for Mobile */}
  {isExpanded && (
- <div className="mt-2 pt-3 border-t border-black/[0.05]">
+ <div className="mt-2 pt-3 border-t border-white/[0.08]">
  <div className="grid grid-cols-1 gap-6">
  {/* Order Items */}
  <div>
@@ -299,13 +299,13 @@ const AbandonedCheckouts = () => {
  </h4>
  <div className="space-y-2">
  {order.items?.map((item, idx) => (
- <div key={idx} className="flex gap-3 p-3 bg-black/[0.02] rounded-lg border border-black/[0.06]">
- <div className="w-14 h-16 bg-white rounded overflow-hidden flex-shrink-0 border border-black/[0.06]">
+ <div key={idx} className="flex gap-3 p-3 bg-white/[0.05] rounded-lg border border-white/10">
+ <div className="w-14 h-16 bg-[#131316] rounded overflow-hidden flex-shrink-0 border border-white/10">
  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
  </div>
  <div className="flex-1 min-w-0">
  <p className="font-bold text-[11px] truncate uppercase">{item.name || item.title}</p>
- <p className="text-[9px] text-gray-500 mt-1 uppercase tracking-widest font-bold">
+ <p className="text-[9px] text-[#EDEAE2]/55 mt-1 uppercase tracking-widest font-bold">
  {item.category === "tickets" ? (
  <span className="inline-flex items-center gap-1">
  <Ticket size={10} className="shrink-0" />
@@ -315,7 +315,7 @@ const AbandonedCheckouts = () => {
  `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
  )}
  </p>
- <p className="text-[10px] text-gray-500 font-medium mt-1">Qty: {item.quantity}</p>
+ <p className="text-[10px] text-[#EDEAE2]/55 font-medium mt-1">Qty: {item.quantity}</p>
  </div>
  <div className="text-right pt-1 flex flex-col justify-between">
  <p className="font-bold text-xs">₦{(item.price * item.quantity).toLocaleString()}</p>
@@ -331,12 +331,12 @@ const AbandonedCheckouts = () => {
  <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
  <MapPin size={14} /> Shipping
  </h4>
- <div className="p-4 bg-black/[0.02] rounded-lg border border-black/[0.06] space-y-2">
+ <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-2">
  <p className="font-bold text-xs truncate uppercase">{order.customer?.firstName} {order.customer?.lastName}</p>
- <p className="text-[11px] text-gray-600 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
- <p className="text-[11px] text-gray-600 uppercase">{order.customer?.city}, {order.customer?.state}</p>
- <div className="flex items-center gap-2 text-[11px] text-gray-600 pt-1 border-t border-black/[0.08] mt-2">
- <Phone size={12} className="text-gray-400" />
+ <p className="text-[11px] text-[#EDEAE2]/65 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
+ <p className="text-[11px] text-[#EDEAE2]/65 uppercase">{order.customer?.city}, {order.customer?.state}</p>
+ <div className="flex items-center gap-2 text-[11px] text-[#EDEAE2]/65 pt-1 border-t border-white/14 mt-2">
+ <Phone size={12} className="text-[#EDEAE2]/42" />
  <span>{order.customer?.phone}</span>
  </div>
  </div>
@@ -347,16 +347,16 @@ const AbandonedCheckouts = () => {
  <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
  <LayoutDashboard size={14}/> Summary
  </h4>
- <div className="p-4 bg-black/[0.02] rounded-lg border border-black/[0.06] space-y-3 font-inter">
- <div className="flex justify-between text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+ <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-3 font-inter">
+ <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
  <span>Subtotal</span>
  <span className="text-right">₦{order.subtotal?.toLocaleString()}</span>
  </div>
- <div className="flex justify-between text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+ <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
  <span>Shipping</span>
  <span className="text-right">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
  </div>
- <div className="flex justify-between font-bold text-sm pt-3 border-t border-black/[0.08] uppercase">
+ <div className="flex justify-between font-bold text-sm pt-3 border-t border-white/14 uppercase">
  <span>Total</span>
  <span className="text-right">₦{order.total?.toLocaleString()}</span>
  </div>
@@ -375,26 +375,26 @@ const AbandonedCheckouts = () => {
  <div className="hidden md:block overflow-x-auto">
  <table className="w-full admin-table">
  <thead>
- <tr className="bg-black/[0.02] border-b border-black/[0.06]">
- <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"></th>
- <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
- <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Customer</th>
- <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
- <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Date</th>
- <th className="px-4 md:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+ <tr className="bg-white/[0.05] border-b border-white/10">
+ <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[#EDEAE2]/55 uppercase tracking-wider w-12"></th>
+ <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[#EDEAE2]/55 uppercase tracking-wider">Order ID</th>
+ <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[#EDEAE2]/55 uppercase tracking-wider hidden md:table-cell">Customer</th>
+ <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[#EDEAE2]/55 uppercase tracking-wider">Status</th>
+ <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[#EDEAE2]/55 uppercase tracking-wider hidden sm:table-cell">Date</th>
+ <th className="px-4 md:px-6 py-3 text-right text-xs font-medium text-[#EDEAE2]/55 uppercase tracking-wider">Total</th>
  </tr>
  </thead>
- <tbody className="bg-white divide-y divide-black/[0.05]">
+ <tbody className="bg-[#131316] divide-y divide-white/10">
  {filteredOrders.map((order) => {
  const isExpanded = expandedOrders.has(order.id);
  const hasTickets = order.items?.some(i => i.category === "tickets");
  return (
  <React.Fragment key={order.id}>
- <tr className="transition-colors hover:bg-black/[0.02]">
+ <tr className="transition-colors hover:bg-white/[0.05]">
  <td className="px-4 md:px-6 py-4">
  <button
  onClick={() => toggleOrderExpansion(order.id)}
- className="focus-ring rounded text-gray-400 hover:text-gray-600 transition-colors"
+ className="focus-ring rounded text-[#EDEAE2]/42 hover:text-[#EDEAE2]/65 transition-colors"
  >
  {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
  </button>
@@ -410,13 +410,13 @@ const AbandonedCheckouts = () => {
  <td className="px-4 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
  <div>
  <p className="font-medium text-sm">{order.customer?.firstName} {order.customer?.lastName}</p>
- <p className="text-xs text-gray-500">{order.customer?.email}</p>
+ <p className="text-xs text-[#EDEAE2]/55">{order.customer?.email}</p>
  </div>
  </td>
  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
- <span className="text-xs text-rose-600 font-bold uppercase tracking-widest bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-100">ABANDONED</span>
+ <span className="text-xs text-rose-300 font-bold uppercase tracking-widest bg-rose-500/[0.14] px-2.5 py-1 rounded-lg border border-rose-500/25">ABANDONED</span>
  </td>
- <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 hidden sm:table-cell">
+ <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-[#EDEAE2]/55 hidden sm:table-cell">
  {order.created_at?.seconds
  ? new Date(order.created_at.seconds * 1000).toLocaleDateString('en-US', {
  year: 'numeric',
@@ -433,7 +433,7 @@ const AbandonedCheckouts = () => {
  {/* Expanded Row */}
  {isExpanded && (
  <tr>
- <td colSpan="6" className="px-4 md:px-6 py-6 bg-black/[0.015]">
+ <td colSpan="6" className="px-4 md:px-6 py-6 bg-white/[0.02]">
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  {/* Order Items */}
  <div>
@@ -443,13 +443,13 @@ const AbandonedCheckouts = () => {
  </h4>
  <div className="space-y-3">
  {order.items?.map((item, idx) => (
- <div key={idx} className="flex gap-4 p-3 bg-white rounded-lg border border-black/[0.06]">
- <div className="w-16 h-20 bg-black/[0.03] rounded overflow-hidden flex-shrink-0">
+ <div key={idx} className="flex gap-4 p-3 bg-[#131316] rounded-lg border border-white/10">
+ <div className="w-16 h-20 bg-white/[0.07] rounded overflow-hidden flex-shrink-0">
  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
  </div>
  <div className="flex-1 min-w-0">
  <p className="font-medium text-sm truncate">{item.name || item.title}</p>
- <p className="text-xs text-gray-500 mt-1">
+ <p className="text-xs text-[#EDEAE2]/55 mt-1">
  {item.category === "tickets" ? (
  <span className="inline-flex items-center gap-1">
  <Ticket size={10} className="shrink-0" />
@@ -459,7 +459,7 @@ const AbandonedCheckouts = () => {
  `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
  )}
  </p>
- <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+ <p className="text-xs text-[#EDEAE2]/55">Qty: {item.quantity}</p>
  </div>
  <div className="text-right">
  <p className="font-medium text-sm">₦{(item.price * item.quantity).toLocaleString()}</p>
@@ -477,11 +477,11 @@ const AbandonedCheckouts = () => {
  <MapPin size={16} />
  Shipping Address
  </h4>
- <div className="p-4 bg-white rounded-lg border border-black/[0.06] space-y-2">
+ <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-2">
  <p className="font-medium text-sm">{order.customer?.firstName} {order.customer?.lastName}</p>
- <p className="text-sm text-gray-600">{order.customer?.address}</p>
- <p className="text-sm text-gray-600">{order.customer?.city}, {order.customer?.state}</p>
- <p className="text-sm text-gray-600">{order.customer?.country}</p>
+ <p className="text-sm text-[#EDEAE2]/65">{order.customer?.address}</p>
+ <p className="text-sm text-[#EDEAE2]/65">{order.customer?.city}, {order.customer?.state}</p>
+ <p className="text-sm text-[#EDEAE2]/65">{order.customer?.country}</p>
  </div>
  </div>
 
@@ -491,10 +491,10 @@ const AbandonedCheckouts = () => {
  <User size={16} />
  Contact Information
  </h4>
- <div className="p-4 bg-white rounded-lg border border-black/[0.06] space-y-3">
+ <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-3">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2 text-sm">
- <Mail size={14} className="text-gray-400" />
+ <Mail size={14} className="text-[#EDEAE2]/42" />
  <span className="truncate">{order.customer?.email}</span>
  </div>
  {order.customer?.email && (
@@ -503,14 +503,14 @@ const AbandonedCheckouts = () => {
  e.stopPropagation();
  window.location.href = `mailto:${order.customer?.email}?subject=Did you forget something? (Order #${order.id.slice(0,8)})&body=Hi ${order.customer?.firstName},%0D%0A%0D%0AWe noticed you left some items in your cart...`
  }}
- className="focus-ring flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.05] hover:bg-black/[0.08] text-black text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
+ className="focus-ring flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.11] hover:bg-white/[0.15] text-[#EDEAE2] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
  >
  <Mail size={12} /> Email Buyer
  </button>
  )}
  </div>
  <div className="flex items-center gap-2 text-sm">
- <Phone size={14} className="text-gray-400" />
+ <Phone size={14} className="text-[#EDEAE2]/42" />
  <span>{order.customer?.phone}</span>
  </div>
  </div>
@@ -519,21 +519,21 @@ const AbandonedCheckouts = () => {
  {/* Order Summary */}
  <div>
  <h4 className="font-semibold mb-4 text-sm md:text-base">Order Status & Summary</h4>
- <div className="p-4 bg-white rounded-lg border border-black/[0.06] space-y-3">
+ <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-3">
  <div className="flex justify-between items-center text-sm">
- <span className="text-gray-500">Payment Status</span>
- <span className="text-xs text-rose-600 font-bold uppercase tracking-widest">ABANDONED</span>
+ <span className="text-[#EDEAE2]/55">Payment Status</span>
+ <span className="text-xs text-rose-300 font-bold uppercase tracking-widest">ABANDONED</span>
  </div>
- <div className="space-y-2 pt-3 border-t border-black/[0.06] font-inter">
- <div className="flex justify-between text-xs text-gray-500">
+ <div className="space-y-2 pt-3 border-t border-white/10 font-inter">
+ <div className="flex justify-between text-xs text-[#EDEAE2]/55">
  <span>Subtotal</span>
  <span>₦{order.subtotal?.toLocaleString()}</span>
  </div>
- <div className="flex justify-between text-xs text-gray-500">
+ <div className="flex justify-between text-xs text-[#EDEAE2]/55">
  <span>Shipping Fee</span>
  <span>₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
  </div>
- <div className="flex justify-between font-bold text-base pt-2 border-t border-black/[0.06]">
+ <div className="flex justify-between font-bold text-base pt-2 border-t border-white/10">
  <span>Grand Total</span>
  <span>₦{order.total?.toLocaleString()}</span>
  </div>

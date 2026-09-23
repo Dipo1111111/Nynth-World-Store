@@ -12,9 +12,11 @@ const TOKENS = [
 ];
 
 export function readChartPalette(element) {
-  const root = element?.ownerDocument?.documentElement || (
-    typeof document !== "undefined" ? document.documentElement : null
-  );
+  const root =
+    element ||
+    (typeof document !== "undefined"
+      ? document.querySelector(".admin-app") || document.documentElement
+      : null);
   if (!root) return {};
   const style = getComputedStyle(root);
   return TOKENS.reduce((acc, name) => {
@@ -68,13 +70,15 @@ export const doughnutOptions = {
         boxWidth: 7,
         boxHeight: 7,
         font: { size: 11, family: "Inter", weight: "500" },
-        color: "oklch(0.556 0 0)",
+        color: "oklch(0.66 0.005 90)",
       },
     },
     tooltip: {
-      backgroundColor: "oklch(0.205 0 0 / 0.92)",
-      titleColor: "oklch(0.985 0 0)",
-      bodyColor: "oklch(0.985 0 0)",
+      backgroundColor: "oklch(0.17 0.002 85)",
+      borderColor: "oklch(1 0 0 / 0.14)",
+      borderWidth: 1,
+      titleColor: "oklch(0.93 0.005 90)",
+      bodyColor: "oklch(0.93 0.005 90)",
       padding: 12,
       cornerRadius: 8,
       displayColors: false,

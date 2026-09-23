@@ -113,10 +113,10 @@ const isPaid = (o) => o.payment_status === 'paid' || o.payment_status === 'succe
 
 const GrowthBadge = ({ value }) => {
     const isUp = value >= 0;
-    const colorClass = isUp ? "text-emerald-600" : "text-rose-600";
+    const colorClass = isUp ? "text-emerald-300" : "text-rose-300";
     const Icon = isUp ? ArrowUpRight : ArrowDownRight;
     return (
-        <span className={`flex items-center text-xs font-semibold ${colorClass}`}>
+        <span className={`flex items-center text-xs font-extrabold tracking-tight tabular-nums ${colorClass}`}>
             <Icon size={14} className="mr-0.5" />
             {Math.abs(value).toFixed(1)}%
         </span>
@@ -147,7 +147,7 @@ const Sparkline = ({ color, points }) => {
     }), [points, color]);
 
     if (!points.length) {
-        return <div className="text-[10px] text-gray-300 flex items-end h-full">No trend data for this period</div>;
+        return <div className="text-[10px] text-[#EDEAE2]/35 flex items-end h-full">No trend data for this period</div>;
     }
     return <Line data={data} options={sparklineOptions} />;
 };
@@ -171,7 +171,7 @@ const DashboardSkeleton = () => (
     <div className="space-y-6 md:space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-xl border border-black/[0.06] bg-white shadow-card p-5">
+                <div key={i} className="rounded-xl border border-white/10 bg-[#131316] shadow-card p-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="skeleton h-4 w-24" />
                         <div className="skeleton h-10 w-10 rounded-lg" />
@@ -183,7 +183,7 @@ const DashboardSkeleton = () => (
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
             {[...Array(3)].map((_, i) => (
-                <div key={i} className="rounded-xl border border-black/[0.06] bg-white shadow-card p-5">
+                <div key={i} className="rounded-xl border border-white/10 bg-[#131316] shadow-card p-5">
                     <div className="skeleton h-5 w-40 mb-5" />
                     <div className="skeleton h-32 w-full" />
                 </div>
@@ -423,12 +423,12 @@ const AdminDashboard = () => {
 
     // --- TREND RENDERER ---
     const PAYMENT_PILLS = {
-        pending: "bg-amber-50 text-amber-700",
-        paid: "bg-emerald-50 text-emerald-700",
-        success: "bg-emerald-50 text-emerald-700",
-        failed: "bg-rose-50 text-rose-600",
-        cancelled: "bg-slate-100 text-slate-500",
-        refunded: "bg-slate-100 text-slate-500",
+        pending: "bg-amber-500/[0.14] text-amber-300",
+        paid: "bg-emerald-500/[0.14] text-emerald-300",
+        success: "bg-emerald-500/[0.14] text-emerald-300",
+        failed: "bg-rose-500/[0.14] text-rose-300",
+        cancelled: "bg-slate-500/[0.18] text-slate-400",
+        refunded: "bg-slate-500/[0.18] text-slate-400",
     };
 
     const PaymentPill = ({ status }) => {
@@ -446,7 +446,7 @@ const AdminDashboard = () => {
     const deliveredRef = useCountUp(dashboardData?.deliveredCount || 0);
 
     const filterOptions = [
-        { id: 'all', label: 'All', dot: 'bg-black' },
+        { id: 'all', label: 'All', dot: 'bg-[#EDEAE2]' },
         { id: 'pending', label: 'Pending', dot: 'bg-amber-500' },
         { id: 'paid', label: 'Paid', dot: 'bg-emerald-500' },
         { id: 'delivered', label: 'Delivered', dot: 'bg-violet-500' },
@@ -460,12 +460,12 @@ const AdminDashboard = () => {
             <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-3 mb-1.5">
-                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Overview</h1>
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-[-0.02em] text-[#EDEAE2]">Overview</h1>
                         <Badge variant={isAdmin ? "success" : "warning"}>
                             {isAdmin ? "Verified Admin" : "Standard Role"}
                         </Badge>
                     </div>
-                    <p className="text-sm text-gray-500">View and analyze your store's performance.</p>
+                    <p className="text-sm text-[#EDEAE2]/55">View and analyze your store's performance.</p>
                 </div>
                 <select
                     value={globalFilter}
@@ -487,20 +487,20 @@ const AdminDashboard = () => {
                     {/* Top stats */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
                         {/* 1. Total Sales - paid orders only (real money in) */}
-                        <Card hover className="admin-reveal bg-white">
+                        <Card hover className="admin-reveal bg-[#131316]">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-1">
-                                    <p className="text-sm font-medium text-gray-600">Total sales (paid)</p>
-                                    <StatIcon icon={TrendingUp} className="bg-emerald-50 text-emerald-600" />
+                                    <p className="text-sm font-medium text-[#EDEAE2]/65">Total sales (paid)</p>
+                                    <StatIcon icon={TrendingUp} className="bg-emerald-500/[0.14] text-emerald-300" />
                                 </div>
                                 <div className="flex items-end justify-between mb-4">
-                                    <h3 className="text-2xl font-bold text-gray-900">
-                                        <span className="text-lg text-gray-500 font-semibold">₦</span>
+                                    <h3 className="text-[28px] leading-none font-extrabold tracking-[-0.02em] tabular-nums text-[#EDEAE2]">
+                                        <span className="text-xl text-[#EDEAE2]/55 font-semibold">₦</span>
                                         <span ref={salesRef}>0</span>
                                     </h3>
                                     <GrowthBadge value={dashboardData.salesGrowth} />
                                 </div>
-                                <div className="text-xs text-gray-400 font-medium mb-1">
+                                <div className="text-xs text-[#EDEAE2]/42 font-medium mb-1">
                                     {dashboardData.paidCount} paid order{dashboardData.paidCount === 1 ? '' : 's'}
                                 </div>
                                 <div className="h-14 w-full mt-3">
@@ -510,20 +510,20 @@ const AdminDashboard = () => {
                         </Card>
 
                         {/* 2. Pending payment - surfaced for attention, NEVER added to sales */}
-                        <Card hover className="admin-reveal bg-white">
+                        <Card hover className="admin-reveal bg-[#131316]">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-1">
-                                    <p className="text-sm font-medium text-amber-700">Pending payment</p>
-                                    <StatIcon icon={BellRing} className="bg-amber-50 text-amber-600" />
+                                    <p className="text-sm font-medium text-amber-300">Pending payment</p>
+                                    <StatIcon icon={BellRing} className="bg-amber-500/[0.14] text-amber-300" />
                                 </div>
                                 <div className="flex items-end justify-between mb-4">
-                                    <h3 className="text-2xl font-bold text-gray-900">
-                                        <span className="text-lg text-gray-500 font-semibold">₦</span>
+                                    <h3 className="text-[28px] leading-none font-extrabold tracking-[-0.02em] tabular-nums text-[#EDEAE2]">
+                                        <span className="text-xl text-[#EDEAE2]/55 font-semibold">₦</span>
                                         <span ref={pendingRef}>0</span>
                                     </h3>
                                     <GrowthBadge value={dashboardData.pendingGrowth} />
                                 </div>
-                                <div className="text-xs text-amber-600 font-medium mb-3">
+                                <div className="text-xs text-amber-300 font-medium mb-3">
                                     {dashboardData.pendingCount} order{dashboardData.pendingCount === 1 ? '' : 's'} awaiting payment
                                 </div>
                                 <Button
@@ -538,19 +538,19 @@ const AdminDashboard = () => {
                         </Card>
 
                         {/* 3. Total orders (paid) */}
-                        <Card hover className="admin-reveal bg-white">
+                        <Card hover className="admin-reveal bg-[#131316]">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-1">
-                                    <p className="text-sm font-medium text-gray-600">Total orders (paid)</p>
-                                    <StatIcon icon={Package} className="bg-violet-50 text-violet-600" />
+                                    <p className="text-sm font-medium text-[#EDEAE2]/65">Total orders (paid)</p>
+                                    <StatIcon icon={Package} className="bg-violet-500/[0.14] text-violet-300" />
                                 </div>
                                 <div className="flex items-end justify-between mb-4">
-                                    <h3 className="text-2xl font-bold text-gray-900">
+                                    <h3 className="text-[28px] leading-none font-extrabold tracking-[-0.02em] tabular-nums text-[#EDEAE2]">
                                         <span ref={ordersRef}>0</span>
                                     </h3>
                                     <GrowthBadge value={dashboardData.ordersGrowth} />
                                 </div>
-                                <div className="text-xs text-gray-400 font-medium mb-1">
+                                <div className="text-xs text-[#EDEAE2]/42 font-medium mb-1">
                                     Paid and collected
                                 </div>
                                 <div className="h-14 w-full mt-3">
@@ -561,28 +561,28 @@ const AdminDashboard = () => {
 
                         {/* 4. Live visitors + Delivered */}
                         <div className="flex flex-col gap-4 md:gap-5">
-                            <Card hover className="admin-reveal bg-white flex-1 flex flex-col justify-center">
+                            <Card hover className="admin-reveal bg-[#131316] flex-1 flex flex-col justify-center">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Online store visitors</p>
-                                        <h3 className="text-2xl font-bold text-gray-900 mt-1 flex items-center gap-2">
+                                        <p className="text-sm font-medium text-[#EDEAE2]/65">Online store visitors</p>
+                                        <h3 className="text-2xl font-bold text-[#EDEAE2] mt-1 flex items-center gap-2">
                                             {liveVisitors}
                                             <span className="inline-flex w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                         </h3>
                                     </div>
-                                    <StatIcon icon={Activity} className="bg-sky-50 text-sky-600" />
+                                    <StatIcon icon={Activity} className="bg-sky-500/[0.14] text-sky-300" />
                                 </CardContent>
                             </Card>
 
-                            <Card hover className="admin-reveal bg-white flex-1 flex flex-col justify-center">
+                            <Card hover className="admin-reveal bg-[#131316] flex-1 flex flex-col justify-center">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Delivered</p>
-                                        <h3 className="text-2xl font-bold text-gray-900 mt-1">
+                                        <p className="text-sm font-medium text-[#EDEAE2]/65">Delivered</p>
+                                        <h3 className="text-2xl font-bold text-[#EDEAE2] mt-1">
                                             <span ref={deliveredRef}>0</span>
                                         </h3>
                                     </div>
-                                    <StatIcon icon={Truck} className="bg-emerald-50 text-emerald-600" />
+                                    <StatIcon icon={Truck} className="bg-emerald-500/[0.14] text-emerald-300" />
                                 </CardContent>
                             </Card>
                         </div>
@@ -591,26 +591,26 @@ const AdminDashboard = () => {
                     {/* Secondary grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
                         {/* Top Products */}
-                        <Card hover className="admin-reveal border-black/[0.06] lg:col-span-1">
-                            <CardHeader className="border-b border-black/[0.04] pb-4">
-                                <CardTitle className="text-base font-semibold text-gray-900">Top products by units sold</CardTitle>
+                        <Card hover className="admin-reveal border-white/10 lg:col-span-1">
+                            <CardHeader className="border-b border-white/[0.06] pb-4">
+                                <CardTitle className="text-base font-semibold text-[#EDEAE2]">Top products by units sold</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 {dashboardData.topProducts.length === 0 ? (
-                                    <div className="p-8 text-center text-sm text-gray-500">No product sales in this period.</div>
+                                    <div className="p-8 text-center text-sm text-[#EDEAE2]/55">No product sales in this period.</div>
                                 ) : (
-                                    <div className="divide-y divide-black/[0.04]">
+                                    <div className="divide-y divide-white/[0.08]">
                                         {dashboardData.topProducts.map((prod, i) => (
-                                            <div key={i} className="flex items-center justify-between p-4 hover:bg-black/[0.02] transition-colors">
+                                            <div key={i} className="flex items-center justify-between p-4 hover:bg-white/[0.05] transition-colors">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <div className="w-10 h-10 rounded-lg border border-black/[0.06] overflow-hidden bg-white shrink-0 shadow-card">
+                                                    <div className="w-10 h-10 rounded-lg border border-white/10 overflow-hidden bg-[#131316] shrink-0 shadow-card">
                                                         <img src={prod.image || "/placeholder.jpg"} className="w-full h-full object-cover" alt="" />
                                                     </div>
-                                                    <p className="text-sm font-medium text-gray-800 line-clamp-1">{prod.title}</p>
+                                                    <p className="text-sm font-medium text-[#E3E0D6] line-clamp-1">{prod.title}</p>
                                                 </div>
                                                 <div className="text-right ml-4 shrink-0">
-                                                    <p className="text-sm font-bold text-gray-900">{prod.quantity}</p>
-                                                    <p className="text-xs text-gray-500">₦{prod.revenue.toLocaleString()}</p>
+                                                    <p className="text-sm font-bold text-[#EDEAE2]">{prod.quantity}</p>
+                                                    <p className="text-xs text-[#EDEAE2]/55">₦{prod.revenue.toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -620,11 +620,11 @@ const AdminDashboard = () => {
                         </Card>
 
                         {/* Recent Orders List */}
-                        <Card hover className="admin-reveal border-black/[0.06] lg:col-span-1">
-                            <CardHeader className="border-b border-black/[0.04] pb-4 flex flex-col gap-3">
+                        <Card hover className="admin-reveal border-white/10 lg:col-span-1">
+                            <CardHeader className="border-b border-white/[0.06] pb-4 flex flex-col gap-3">
                                 <div className="flex flex-row items-center justify-between">
-                                    <CardTitle className="text-base font-semibold text-gray-900">Recent orders</CardTitle>
-                                    <Link to="/admin/orders" className="text-xs font-semibold text-gray-900 hover:text-black underline underline-offset-4">
+                                    <CardTitle className="text-base font-semibold text-[#EDEAE2]">Recent orders</CardTitle>
+                                    <Link to="/admin/orders" className="text-xs font-semibold text-[#EDEAE2] hover:text-[#EDEAE2] underline underline-offset-4">
                                         View all
                                     </Link>
                                 </div>
@@ -632,23 +632,23 @@ const AdminDashboard = () => {
                             </CardHeader>
                             <CardContent className="p-0">
                                 {dashboardData.recentList.length === 0 ? (
-                                    <div className="p-8 text-center text-sm text-gray-500">
+                                    <div className="p-8 text-center text-sm text-[#EDEAE2]/55">
                                         {paymentFilter === 'all'
                                             ? 'No recent orders.'
                                             : `No ${paymentFilter} orders in this period.`}
                                     </div>
                                 ) : (
-                                    <div className="divide-y divide-black/[0.04]">
+                                    <div className="divide-y divide-white/[0.08]">
                                         {dashboardData.recentList.map((order) => (
-                                            <div key={order.id} className="flex items-center justify-between p-4 hover:bg-black/[0.02] transition-colors">
+                                            <div key={order.id} className="flex items-center justify-between p-4 hover:bg-white/[0.05] transition-colors">
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-bold text-gray-900">#{order.id.slice(0, 8).toUpperCase()}</p>
-                                                    <p className="text-xs text-gray-500 truncate mt-0.5">
+                                                    <p className="text-sm font-bold text-[#EDEAE2]">#{order.id.slice(0, 8).toUpperCase()}</p>
+                                                    <p className="text-xs text-[#EDEAE2]/55 truncate mt-0.5">
                                                         {order.customer?.firstName} {order.customer?.lastName}
                                                     </p>
                                                 </div>
                                                 <div className="text-right shrink-0">
-                                                    <p className="text-sm font-semibold text-gray-900">₦{order.total?.toLocaleString()}</p>
+                                                    <p className="text-sm font-semibold text-[#EDEAE2]">₦{order.total?.toLocaleString()}</p>
                                                     <PaymentPill status={order.payment_status} />
                                                 </div>
                                             </div>
@@ -659,19 +659,19 @@ const AdminDashboard = () => {
                         </Card>
 
                         {/* Order Status Doughnut */}
-                        <Card hover className="admin-reveal border-black/[0.06] lg:col-span-1">
-                            <CardHeader className="border-b border-black/[0.04] pb-4">
-                                <CardTitle className="text-base font-semibold text-gray-900">Fulfillment status</CardTitle>
+                        <Card hover className="admin-reveal border-white/10 lg:col-span-1">
+                            <CardHeader className="border-b border-white/[0.06] pb-4">
+                                <CardTitle className="text-base font-semibold text-[#EDEAE2]">Fulfillment status</CardTitle>
                             </CardHeader>
                             <CardContent className="p-5 flex flex-col justify-center h-[calc(100%-70px)]">
                                 {Object.values(dashboardData.statusBreakdown).reduce((a, b) => a + b, 0) === 0 ? (
-                                    <div className="text-center text-sm text-gray-500 my-auto">No data for this period.</div>
+                                    <div className="text-center text-sm text-[#EDEAE2]/55 my-auto">No data for this period.</div>
                                 ) : (
                                     <div className="h-52 w-full chart-wrap">
                                         <Doughnut data={statusChartData} options={donutOpts} />
                                         <div className="chart-donut-center mb-3">
-                                            <span className="text-[10px] text-gray-400 font-medium tracking-[0.2em] uppercase">All</span>
-                                            <span className="text-2xl font-bold text-gray-900 leading-none mt-1">
+                                            <span className="text-[10px] text-[#EDEAE2]/42 font-medium tracking-[0.2em] uppercase">All</span>
+                                            <span className="text-2xl font-bold text-[#EDEAE2] leading-none mt-1">
                                                 {dashboardData.ordersCount}
                                             </span>
                                         </div>

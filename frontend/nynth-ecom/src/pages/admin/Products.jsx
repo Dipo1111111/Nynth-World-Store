@@ -22,27 +22,27 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <div ref={setNodeRef} style={style} className={`bg-white p-4 rounded-xl border ${isDragging ? "border-black shadow-card opacity-80" : "border-black/[0.06] shadow-card"} flex flex-col gap-3 group transition-all`}>
+ <div ref={setNodeRef} style={style} className={`bg-[#131316] p-4 rounded-xl border ${isDragging ? "border-white/25 shadow-card opacity-80" : "border-white/10 shadow-card"} flex flex-col gap-3 group transition-all`}>
  <div className="flex gap-4">
- <div className="w-20 h-20 bg-black/[0.03] rounded-lg overflow-hidden flex-shrink-0 border border-black/[0.06]">
+ <div className="w-20 h-20 bg-white/[0.07] rounded-lg overflow-hidden flex-shrink-0 border border-white/10">
  {(product.images?.[0] || product.imageUrl) ? (
  <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
  ) : (
- <ImageIcon className="w-full h-full p-4 text-gray-300" />
+ <ImageIcon className="w-full h-full p-4 text-[#EDEAE2]/35" />
  )}
  </div>
  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
  <div>
- <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight">{product.title || product.name}</h3>
- <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{product.category}</p>
+ <h3 className="font-bold text-[#EDEAE2] text-sm truncate uppercase tracking-tight">{product.title || product.name}</h3>
+ <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-0.5">{product.category}</p>
  </div>
  <div className="flex items-center justify-between mt-2">
  <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
  <div className="flex items-center gap-1">
  <span className={`px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider border ${
- product.stockQuantity <= 0 ? "bg-rose-50 text-rose-600 border-rose-100" :
- product.stockQuantity <= 5 ? "bg-amber-50 text-amber-700 border-amber-100" :
- "bg-emerald-50 text-emerald-700 border-emerald-100"
+ product.stockQuantity <= 0 ? "bg-rose-500/[0.14] text-rose-300 border-rose-500/25" :
+ product.stockQuantity <= 5 ? "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" :
+ "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
  }`}>
  {product.stockQuantity <= 0 ? "Out" : `${product.stockQuantity} Left`}
  </span>
@@ -50,20 +50,20 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  </div>
  </div>
  </div>
- <div className="flex justify-end gap-2 pt-2 border-t border-black/[0.05]">
- <button {...attributes} {...listeners} className="focus-ring flex items-center justify-center p-2 bg-black/[0.03] text-gray-400 hover:text-black rounded-lg border border-transparent touch-none active:cursor-grabbing cursor-grab">
+ <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
+ <button {...attributes} {...listeners} className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[#EDEAE2]/42 hover:text-[#EDEAE2] rounded-lg border border-transparent touch-none active:cursor-grabbing cursor-grab">
  <GripVertical size={16} />
  </button>
  <button
  onClick={() => handleTogglePublic(product)}
- className={`focus-ring flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100' : 'bg-slate-100 text-gray-500 border-slate-200 hover:bg-slate-200'}`}
+ className={`focus-ring flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25 hover:bg-emerald-500/25' : 'bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30 hover:bg-slate-500/35'}`}
  >
  {product.isPublic !== false ? <><Eye size={14}/> Visible</> : <><EyeOff size={14}/> Hidden</>}
  </button>
- <button onClick={() => handleEdit(product)} className="focus-ring flex items-center justify-center p-2 bg-black/[0.03] text-gray-600 rounded-lg border border-black/[0.06] hover:bg-black/[0.06]">
+ <button onClick={() => handleEdit(product)} className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[#EDEAE2]/65 rounded-lg border border-white/10 hover:bg-white/[0.12]">
  <Edit2 size={14} />
  </button>
- <button onClick={() => handleDelete(product.id)} className="focus-ring flex items-center justify-center p-2 bg-rose-50 text-rose-500 rounded-lg border border-rose-100 hover:bg-rose-100">
+ <button onClick={() => handleDelete(product.id)} className="focus-ring flex items-center justify-center p-2 bg-rose-500/[0.14] text-rose-300 rounded-lg border border-rose-500/25 hover:bg-rose-500/25">
  <Trash2 size={14} />
  </button>
  </div>
@@ -76,52 +76,52 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <tr ref={setNodeRef} style={style} className={`transition-colors ${isDragging ? "bg-black/[0.02] shadow-card ring-1 ring-black/[0.06] opacity-80" : "hover:bg-black/[0.02]"}`}>
+ <tr ref={setNodeRef} style={style} className={`transition-colors ${isDragging ? "bg-white/[0.05] shadow-card ring-1 ring-white/12 opacity-80" : "hover:bg-white/[0.05]"}`}>
  <td className="p-4">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-black/[0.03] rounded-lg overflow-hidden border border-black/[0.06]">
+ <div className="w-12 h-12 bg-white/[0.07] rounded-lg overflow-hidden border border-white/10">
  {(product.images?.[0] || product.imageUrl) ? (
  <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
  ) : (
- <ImageIcon className="w-full h-full p-3 text-gray-300" />
+ <ImageIcon className="w-full h-full p-3 text-[#EDEAE2]/35" />
  )}
  </div>
  <div>
- <span className="font-bold text-gray-900 text-sm uppercase tracking-tight block">{product.title || product.name}</span>
- <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
+ <span className="font-bold text-[#EDEAE2] text-sm uppercase tracking-tight block">{product.title || product.name}</span>
+ <span className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
  </div>
  </div>
  </td>
- <td className="p-4 capitalize text-gray-600 text-sm font-medium">{product.category}</td>
+ <td className="p-4 capitalize text-[#EDEAE2]/65 text-sm font-medium">{product.category}</td>
  <td className="p-4 font-bold text-sm">₦{product.price?.toLocaleString()}</td>
  <td className="p-4">
  <div className="flex flex-col gap-1">
  <span className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider w-fit border ${
- product.stockQuantity <= 0 ? "bg-rose-50 text-rose-600 border-rose-100" :
- product.stockQuantity <= 5 ? "bg-amber-50 text-amber-700 border-amber-100" :
- "bg-emerald-50 text-emerald-700 border-emerald-100"
+ product.stockQuantity <= 0 ? "bg-rose-500/[0.14] text-rose-300 border-rose-500/25" :
+ product.stockQuantity <= 5 ? "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" :
+ "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
  }`}>
  {product.stockQuantity <= 0 ? "Out of Stock" : product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
  </span>
- <span className="text-[10px] text-gray-400 font-bold px-1 uppercase tracking-tighter">{product.stockQuantity} UNITS</span>
+ <span className="text-[10px] text-[#EDEAE2]/42 font-bold px-1 uppercase tracking-tighter">{product.stockQuantity} UNITS</span>
  </div>
  </td>
  <td className="p-4 text-right">
  <div className="flex justify-end items-center gap-2 transition-all">
  <button
  onClick={() => handleTogglePublic(product)}
- className={`focus-ring p-1.5 rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-100 text-gray-500 border-slate-200'}`}
+ className={`focus-ring p-1.5 rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25' : 'bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30'}`}
  title={product.isPublic !== false ? "Hide from Store" : "Show on Store"}
  >
  {product.isPublic !== false ? <Eye size={16} /> : <EyeOff size={16} />}
  </button>
- <button {...attributes} {...listeners} className="focus-ring p-2 text-gray-400 hover:text-black cursor-grab active:cursor-grabbing touch-none">
+ <button {...attributes} {...listeners} className="focus-ring p-2 text-[#EDEAE2]/42 hover:text-[#EDEAE2] cursor-grab active:cursor-grabbing touch-none">
  <GripVertical size={16} />
  </button>
- <button onClick={() => handleEdit(product)} className="focus-ring p-2 text-gray-600 hover:text-black hover:bg-black/[0.04] rounded-lg border border-transparent hover:border-black/[0.06]">
+ <button onClick={() => handleEdit(product)} className="focus-ring p-2 text-[#EDEAE2]/65 hover:text-[#EDEAE2] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-white/10">
  <Edit2 size={16} />
  </button>
- <button onClick={() => handleDelete(product.id)} className="focus-ring p-2 text-rose-500 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-100">
+ <button onClick={() => handleDelete(product.id)} className="focus-ring p-2 text-rose-300 hover:bg-rose-500/[0.14] rounded-lg border border-transparent hover:border-rose-500/25">
  <Trash2 size={16} />
  </button>
  </div>
@@ -472,10 +472,10 @@ export default function AdminProducts() {
  <AdminLayout title="Products">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">
  {products.length} product{products.length !== 1 ? "s" : ""} · drag rows or long-press cards to reorder
  </p>
- <p className="text-sm text-gray-500">Keep your catalog ordered and discoverable.</p>
+ <p className="text-sm text-[#EDEAE2]/55">Keep your catalog ordered and discoverable.</p>
  </div>
  <button
  onClick={handleCreate}
@@ -486,10 +486,10 @@ export default function AdminProducts() {
  </button>
  </div>
 
- <div className="bg-transparent sm:bg-white sm:rounded-xl sm:border sm:border-black/[0.06] sm:shadow-card overflow-hidden">
+ <div className="bg-transparent sm:bg-[#131316] sm:rounded-xl sm:border sm:border-white/10 sm:shadow-card overflow-hidden">
  {loading ? (
- <div className="p-12 flex justify-center bg-white rounded-xl border border-black/[0.06]">
- <Loader2 className="animate-spin text-black/20" size={32} />
+ <div className="p-12 flex justify-center bg-[#131316] rounded-xl border border-white/10">
+ <Loader2 className="animate-spin text-white/25" size={32} />
  </div>
  ) : (
  <>
@@ -502,11 +502,11 @@ export default function AdminProducts() {
  <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
  ))}
  {products.length === 0 && (
- <div className="text-center py-20 bg-white rounded-xl border border-dashed border-black/[0.12]">
- <div className="w-12 h-12 mx-auto rounded-xl bg-black/[0.04] flex items-center justify-center mb-3">
- <Package className="h-6 w-6 text-gray-300" />
+ <div className="text-center py-20 bg-[#131316] rounded-xl border border-dashed border-white/22">
+ <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.09] flex items-center justify-center mb-3">
+ <Package className="h-6 w-6 text-[#EDEAE2]/35" />
  </div>
- <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
+ <p className="text-[#EDEAE2]/55 text-xs font-bold uppercase tracking-widest">No products found</p>
  </div>
  )}
  </div>
@@ -517,27 +517,27 @@ export default function AdminProducts() {
  <div className="hidden sm:block overflow-x-auto">
  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
  <table className="w-full text-left admin-table">
- <thead className="bg-black/[0.02] border-b border-black/[0.06]">
+ <thead className="bg-white/[0.05] border-b border-white/10">
  <tr>
- <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Product</th>
- <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Category</th>
- <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Price</th>
- <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Stock</th>
- <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 text-right">Actions</th>
+ <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[#EDEAE2]/42">Product</th>
+ <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[#EDEAE2]/42 whitespace-nowrap">Category</th>
+ <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[#EDEAE2]/42 whitespace-nowrap">Price</th>
+ <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[#EDEAE2]/42">Stock</th>
+ <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[#EDEAE2]/42 text-right">Actions</th>
  </tr>
  </thead>
  <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
- <tbody className="divide-y divide-black/[0.05]">
+ <tbody className="divide-y divide-white/10">
  {products.map(product => (
  <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
  ))}
  {products.length === 0 && (
  <tr>
  <td colSpan="5" className="p-12 text-center">
- <div className="w-12 h-12 mx-auto rounded-xl bg-black/[0.04] flex items-center justify-center mb-3">
- <Package className="h-6 w-6 text-gray-300" />
+ <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.09] flex items-center justify-center mb-3">
+ <Package className="h-6 w-6 text-[#EDEAE2]/35" />
  </div>
- <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
+ <p className="text-[#EDEAE2]/55 text-xs font-bold uppercase tracking-widest">No products found</p>
  </td>
  </tr>
  )}
@@ -553,15 +553,15 @@ export default function AdminProducts() {
  {/* Modal */}
  {isModalOpen && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-black/[0.06]">
+ <div className="bg-[#131316] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-white/10">
  <div className="flex justify-between items-center mb-6">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Catalog</p>
- <h2 className="text-2xl font-bold text-gray-900">{editingId ? "Edit Product" : "New Product"}</h2>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">Catalog</p>
+ <h2 className="text-2xl font-bold text-[#EDEAE2]">{editingId ? "Edit Product" : "New Product"}</h2>
  </div>
  <button
  onClick={() => setIsModalOpen(false)}
- className="focus-ring p-2 hover:bg-black/[0.04] rounded-lg transition-colors"
+ className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg transition-colors"
  >
  <X size={20} />
  </button>
@@ -570,54 +570,54 @@ export default function AdminProducts() {
  <form onSubmit={handleSubmit} className="space-y-6">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Title</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Title</label>
  <input
  required
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  value={formData.title}
  onChange={e => setFormData({ ...formData, title: e.target.value })}
  />
  </div>
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Price (₦)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Price (₦)</label>
  <input
  type="number"
  required
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  value={formData.price}
  onChange={e => setFormData({ ...formData, price: e.target.value })}
  />
  </div>
  <div className="space-y-2 md:col-span-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">
- Compare at Price (₦) <span className="text-gray-400 text-xs normal-case">- optional</span>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">
+ Compare at Price (₦) <span className="text-[#EDEAE2]/42 text-xs normal-case">- optional</span>
  </label>
  <input
  type="number"
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  placeholder="e.g. 15000"
  value={formData.compareAtPrice || ""}
  onChange={e => setFormData({ ...formData, compareAtPrice: e.target.value ? parseFloat(e.target.value) : null })}
  />
- <p className="text-[11px] text-gray-400">Original price shown with strikethrough. Leave empty to hide.</p>
+ <p className="text-[11px] text-[#EDEAE2]/42">Original price shown with strikethrough. Leave empty to hide.</p>
  </div>
 
  </div>
 
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Description</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Description</label>
  <textarea
  rows={4}
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  value={formData.description}
  onChange={e => setFormData({ ...formData, description: e.target.value })}
  />
  </div>
 
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Category</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Category</label>
  <select
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg bg-white focus-ring cursor-pointer"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg bg-[#131316] focus-ring cursor-pointer"
  value={formData.category}
  onChange={e => setFormData({ ...formData, category: e.target.value })}
  >
@@ -629,26 +629,26 @@ export default function AdminProducts() {
 
  {/* Ticket / Event fields */}
  {formData.category === "tickets" && (
- <div className="space-y-4 pt-4 border-t border-black/[0.06] bg-black/[0.02] p-4 rounded-xl">
+ <div className="space-y-4 pt-4 border-t border-white/10 bg-white/[0.05] p-4 rounded-xl">
  <div className="flex items-center gap-2">
- <Ticket size={16} className="text-black" />
- <span className="text-[10px] font-bold uppercase tracking-widest text-black">Event Setup - e-tickets auto-deliver</span>
+ <Ticket size={16} className="text-[#EDEAE2]" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]">Event Setup - e-tickets auto-deliver</span>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Event Date &amp; Time (WAT)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Event Date &amp; Time (WAT)</label>
  <input
  type="datetime-local"
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg bg-white focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg bg-[#131316] focus-ring"
  value={formData.eventDateTime || ""}
  onChange={e => setFormData({ ...formData, eventDateTime: e.target.value })}
  />
- <p className="text-[11px] text-gray-400">Drives the countdown, sold-out state and e-ticket date.</p>
+ <p className="text-[11px] text-[#EDEAE2]/42">Drives the countdown, sold-out state and e-ticket date.</p>
  </div>
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Venue</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Venue</label>
  <input
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  placeholder="e.g. Lagos - Eko Hotel Convention Centre"
  value={formData.venue || ""}
  onChange={e => setFormData({ ...formData, venue: e.target.value })}
@@ -656,15 +656,15 @@ export default function AdminProducts() {
  </div>
  </div>
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Total Tickets Available (Capacity)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Total Tickets Available (Capacity)</label>
  <input
  type="number"
  min="0"
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  value={formData.stockQuantity}
  onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
  />
- <p className="text-[11px] text-gray-400">Auto-reduced per ticket sold. Hits 0 = SOLD OUT on the storefront.</p>
+ <p className="text-[11px] text-[#EDEAE2]/42">Auto-reduced per ticket sold. Hits 0 = SOLD OUT on the storefront.</p>
  </div>
  </div>
  )}
@@ -672,10 +672,10 @@ export default function AdminProducts() {
  {/* Variants - apparel & headwear only. Tickets are single-format:
  no sizes, no colors, no merchandising badges. */}
  {formData.category !== "tickets" && (
- <div className="space-y-4 pt-4 border-t border-black/[0.06]">
+ <div className="space-y-4 pt-4 border-t border-white/10">
  {formData.category !== "headwear" && (
  <div>
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Sizes</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-2">Sizes</label>
  <div className="flex flex-wrap gap-2">
  {availableSizes.map(size => (
  <button
@@ -683,8 +683,8 @@ export default function AdminProducts() {
  type="button"
  onClick={() => toggleSelection("sizes", size)}
  className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.sizes.includes(size)
- ? "bg-black text-white border-black"
- : "bg-white text-gray-600 border-black/[0.08] hover:border-black"
+ ? "bg-[#EDEAE2] text-[#0d0d0f] border-white/25"
+ : "bg-[#131316] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
  }`}
  >
  {size}
@@ -695,7 +695,7 @@ export default function AdminProducts() {
  )}
 
  <div>
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Colors</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-2">Colors</label>
  <div className="flex flex-wrap gap-2">
  {availableColors.map(color => (
  <button
@@ -703,8 +703,8 @@ export default function AdminProducts() {
  type="button"
  onClick={() => toggleSelection("colors", color)}
  className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.colors.includes(color)
- ? "bg-black text-white border-black"
- : "bg-white text-gray-600 border-black/[0.08] hover:border-black"
+ ? "bg-[#EDEAE2] text-[#0d0d0f] border-white/25"
+ : "bg-[#131316] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
  }`}
  >
  {color}
@@ -714,7 +714,7 @@ export default function AdminProducts() {
  </div>
 
  <div>
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Tags</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-2">Tags</label>
  <div className="flex flex-wrap gap-2">
  {availableTags.map(tag => (
  <button
@@ -722,8 +722,8 @@ export default function AdminProducts() {
  type="button"
  onClick={() => toggleSelection("tags", tag)}
  className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.tags.includes(tag)
- ? "bg-black text-white border-black"
- : "bg-white text-gray-600 border-black/[0.08] hover:border-black"
+ ? "bg-[#EDEAE2] text-[#0d0d0f] border-white/25"
+ : "bg-[#131316] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
  }`}
  >
  {tag}
@@ -736,12 +736,12 @@ export default function AdminProducts() {
 
  {formData.category !== "headwear" && formData.category !== "tickets" ? (
  formData.sizes.length > 0 && (
- <div className="bg-black/[0.02] p-4 rounded-xl border border-black/[0.06] space-y-4">
- <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/[0.06] shadow-card">
- <label className="text-[10px] font-bold uppercase tracking-widest text-black">Inventory per Size</label>
+ <div className="bg-white/[0.05] p-4 rounded-xl border border-white/10 space-y-4">
+ <div className="flex justify-between items-center bg-[#131316] p-3 rounded-lg border border-white/10 shadow-card">
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]">Inventory per Size</label>
  <div className="flex items-center gap-3">
- <div className="flex items-center gap-2 border-r border-black/[0.06] pr-3">
- <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Bulk Update:</span>
+ <div className="flex items-center gap-2 border-r border-white/10 pr-3">
+ <span className="text-[9px] font-bold text-[#EDEAE2]/42 uppercase tracking-tighter">Bulk Update:</span>
  <div className="flex">
  <input
  id="bulk-stock-input"
@@ -759,7 +759,7 @@ export default function AdminProducts() {
  toast.success("Applied to all sizes");
  }
  }}
- className="px-2 py-1 bg-black text-white text-[8px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
+ className="px-2 py-1 bg-[#EDEAE2] text-[#0d0d0f] text-[8px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
  >
  Set All
  </button>
@@ -770,7 +770,7 @@ export default function AdminProducts() {
  onClick={() => {
  if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
  }}
- className="text-[9px] font-bold text-rose-400 hover:text-rose-500 uppercase tracking-tighter transition-colors"
+ className="text-[9px] font-bold text-rose-300 hover:text-rose-300 uppercase tracking-tighter transition-colors"
  >
  Clear All
  </button>
@@ -779,13 +779,13 @@ export default function AdminProducts() {
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
  {formData.sizes.map(size => (
  <div key={size} className="space-y-1">
- <label className="text-[10px] font-bold text-gray-500">{size}</label>
+ <label className="text-[10px] font-bold text-[#EDEAE2]/55">{size}</label>
  <input
  type="number"
  min="0"
  value={formData.sizeStock[size] || 0}
  onChange={(e) => handleSizeStockChange(size, e.target.value)}
- className="w-full p-2 text-xs border border-black/[0.08] rounded-lg font-bold focus-ring"
+ className="w-full p-2 text-xs border border-white/14 rounded-lg font-bold focus-ring"
  />
  </div>
  ))}
@@ -794,33 +794,33 @@ export default function AdminProducts() {
  )
  ) : formData.category === "headwear" ? (
  <div className="space-y-2">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Total Units In Stock</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Total Units In Stock</label>
  <input
  type="number"
  min="0"
  placeholder="Enter total quantity"
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
  value={formData.stockQuantity}
  onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
  />
- <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight italic">
+ <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-tight italic">
  * Headwear is treat as One Size. Enter total units available across all expandable strap units.
  </p>
  </div>
  ) : null}
 
  {/* Images */}
- <div className="space-y-2 pt-4 border-t border-black/[0.06]">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Images</label>
+ <div className="space-y-2 pt-4 border-t border-white/10">
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Images</label>
 
  {/* Existing Images */}
  <div className="flex gap-4 mb-2 overflow-x-auto no-scrollbar pb-4 snap-x">
  {formData.images.map((img, idx) => (
  <div key={idx} className="flex flex-col gap-2 flex-shrink-0 snap-start">
- <div className="w-28 h-28 rounded-xl border border-black/[0.08] overflow-hidden relative shadow-card">
+ <div className="w-28 h-28 rounded-xl border border-white/14 overflow-hidden relative shadow-card">
  <img src={img} className="w-full h-full object-cover" />
  {idx === 0 && (
- <div className="absolute top-1 left-1 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
+ <div className="absolute top-1 left-1 bg-[#EDEAE2] text-[#0d0d0f] text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
  Primary
  </div>
  )}
@@ -844,7 +844,7 @@ export default function AdminProducts() {
  setFormData({ ...formData, images: newImages });
  }}
  disabled={idx === 0}
- className="focus-ring p-1.5 rounded-md hover:bg-black/[0.04] text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+ className="focus-ring p-1.5 rounded-md hover:bg-white/[0.09] text-[#EDEAE2]/65 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
  title="Move Left"
  >
  <ChevronLeft size={16} strokeWidth={2.5} />
@@ -853,7 +853,7 @@ export default function AdminProducts() {
  <button
  type="button"
  onClick={() => setFormData({ ...formData, modelImage: formData.modelImage === img ? null : img })}
- className={`focus-ring p-1.5 rounded-md hover:bg-black/[0.04] transition-colors ${formData.modelImage === img ? 'text-amber-500 bg-amber-50' : 'text-gray-600'}`}
+ className={`focus-ring p-1.5 rounded-md hover:bg-white/[0.09] transition-colors ${formData.modelImage === img ? 'text-amber-500 bg-amber-500/[0.14]' : 'text-[#EDEAE2]/65'}`}
  title="Toggle Model Image"
  >
  <Star size={14} fill={formData.modelImage === img ? "currentColor" : "none"} />
@@ -870,7 +870,7 @@ export default function AdminProducts() {
  modelImage: prev.modelImage === img ? null : prev.modelImage
  }));
  }}
- className="focus-ring p-1.5 rounded-md hover:bg-rose-50 text-rose-500 transition-colors"
+ className="focus-ring p-1.5 rounded-md hover:bg-rose-500/[0.14] text-rose-300 transition-colors"
  title="Delete Image"
  >
  <Trash2 size={14} />
@@ -887,7 +887,7 @@ export default function AdminProducts() {
  setFormData({ ...formData, images: newImages });
  }}
  disabled={idx === formData.images.length - 1}
- className="focus-ring p-1.5 rounded-md hover:bg-black/[0.04] text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+ className="focus-ring p-1.5 rounded-md hover:bg-white/[0.09] text-[#EDEAE2]/65 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
  title="Move Right"
  >
  <ChevronRight size={16} strokeWidth={2.5} />
@@ -897,7 +897,7 @@ export default function AdminProducts() {
  ))}
  </div>
 
- <div className="border-2 border-dashed border-black/[0.15] rounded-xl p-6 text-center cursor-pointer hover:border-black/30 hover:bg-black/[0.02] transition-all relative">
+ <div className="border-2 border-dashed border-white/26 rounded-xl p-6 text-center cursor-pointer hover:border-white/45 hover:bg-white/[0.05] transition-all relative">
  <input
  type="file"
  multiple
@@ -906,7 +906,7 @@ export default function AdminProducts() {
  onChange={handleImageUpload}
  disabled={isUploading}
  />
- <div className="flex flex-col items-center text-gray-400">
+ <div className="flex flex-col items-center text-[#EDEAE2]/42">
  <Upload size={24} className="mb-1" />
  <span className="text-sm">
  {isUploading
@@ -918,39 +918,39 @@ export default function AdminProducts() {
  </div>
 
  {/* Inventory Management */}
- <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4 border-t border-black/[0.06]">
+ <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4 border-t border-white/10">
  {formData.category !== "tickets" && (
  <div className="space-y-2 flex-1">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Stock Quantity</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Stock Quantity</label>
  <div className="relative">
  <input
  type="number"
  min="0"
  readOnly
- className="w-full px-4 py-3 pl-10 border border-black/[0.08] rounded-lg bg-black/[0.02] text-gray-500 font-bold focus-ring"
+ className="w-full px-4 py-3 pl-10 border border-white/14 rounded-lg bg-white/[0.05] text-[#EDEAE2]/55 font-bold focus-ring"
  value={formData.stockQuantity}
  />
- <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+ <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={18} />
  </div>
- <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Automatic Total from Sizes</p>
+ <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-tighter">Automatic Total from Sizes</p>
  </div>
  )}
 
  {formData.category !== "tickets" && (
  <div className="space-y-2 flex-1">
- <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Weight (kg)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Weight (kg)</label>
  <div className="relative">
  <input
  type="number"
  step="0.1"
  min="0"
- className="w-full px-4 py-3 pl-10 border border-black/[0.08] rounded-lg focus-ring"
+ className="w-full px-4 py-3 pl-10 border border-white/14 rounded-lg focus-ring"
  value={formData.weight}
  onChange={e => setFormData({ ...formData, weight: parseFloat(e.target.value) || 0 })}
  />
- <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+ <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={18} />
  </div>
- <p className="text-[11px] text-gray-400">Used for interstate shipping calculations (₦1,500/kg above 3kg).</p>
+ <p className="text-[11px] text-[#EDEAE2]/42">Used for interstate shipping calculations (₦1,500/kg above 3kg).</p>
  </div>
  )}
 
@@ -960,7 +960,7 @@ export default function AdminProducts() {
  type="checkbox"
  checked={formData.featured}
  onChange={e => setFormData({ ...formData, featured: e.target.checked })}
- className="w-4 h-4 rounded border-black/20 accent-black"
+ className="w-4 h-4 rounded border-white/32 accent-[#EDEAE2]"
  />
  <span className="text-sm font-medium">Featured</span>
  </label>
@@ -971,7 +971,7 @@ export default function AdminProducts() {
  type="checkbox"
  checked={formData.bestSeller}
  onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
- className="w-4 h-4 rounded border-black/20 accent-black"
+ className="w-4 h-4 rounded border-white/32 accent-[#EDEAE2]"
  />
  <span className="text-sm font-medium">Best Seller</span>
  </label>
@@ -983,14 +983,14 @@ export default function AdminProducts() {
  <button
  type="button"
  onClick={() => setIsModalOpen(false)}
- className="focus-ring px-6 py-2.5 border border-black/[0.1] rounded-lg hover:bg-black/[0.02]"
+ className="focus-ring px-6 py-2.5 border border-white/18 rounded-lg hover:bg-white/[0.05]"
  disabled={isSubmitting || isUploading}
  >
  Cancel
  </button>
  <button
  type="submit"
- className="focus-ring px-6 py-2.5 bg-black text-white rounded-lg hover:opacity-90 shadow-card flex items-center gap-2"
+ className="focus-ring px-6 py-2.5 bg-[#EDEAE2] text-[#0d0d0f] rounded-lg hover:opacity-90 shadow-card flex items-center gap-2"
  disabled={isSubmitting || isUploading}
  >
  {(isSubmitting || isUploading) && <Loader2 className="animate-spin" size={16} />}

@@ -112,14 +112,14 @@ export default function AdminLookbooks() {
  {/* Action Bar */}
  <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Editorial Archive</p>
- <h2 className="text-2xl font-bold text-gray-900">Gallery</h2>
- <p className="text-gray-400 text-sm mt-1">Manage your editorial imagery.</p>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">Editorial Archive</p>
+ <h2 className="text-2xl font-bold text-[#EDEAE2]">Gallery</h2>
+ <p className="text-[#EDEAE2]/42 text-sm mt-1">Manage your editorial imagery.</p>
  </div>
  <div className="flex gap-3">
  <button
  onClick={() => loadLookbooks(true)}
- className="focus-ring px-5 py-2.5 border border-black/[0.08] rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-black/[0.02] transition-all active:scale-[0.98]"
+ className="focus-ring px-5 py-2.5 border border-white/14 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.05] transition-all active:scale-[0.98]"
  >
  Refresh
  </button>
@@ -140,12 +140,12 @@ export default function AdminLookbooks() {
  ))}
  </div>
  ) : lookbooks.length === 0 ? (
- <div className="bg-white border border-dashed border-black/[0.12] rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-card">
- <div className="w-16 h-16 bg-black/[0.04] rounded-2xl flex items-center justify-center mb-6">
- <Upload className="w-8 h-8 text-gray-300" />
+ <div className="bg-[#131316] border border-dashed border-white/22 rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-card">
+ <div className="w-16 h-16 bg-white/[0.09] rounded-2xl flex items-center justify-center mb-6">
+ <Upload className="w-8 h-8 text-[#EDEAE2]/35" />
  </div>
- <h3 className="text-xl font-bold text-gray-900 mb-2">No Looks Found</h3>
- <p className="text-gray-400 text-sm mb-8">Start by adding your first visual to the collection.</p>
+ <h3 className="text-xl font-bold text-[#EDEAE2] mb-2">No Looks Found</h3>
+ <p className="text-[#EDEAE2]/42 text-sm mb-8">Start by adding your first visual to the collection.</p>
  <button
  onClick={() => setIsModalOpen(true)}
  className="btn-primary focus-ring flex items-center gap-3 px-8 py-4 shadow-card"
@@ -157,13 +157,13 @@ export default function AdminLookbooks() {
  ) : (
  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
  {lookbooks.map((look) => (
- <div key={look.id} className="bg-white border border-black/[0.06] rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover relative group aspect-[3/4]">
+ <div key={look.id} className="bg-[#131316] border border-white/10 rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover relative group aspect-[3/4]">
  <img src={look.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
 
  {/* Persistent Delete Button for Mobile/Desktop Accessibility */}
  <button
  onClick={() => setDeleteConfirmId(look.id)}
- className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-rose-500 p-2.5 rounded-lg shadow-card hover:bg-white hover:scale-110 active:scale-90 transition-all duration-300 z-10"
+ className="absolute bottom-3 right-3 bg-[#131316]/90 backdrop-blur-sm text-rose-300 p-2.5 rounded-lg shadow-card hover:bg-white/15 hover:scale-110 active:scale-90 transition-all duration-300 z-10"
  aria-label="Delete Look"
  >
  <Trash2 size={16} />
@@ -184,19 +184,19 @@ export default function AdminLookbooks() {
  }
  }}
  >
- <div className="bg-white rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-black/[0.06]">
+ <div className="bg-[#131316] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-white/10">
  <div className="flex justify-between items-center mb-8">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">New Editorial Image</p>
- <h2 className="text-2xl font-bold text-gray-900">Upload Visual</h2>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">New Editorial Image</p>
+ <h2 className="text-2xl font-bold text-[#EDEAE2]">Upload Visual</h2>
  </div>
- <button onClick={() => setIsModalOpen(false)} className="focus-ring p-2 hover:bg-black/[0.04] rounded-lg transition-colors">
+ <button onClick={() => setIsModalOpen(false)} className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg transition-colors">
  <X size={20} />
  </button>
  </div>
 
  <form onSubmit={handleSubmit} className="space-y-8">
- <div className="border-2 border-dashed border-black/[0.12] rounded-2xl p-16 text-center cursor-pointer hover:border-black/30 hover:bg-black/[0.02] transition-all relative group">
+ <div className="border-2 border-dashed border-white/22 rounded-2xl p-16 text-center cursor-pointer hover:border-white/45 hover:bg-white/[0.05] transition-all relative group">
  <input
  type="file"
  onChange={handleImageChange}
@@ -204,15 +204,15 @@ export default function AdminLookbooks() {
  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
  />
  {formData.image ? (
- <div className="flex flex-col items-center gap-4 text-emerald-600">
- <div className="w-16 h-16 bg-emerald-50 rounded-xl flex items-center justify-center">
+ <div className="flex flex-col items-center gap-4 text-emerald-300">
+ <div className="w-16 h-16 bg-emerald-500/[0.14] rounded-xl flex items-center justify-center">
  <CheckCircle size={32} />
  </div>
  <span className="text-sm font-bold uppercase tracking-widest">{formData.image.name}</span>
  </div>
  ) : (
- <div className="flex flex-col items-center text-gray-300 group-hover:text-gray-400 transition-colors">
- <div className="w-16 h-16 bg-black/[0.04] rounded-2xl flex items-center justify-center mb-6">
+ <div className="flex flex-col items-center text-[#EDEAE2]/35 group-hover:text-[#EDEAE2]/42 transition-colors">
+ <div className="w-16 h-16 bg-white/[0.09] rounded-2xl flex items-center justify-center mb-6">
  <Plus size={32} />
  </div>
  <span className="font-bold uppercase tracking-[0.2em] text-[10px]">Select Image File</span>
@@ -227,14 +227,14 @@ export default function AdminLookbooks() {
  setIsModalOpen(false);
  resetForm();
  }}
- className="focus-ring flex-1 py-4 border border-black/[0.08] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black/[0.02] transition-all"
+ className="focus-ring flex-1 py-4 border border-white/14 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.05] transition-all"
  >
  Cancel
  </button>
  <button
  type="submit"
  disabled={isSubmitting || !formData.image}
- className="focus-ring flex-[1.5] py-4 bg-black text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black/90 disabled:opacity-20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+ className="focus-ring flex-[1.5] py-4 bg-[#EDEAE2] text-[#0d0d0f] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black/90 disabled:opacity-20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
  >
  {isSubmitting ? (
  <>
@@ -243,7 +243,7 @@ export default function AdminLookbooks() {
  </>
  ) : (
  <>
- <div className="w-1.5 h-1.5 bg-white rounded-lg animate-pulse"></div>
+ <div className="w-1.5 h-1.5 bg-[#131316] rounded-lg animate-pulse"></div>
  <span>Create Look</span>
  </>
  )}
@@ -257,12 +257,12 @@ export default function AdminLookbooks() {
  {/* DELETE CONFIRMATION MODAL */}
  {deleteConfirmId && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-black/[0.06]">
- <div className="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
- <AlertTriangle className="text-rose-500" size={32} strokeWidth={1.5} />
+ <div className="bg-[#131316] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-white/10">
+ <div className="w-20 h-20 bg-rose-500/[0.14] rounded-2xl flex items-center justify-center mx-auto mb-8">
+ <AlertTriangle className="text-rose-300" size={32} strokeWidth={1.5} />
  </div>
- <h3 className="text-2xl font-bold mb-4 text-gray-900">Are you sure?</h3>
- <p className="text-gray-400 text-sm mb-10 leading-relaxed uppercase tracking-widest font-bold text-[9px]">
+ <h3 className="text-2xl font-bold mb-4 text-[#EDEAE2]">Are you sure?</h3>
+ <p className="text-[#EDEAE2]/42 text-sm mb-10 leading-relaxed uppercase tracking-widest font-bold text-[9px]">
  This will permanently remove this look from the website.
  </p>
 
@@ -277,7 +277,7 @@ export default function AdminLookbooks() {
  <button
  onClick={() => setDeleteConfirmId(null)}
  disabled={isDeleting}
- className="focus-ring w-full py-4 bg-black/[0.03] text-black border border-black/[0.06] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black/[0.05] transition-all active:scale-[0.98]"
+ className="focus-ring w-full py-4 bg-white/[0.07] text-[#EDEAE2] border border-white/10 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.11] transition-all active:scale-[0.98]"
  >
  Wait, Go Back
  </button>

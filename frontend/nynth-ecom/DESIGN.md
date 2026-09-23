@@ -91,3 +91,39 @@ Restrained - tinted neutrals + one accent (green) ≤10%. The palette is black/w
 - **Admin cards**: `shadow-sm`
 - **Modals**: `shadow-xl` on white bg with black/50 backdrop
 - **Toast notifications**: Fixed top-center via react-hot-toast
+
+---
+
+# Admin Back Office — "The Black Atelier"
+
+The admin panel is a **separate world** from the storefront: a matte-ink editorial back office.
+Scope is the `.admin-app` class on `AdminLayout`'s root — it flips shadcn semantic variables
+(`--background`, `--card`, `--popover`, `--primary`, `--secondary`, `--muted`, `--border`,
+`--input`, `--ring`, …) so every `ui/` primitive renders dark inside admin while the storefront
+stays light. Tokens live in `src/index.css`.
+
+## Color
+- **Shell**: `--background` indal `oklch(0.155 0.002 85)` (#161619-ish); sidebar `#0b0b0c`.
+- **Bone type**: `#EDEAE2` (type ramp: `text-[#EDEAE2]`, muted `text-[#EDEAE2]/42`).
+- **Panels**: `bg-[#131316]`, hairlines `border-white/10`–`border-white/14` + `border-white/[0.07]` rail.
+- **Tint chips** are variable-driven (`--tint-{emerald,amber,sky,rose,violet,slate}-{bg,fg,line}`)
+  so `ui/badge.jsx` + `StatusDropdown` work on both light (storefront) and dark (admin):
+  `bg-emerald-500/[0.14] text-emerald-300` style under `.admin-app`.
+- **Chart tokens**: `--admin-chart-*` read from the `.admin-app` element by `src/lib/charts.js`
+  (fallback `:root`) — dark gridlines/text, emerald + bone series, bone legend/tooltip (tooltip
+  `bg` `oklch(0.17 0.002 85)` on hairline `oklch(1 0 0 / 0.14)`).
+
+## Typography (display scale)
+- Metric/display numerals: `text-[28px] leading-none font-extrabold tracking-[-0.02em] tabular-nums`
+  bone; `₦` at `text-xl`. Page titles `text-3xl md:text-4xl font-extrabold tracking-[-0.02em]`.
+- Layout title: `text-[30px] leading-[1.05] md:text-[40px] font-extrabold tracking-[-0.02em]`.
+- Micro-codes/IDs: `font-mono` bone/42. Growth badges `text-xs font-extrabold tracking-tight tabular-nums`.
+
+## Surfaces & chrome
+- Root: `min-h-screen admin-app admin-paper flex`; fixed sidebar `bg-[#0b0b0c]` + hairline right
+  rail; active nav pill = bone; inactive = bone/42 with mono sub-labels.
+- Browser chrome (scrollbars, caret, selection, number spinners) themed dark by `.admin-app`.
+- Radix `Select` portals to `<body>` and escapes the scope — `ui/select.jsx` is dark-styled
+  explicitly. No other Radix portal components exist.
+- Elevation is light-touch: subtle inset white top-light + soft drop on cards; **no** colored
+  shadows, no `grayscale` filters on avatars.

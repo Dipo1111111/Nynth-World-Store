@@ -161,14 +161,14 @@ export default function DiscountCodes() {
  {/* Header */}
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
- <span className="text-black">{activeCount}</span> active · {codes.length} total
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">
+ <span className="text-[#EDEAE2]">{activeCount}</span> active · {codes.length} total
  </p>
- <p className="text-sm text-gray-500">Promo codes applied at checkout.</p>
+ <p className="text-sm text-[#EDEAE2]/55">Promo codes applied at checkout.</p>
  </div>
  <button
  onClick={() => openModal()}
- className="focus-ring flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-gray-800 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover active:scale-[0.98]"
+ className="focus-ring flex items-center gap-2 px-5 py-2.5 bg-[#EDEAE2] text-[#0d0d0f] text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover active:scale-[0.98]"
  >
  <Plus size={16} />
  Add Code
@@ -178,19 +178,19 @@ export default function DiscountCodes() {
  {/* Table */}
  {loading ? (
  <div className="flex items-center justify-center py-20">
- <Loader2 className="animate-spin text-black/20" size={28} />
+ <Loader2 className="animate-spin text-white/25" size={28} />
  </div>
  ) : codes.length === 0 ? (
- <Card className="border-black/[0.06]">
+ <Card className="border-white/10">
  <CardContent className="flex flex-col items-center justify-center py-20 text-center">
- <div className="w-16 h-16 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-4">
- <Tag className="text-gray-300" size={30} />
+ <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+ <Tag className="text-[#EDEAE2]/35" size={30} />
  </div>
- <p className="text-gray-900 font-medium mb-1">No discount codes yet</p>
- <p className="text-gray-400 text-sm mb-6">Create your first promo code to run a campaign.</p>
+ <p className="text-[#EDEAE2] font-medium mb-1">No discount codes yet</p>
+ <p className="text-[#EDEAE2]/42 text-sm mb-6">Create your first promo code to run a campaign.</p>
  <button
  onClick={() => openModal()}
- className="focus-ring flex items-center gap-2 px-6 py-3 bg-black text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-gray-800 shadow-card transition-all"
+ className="focus-ring flex items-center gap-2 px-6 py-3 bg-[#EDEAE2] text-[#0d0d0f] text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all"
  >
  <Plus size={15} />
  Create your first code
@@ -204,42 +204,42 @@ export default function DiscountCodes() {
  {codes.map((code) => (
  <div
  key={code.id}
- className={`bg-white p-4 rounded-xl border ${
- isExpired(code) ? "border-rose-100 opacity-60" : "border-black/[0.06]"
+ className={`bg-[#131316] p-4 rounded-xl border ${
+ isExpired(code) ? "border-rose-500/25 opacity-60" : "border-white/10"
  } shadow-card`}
  >
  <div className="flex items-start justify-between mb-3">
  <div>
- <span className="font-mono font-bold text-sm tracking-wider bg-black text-white px-2.5 py-1 rounded-lg">
+ <span className="font-mono font-bold text-sm tracking-wider bg-[#EDEAE2] text-[#0d0d0f] px-2.5 py-1 rounded-lg">
  {code.code}
  </span>
  <div className="flex items-center gap-2 mt-2 flex-wrap">
  {code.type === "percentage" ? (
- <span className="flex items-center gap-1 text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-lg border border-violet-100">
+ <span className="flex items-center gap-1 text-xs font-bold text-violet-300 bg-violet-500/[0.14] px-2 py-0.5 rounded-lg border border-violet-500/25">
  <Percent size={10} /> {code.value}%
  </span>
  ) : (
- <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+ <span className="flex items-center gap-1 text-xs font-bold text-emerald-300 bg-emerald-500/[0.14] px-2 py-0.5 rounded-lg border border-emerald-500/25">
  <DollarSign size={10} /> ₦
  {Number(code.value).toLocaleString()}
  </span>
  )}
  {isExpired(code) ? (
- <span className="text-[9px] font-bold uppercase tracking-wider text-rose-500 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-rose-300 bg-rose-500/[0.14] px-2 py-0.5 rounded-lg border border-rose-500/25">
  Expired
  </span>
  ) : code.isActive ? (
- <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/[0.14] px-2 py-0.5 rounded-lg border border-emerald-500/25">
  Active
  </span>
  ) : (
- <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-[#EDEAE2]/55 bg-slate-500/[0.18] px-2 py-0.5 rounded-lg border border-slate-500/30">
  Inactive
  </span>
  )}
  </div>
  {code.expiresAt && (
- <p className="text-[10px] text-gray-400 flex items-center gap-1 mb-3 mt-2">
+ <p className="text-[10px] text-[#EDEAE2]/42 flex items-center gap-1 mb-3 mt-2">
  <Calendar size={10} />
  Expires{" "}
  {new Date(
@@ -249,13 +249,13 @@ export default function DiscountCodes() {
  )}
  </div>
  </div>
- <div className="flex justify-end gap-2 pt-2 border-t border-black/[0.05]">
+ <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
  <button
  onClick={() => handleToggleActive(code)}
  className={`focus-ring flex items-center justify-center gap-1 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  code.isActive
- ? "bg-emerald-50 text-emerald-600 border-emerald-100"
- : "bg-slate-100 text-gray-500 border-slate-200"
+ ? "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
+ : "bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30"
  }`}
  >
  {code.isActive ? (
@@ -267,13 +267,13 @@ export default function DiscountCodes() {
  </button>
  <button
  onClick={() => openModal(code)}
- className="focus-ring flex items-center justify-center p-2 bg-black/[0.03] text-gray-600 rounded-lg border border-black/[0.06] hover:bg-black/[0.06]"
+ className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[#EDEAE2]/65 rounded-lg border border-white/10 hover:bg-white/[0.12]"
  >
  <Edit2 size={14} />
  </button>
  <button
  onClick={() => handleDelete(code.id)}
- className="focus-ring flex items-center justify-center p-2 bg-rose-50 text-rose-500 rounded-lg border border-rose-100 hover:bg-rose-100"
+ className="focus-ring flex items-center justify-center p-2 bg-rose-500/[0.14] text-rose-300 rounded-lg border border-rose-500/25 hover:bg-rose-500/25"
  >
  <Trash2 size={14} />
  </button>
@@ -283,40 +283,40 @@ export default function DiscountCodes() {
  </div>
 
  {/* Desktop Table */}
- <div className="hidden md:block bg-white rounded-xl border border-black/[0.06] shadow-card overflow-hidden">
+ <div className="hidden md:block bg-[#131316] rounded-xl border border-white/10 shadow-card overflow-hidden">
  <table className="w-full admin-table">
  <thead>
- <tr className="border-b border-black/[0.06] bg-black/[0.02]">
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 px-6 py-3">
+ <tr className="border-b border-white/10 bg-white/[0.05]">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
  Code
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
  Type
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
  Value
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
  Expires
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
  Status
  </th>
- <th className="text-right text-[10px] font-bold uppercase tracking-widest text-gray-400 px-6 py-3">
+ <th className="text-right text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
  Actions
  </th>
  </tr>
  </thead>
- <tbody className="divide-y divide-black/[0.05]">
+ <tbody className="divide-y divide-white/10">
  {codes.map((code) => (
  <tr
  key={code.id}
- className={`hover:bg-black/[0.02] transition-colors ${
+ className={`hover:bg-white/[0.05] transition-colors ${
  isExpired(code) ? "opacity-50" : ""
  }`}
  >
  <td className="px-6 py-4">
- <span className="font-mono font-bold text-sm tracking-wider bg-black text-white px-2.5 py-1 rounded-lg">
+ <span className="font-mono font-bold text-sm tracking-wider bg-[#EDEAE2] text-[#0d0d0f] px-2.5 py-1 rounded-lg">
  {code.code}
  </span>
  </td>
@@ -324,8 +324,8 @@ export default function DiscountCodes() {
  <span
  className={`flex items-center gap-1 text-xs font-bold uppercase tracking-wider ${
  code.type === "percentage"
- ? "text-violet-600"
- : "text-emerald-600"
+ ? "text-violet-300"
+ : "text-emerald-300"
  }`}
  >
  {code.type === "percentage" ? (
@@ -341,7 +341,7 @@ export default function DiscountCodes() {
  ? `${code.value}%`
  : `₦${Number(code.value).toLocaleString()}`}
  </td>
- <td className="px-6 py-4 text-sm text-gray-500">
+ <td className="px-6 py-4 text-sm text-[#EDEAE2]/55">
  {code.expiresAt
  ? new Date(
  code.expiresAt.seconds * 1000
@@ -350,15 +350,15 @@ export default function DiscountCodes() {
  </td>
  <td className="px-6 py-4">
  {isExpired(code) ? (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-100">
+ <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-rose-500/[0.14] text-rose-300 border border-rose-500/25">
  Expired
  </span>
  ) : code.isActive ? (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
+ <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-emerald-500/[0.14] text-emerald-300 border border-emerald-500/25">
  Active
  </span>
  ) : (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">
+ <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-slate-500/[0.18] text-slate-400 border border-slate-500/30">
  Inactive
  </span>
  )}
@@ -369,8 +369,8 @@ export default function DiscountCodes() {
  onClick={() => handleToggleActive(code)}
  className={`focus-ring p-1.5 rounded-lg border transition-colors ${
  code.isActive
- ? "bg-emerald-50 text-emerald-600 border-emerald-100"
- : "bg-slate-100 text-gray-500 border-slate-200"
+ ? "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
+ : "bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30"
  }`}
  title={code.isActive ? "Deactivate" : "Activate"}
  >
@@ -382,13 +382,13 @@ export default function DiscountCodes() {
  </button>
  <button
  onClick={() => openModal(code)}
- className="focus-ring p-2 text-gray-600 hover:text-black hover:bg-black/[0.04] rounded-lg border border-transparent hover:border-black/[0.06]"
+ className="focus-ring p-2 text-[#EDEAE2]/65 hover:text-[#EDEAE2] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-white/10"
  >
  <Edit2 size={16} />
  </button>
  <button
  onClick={() => handleDelete(code.id)}
- className="focus-ring p-2 text-rose-500 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-100"
+ className="focus-ring p-2 text-rose-300 hover:bg-rose-500/[0.14] rounded-lg border border-transparent hover:border-rose-500/25"
  >
  <Trash2 size={16} />
  </button>
@@ -405,19 +405,19 @@ export default function DiscountCodes() {
  {/* Add / Edit Modal */}
  {isModalOpen && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl w-full max-w-md shadow-raised border border-black/[0.06]">
- <div className="flex items-center justify-between p-6 border-b border-black/[0.06]">
+ <div className="bg-[#131316] rounded-2xl w-full max-w-md shadow-raised border border-white/10">
+ <div className="flex items-center justify-between p-6 border-b border-white/10">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">
  {editingId ? "Update promo" : "New promo code"}
  </p>
- <h2 className="font-bold text-lg text-gray-900">
+ <h2 className="font-bold text-lg text-[#EDEAE2]">
  {editingId ? "Edit Code" : "New Code"}
  </h2>
  </div>
  <button
  onClick={closeModal}
- className="focus-ring p-2 hover:bg-black/[0.04] rounded-lg transition-colors"
+ className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg transition-colors"
  >
  <X size={18} />
  </button>
@@ -426,7 +426,7 @@ export default function DiscountCodes() {
  <form onSubmit={handleSubmit} className="p-6 space-y-5">
  {/* Code */}
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
  Discount Code
  </label>
  <input
@@ -436,7 +436,7 @@ export default function DiscountCodes() {
  setForm({ ...form, code: e.target.value.toUpperCase() })
  }
  placeholder="e.g. NYNTH20"
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg text-sm font-mono font-bold tracking-wider uppercase focus-ring transition-colors"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm font-mono font-bold tracking-wider uppercase focus-ring transition-colors"
  required
  />
  </div>
@@ -444,7 +444,7 @@ export default function DiscountCodes() {
  {/* Type + Value */}
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
  Type
  </label>
  <select
@@ -452,14 +452,14 @@ export default function DiscountCodes() {
  onChange={(e) =>
  setForm({ ...form, type: e.target.value })
  }
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg text-sm focus-ring transition-colors bg-white cursor-pointer"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors bg-[#131316] cursor-pointer"
  >
  <option value="percentage">Percentage (%)</option>
  <option value="fixed">Fixed Amount (₦)</option>
  </select>
  </div>
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
  {form.type === "percentage"
  ? "Percentage Off"
  : "Amount Off (₦)"}
@@ -473,7 +473,7 @@ export default function DiscountCodes() {
  setForm({ ...form, value: e.target.value })
  }
  placeholder={form.type === "percentage" ? "20" : "2000"}
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg text-sm focus-ring transition-colors"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors"
  required
  />
  </div>
@@ -481,7 +481,7 @@ export default function DiscountCodes() {
 
  {/* Expiry */}
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
  Expiry Date (Optional)
  </label>
  <input
@@ -490,15 +490,15 @@ export default function DiscountCodes() {
  onChange={(e) =>
  setForm({ ...form, expiresAt: e.target.value })
  }
- className="w-full px-4 py-3 border border-black/[0.08] rounded-lg text-sm focus-ring transition-colors"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors"
  />
  </div>
 
  {/* Active Toggle */}
- <div className="flex items-center justify-between py-3 px-4 bg-black/[0.02] rounded-xl border border-black/[0.06]">
+ <div className="flex items-center justify-between py-3 px-4 bg-white/[0.05] rounded-xl border border-white/10">
  <div>
- <span className="text-sm font-medium text-gray-900 block">Active</span>
- <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Code available at checkout</span>
+ <span className="text-sm font-medium text-[#EDEAE2] block">Active</span>
+ <span className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Code available at checkout</span>
  </div>
  <button
  type="button"
@@ -507,11 +507,11 @@ export default function DiscountCodes() {
  }
  aria-label="Toggle active"
  className={`focus-ring p-0.5 rounded-lg transition-colors ${
- form.isActive ? "bg-black" : "bg-black/[0.15]"
+ form.isActive ? "bg-[#EDEAE2]" : "bg-white/[0.18]"
  }`}
  >
  <div
- className={`w-5 h-5 rounded-lg bg-white shadow transition-transform ${
+ className={`w-5 h-5 rounded-lg bg-[#131316] shadow transition-transform ${
  form.isActive ? "translate-x-5" : "translate-x-0"
  }`}
  />
@@ -523,14 +523,14 @@ export default function DiscountCodes() {
  <button
  type="button"
  onClick={closeModal}
- className="focus-ring flex-1 py-3 text-sm font-bold border border-black/[0.1] rounded-lg hover:bg-black/[0.02] transition-colors"
+ className="focus-ring flex-1 py-3 text-sm font-bold border border-white/18 rounded-lg hover:bg-white/[0.05] transition-colors"
  >
  Cancel
  </button>
  <button
  type="submit"
  disabled={isSubmitting}
- className="focus-ring flex-1 py-3 text-sm font-bold bg-black text-white rounded-lg hover:bg-gray-800 shadow-card transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+ className="focus-ring flex-1 py-3 text-sm font-bold bg-[#EDEAE2] text-[#0d0d0f] rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all disabled:opacity-50 flex items-center justify-center gap-2"
  >
  {isSubmitting && <Loader2 size={14} className="animate-spin" />}
  {editingId ? "Save Changes" : "Create Code"}

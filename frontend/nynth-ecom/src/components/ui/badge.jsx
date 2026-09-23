@@ -12,16 +12,16 @@ const badgeVariants = cva(
                 secondary:
                     "border-transparent bg-secondary text-secondary-foreground",
                 destructive:
-                    "border-transparent bg-rose-50 text-rose-600 border-rose-100",
+                    "border-[var(--tint-rose-line)] bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)]",
                 outline: "text-foreground",
                 success:
-                    "border-transparent bg-emerald-50 text-emerald-700 border-emerald-100",
+                    "border-[var(--tint-emerald-line)] bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)]",
                 warning:
-                    "border-transparent bg-amber-50 text-amber-700 border-amber-100",
+                    "border-[var(--tint-amber-line)] bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)]",
                 info:
-                    "border-transparent bg-sky-50 text-sky-700 border-sky-100",
+                    "border-[var(--tint-sky-line)] bg-[var(--tint-sky-bg)] text-[var(--tint-sky-fg)]",
                 neutral:
-                    "border-transparent bg-slate-100 text-slate-600 border-slate-200",
+                    "border-[var(--tint-slate-line)] bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)]",
             },
         },
         defaultVariants: {

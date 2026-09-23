@@ -82,7 +82,7 @@ const AdminPWAPrompt = () => {
                     {('Notification' in window) && Notification.permission !== 'granted' && (
                         <button
                             onClick={() => Notification.requestPermission()}
-                            className="w-full bg-white text-black py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
+                            className="w-full bg-[#131316] text-[#EDEAE2] py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
                         >
                             <BellRing size={15} />
                             Enable Sales Alerts
@@ -92,7 +92,7 @@ const AdminPWAPrompt = () => {
                     {platform === 'android' ? (
                         <button
                             onClick={handleInstall}
-                            className="w-full bg-white text-black py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
+                            className="w-full bg-[#131316] text-[#EDEAE2] py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
                         >
                             Install App
                         </button>

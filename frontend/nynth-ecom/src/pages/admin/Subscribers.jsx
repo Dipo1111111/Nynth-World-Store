@@ -19,10 +19,10 @@ import { useCountUp } from "../../lib/motion";
 import toast from "react-hot-toast";
 
 const SOURCE_CONFIG = {
- waitlist: { label: "Waitlist", className: "bg-black text-white border-black" },
- newsletter: { label: "Newsletter", className: "bg-slate-100 text-slate-600 border-slate-200" },
- abandoned: { label: "Abandoned", className: "bg-amber-50 text-amber-700 border-amber-100" },
- customers: { label: "Customer", className: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+ waitlist: { label: "Waitlist", className: "bg-[#EDEAE2] text-[#0d0d0f] border-white/25" },
+ newsletter: { label: "Newsletter", className: "bg-slate-500/[0.18] text-slate-300 border-slate-500/30" },
+ abandoned: { label: "Abandoned", className: "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" },
+ customers: { label: "Customer", className: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25" },
 };
 
 const SourceBadge = ({ source }) => {
@@ -203,40 +203,40 @@ const Subscribers = () => {
  <AdminLayout title="Subscribers">
  {/* Summary strip */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
- <Card hover className="border-black/[0.06]">
+ <Card hover className="border-white/10">
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Audience</span>
- <StatIcon icon={Users} className="bg-slate-100 text-slate-600" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Total Audience</span>
+ <StatIcon icon={Users} className="bg-slate-500/[0.18] text-slate-300" />
  </div>
- <h3 className="text-xl font-bold text-gray-900"><span ref={totalRef}>0</span></h3>
+ <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={totalRef}>0</span></h3>
  </CardContent>
  </Card>
- <Card hover className="border-black/[0.06]">
+ <Card hover className="border-white/10">
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Waitlist Signups</span>
- <StatIcon icon={UserPlus} className="bg-violet-50 text-violet-600" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Waitlist Signups</span>
+ <StatIcon icon={UserPlus} className="bg-violet-500/[0.14] text-violet-300" />
  </div>
- <h3 className="text-xl font-bold text-gray-900"><span ref={waitlistRef}>0</span></h3>
+ <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={waitlistRef}>0</span></h3>
  </CardContent>
  </Card>
- <Card hover className="border-black/[0.06]">
+ <Card hover className="border-white/10">
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Customers</span>
- <StatIcon icon={ShoppingBag} className="bg-emerald-50 text-emerald-600" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Customers</span>
+ <StatIcon icon={ShoppingBag} className="bg-emerald-500/[0.14] text-emerald-300" />
  </div>
- <h3 className="text-xl font-bold text-gray-900"><span ref={customersRef}>0</span></h3>
+ <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={customersRef}>0</span></h3>
  </CardContent>
  </Card>
- <Card hover className="border-black/[0.06]">
+ <Card hover className="border-white/10">
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Abandoned Checkouts</span>
- <StatIcon icon={TrendingDown} className="bg-amber-50 text-amber-600" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Abandoned Checkouts</span>
+ <StatIcon icon={TrendingDown} className="bg-amber-500/[0.14] text-amber-300" />
  </div>
- <h3 className="text-xl font-bold text-gray-900"><span ref={abandonedRef}>0</span></h3>
+ <h3 className="text-xl font-bold text-[#EDEAE2]"><span ref={abandonedRef}>0</span></h3>
  </CardContent>
  </Card>
  </div>
@@ -244,13 +244,13 @@ const Subscribers = () => {
  {/* Toolbar: search + segmented filters + actions */}
  <div className="admin-toolbar mb-6">
  <div className="relative flex-1 min-w-[200px]">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={16} />
  <input
  type="text"
  placeholder="Search emails..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-2 bg-white border border-black/[0.08] rounded-lg focus-ring text-sm placeholder:text-gray-400"
+ className="w-full pl-10 pr-4 py-2 bg-[#131316] border border-white/14 rounded-lg focus-ring text-sm placeholder:text-[#EDEAE2]/42"
  />
  </div>
 
@@ -291,31 +291,31 @@ const Subscribers = () => {
  {loading ? (
  <div className="flex items-center justify-center h-64">
  <div className="text-center">
- <div className="animate-spin rounded-full h-12 w-12 border-2 border-black/10 border-t-black mx-auto mb-4"></div>
- <p className="text-gray-500 text-sm">Loading subscribers...</p>
+ <div className="animate-spin rounded-full h-12 w-12 border-2 border-white/18 border-t-white/18 mx-auto mb-4"></div>
+ <p className="text-[#EDEAE2]/55 text-sm">Loading subscribers...</p>
  </div>
  </div>
  ) : filteredSubscribers.length === 0 ? (
- <Card className="border-black/[0.06]">
+ <Card className="border-white/10">
  <CardContent className="flex flex-col items-center justify-center py-16">
- <div className="w-16 h-16 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-4">
- <Users className="h-8 w-8 text-gray-300" />
+ <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+ <Users className="h-8 w-8 text-[#EDEAE2]/35" />
  </div>
  <h3 className="text-lg font-medium mb-2">
  {activeFilter === 'abandoned' ? 'No abandoned checkouts found' : activeFilter === 'customers' ? 'No customers found' : 'No subscribers found'}
  </h3>
- <p className="text-gray-500 text-sm">
+ <p className="text-[#EDEAE2]/55 text-sm">
  {activeFilter === 'abandoned' ? 'Abandoned checkouts with an email will appear here.' : activeFilter === 'customers' ? 'Successful purchases will appear here.' : 'Signups from the website will appear here.'}
  </p>
  </CardContent>
  </Card>
  ) : (
- <Card className="border-black/[0.06] overflow-hidden">
- <CardHeader className="border-b border-black/[0.06]">
+ <Card className="border-white/10 overflow-hidden">
+ <CardHeader className="border-b border-white/10">
  <div className="flex items-center justify-between">
  <CardTitle className="text-base">
  {activeFilter === 'all' ? 'All Subscribers' : activeFilter === 'abandoned' ? 'Abandoned Checkouts' : activeFilter === 'customers' ? 'Customers' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
- <span className="ml-2 px-2 py-0.5 bg-black/[0.05] text-gray-500 text-[10px] rounded-lg font-sans tracking-normal">
+ <span className="ml-2 px-2 py-0.5 bg-white/[0.11] text-[#EDEAE2]/55 text-[10px] rounded-lg font-sans tracking-normal">
  {filteredSubscribers.length}
  </span>
  </CardTitle>
@@ -324,23 +324,23 @@ const Subscribers = () => {
  </CardHeader>
  <CardContent className="p-0">
  {/* Mobile Card View */}
- <div className="sm:hidden divide-y divide-black/[0.04]">
+ <div className="sm:hidden divide-y divide-white/[0.08]">
  {filteredSubscribers.map((sub) => (
- <div key={sub.id} className="p-4 bg-white flex flex-col gap-3">
+ <div key={sub.id} className="p-4 bg-[#131316] flex flex-col gap-3">
  <div className="flex items-start justify-between gap-2">
  <div className="flex items-center gap-3 min-w-0 flex-1">
  <button onClick={() => toggleEmail(sub.email)} className="focus-ring shrink-0 rounded" aria-label="Toggle select">
  {selectedEmails.has(sub.email) ? (
- <CheckSquare size={18} className="text-black" />
+ <CheckSquare size={18} className="text-[#EDEAE2]" />
  ) : (
- <Square size={18} className="text-gray-300" />
+ <Square size={18} className="text-[#EDEAE2]/35" />
  )}
  </button>
  <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0 flex-1">
- <div className="w-8 h-8 rounded-lg bg-black text-white hidden sm:flex items-center justify-center flex-shrink-0">
+ <div className="w-8 h-8 rounded-lg bg-[#EDEAE2] text-[#0d0d0f] hidden sm:flex items-center justify-center flex-shrink-0">
  <Mail size={12} />
  </div>
- <span className="text-xs font-bold text-gray-900 break-all uppercase tracking-tight">
+ <span className="text-xs font-bold text-[#EDEAE2] break-all uppercase tracking-tight">
  {sub.email}
  </span>
  </div>
@@ -349,10 +349,10 @@ const Subscribers = () => {
  </div>
  <div className="flex items-center justify-between text-[10px]">
  <div className="flex items-center gap-1.5">
- <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-black/[0.15]'}`}></div>
- <span className="text-gray-500 font-bold uppercase tracking-widest">{sub.status || 'active'}</span>
+ <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-white/[0.18]'}`}></div>
+ <span className="text-[#EDEAE2]/55 font-bold uppercase tracking-widest">{sub.status || 'active'}</span>
  </div>
- <span className="text-gray-400 font-bold uppercase tracking-widest">
+ <span className="text-[#EDEAE2]/42 font-bold uppercase tracking-widest">
  {formatDate(sub.subscribed_at).split(',')[0]}
  </span>
  </div>
@@ -364,40 +364,40 @@ const Subscribers = () => {
  <div className="hidden sm:block overflow-x-auto">
  <table className="w-full admin-table">
  <thead>
- <tr className="bg-black/[0.02]">
- <th className="px-4 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest w-10">
+ <tr className="bg-white/[0.05]">
+ <th className="px-4 py-4 text-left text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest w-10">
  <button onClick={toggleSelectAll} className="focus-ring rounded" aria-label="Select all">
  {selectedEmails.size === filteredSubscribers.length && filteredSubscribers.length > 0 ? (
- <CheckSquare size={16} className="text-black" />
+ <CheckSquare size={16} className="text-[#EDEAE2]" />
  ) : (
- <Square size={16} className="text-gray-400" />
+ <Square size={16} className="text-[#EDEAE2]/42" />
  )}
  </button>
  </th>
- <th className="px-4 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email</th>
- <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Source</th>
- <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
- <th className="px-4 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Signed Up</th>
+ <th className="px-4 py-4 text-left text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest">Email</th>
+ <th className="px-6 py-4 text-left text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest">Source</th>
+ <th className="px-6 py-4 text-left text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest">Status</th>
+ <th className="px-4 py-4 text-right text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest">Signed Up</th>
  </tr>
  </thead>
- <tbody className="divide-y divide-black/[0.05] bg-white">
+ <tbody className="divide-y divide-white/10 bg-[#131316]">
  {filteredSubscribers.map((sub) => (
- <tr key={sub.id} className="transition-colors group hover:bg-black/[0.02]">
+ <tr key={sub.id} className="transition-colors group hover:bg-white/[0.05]">
  <td className="px-4 py-4 whitespace-nowrap">
  <button onClick={() => toggleEmail(sub.email)} className="focus-ring rounded" aria-label="Toggle select">
  {selectedEmails.has(sub.email) ? (
- <CheckSquare size={16} className="text-black" />
+ <CheckSquare size={16} className="text-[#EDEAE2]" />
  ) : (
- <Square size={16} className="text-gray-300" />
+ <Square size={16} className="text-[#EDEAE2]/35" />
  )}
  </button>
  </td>
  <td className="px-4 py-4 whitespace-nowrap">
  <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-lg bg-black/[0.04] flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition-all">
+ <div className="w-8 h-8 rounded-lg bg-white/[0.09] flex items-center justify-center text-[#EDEAE2]/42 group-hover:bg-black/70 group-hover:text-white transition-all">
  <Mail size={14} />
  </div>
- <span className="text-sm font-medium text-gray-900 font-inter">{sub.email}</span>
+ <span className="text-sm font-medium text-[#EDEAE2] font-inter">{sub.email}</span>
  </div>
  </td>
  <td className="px-6 py-4 whitespace-nowrap">
@@ -405,12 +405,12 @@ const Subscribers = () => {
  </td>
  <td className="px-6 py-4 whitespace-nowrap">
  <div className="flex items-center gap-2">
- <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-black/[0.15]'}`}></div>
- <span className="text-xs text-gray-600 capitalize">{sub.status || 'active'}</span>
+ <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-white/[0.18]'}`}></div>
+ <span className="text-xs text-[#EDEAE2]/65 capitalize">{sub.status || 'active'}</span>
  </div>
  </td>
  <td className="px-4 py-4 whitespace-nowrap text-right">
- <span className="text-xs text-gray-500 font-inter">{formatDate(sub.subscribed_at)}</span>
+ <span className="text-xs text-[#EDEAE2]/55 font-inter">{formatDate(sub.subscribed_at)}</span>
  </td>
  </tr>
  ))}
@@ -424,27 +424,27 @@ const Subscribers = () => {
  {/* Email Modal */}
  {showEmailModal && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
- <div className="bg-white rounded-2xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-black/[0.06]">
- <div className="flex items-center justify-between p-6 border-b border-black/[0.06]">
+ <div className="bg-[#131316] rounded-2xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/10">
+ <div className="flex items-center justify-between p-6 border-b border-white/10">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">BCC Campaign</p>
- <h3 className="text-lg font-bold text-gray-900">Send Email</h3>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">BCC Campaign</p>
+ <h3 className="text-lg font-bold text-[#EDEAE2]">Send Email</h3>
  </div>
  <button
  onClick={() => setShowEmailModal(false)}
- className="focus-ring p-2 hover:bg-black/[0.04] rounded-lg text-gray-400 hover:text-black transition-colors"
+ className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
  >
  <X size={20} />
  </button>
  </div>
  <div className="p-6 space-y-4">
- <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">
- <Mail size={16} className="text-emerald-600 shrink-0" />
- <div className="text-sm text-emerald-800">
+ <div className="flex items-center gap-3 bg-emerald-500/[0.14] border border-emerald-500/25 rounded-xl px-4 py-3">
+ <Mail size={16} className="text-emerald-300 shrink-0" />
+ <div className="text-sm text-emerald-200">
  <span className="font-bold">{selectedEmails.size}</span> recipient{selectedEmails.size !== 1 ? 's' : ''} selected
  </div>
  </div>
- <p className="text-xs text-gray-400 leading-relaxed">
+ <p className="text-xs text-[#EDEAE2]/42 leading-relaxed">
  Click the button below to open your email client with all recipients added as BCC. You'll compose and send the email yourself.
  </p>
  <div className="flex gap-3 pt-2">
@@ -457,7 +457,7 @@ const Subscribers = () => {
  </Button>
  <Button
  onClick={handleSendEmail}
- className="flex-1 bg-black text-white hover:bg-gray-800"
+ className="flex-1 bg-[#EDEAE2] text-[#0d0d0f] hover:bg-[#DBD8CE]"
  >
  <Mail size={14} className="mr-2" />
  Open Email
