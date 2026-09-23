@@ -25,6 +25,7 @@ export default defineConfig({
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
   },
   build: {
+    manifest: true, // emit dist/.vite/manifest.json so deploy smoke tests can enumerate every chunk
     cssMinify: 'lightningcss', // Uses lightningcss to transpile modern CSS features
     cssTarget: ['chrome61', 'safari11', 'edge16', 'firefox60'], // Target older browsers for CSS compatibility
     target: ['chrome61', 'safari11', 'edge16', 'firefox60'],

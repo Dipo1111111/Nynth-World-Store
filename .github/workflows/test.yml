@@ -22,6 +22,7 @@ jobs:
       - run: npx eslint . --max-warnings 0
       - run: npm test
       - run: npm run build
+      - run: node scripts/verify-dist.mjs
 
   edge-functions:
     runs-on: ubuntu-latest

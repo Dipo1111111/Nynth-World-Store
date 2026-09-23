@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "verify:dist": "node scripts/verify-dist.mjs",
+    "smoke:live": "node scripts/smoke-live.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:edge": "deno test --allow-env --allow-net --allow-read supabase/functions",
