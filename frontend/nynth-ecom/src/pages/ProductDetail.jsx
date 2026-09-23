@@ -773,7 +773,7 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
           {/* Scrollable / pannable image area - pinch to zoom, drag to pan, double-tap to toggle */}
           <div
             ref={zoomAreaRef}
-            className="flex-1 overflow-auto flex items-center justify-center p-6 select-none touch-none"
+            className="flex-1 overflow-auto flex p-6 select-none touch-none"
             onTouchStart={(e) => {
               if (e.touches.length === 2) {
                 const dist = Math.hypot(
@@ -812,8 +812,8 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
               draggable={false}
               onClick={(e) => e.stopPropagation()}
               onDoubleClick={(e) => { e.stopPropagation(); setZoomLevel((z) => (z > 1 ? 1 : 2.5)); }}
-              className="w-full h-full object-contain transition-[width] duration-200"
-              style={{ width: `${zoomLevel * 100}%`, maxWidth: `${zoomLevel * 100}vw` }}
+              className="m-auto object-contain"
+              style={{ width: `${zoomLevel * 100}%`, height: `${zoomLevel * 100}%`, maxWidth: "none", maxHeight: "none" }}
             />
           </div>
 

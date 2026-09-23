@@ -63,6 +63,9 @@ import {
   deleteProduct,
   markTicketUsed,
   fetchProducts,
+  fetchRelatedProducts,
+  searchProducts,
+  fetchProductsByCategory,
   fetchOrder,
   getAllOrders,
   validateDiscountCode,
@@ -334,5 +337,42 @@ describe("markTicketUsed (door check-in)", () => {
     await expect(markTicketUsed("o1", "   ")).rejects.toThrow("ticket code");
     h.setQuery({ data: null, error: null });
     await expect(markTicketUsed("ghost", "NWT-ABC")).rejects.toThrow("Order not found");
+  });
+});
+
+describe("storefront visibility rule (hidden and sold-out never list)", () => {
+  const rows = [
+    { id: "live", name: "Live Tee", stock_quantity: 5, is_public: true },
+    { id: "hidden", name: "Hidden Tee", stock_quantity: 5, is_public: false },
+    { id: "soldout", name: "Gone Tee", stock_quantity: 0, is_public: true },
+    { id: "nostock", name: "Mystery Tee", stock_quantity: null, is_public: true },
+  ];
+
+  it("recommendations exclude hidden, sold-out, and the current product", async () => {
+    h.setQuery({ data: rows, error: null });
+    const list = await fetchRelatedProducts("apparel", "live", 4);
+    const ids = list.map((p) => p.id);
+    expect(ids).not.toContain("hidden");
+    expect(ids).not.toContain("soldout");
+    expect(ids).not.toContain("live");
+    expect(ids).toContain("nostock");
+  });
+
+  it("search never surfaces hidden or sold-out products", async () => {
+    h.setQuery({ data: rows, error: null });
+    const list = await searchProducts("tee");
+    const ids = list.map((p) => p.id);
+    expect(ids).not.toContain("hidden");
+    expect(ids).not.toContain("soldout");
+    expect(ids).toContain("live");
+  });
+
+  it("category lists never surface hidden or sold-out products", async () => {
+    h.setQuery({ data: rows, error: null });
+    const list = await fetchProductsByCategory("apparel", 15);
+    const ids = list.map((p) => p.id);
+    expect(ids).not.toContain("hidden");
+    expect(ids).not.toContain("soldout");
+    expect(ids).toContain("live");
   });
 });

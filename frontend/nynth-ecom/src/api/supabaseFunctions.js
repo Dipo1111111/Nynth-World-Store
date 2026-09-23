@@ -19,6 +19,10 @@ const finalNumber = (v) => { const n = Number(v); return Number.isFinite(n) ? n 
 const rowToProduct = (r) => ({ ...(r.data ?? {}), id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
 const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, isTest: r.is_test === true, created_at: toTimestamp(r.created_at) });
 
+// Storefront rule: hidden products never list. Exact-zero stock (deliberately
+// sold out) never lists either. Null stock means unknown, stays visible.
+const isLiveProduct = (p) => p.isPublic !== false && p.stockQuantity !== 0;
+
 // Test-mode detection: the storefront runs on Paystack test keys until launch, so
 // an order created under those keys is test traffic. Server (edge) re-stamps this
 // authoritatively from its own secret key when it finalizes the payment.
@@ -35,7 +39,7 @@ export const fetchProducts = async ({ admin = false } = {}) => {
   const { data, error } = await supabase.from("products").select("*").order("display_order", { ascending: true });
   if (error) { console.error("Error fetching products:", error); return []; }
   const all = (data ?? []).map(rowToProduct);
-  return admin ? all : all.filter((p) => p.isPublic !== false);
+  return admin ? all : all.filter(isLiveProduct);
 };
 export const fetchSingleProduct = async (id, { admin = false } = {}) => {
   const { data, error } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
@@ -103,37 +107,37 @@ export const markTicketUsed = async (orderId, code) => {
 // --- FILTERING ---
 export const fetchFeaturedProducts = async (max = 6) => {
   const { data } = await supabase.from("products").select("*").eq("featured", true).limit(max);
-  let list = (data ?? []).map(rowToProduct).filter((p) => p.isPublic !== false);
+  let list = (data ?? []).map(rowToProduct).filter(isLiveProduct);
   if (list.length < max) {
     const { data: bs } = await supabase.from("products").select("*").eq("best_seller", true).limit(max - list.length);
-    list = [...list, ...((bs ?? []).map(rowToProduct).filter((p) => p.isPublic !== false))];
+    list = [...list, ...((bs ?? []).map(rowToProduct).filter(isLiveProduct))];
   }
   if (list.length < 3) {
     const { data: latest } = await supabase.from("products").select("*").order("created_at", { ascending: false }).limit(max);
-    return (latest ?? []).map(rowToProduct).filter((p) => p.isPublic !== false);
+    return (latest ?? []).map(rowToProduct).filter(isLiveProduct);
   }
   return list;
 };
 export const fetchProductsByCategory = async (category, max = 15) => {
   const { data } = await supabase.from("products").select("*").eq("category", String(category).toLowerCase()).limit(max);
-  return (data ?? []).map(rowToProduct).filter((p) => p.isPublic !== false);
+  return (data ?? []).map(rowToProduct).filter(isLiveProduct);
 };
 export const fetchProductsByTag = async (tag, max = 10) => {
   const { data } = await supabase.from("products").select("*").contains("tags", [tag]).limit(max);
-  return (data ?? []).map(rowToProduct).filter((p) => p.isPublic !== false);
+  return (data ?? []).map(rowToProduct).filter(isLiveProduct);
 };
 export const fetchRelatedProducts = async (category, excludeId, max = 4) => {
   const { data } = await supabase.from("products").select("*").eq("category", category).limit(max + 1);
-  return (data ?? []).map(rowToProduct).filter((p) => p.id !== excludeId).slice(0, max);
+  return (data ?? []).map(rowToProduct).filter((p) => p.id !== excludeId && isLiveProduct(p)).slice(0, max);
 };
 export const fetchNewArrivals = async (max = 8) => {
   const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false }).limit(max);
-  return (data ?? []).map(rowToProduct).filter((p) => p.isPublic !== false);
+  return (data ?? []).map(rowToProduct).filter(isLiveProduct);
 };
 export const fetchRecommendedProducts = async (product, max = 4) => fetchRelatedProducts(product?.category, product?.id, max);
 export const searchProducts = async (term) => {
   const { data } = await supabase.from("products").select("*").ilike("name", "%" + term + "%").limit(20);
-  return (data ?? []).map(rowToProduct);
+  return (data ?? []).map(rowToProduct).filter(isLiveProduct);
 };
 export const getCategories = async () => {
   const { data } = await supabase.from("products").select("category");
