@@ -22,9 +22,9 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <div ref={setNodeRef} style={style} className={`bg-white p-4 rounded-lg border ${isDragging ? "border-black shadow-sm opacity-80" : "border-gray-100 shadow-sm"} flex flex-col gap-3 group`}>
+ <div ref={setNodeRef} style={style} className={`bg-white p-4 rounded-xl border ${isDragging ? "border-black shadow-card opacity-80" : "border-black/[0.06] shadow-card"} flex flex-col gap-3 group transition-all`}>
  <div className="flex gap-4">
- <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
+ <div className="w-20 h-20 bg-black/[0.03] rounded-lg overflow-hidden flex-shrink-0 border border-black/[0.06]">
  {(product.images?.[0] || product.imageUrl) ? (
  <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
  ) : (
@@ -39,10 +39,10 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  <div className="flex items-center justify-between mt-2">
  <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
  <div className="flex items-center gap-1">
- <span className={`px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider ${
- product.stockQuantity <= 0 ? "bg-gray-50 text-red-500 border border-red-100" :
- product.stockQuantity <= 5 ? "bg-gray-50 text-gray-600 border border-orange-100" :
- "bg-green-50 text-green-600 border border-green-100"
+ <span className={`px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider border ${
+ product.stockQuantity <= 0 ? "bg-rose-50 text-rose-600 border-rose-100" :
+ product.stockQuantity <= 5 ? "bg-amber-50 text-amber-700 border-amber-100" :
+ "bg-emerald-50 text-emerald-700 border-emerald-100"
  }`}>
  {product.stockQuantity <= 0 ? "Out" : `${product.stockQuantity} Left`}
  </span>
@@ -50,20 +50,20 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  </div>
  </div>
  </div>
- <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
- <button {...attributes} {...listeners} className="flex items-center justify-center p-2 bg-gray-50 text-gray-400 hover:text-black rounded-lg border border-transparent touch-none active:cursor-grabbing">
+ <div className="flex justify-end gap-2 pt-2 border-t border-black/[0.05]">
+ <button {...attributes} {...listeners} className="focus-ring flex items-center justify-center p-2 bg-black/[0.03] text-gray-400 hover:text-black rounded-lg border border-transparent touch-none active:cursor-grabbing cursor-grab">
  <GripVertical size={16} />
  </button>
- <button 
- onClick={() => handleTogglePublic(product)} 
- className={`flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-green-50 text-green-600 border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
+ <button
+ onClick={() => handleTogglePublic(product)}
+ className={`focus-ring flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100' : 'bg-slate-100 text-gray-500 border-slate-200 hover:bg-slate-200'}`}
  >
  {product.isPublic !== false ? <><Eye size={14}/> Visible</> : <><EyeOff size={14}/> Hidden</>}
  </button>
- <button onClick={() => handleEdit(product)} className="flex items-center justify-center p-2 bg-gray-50 text-gray-600 rounded-lg border border-black/5 hover:bg-gray-100">
+ <button onClick={() => handleEdit(product)} className="focus-ring flex items-center justify-center p-2 bg-black/[0.03] text-gray-600 rounded-lg border border-black/[0.06] hover:bg-black/[0.06]">
  <Edit2 size={14} />
  </button>
- <button onClick={() => handleDelete(product.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-500 rounded-lg border border-red-100 hover:bg-red-100">
+ <button onClick={() => handleDelete(product.id)} className="focus-ring flex items-center justify-center p-2 bg-rose-50 text-rose-500 rounded-lg border border-rose-100 hover:bg-rose-100">
  <Trash2 size={14} />
  </button>
  </div>
@@ -76,10 +76,10 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <tr ref={setNodeRef} style={style} className={`group transition-colors ${isDragging ? "bg-gray-50 shadow-sm ring-1 ring-black/5 opacity-80" : "hover:bg-gray-50"}`}>
+ <tr ref={setNodeRef} style={style} className={`transition-colors ${isDragging ? "bg-black/[0.02] shadow-card ring-1 ring-black/[0.06] opacity-80" : "hover:bg-black/[0.02]"}`}>
  <td className="p-4">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden border border-black/5">
+ <div className="w-12 h-12 bg-black/[0.03] rounded-lg overflow-hidden border border-black/[0.06]">
  {(product.images?.[0] || product.imageUrl) ? (
  <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
  ) : (
@@ -97,9 +97,9 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <td className="p-4">
  <div className="flex flex-col gap-1">
  <span className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider w-fit border ${
- product.stockQuantity <= 0 ? "bg-gray-50 text-red-500 border-red-100" :
- product.stockQuantity <= 5 ? "bg-gray-50 text-gray-600 border-orange-100" :
- "bg-green-50 text-green-600 border-green-100"
+ product.stockQuantity <= 0 ? "bg-rose-50 text-rose-600 border-rose-100" :
+ product.stockQuantity <= 5 ? "bg-amber-50 text-amber-700 border-amber-100" :
+ "bg-emerald-50 text-emerald-700 border-emerald-100"
  }`}>
  {product.stockQuantity <= 0 ? "Out of Stock" : product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
  </span>
@@ -108,20 +108,20 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  </td>
  <td className="p-4 text-right">
  <div className="flex justify-end items-center gap-2 transition-all">
- <button 
- onClick={() => handleTogglePublic(product)} 
- className={`p-1.5 focus:outline-none rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-400 border-gray-200'}`}
+ <button
+ onClick={() => handleTogglePublic(product)}
+ className={`focus-ring p-1.5 rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-100 text-gray-500 border-slate-200'}`}
  title={product.isPublic !== false ? "Hide from Store" : "Show on Store"}
  >
  {product.isPublic !== false ? <Eye size={16} /> : <EyeOff size={16} />}
  </button>
- <button {...attributes} {...listeners} className="p-2 text-gray-400 hover:text-black cursor-grab active:cursor-grabbing touch-none">
+ <button {...attributes} {...listeners} className="focus-ring p-2 text-gray-400 hover:text-black cursor-grab active:cursor-grabbing touch-none">
  <GripVertical size={16} />
  </button>
- <button onClick={() => handleEdit(product)} className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg border border-transparent hover:border-black/5">
+ <button onClick={() => handleEdit(product)} className="focus-ring p-2 text-gray-600 hover:text-black hover:bg-black/[0.04] rounded-lg border border-transparent hover:border-black/[0.06]">
  <Edit2 size={16} />
  </button>
- <button onClick={() => handleDelete(product.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100">
+ <button onClick={() => handleDelete(product.id)} className="focus-ring p-2 text-rose-500 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-100">
  <Trash2 size={16} />
  </button>
  </div>
@@ -196,7 +196,7 @@ export default function AdminProducts() {
  const oldIndex = items.findIndex((p) => p.id === active.id);
  const newIndex = items.findIndex((p) => p.id === over.id);
  const newArray = arrayMove(items, oldIndex, newIndex);
- 
+
  toast.promise(
  updateProductOrderBatch(newArray),
  { loading: 'Saving new order...', success: 'Order updated successfully', error: 'Failed to update order' },
@@ -271,11 +271,11 @@ export default function AdminProducts() {
  setIsUploading(true);
  const totalFiles = files.length;
  toast.loading(`Compressing ${totalFiles} image${totalFiles > 1 ? 's' : ''}...`, { id: "upload-status" });
- 
+
  const compressedFiles = await Promise.all(
  files.map(file => compressImage(file))
  );
- 
+
  let uploadedUrls = [];
  for (let i = 0; i < compressedFiles.length; i++) {
  toast.loading(`Uploading image ${i + 1} of ${totalFiles}...`, { id: "upload-status" });
@@ -314,9 +314,9 @@ export default function AdminProducts() {
  // If removing a size, also remove it from sizeStock
  const newSizeStock = { ...prev.sizeStock };
  if (field === 'sizes') delete newSizeStock[value];
- 
- return { 
- ...prev, 
+
+ return {
+ ...prev,
  [field]: current.filter(item => item !== value),
  sizeStock: field === 'sizes' ? newSizeStock : prev.sizeStock
  };
@@ -331,8 +331,8 @@ export default function AdminProducts() {
  setFormData(prev => {
  const newSizeStock = { ...prev.sizeStock, [size]: qty };
  const totalStock = Object.values(newSizeStock).reduce((a, b) => a + b, 0);
- return { 
- ...prev, 
+ return {
+ ...prev,
  sizeStock: newSizeStock,
  stockQuantity: totalStock
  };
@@ -347,8 +347,8 @@ export default function AdminProducts() {
  newSizeStock[size] = qty;
  });
  const totalStock = Object.values(newSizeStock).reduce((a, b) => a + b, 0);
- return { 
- ...prev, 
+ return {
+ ...prev,
  sizeStock: newSizeStock,
  stockQuantity: totalStock
  };
@@ -422,9 +422,9 @@ export default function AdminProducts() {
  loadProducts();
  } catch (error) {
  console.error("Product submission error:", error);
- toast.error(`Operation failed: ${error.message || "Unknown error"}`, { 
+ toast.error(`Operation failed: ${error.message || "Unknown error"}`, {
  id: "upload-status",
- duration: 5000 
+ duration: 5000
  });
  } finally {
  setIsSubmitting(false);
@@ -451,7 +451,7 @@ export default function AdminProducts() {
   const handleTogglePublic = async (product) => {
    const newStatus = product.isPublic === false ? true : false;
    const actionText = newStatus ? 'show' : 'hide';
-   
+
    if (confirm(`Are you sure you want to ${actionText} "${product.title || product.name}" on the storefront?`)) {
    try {
    const success = await updateProduct(product.id, { isPublic: newStatus });
@@ -470,34 +470,42 @@ export default function AdminProducts() {
 
  return (
  <AdminLayout title="Products">
- <div className="flex justify-end mb-6">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+ <div>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+ {products.length} product{products.length !== 1 ? "s" : ""} · drag rows or long-press cards to reorder
+ </p>
+ <p className="text-sm text-gray-500">Keep your catalog ordered and discoverable.</p>
+ </div>
  <button
  onClick={handleCreate}
- className="btn-primary flex items-center gap-2 text-xs sm:text-sm py-2 px-4 sm:py-3 sm:px-6"
+ className="focus-ring btn-primary flex items-center gap-2 text-xs sm:text-sm py-2 px-4 sm:py-2.5 sm:px-5 shadow-card"
  >
  <Plus size={18} />
  <span>Add Product</span>
  </button>
  </div>
 
- <div className="bg-transparent sm:bg-white sm:rounded-lg sm:border sm:border-gray-200 overflow-hidden">
+ <div className="bg-transparent sm:bg-white sm:rounded-xl sm:border sm:border-black/[0.06] sm:shadow-card overflow-hidden">
  {loading ? (
- <div className="p-12 flex justify-center bg-white rounded-lg border border-gray-200">
- <Loader2 className="animate-spin text-gray-400" size={32} />
+ <div className="p-12 flex justify-center bg-white rounded-xl border border-black/[0.06]">
+ <Loader2 className="animate-spin text-black/20" size={32} />
  </div>
  ) : (
  <>
  {/* Mobile Card View */}
- 
+
  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
  <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
-<div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
+ <div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
  {products.map(product => (
  <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
  ))}
  {products.length === 0 && (
- <div className="text-center py-20 bg-white rounded-lg border border-dashed border-gray-200">
- <Package className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+ <div className="text-center py-20 bg-white rounded-xl border border-dashed border-black/[0.12]">
+ <div className="w-12 h-12 mx-auto rounded-xl bg-black/[0.04] flex items-center justify-center mb-3">
+ <Package className="h-6 w-6 text-gray-300" />
+ </div>
  <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
  </div>
  )}
@@ -508,8 +516,8 @@ export default function AdminProducts() {
  {/* Desktop Table View */}
  <div className="hidden sm:block overflow-x-auto">
  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
- <table className="w-full text-left">
- <thead className="bg-gray-50 border-b border-gray-200">
+ <table className="w-full text-left admin-table">
+ <thead className="bg-black/[0.02] border-b border-black/[0.06]">
  <tr>
  <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400">Product</th>
  <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-gray-400 whitespace-nowrap">Category</th>
@@ -519,14 +527,16 @@ export default function AdminProducts() {
  </tr>
  </thead>
  <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
- <tbody className="divide-y divide-gray-100">
+ <tbody className="divide-y divide-black/[0.05]">
  {products.map(product => (
  <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
  ))}
  {products.length === 0 && (
  <tr>
  <td colSpan="5" className="p-12 text-center">
- <Package className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+ <div className="w-12 h-12 mx-auto rounded-xl bg-black/[0.04] flex items-center justify-center mb-3">
+ <Package className="h-6 w-6 text-gray-300" />
+ </div>
  <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">No products found</p>
  </td>
  </tr>
@@ -542,13 +552,16 @@ export default function AdminProducts() {
 
  {/* Modal */}
  {isModalOpen && (
- <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
+ <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+ <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-black/[0.06]">
  <div className="flex justify-between items-center mb-6">
- <h2 className="text-2xl font-bold">{editingId ? "Edit Product" : "New Product"}</h2>
+ <div>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Catalog</p>
+ <h2 className="text-2xl font-bold text-gray-900">{editingId ? "Edit Product" : "New Product"}</h2>
+ </div>
  <button
  onClick={() => setIsModalOpen(false)}
- className="p-2 hover:bg-gray-100 rounded-lg"
+ className="focus-ring p-2 hover:bg-black/[0.04] rounded-lg transition-colors"
  >
  <X size={20} />
  </button>
@@ -557,29 +570,31 @@ export default function AdminProducts() {
  <form onSubmit={handleSubmit} className="space-y-6">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div className="space-y-2">
- <label className="text-sm font-medium">Title</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Title</label>
  <input
  required
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  value={formData.title}
  onChange={e => setFormData({ ...formData, title: e.target.value })}
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium">Price (₦)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Price (₦)</label>
  <input
  type="number"
  required
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  value={formData.price}
  onChange={e => setFormData({ ...formData, price: e.target.value })}
  />
  </div>
- <div className="space-y-2">
- <label className="text-sm font-medium">Compare at Price (₦) <span className="text-gray-400 text-xs">- optional</span></label>
+ <div className="space-y-2 md:col-span-2">
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">
+ Compare at Price (₦) <span className="text-gray-400 text-xs normal-case">- optional</span>
+ </label>
  <input
  type="number"
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="e.g. 15000"
  value={formData.compareAtPrice || ""}
  onChange={e => setFormData({ ...formData, compareAtPrice: e.target.value ? parseFloat(e.target.value) : null })}
@@ -590,19 +605,19 @@ export default function AdminProducts() {
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium">Description</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Description</label>
  <textarea
  rows={4}
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  value={formData.description}
  onChange={e => setFormData({ ...formData, description: e.target.value })}
  />
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium">Category</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Category</label>
  <select
- className="w-full border p-3 rounded-lg bg-white"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg bg-white focus-ring cursor-pointer"
  value={formData.category}
  onChange={e => setFormData({ ...formData, category: e.target.value })}
  >
@@ -614,26 +629,26 @@ export default function AdminProducts() {
 
  {/* Ticket / Event fields */}
  {formData.category === "tickets" && (
- <div className="space-y-4 pt-4 border-t border-gray-100 bg-gray-50 p-4 rounded-lg">
+ <div className="space-y-4 pt-4 border-t border-black/[0.06] bg-black/[0.02] p-4 rounded-xl">
  <div className="flex items-center gap-2">
  <Ticket size={16} className="text-black" />
  <span className="text-[10px] font-bold uppercase tracking-widest text-black">Event Setup - e-tickets auto-deliver</span>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div className="space-y-2">
- <label className="text-sm font-medium">Event Date &amp; Time (WAT)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Event Date &amp; Time (WAT)</label>
  <input
  type="datetime-local"
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg bg-white focus-ring"
  value={formData.eventDateTime || ""}
  onChange={e => setFormData({ ...formData, eventDateTime: e.target.value })}
  />
  <p className="text-[11px] text-gray-400">Drives the countdown, sold-out state and e-ticket date.</p>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium">Venue</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Venue</label>
  <input
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="e.g. Lagos - Eko Hotel Convention Centre"
  value={formData.venue || ""}
  onChange={e => setFormData({ ...formData, venue: e.target.value })}
@@ -641,11 +656,11 @@ export default function AdminProducts() {
  </div>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium">Total Tickets Available (Capacity)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Total Tickets Available (Capacity)</label>
  <input
  type="number"
  min="0"
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  value={formData.stockQuantity}
  onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
  />
@@ -657,19 +672,19 @@ export default function AdminProducts() {
  {/* Variants - apparel & headwear only. Tickets are single-format:
  no sizes, no colors, no merchandising badges. */}
  {formData.category !== "tickets" && (
- <div className="space-y-4 pt-4 border-t border-gray-100">
+ <div className="space-y-4 pt-4 border-t border-black/[0.06]">
  {formData.category !== "headwear" && (
  <div>
- <label className="text-sm font-medium mb-2 block">Sizes</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Sizes</label>
  <div className="flex flex-wrap gap-2">
  {availableSizes.map(size => (
  <button
  key={size}
  type="button"
  onClick={() => toggleSelection("sizes", size)}
- className={`px-3 py-1 rounded-lg border text-sm font-medium transition-all ${formData.sizes.includes(size)
+ className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.sizes.includes(size)
  ? "bg-black text-white border-black"
- : "bg-white text-gray-600 border-gray-200 hover:border-black"
+ : "bg-white text-gray-600 border-black/[0.08] hover:border-black"
  }`}
  >
  {size}
@@ -680,16 +695,16 @@ export default function AdminProducts() {
  )}
 
  <div>
- <label className="text-sm font-medium mb-2 block">Colors</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Colors</label>
  <div className="flex flex-wrap gap-2">
  {availableColors.map(color => (
  <button
  key={color}
  type="button"
  onClick={() => toggleSelection("colors", color)}
- className={`px-3 py-1 rounded-lg border text-sm font-medium transition-all ${formData.colors.includes(color)
+ className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.colors.includes(color)
  ? "bg-black text-white border-black"
- : "bg-white text-gray-600 border-gray-200 hover:border-black"
+ : "bg-white text-gray-600 border-black/[0.08] hover:border-black"
  }`}
  >
  {color}
@@ -699,16 +714,16 @@ export default function AdminProducts() {
  </div>
 
  <div>
- <label className="text-sm font-medium mb-2 block">Tags</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Tags</label>
  <div className="flex flex-wrap gap-2">
  {availableTags.map(tag => (
  <button
  key={tag}
  type="button"
  onClick={() => toggleSelection("tags", tag)}
- className={`px-3 py-1 rounded-lg border text-sm font-medium transition-all ${formData.tags.includes(tag)
+ className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.tags.includes(tag)
  ? "bg-black text-white border-black"
- : "bg-white text-gray-600 border-gray-200 hover:border-black"
+ : "bg-white text-gray-600 border-black/[0.08] hover:border-black"
  }`}
  >
  {tag}
@@ -721,18 +736,18 @@ export default function AdminProducts() {
 
  {formData.category !== "headwear" && formData.category !== "tickets" ? (
  formData.sizes.length > 0 && (
- <div className="bg-gray-50 p-4 rounded-lg space-y-4">
- <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/5 shadow-sm">
+ <div className="bg-black/[0.02] p-4 rounded-xl border border-black/[0.06] space-y-4">
+ <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-black/[0.06] shadow-card">
  <label className="text-[10px] font-bold uppercase tracking-widest text-black">Inventory per Size</label>
  <div className="flex items-center gap-3">
- <div className="flex items-center gap-2 border-r border-gray-100 pr-3">
+ <div className="flex items-center gap-2 border-r border-black/[0.06] pr-3">
  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Bulk Update:</span>
  <div className="flex">
- <input 
+ <input
  id="bulk-stock-input"
- type="number" 
+ type="number"
  placeholder="0"
- className="w-12 p-1 text-[10px] border border-r-0 rounded-l font-bold text-center focus:outline-none focus:border-black"
+ className="w-12 p-1 text-[10px] border border-r-0 rounded-l font-bold text-center focus-ring"
  />
  <button
  type="button"
@@ -744,7 +759,7 @@ export default function AdminProducts() {
  toast.success("Applied to all sizes");
  }
  }}
- className="px-2 py-1 bg-black text-white text-[8px] font-bold uppercase rounded-r hover:bg-gray-800 transition-colors"
+ className="px-2 py-1 bg-black text-white text-[8px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
  >
  Set All
  </button>
@@ -755,7 +770,7 @@ export default function AdminProducts() {
  onClick={() => {
  if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
  }}
- className="text-[9px] font-bold text-red-400 hover:text-red-500 uppercase tracking-tighter transition-colors"
+ className="text-[9px] font-bold text-rose-400 hover:text-rose-500 uppercase tracking-tighter transition-colors"
  >
  Clear All
  </button>
@@ -770,7 +785,7 @@ export default function AdminProducts() {
  min="0"
  value={formData.sizeStock[size] || 0}
  onChange={(e) => handleSizeStockChange(size, e.target.value)}
- className="w-full p-2 text-xs border rounded-lg font-bold focus:border-black transition-colors"
+ className="w-full p-2 text-xs border border-black/[0.08] rounded-lg font-bold focus-ring"
  />
  </div>
  ))}
@@ -779,12 +794,12 @@ export default function AdminProducts() {
  )
  ) : formData.category === "headwear" ? (
  <div className="space-y-2">
- <label className="text-sm font-medium">Total Units In Stock</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Total Units In Stock</label>
  <input
  type="number"
  min="0"
  placeholder="Enter total quantity"
- className="w-full border p-3 rounded-lg"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring"
  value={formData.stockQuantity}
  onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
  />
@@ -795,27 +810,27 @@ export default function AdminProducts() {
  ) : null}
 
  {/* Images */}
- <div className="space-y-2 pt-4 border-t border-gray-100">
- <label className="text-sm font-medium">Images</label>
+ <div className="space-y-2 pt-4 border-t border-black/[0.06]">
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Images</label>
 
  {/* Existing Images */}
  <div className="flex gap-4 mb-2 overflow-x-auto no-scrollbar pb-4 snap-x">
  {formData.images.map((img, idx) => (
  <div key={idx} className="flex flex-col gap-2 flex-shrink-0 snap-start">
- <div className="w-28 h-28 rounded-lg border border-gray-200 overflow-hidden relative">
+ <div className="w-28 h-28 rounded-xl border border-black/[0.08] overflow-hidden relative shadow-card">
  <img src={img} className="w-full h-full object-cover" />
  {idx === 0 && (
- <div className="absolute top-1 left-1 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider shadow-sm z-10 pointer-events-none">
+ <div className="absolute top-1 left-1 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
  Primary
  </div>
  )}
  {formData.modelImage === img && (
- <div className="absolute bottom-1 left-1 bg-yellow-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider shadow-sm z-10 pointer-events-none">
+ <div className="absolute bottom-1 left-1 bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
  Model
  </div>
  )}
  </div>
- 
+
  {/* Action Bar (Always visible, below the image) */}
  <div className="flex items-center justify-center gap-1">
  <button
@@ -829,7 +844,7 @@ export default function AdminProducts() {
  setFormData({ ...formData, images: newImages });
  }}
  disabled={idx === 0}
- className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+ className="focus-ring p-1.5 rounded-md hover:bg-black/[0.04] text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
  title="Move Left"
  >
  <ChevronLeft size={16} strokeWidth={2.5} />
@@ -838,7 +853,7 @@ export default function AdminProducts() {
  <button
  type="button"
  onClick={() => setFormData({ ...formData, modelImage: formData.modelImage === img ? null : img })}
- className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${formData.modelImage === img ? 'text-yellow-500 bg-yellow-50' : 'text-gray-600'}`}
+ className={`focus-ring p-1.5 rounded-md hover:bg-black/[0.04] transition-colors ${formData.modelImage === img ? 'text-amber-500 bg-amber-50' : 'text-gray-600'}`}
  title="Toggle Model Image"
  >
  <Star size={14} fill={formData.modelImage === img ? "currentColor" : "none"} />
@@ -849,13 +864,13 @@ export default function AdminProducts() {
  onClick={() => {
  const newImages = formData.images.filter((_, i) => i !== idx);
  // Also clear model image if deleted
- setFormData(prev => ({ 
- ...prev, 
+ setFormData(prev => ({
+ ...prev,
  images: newImages,
- modelImage: prev.modelImage === img ? null : prev.modelImage 
+ modelImage: prev.modelImage === img ? null : prev.modelImage
  }));
  }}
- className="p-1.5 rounded-md hover:bg-red-50 text-red-500 transition-colors"
+ className="focus-ring p-1.5 rounded-md hover:bg-rose-50 text-rose-500 transition-colors"
  title="Delete Image"
  >
  <Trash2 size={14} />
@@ -872,7 +887,7 @@ export default function AdminProducts() {
  setFormData({ ...formData, images: newImages });
  }}
  disabled={idx === formData.images.length - 1}
- className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+ className="focus-ring p-1.5 rounded-md hover:bg-black/[0.04] text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
  title="Move Right"
  >
  <ChevronRight size={16} strokeWidth={2.5} />
@@ -882,7 +897,7 @@ export default function AdminProducts() {
  ))}
  </div>
 
- <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50 relative">
+ <div className="border-2 border-dashed border-black/[0.15] rounded-xl p-6 text-center cursor-pointer hover:border-black/30 hover:bg-black/[0.02] transition-all relative">
  <input
  type="file"
  multiple
@@ -903,16 +918,16 @@ export default function AdminProducts() {
  </div>
 
  {/* Inventory Management */}
- <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4 border-t border-gray-100">
+ <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4 border-t border-black/[0.06]">
  {formData.category !== "tickets" && (
  <div className="space-y-2 flex-1">
- <label className="text-sm font-medium">Stock Quantity</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Stock Quantity</label>
  <div className="relative">
  <input
  type="number"
  min="0"
  readOnly
- className="w-full border p-3 rounded-lg pl-10 bg-gray-50 text-gray-500 font-bold"
+ className="w-full px-4 py-3 pl-10 border border-black/[0.08] rounded-lg bg-black/[0.02] text-gray-500 font-bold focus-ring"
  value={formData.stockQuantity}
  />
  <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -923,13 +938,13 @@ export default function AdminProducts() {
 
  {formData.category !== "tickets" && (
  <div className="space-y-2 flex-1">
- <label className="text-sm font-medium">Weight (kg)</label>
+ <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1.5">Weight (kg)</label>
  <div className="relative">
  <input
  type="number"
  step="0.1"
  min="0"
- className="w-full border p-3 rounded-lg pl-10"
+ className="w-full px-4 py-3 pl-10 border border-black/[0.08] rounded-lg focus-ring"
  value={formData.weight}
  onChange={e => setFormData({ ...formData, weight: parseFloat(e.target.value) || 0 })}
  />
@@ -945,7 +960,7 @@ export default function AdminProducts() {
  type="checkbox"
  checked={formData.featured}
  onChange={e => setFormData({ ...formData, featured: e.target.checked })}
- className="w-4 h-4 rounded border-gray-300 accent-black"
+ className="w-4 h-4 rounded border-black/20 accent-black"
  />
  <span className="text-sm font-medium">Featured</span>
  </label>
@@ -956,7 +971,7 @@ export default function AdminProducts() {
  type="checkbox"
  checked={formData.bestSeller}
  onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
- className="w-4 h-4 rounded border-gray-300 accent-black"
+ className="w-4 h-4 rounded border-black/20 accent-black"
  />
  <span className="text-sm font-medium">Best Seller</span>
  </label>
@@ -968,14 +983,14 @@ export default function AdminProducts() {
  <button
  type="button"
  onClick={() => setIsModalOpen(false)}
- className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+ className="focus-ring px-6 py-2.5 border border-black/[0.1] rounded-lg hover:bg-black/[0.02]"
  disabled={isSubmitting || isUploading}
  >
  Cancel
  </button>
  <button
  type="submit"
- className="px-6 py-2 bg-black text-white rounded-lg hover:opacity-90 flex items-center gap-2"
+ className="focus-ring px-6 py-2.5 bg-black text-white rounded-lg hover:opacity-90 shadow-card flex items-center gap-2"
  disabled={isSubmitting || isUploading}
  >
  {(isSubmitting || isUploading) && <Loader2 className="animate-spin" size={16} />}

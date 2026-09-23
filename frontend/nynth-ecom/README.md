@@ -2,6 +2,8 @@
 
 Minimal-luxury streetwear storefront. Sharp, black/white, typography-led — the public storefront and the admin panel share one codebase.
 
+> **Docs:** [`CODEBASE.md`](./CODEBASE.md) maps the whole repo (routes → pages, API layer, edge functions, configs). `CLAUDE.md` holds project-level agent context.
+
 ## Stack
 
 | Layer | Technology |

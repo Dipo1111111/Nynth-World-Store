@@ -231,7 +231,7 @@ export default function AdminSettings() {
  }
 
  const SectionTitle = ({ icon: Icon, title }) => (
- <div className="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
+ <div className="flex items-center gap-2 mb-6 pb-2 border-b border-black/[0.06]">
  <Icon size={18} className="text-gray-400" />
  <h3 className="font-bold text-lg">{title}</h3>
  </div>
@@ -241,7 +241,7 @@ export default function AdminSettings() {
  <AdminLayout title="Settings">
  <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
  {/* Save model explainer */}
- <div className="bg-amber-50 border border-gray-200 rounded-lg px-5 py-4 flex items-start gap-3">
+ <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 flex items-start gap-3">
  <Info size={18} className="text-amber-700 shrink-0 mt-0.5" />
  <div>
  <p className="text-xs font-bold uppercase tracking-widest text-amber-900">Changes are staged until you save</p>
@@ -253,7 +253,7 @@ export default function AdminSettings() {
  </div>
 
  {/* General Settings */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -262,7 +262,7 @@ export default function AdminSettings() {
  name="site_name"
  value={settings.site_name}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="NYNTH"
  />
  </div>
@@ -272,7 +272,7 @@ export default function AdminSettings() {
  name="currency_symbol"
  value={settings.currency_symbol}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="₦"
  />
  </div>
@@ -280,7 +280,7 @@ export default function AdminSettings() {
  </div>
 
  {/* PRODUCT VARIANT OPTIONS */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={PackageIcon} title="Product Variant Options" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Manage the preset options available when creating or editing products. Separate items with commas.
@@ -293,7 +293,7 @@ export default function AdminSettings() {
  value={settings.available_colors}
  onChange={handleChange}
  rows={3}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring font-mono text-xs"
  placeholder="Black, White, Red..."
  />
  </div>
@@ -304,7 +304,7 @@ export default function AdminSettings() {
  value={settings.available_sizes}
  onChange={handleChange}
  rows={2}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-xs"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring font-mono text-xs"
  placeholder="XS, S, M, L, XL..."
  />
  </div>
@@ -312,13 +312,13 @@ export default function AdminSettings() {
  </div>
 
  {/* LOCK PAGE CONFIGURATION */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
  </p>
  
- <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="mb-6 p-4 bg-black/[0.02] rounded-lg flex items-center justify-between border border-black/[0.06]">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Lock Page</h4>
  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
@@ -331,12 +331,12 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ <div className="w-11 h-6 bg-black/[0.15] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-black/[0.1] after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
  </label>
  </div>
 
  {/* Timer Toggle */}
- <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="mb-6 p-4 bg-black/[0.02] rounded-lg flex items-center justify-between border border-black/[0.06]">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Countdown Timer</h4>
  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
@@ -349,7 +349,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ <div className="w-11 h-6 bg-black/[0.15] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-black/[0.1] after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
  </label>
  </div>
 
@@ -361,7 +361,7 @@ export default function AdminSettings() {
  name="launch_date"
  value={settings.launch_date ? settings.launch_date.substring(0, 16) : ""}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring font-mono"
  />
  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
  </div>
@@ -374,7 +374,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  min="1"
  max="999"
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring font-mono"
  />
  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
  </div>
@@ -384,7 +384,7 @@ export default function AdminSettings() {
  name="lock_password"
  value={settings.lock_password}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring font-mono"
  placeholder="WINNERSONLY"
  />
  </div>
@@ -394,7 +394,7 @@ export default function AdminSettings() {
  name="lock_title1"
  value={settings.lock_title1}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="BY WINNERS FOR WINNERS"
  />
  </div>
@@ -404,7 +404,7 @@ export default function AdminSettings() {
  name="lock_title2"
  value={settings.lock_title2}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="STAY ABOVE"
  />
  </div>
@@ -414,7 +414,7 @@ export default function AdminSettings() {
  name="lock_waitlist_title"
  value={settings.lock_waitlist_title}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="JOIN THE WAITLIST"
  />
  </div>
@@ -424,7 +424,7 @@ export default function AdminSettings() {
  name="lock_waitlist_subtitle"
  value={settings.lock_waitlist_subtitle}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="BE NOTIFIED WHEN WE GO LIVE"
  />
  </div>
@@ -432,7 +432,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Contact Information */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Mail} title="Contact Information" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -444,7 +444,7 @@ export default function AdminSettings() {
  type="email"
  value={settings.support_email}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full pl-10 pr-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="support@nynth.com"
  />
  </div>
@@ -457,7 +457,7 @@ export default function AdminSettings() {
  name="support_phone"
  value={settings.support_phone}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full pl-10 pr-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="+234..."
  />
  </div>
@@ -470,7 +470,7 @@ export default function AdminSettings() {
  name="support_whatsapp"
  value={settings.support_whatsapp}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full pl-10 pr-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="+234..."
  />
  </div>
@@ -483,7 +483,7 @@ export default function AdminSettings() {
  name="office_address"
  value={settings.office_address}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full pl-10 pr-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="123 Street, Lagos"
  />
  </div>
@@ -492,7 +492,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Social Media */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Share2} title="Social Media Links" />
  <div className="grid grid-cols-1 gap-6">
  <div className="space-y-2">
@@ -501,7 +501,7 @@ export default function AdminSettings() {
  name="instagram_url"
  value={settings.instagram_url}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="https://instagram.com/..."
  />
  </div>
@@ -511,7 +511,7 @@ export default function AdminSettings() {
  name="twitter_url"
  value={settings.twitter_url}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="https://x.com/..."
  />
  </div>
@@ -521,7 +521,7 @@ export default function AdminSettings() {
  name="facebook_url"
  value={settings.facebook_url}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="https://facebook.com/..."
  />
  </div>
@@ -531,7 +531,7 @@ export default function AdminSettings() {
  name="tiktok_url"
  value={settings.tiktok_url || ""}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="https://tiktok.com/..."
  />
  </div>
@@ -539,7 +539,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Google Analytics Settings */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
  <div className="space-y-4">
  <div className="space-y-2">
@@ -548,7 +548,7 @@ export default function AdminSettings() {
  name="ga_property_id"
  value={settings.ga_property_id || ""}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors font-mono text-sm"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring font-mono text-sm"
  placeholder="e.g. 123456789"
  />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
@@ -560,10 +560,10 @@ export default function AdminSettings() {
  </div>
 
  {/* Brand Assets Section */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
  <div className="space-y-4">
- <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-black/5">
+ <div className="flex justify-between items-center bg-black/[0.02] p-3 rounded-lg border border-black/[0.06]">
  <span className="text-[10px] font-bold text-black uppercase tracking-widest leading-none">Currently Active Banner</span>
  {!settings.hero_banner && (
  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest bg-white px-2 py-1 rounded border border-black/5">Default System Asset</span>
@@ -580,14 +580,14 @@ export default function AdminSettings() {
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, hero_banner: "" }))}
- className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-lg hover:bg-black transition-colors shadow-sm"
+ className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-lg hover:bg-black transition-colors shadow-card"
  title="Reset to Default"
  >
  <X size={18} />
  </button>
  )}
  </div>
- <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-gray-50 transition-all cursor-pointer group">
+ <div className="relative border-2 border-dashed border-black/[0.15] rounded-lg p-10 flex flex-col items-center justify-center hover:bg-black/[0.02] transition-all cursor-pointer group">
  <input
  type="file"
  accept="image/*"
@@ -606,7 +606,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Banner Hover Color */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Megaphone} title="Banner Hover Style" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4 leading-relaxed">
  Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
@@ -618,8 +618,8 @@ export default function AdminSettings() {
  onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "red" }))}
  className={`flex items-center gap-3 px-5 py-3 border transition-all ${
  settings.banner_hover_color === 'red'
- ? 'border-red-600 bg-gray-50 text-red-500'
- : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+? 'border-red-600 bg-rose-50 text-rose-600'
+  : 'border-black/[0.08] bg-white text-gray-400 hover:border-black/20'
  }`}
  >
  <div className="w-4 h-4 rounded-lg bg-red-600"></div>
@@ -630,8 +630,8 @@ export default function AdminSettings() {
  onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
  className={`flex items-center gap-3 px-5 py-3 border transition-all ${
  settings.banner_hover_color === 'black'
- ? 'border-black bg-black text-white'
- : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+? 'border-black bg-black text-white'
+  : 'border-black/[0.08] bg-white text-gray-400 hover:border-black/20'
  }`}
  >
  <div className="w-4 h-4 rounded-lg bg-black"></div>
@@ -641,7 +641,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Shipping Settings */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
  <label className="text-sm font-medium text-gray-700">Default Shipping Fee ({settings.currency_symbol})</label>
@@ -650,19 +650,19 @@ export default function AdminSettings() {
  type="number"
  value={settings.shipping_fee}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  />
  </div>
  </div>
 
  {/* Free Delivery Discount */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Percent} title="Free Delivery Discount" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
  </p>
 
- <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="mb-6 p-4 bg-black/[0.02] rounded-lg flex items-center justify-between border border-black/[0.06]">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Free Delivery Discount</h4>
  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
@@ -675,7 +675,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ <div className="w-11 h-6 bg-black/[0.15] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-black/[0.1] after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
  </label>
  </div>
 
@@ -688,7 +688,7 @@ export default function AdminSettings() {
  value={settings.free_delivery_threshold}
  onChange={handleChange}
  min="0"
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="50000"
  />
  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
@@ -716,7 +716,7 @@ export default function AdminSettings() {
  />
 
  {/* Shipping Location Toggles */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Truck} title="Shipping Locations" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Toggle delivery locations on or off. Disabled locations will not appear in checkout.
@@ -761,7 +761,7 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+ ? "border-black/[0.06] text-gray-400 bg-black/[0.02] line-through"
  : "border-black/10 text-black bg-white hover:border-black/20"
  }`}
  >
@@ -811,7 +811,7 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+ ? "border-black/[0.06] text-gray-400 bg-black/[0.02] line-through"
  : "border-black/10 text-black bg-white hover:border-black/20"
  }`}
  >
@@ -861,7 +861,7 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-gray-200 text-gray-300 bg-gray-50 line-through"
+ ? "border-black/[0.06] text-gray-400 bg-black/[0.02] line-through"
  : "border-black/10 text-black bg-white hover:border-black/20"
  }`}
  >
@@ -874,13 +874,13 @@ export default function AdminSettings() {
  </div>
 
  {/* Announcement Bar */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
  </p>
 
- <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="mb-6 p-4 bg-black/[0.02] rounded-lg flex items-center justify-between border border-black/[0.06]">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Announcement Bar</h4>
  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
@@ -893,7 +893,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ <div className="w-11 h-6 bg-black/[0.15] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-black/[0.1] after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
  </label>
  </div>
 
@@ -904,7 +904,7 @@ export default function AdminSettings() {
  name="announcement_bar_text"
  value={settings.announcement_bar_text}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="NEXT DROP IN:"
  />
  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
@@ -913,13 +913,13 @@ export default function AdminSettings() {
  </div>
 
  {/* Promotional Marquee */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Megaphone} title="Promotional Marquee" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A scrolling banner that appears above the hero image on Shop and Home pages.
  </p>
 
- <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between border border-black/5">
+ <div className="mb-6 p-4 bg-black/[0.02] rounded-lg flex items-center justify-between border border-black/[0.06]">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-black uppercase tracking-tight">Enable Marquee</h4>
  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
@@ -932,7 +932,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+ <div className="w-11 h-6 bg-black/[0.15] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-black/[0.1] after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
  </label>
  </div>
 
@@ -943,7 +943,7 @@ export default function AdminSettings() {
  name="marquee_text"
  value={settings.marquee_text}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
  />
  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
@@ -952,7 +952,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Email Section Settings */}
- <div className="bg-white p-6 rounded-lg border border-red-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-rose-100 shadow-card">
  <SectionTitle icon={Mail} title="Email Section Settings" />
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -966,7 +966,7 @@ export default function AdminSettings() {
  type="button"
  onClick={handleMerge}
  disabled={isMerging}
- className="px-6 py-2 bg-gray-50 text-red-500 border border-red-100 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
+ className="px-6 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
  >
  {isMerging ? "Cleaning..." : "Clean Duplicates"}
  </button>
@@ -975,10 +975,10 @@ export default function AdminSettings() {
  </div>
 
  {/* Size Chart Settings */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-6">
- <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+ <div className="flex items-center justify-between p-4 bg-black/[0.02] rounded-lg border border-black/[0.06]">
  <div>
  <h4 className="text-sm font-bold uppercase tracking-widest text-black">Enable Size Chart</h4>
  <p className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
@@ -986,7 +986,7 @@ export default function AdminSettings() {
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
- className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-black' : 'bg-gray-200'}`}
+ className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-black' : 'bg-black/[0.15]'}`}
  >
  <div className={`absolute top-1 w-4 h-4 rounded-lg bg-white transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
  </button>
@@ -1001,7 +1001,7 @@ export default function AdminSettings() {
  value={settings.size_chart_model_info}
  onChange={handleChange}
  rows={3}
- className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-black transition-colors text-[11px] leading-relaxed"
+ className="w-full px-4 py-3 border border-black/[0.08] rounded-lg focus-ring text-[11px] leading-relaxed"
  placeholder="Our model is 185cm tall and wears a size M..."
  />
  </div>
@@ -1021,9 +1021,9 @@ export default function AdminSettings() {
  </button>
  </div>
 
- <div className="overflow-x-auto border border-gray-100 rounded-lg">
- <table className="w-full text-left">
- <thead className="bg-gray-50 border-b border-gray-100">
+<div className="overflow-x-auto border border-black/[0.06] rounded-lg">
+  <table className="w-full text-left">
+  <thead className="bg-black/[0.02] border-b border-black/[0.06]">
  <tr>
  <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Size</th>
  <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">Chest (cm)</th>
@@ -1032,7 +1032,7 @@ export default function AdminSettings() {
  <th className="p-3 w-10"></th>
  </tr>
  </thead>
- <tbody className="divide-y divide-gray-50">
+ <tbody className="divide-y divide-black/[0.05]">
  {(settings.size_chart_data || []).map((row, idx) => (
  <tr key={idx}>
  <td className="p-2">
@@ -1043,7 +1043,7 @@ export default function AdminSettings() {
  newData[idx].size = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] font-bold uppercase text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] font-bold uppercase text-center"
  placeholder="M"
  />
  </td>
@@ -1055,7 +1055,7 @@ export default function AdminSettings() {
  newData[idx].chest = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] text-center"
  placeholder="91-97"
  />
  </td>
@@ -1067,7 +1067,7 @@ export default function AdminSettings() {
  newData[idx].waist = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] text-center"
  placeholder="76-81"
  />
  </td>
@@ -1079,7 +1079,7 @@ export default function AdminSettings() {
  newData[idx].length = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus:border-gray-200 rounded text-[11px] text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] text-center"
  placeholder="72"
  />
  </td>
@@ -1090,7 +1090,7 @@ export default function AdminSettings() {
  const newData = settings.size_chart_data.filter((_, i) => i !== idx);
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+ className="p-2 text-gray-300 hover:text-rose-500 transition-colors"
  >
  <Trash2 size={14} />
  </button>
@@ -1100,7 +1100,7 @@ export default function AdminSettings() {
  </tbody>
  </table>
  {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
- <div className="p-8 text-center bg-gray-50/50">
+ <div className="p-8 text-center bg-black/[0.02]">
  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">No measurement rows added</p>
  </div>
  )}
@@ -1113,7 +1113,7 @@ export default function AdminSettings() {
 
 
  {/* Our Story Editor */}
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+ <div className="bg-white p-6 rounded-xl border border-black/[0.06] shadow-card">
  <SectionTitle icon={BookOpen} title="Our Story" />
  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
@@ -1137,7 +1137,7 @@ export default function AdminSettings() {
  <input
  value={story("company")}
  onChange={(e) => updateStory("company", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="NYNTH WORLD LTD"
  />
  </div>
@@ -1148,7 +1148,7 @@ export default function AdminSettings() {
  <input
  value={story("founded")}
  onChange={(e) => updateStory("founded", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="Founded October 20, 2022"
  />
  </div>
@@ -1157,7 +1157,7 @@ export default function AdminSettings() {
  <input
  value={story("cac")}
  onChange={(e) => updateStory("cac", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="Registered with the Corporate Affairs Commission (CAC), October 2, 2025"
  />
  </div>
@@ -1169,7 +1169,7 @@ export default function AdminSettings() {
  <input
  value={story("founder_label")}
  onChange={(e) => updateStory("founder_label", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="Founder & Chief Executive Officer"
  />
  </div>
@@ -1178,7 +1178,7 @@ export default function AdminSettings() {
  <input
  value={story("founder_name")}
  onChange={(e) => updateStory("founder_name", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="Yange Newman Terseer"
  />
  </div>
@@ -1190,7 +1190,7 @@ export default function AdminSettings() {
  value={story("belief")}
  onChange={(e) => updateStory("belief", e.target.value)}
  rows={3}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm italic"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring text-sm italic"
  placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
  />
  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
@@ -1202,7 +1202,7 @@ export default function AdminSettings() {
  value={story("belief_desc")}
  onChange={(e) => updateStory("belief_desc", e.target.value)}
  rows={2}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring text-sm"
  placeholder="It is a brand based on mindset.&#10;A standard for people who choose to rise in every situation."
  />
  </div>
@@ -1213,7 +1213,7 @@ export default function AdminSettings() {
  value={story("origin")}
  onChange={(e) => updateStory("origin", e.target.value)}
  rows={4}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring text-sm"
  placeholder="NYNTH started from a real moment.&#10;The Founder was ranked 9th across 9 subjects and told he would not succeed.&#10;That moment did not create doubt. It created a shift in mindset."
  />
  </div>
@@ -1224,7 +1224,7 @@ export default function AdminSettings() {
  <input
  value={story("quote1")}
  onChange={(e) => updateStory("quote1", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring italic font-bold"
  placeholder="Position is temporary."
  />
  </div>
@@ -1233,7 +1233,7 @@ export default function AdminSettings() {
  <input
  value={story("quote2")}
  onChange={(e) => updateStory("quote2", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors italic font-bold"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring italic font-bold"
  placeholder="Mindset is Permanent."
  />
  </div>
@@ -1245,7 +1245,7 @@ export default function AdminSettings() {
  value={story("meaning")}
  onChange={(e) => updateStory("meaning", e.target.value)}
  rows={4}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring text-sm"
  placeholder="NYNTH is not just a number. It stands for elevation.&#10;It represents people who push past limits,&#10;stay disciplined,&#10;and keep the mindset of staying above."
  />
  </div>
@@ -1256,7 +1256,7 @@ export default function AdminSettings() {
  value={story("philosophy")}
  onChange={(e) => updateStory("philosophy", e.target.value)}
  rows={4}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors text-sm"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring text-sm"
  placeholder="Every NYNTH piece is made with intention.&#10;Not just as clothing, but as identity.&#10;When you see NYNTH, you see a person who keeps going."
  />
  </div>
@@ -1267,7 +1267,7 @@ export default function AdminSettings() {
  <input
  value={story("tagline")}
  onChange={(e) => updateStory("tagline", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="BY WINNERS, FOR WINNERS, stay above"
  />
  </div>
@@ -1276,7 +1276,7 @@ export default function AdminSettings() {
  <input
  value={story("footer_name")}
  onChange={(e) => updateStory("footer_name", e.target.value)}
- className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-black transition-colors"
+ className="w-full px-4 py-2 border border-black/[0.08] rounded-lg focus-ring"
  placeholder="NYNTH WORLD LTD"
  />
  </div>
@@ -1291,7 +1291,7 @@ export default function AdminSettings() {
  <button
  type="submit"
  disabled={saving || !isDirty}
- className="flex items-center gap-2 bg-black text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+ className="flex items-center gap-2 bg-black text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-card focus-ring"
  >
  {saving ? (
  <Loader2 className="animate-spin" size={20} />
@@ -1305,7 +1305,7 @@ export default function AdminSettings() {
 
  {/* Sticky save bar - appears whenever there are unsaved changes */}
  {isDirty && (
- <div className="fixed bottom-0 inset-x-0 z-50 border-t border-gray-200 bg-amber-50/95 backdrop-blur">
+ <div className="fixed bottom-0 inset-x-0 z-50 border-t border-amber-900/10 bg-amber-50/95 backdrop-blur">
  <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-2.5 min-w-0">
  <span className="w-2 h-2 rounded-lg bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
@@ -1326,7 +1326,7 @@ export default function AdminSettings() {
  type="button"
  onClick={handleSubmit}
  disabled={saving}
- className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-sm"
+ className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-card focus-ring"
  >
  {saving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
  {saving ? "Saving..." : "Save All Settings"}
