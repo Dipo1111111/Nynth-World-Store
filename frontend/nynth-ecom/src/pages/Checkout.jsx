@@ -327,10 +327,17 @@ const Checkout = () => {
         : 0;
       const grandTotal = totalAmount + shippingFee - orderDiscount;
 
-      // Create order in Firestore
+      // Never send a broken total to the database/Paystack
+      if (!Number.isFinite(orderDiscount) || !Number.isFinite(grandTotal)) {
+        toast.error("Could not calculate your order total. Remove the discount code and try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Create the order (pending until Paystack confirms)
       const orderData = {
         customer: { ...form, phone: `${form.phoneCode}${form.phone.replace(/\s/g, '')}` },
-        userId: currentUser ? currentUser.uid : null, // Link to user
+        userId: currentUser ? currentUser.id : null, // Supabase auth user id
         items: cartItems,
         subtotal: totalAmount,
         shippingFee: shippingFee,
@@ -340,7 +347,6 @@ const Checkout = () => {
         payment_status: "pending",
         order_status: "pending", // Start as pending until payment confirmed
         payment_method: "paystack",
-        createdAt: new Date(),
       };
 
       const orderId = await addOrder(orderData);

@@ -14,6 +14,8 @@ const toTimestamp = (v) => {
   const ms = v instanceof Date ? v.getTime() : new Date(v).getTime();
   return isNaN(ms) ? null : { seconds: Math.floor(ms / 1000) };
 };
+// Coerce to a finite number; NaN/undefined -> 0 so PostgREST never rejects with 400.
+const finalNumber = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 const rowToProduct = (r) => ({ ...(r.data ?? {}), id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
 const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, created_at: toTimestamp(r.created_at) });
 
@@ -208,9 +210,13 @@ export const verifyOrderPayment = async (_orderId, reference) => {
 // --- ORDERS ---
 export const addOrder = async (order) => {
   const { data: { user } } = await supabase.auth.getUser();
-  const { data, error } = await supabase.from("orders").insert({ user_id: order.userId ?? user?.id ?? null, customer: order.customer ?? {}, items: order.items ?? [], subtotal: Number(order.subtotal ?? 0), shipping_fee: Number(order.shippingFee ?? order.shipping_fee ?? 0), discount_amount: Number(order.discountAmount ?? 0), discount_code: order.discountCode ?? null, total: Number(order.total ?? 0), payment_status: "pending", order_status: "pending" }).select("id").single();
+  // Client-generated id: INSERT ... RETURNING requires SELECT RLS on the returned row,
+  // which guests (user_id = null) can never pass -> PostgREST 400/42501. Insert without
+  // returning instead, and hand the id back for Paystack metadata + verification.
+  const id = order.id ?? crypto.randomUUID();
+  const { error } = await supabase.from("orders").insert({ id, user_id: order.userId ?? user?.id ?? null, customer: order.customer ?? {}, items: order.items ?? [], subtotal: finalNumber(order.subtotal), shipping_fee: finalNumber(order.shippingFee ?? order.shipping_fee), discount_amount: finalNumber(order.discountAmount), discount_code: order.discountCode ?? null, total: finalNumber(order.total), payment_status: "pending", order_status: "pending" });
   if (error) throw error;
-  return data.id;
+  return id;
 };
 export const fetchOrders = () => getAllOrders();
 export const getAllOrders = async () => {
@@ -343,7 +349,7 @@ export const fetchDiscountCodes = async () => {
 };
 export const validateDiscountCode = async (code) => {
   const { data } = await supabase.from("discount_codes").select("*").eq("code", String(code).toUpperCase()).eq("active", true).maybeSingle();
-  if (!data) return { valid: false };
-  if (data.expires_at && new Date(data.expires_at) < new Date()) return { valid: false, reason: "expired" };
-  return { valid: true, code: data };
+  if (!data) return { valid: false, error: "Invalid or inactive code" };
+  if (data.expires_at && new Date(data.expires_at) < new Date()) return { valid: false, error: "This code has expired", reason: "expired" };
+  return { valid: true, code: data, discountType: data.percent_off != null && Number(data.percent_off) > 0 ? "percentage" : "fixed", discountValue: Number(data.percent_off ?? data.amount_off ?? 0) };
 };
