@@ -40,13 +40,14 @@ async function validSignature(secret: string, raw: string, sig: string) {
 
 Deno.serve(async (req) => {
   const secret = Deno.env.get("PAYSTACK_SECRET_KEY") ?? "";
-  // Authoritative test-mode stamp: sk_test_ keys fund only Paystack's sandbox.
-  const isTest = secret.startsWith("sk_test_");
   const raw = await req.text();
   const sig = req.headers.get("x-paystack-signature") ?? "";
   if (!secret || !(await validSignature(secret, raw, sig))) return new Response("Invalid signature", { status: 401 });
   const event = JSON.parse(raw);
   if (event.event !== "charge.success") return new Response("Event acknowledged", { status: 200 });
+  // Authoritative test stamp: Paystack itself reports which domain moved the money.
+  // Never infer it from local keys, the frontend and server keys can disagree.
+  const isTest = (event.data?.domain ?? (secret.startsWith("sk_test_") ? "test" : "live")) === "test";
   const orderId = event.data?.metadata?.orderId;
   const reference = event.data?.reference;
   if (!orderId) return new Response("No orderId in metadata", { status: 400 });

@@ -42,11 +42,12 @@ export async function handler(req: Request): Promise<Response> {
   const { reference } = await req.json().catch(() => ({}));
   if (!reference) return Response.json({ error: "reference required" }, { status: 400, headers: corsHeaders });
   const secret = Deno.env.get("PAYSTACK_SECRET_KEY") ?? "";
-  // Authoritative test-mode stamp: sk_test_ keys fund only Paystack's sandbox.
-  const isTest = secret.startsWith("sk_test_");
   const res = await fetch("https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference), { headers: { Authorization: "Bearer " + secret } });
   const body = await res.json().catch(() => ({}));
   if (!res.ok || !body.status || body.data?.status !== "success") return Response.json({ error: body.message ?? "verification failed" }, { status: 400, headers: corsHeaders });
+  // Authoritative test stamp: Paystack itself reports which domain moved the money.
+  // Never infer it from local keys, the frontend and server keys can disagree.
+  const isTest = (body.data?.domain ?? (secret.startsWith("sk_test_") ? "test" : "live")) === "test";
   const orderId = body.data?.metadata?.orderId;
   if (!orderId) return Response.json({ error: "No orderId in metadata" }, { status: 404, headers: corsHeaders });
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
