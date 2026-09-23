@@ -33,4 +33,14 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+      # The edge tests import @supabase/supabase-js via esm.sh, whose types
+      # reference @types/node. Deno resolves that from node_modules, so install
+      # the same lockfile here or `deno test` fails with "Could not find
+      # @types/node" (reproduces local: it only passes because node_modules exists).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/nynth-ecom/package-lock.json
+      - run: npm ci
       - run: deno test --allow-env --allow-net --allow-read supabase/functions
