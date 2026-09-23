@@ -12,23 +12,23 @@ import toast from 'react-hot-toast';
 const STATUS_CONFIG = {
     pending: {
         label: 'Order Pending',
-        className: 'bg-gray-50 text-gray-600 border-orange-100'
+        className: 'bg-amber-50 text-amber-700 border-amber-100'
     },
     packaging: {
         label: 'In Packaging',
-        className: 'bg-gray-50 text-gray-600 border-indigo-100'
+        className: 'bg-violet-50 text-violet-700 border-violet-100'
     },
     shipped: {
         label: 'En Route / Shipped',
-        className: 'bg-gray-50 text-gray-600 border-blue-100'
+        className: 'bg-sky-50 text-sky-700 border-sky-100'
     },
     delivered: {
         label: 'Delivered',
-        className: 'bg-gray-50 text-green-500 border-emerald-100'
+        className: 'bg-emerald-50 text-emerald-700 border-emerald-100'
     },
     cancelled: {
         label: 'Cancelled',
-        className: 'bg-gray-50 text-gray-500 border-gray-200'
+        className: 'bg-slate-100 text-slate-500 border-slate-200'
     }
 };
 

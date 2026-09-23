@@ -17,10 +17,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global suppression of focus rings */
-*:focus {
-  outline: none !important;
-  box-shadow: none !important;
+/* Focus handling: hide rings for pointer interaction, keep keyboard focus
+   visible and accessible. Add .focus-ring to restore a strong ring. */
+:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+:focus-visible {
+  outline: 2px solid oklch(0.556 0 0);
+  outline-offset: 2px;
 }
 
 /* Use the CSS variables directly in @apply */

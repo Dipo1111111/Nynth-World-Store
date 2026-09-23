@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Smartphone, ArrowBigDown, Share, Plus } from 'lucide-react';
+import { X, Smartphone, ArrowBigDown, Share, Plus, BellRing } from 'lucide-react';
 
 const AdminPWAPrompt = () => {
     const [show, setShow] = useState(false);
@@ -58,59 +58,61 @@ const AdminPWAPrompt = () => {
     if (!show || !platform) return null;
 
     return (
-        <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-10 md:w-96 z-[9999]">
-            <div className="bg-black text-white p-6 rounded-lg border border-white/10 relative overflow-hidden">
+        <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-10 md:w-96 z-[9999] animate-admin-fade-up">
+            <div className="bg-[#0c0c0c] text-white p-6 rounded-xl border border-white/10 shadow-raised relative overflow-hidden">
                 <button
                     onClick={dismiss}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Dismiss"
                 >
-                    <X size={20} />
+                    <X size={18} />
                 </button>
 
                 <div className="flex gap-4 items-start mb-6">
-                    <div className="p-3 bg-white/10 rounded">
-                        <Smartphone size={24} />
+                    <div className="p-3 bg-white/[0.08] rounded-lg shrink-0">
+                        <Smartphone size={22} />
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg">Install NYNTH Admin</h3>
-                        <p className="text-sm text-gray-400 mt-1">Access your store management faster and get real-time sales alerts.</p>
+                        <h3 className="font-bold text-lg tracking-tight">Install NYNTH Admin</h3>
+                        <p className="text-sm text-white/50 mt-1">Faster access and real-time sales alerts.</p>
                     </div>
                 </div>
 
                 <div className="space-y-3">
                     {('Notification' in window) && Notification.permission !== 'granted' && (
-                            <button
+                        <button
                             onClick={() => Notification.requestPermission()}
-                            className="w-full bg-black text-white py-3 rounded font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all mb-2"
+                            className="w-full bg-white text-black py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
                         >
-                            Enable Sales Alerts 🔔
+                            <BellRing size={15} />
+                            Enable Sales Alerts
                         </button>
                     )}
 
                     {platform === 'android' ? (
-                            <button
+                        <button
                             onClick={handleInstall}
-                            className="w-full bg-white text-black py-3 rounded font-bold flex items-center justify-center gap-2 hover:bg-gray-200 transition-all"
+                            className="w-full bg-white text-black py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
                         >
                             Install App
                         </button>
                     ) : (
-                        <div className="space-y-4 bg-white/5 p-4 rounded border border-white/5">
+                        <div className="space-y-4 bg-white/[0.06] p-4 rounded-lg border border-white/10">
                             <p className="text-sm font-medium flex items-center gap-2">
                                 To install on iPhone:
                             </p>
-                            <div className="space-y-3 text-xs text-gray-400">
+                            <div className="space-y-3 text-xs text-white/50">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 bg-white/10 flex items-center justify-center">
+                                    <div className="w-6 h-6 bg-white/10 flex items-center justify-center rounded">
                                         <Share size={12} />
                                     </div>
-                                    <span>1. Tap the 'Share' icon below</span>
+                                    <span>Tap the 'Share' icon</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 bg-white/10 flex items-center justify-center">
-                                        <Plus size={12} className="border border-white/50 rounded p-0.5" />
+                                    <div className="w-6 h-6 bg-white/10 flex items-center justify-center rounded">
+                                        <Plus size={12} />
                                     </div>
-                                    <span>2. Select 'Add to Home Screen'</span>
+                                    <span>Select 'Add to Home Screen'</span>
                                 </div>
                             </div>
                         </div>
