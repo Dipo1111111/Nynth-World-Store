@@ -404,8 +404,8 @@ export default function DiscountCodes() {
 
  {/* Add / Edit Modal */}
  {isModalOpen && (
- <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-md shadow-raised border border-white/10">
+<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+<div className="bg-[#0a0a0a] rounded-2xl w-full max-w-md shadow-raised border border-white/10 my-auto">
  <div className="flex items-center justify-between p-6 border-b border-white/10">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">

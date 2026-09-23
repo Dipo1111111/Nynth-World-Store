@@ -176,7 +176,7 @@ export default function AdminLookbooks() {
  {/* Upload Modal */}
  {isModalOpen && (
  <div
- className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300"
+ className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300"
  onClick={(e) => {
  if (e.target === e.currentTarget) {
  setIsModalOpen(false);
@@ -184,7 +184,7 @@ export default function AdminLookbooks() {
  }
  }}
  >
- <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-white/10">
+ <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-white/10 my-auto">
  <div className="flex justify-between items-center mb-8">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">New Editorial Image</p>
@@ -256,8 +256,8 @@ export default function AdminLookbooks() {
 
  {/* DELETE CONFIRMATION MODAL */}
  {deleteConfirmId && (
- <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
- <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-white/10">
+<div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto">
+<div className="bg-[#0a0a0a] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-white/10 my-auto">
  <div className="w-20 h-20 bg-rose-500/[0.14] rounded-2xl flex items-center justify-center mx-auto mb-8">
  <AlertTriangle className="text-rose-300" size={32} strokeWidth={1.5} />
  </div>

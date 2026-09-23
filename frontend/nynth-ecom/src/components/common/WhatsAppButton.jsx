@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { useSettings } from "../../context/SettingsContext";
 
 const WhatsAppIcon = () => (
@@ -8,7 +9,9 @@ const WhatsAppIcon = () => (
 );
 
 export default function WhatsAppButton() {
+  const { pathname } = useLocation();
   const { settings } = useSettings();
+  if (pathname.startsWith("/admin")) return null;
   const raw = typeof settings?.support_whatsapp === "string" ? settings.support_whatsapp : "";
   const number = raw.replace(/[^0-9]/g, "");
 
