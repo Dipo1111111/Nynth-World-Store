@@ -18,7 +18,7 @@ export default function NotFound() {
                     <p className="text-[11px] tracking-[0.3em] font-bold uppercase text-black/40 mb-3">Error 404</p>
                     <h1 className="text-7xl md:text-8xl font-extrabold tracking-[-0.04em] leading-none mb-4">404</h1>
                     <p className="text-sm text-black/60 max-w-sm mx-auto mb-8 leading-relaxed">
-                        This page doesn't exist or was moved. The shop is still open — let's get you back to it.
+                        This page doesn't exist or was moved. The shop is still open - let's get you back to it.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

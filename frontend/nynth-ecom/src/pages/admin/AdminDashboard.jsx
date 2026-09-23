@@ -285,7 +285,7 @@ const AdminDashboard = () => {
 
             {loading || !dashboardData ? <DashboardSkeleton /> : (
                 <div ref={revealScope} className="space-y-5 md:space-y-6">
-                    {/* Lead metric — editorial block */}
+                    {/* Lead metric - editorial block */}
                     <section className="border border-white/10 bg-[#0a0a0a] rounded-2xl p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
                             <div>
@@ -318,7 +318,7 @@ const AdminDashboard = () => {
 
                     {/* Dense editorial row */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
-                        {/* Recent orders — 7 cols */}
+                        {/* Recent orders - 7 cols */}
                         <div className="lg:col-span-7 border border-white/10 bg-[#0a0a0a] rounded-2xl overflow-hidden">
                             <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/60">Recent orders</h2>

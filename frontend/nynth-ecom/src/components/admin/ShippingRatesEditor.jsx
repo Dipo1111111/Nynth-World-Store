@@ -151,7 +151,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                 : cur.filter((k) => !keys.includes(k));
             return { ...prev, disabled_locations: { ...prev.disabled_locations, [region]: updated } };
         });
-        toast.success(disable ? "Zone disabled — hidden at checkout, prices kept" : "Zone enabled — back live at checkout");
+        toast.success(disable ? "Zone disabled - hidden at checkout, prices kept" : "Zone enabled - back live at checkout");
     };
 
     // --- custom locations (stored in settings.custom_shipping_locations) --------
@@ -170,7 +170,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
         });
         setNewLoc({ name: "", price: "", speed: "" });
         setAdding(null);
-        toast.success(`Added ${name} — press Save All Settings to publish`);
+        toast.success(`Added ${name} - press Save All Settings to publish`);
     };
     const deleteCustomLocation = (region, name) => {
         if (!window.confirm(`Delete custom location "${name}"?`)) return;

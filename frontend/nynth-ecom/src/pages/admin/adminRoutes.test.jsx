@@ -15,6 +15,7 @@ const ROUTES = [
     ["Subscribers", "./Subscribers"],
     ["Lookbooks", "./Lookbooks"],
     ["AbandonedCheckouts", "./AbandonedCheckouts"],
+    ["CheckIn", "./CheckIn"],
 ];
 
 describe("admin lazy routes stay importable", () => {

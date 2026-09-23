@@ -94,10 +94,10 @@ Restrained - tinted neutrals + one accent (green) ≤10%. The palette is black/w
 
 ---
 
-# Admin Back Office — "The Black Atelier"
+# Admin Back Office - "The Black Atelier"
 
 The admin panel is a **separate world** from the storefront: a matte-ink editorial back office.
-Scope is the `.admin-app` class on `AdminLayout`'s root — it flips shadcn semantic variables
+Scope is the `.admin-app` class on `AdminLayout`'s root - it flips shadcn semantic variables
 (`--background`, `--card`, `--popover`, `--primary`, `--secondary`, `--muted`, `--border`,
 `--input`, `--ring`, …) so every `ui/` primitive renders dark inside admin while the storefront
 stays light. Tokens live in `src/index.css`.
@@ -105,13 +105,13 @@ stays light. Tokens live in `src/index.css`.
 ## Color
 - **Shell**: `--background` indal `oklch(0.155 0.002 85)` (#161619-ish); sidebar `#0b0b0c`.
 - **Bone type**: `#EDEAE2` (type ramp: `text-[#EDEAE2]`, muted `text-[#EDEAE2]/42`).
-- **Panels**: `bg-[#0a0a0a]` (true ink — was `#131316`, read navy next to the warm shell), hairlines `border-white/10`–`border-white/14` + `border-white/[0.07]` rail.
-- **All admin surfaces are true black** — no light-gray layers: `--card`/`--popover` `oklch(0.12 0 0)`, `--secondary`/`--muted`/`--accent` `oklch(0.14 0 0)` (hover step), toolbars/segmented controls/table headers/tooltips/select dropdowns all black (was `oklch(0.17–0.255 0.002 85)` which read as navy/white on the black panels).
+- **Panels**: `bg-[#0a0a0a]` (true ink - was `#131316`, read navy next to the warm shell), hairlines `border-white/10`-`border-white/14` + `border-white/[0.07]` rail.
+- **All admin surfaces are true black** - no light-gray layers: `--card`/`--popover` `oklch(0.12 0 0)`, `--secondary`/`--muted`/`--accent` `oklch(0.14 0 0)` (hover step), toolbars/segmented controls/table headers/tooltips/select dropdowns all black (was `oklch(0.17-0.255 0.002 85)` which read as navy/white on the black panels).
 - **Tint chips** are variable-driven (`--tint-{emerald,amber,sky,rose,violet,slate}-{bg,fg,line}`)
   so `ui/badge.jsx` + `StatusDropdown` work on both light (storefront) and dark (admin):
   `bg-emerald-500/[0.14] text-emerald-300` style under `.admin-app`.
 - **Chart tokens**: `--admin-chart-*` read from the `.admin-app` element by `src/lib/charts.js`
-  (fallback `:root`) — dark gridlines/text, emerald + bone series, bone legend/tooltip (tooltip
+  (fallback `:root`) - dark gridlines/text, emerald + bone series, bone legend/tooltip (tooltip
   `bg` `oklch(0.17 0.002 85)` on hairline `oklch(1 0 0 / 0.14)`).
 
 ## Typography (display scale)
@@ -124,7 +124,7 @@ stays light. Tokens live in `src/index.css`.
 - Root: `min-h-screen admin-app admin-paper flex`; fixed sidebar `bg-[#0b0b0c]` + hairline right
   rail; active nav pill = bone; inactive = bone/42 with mono sub-labels.
 - Browser chrome (scrollbars, caret, selection, number spinners) themed dark by `.admin-app`.
-- Radix `Select` portals to `<body>` and escapes the scope — `ui/select.jsx` is dark-styled
+- Radix `Select` portals to `<body>` and escapes the scope - `ui/select.jsx` is dark-styled
   explicitly. No other Radix portal components exist.
 - Elevation is light-touch: subtle inset white top-light + soft drop on cards; **no** colored
   shadows, no `grayscale` filters on avatars.

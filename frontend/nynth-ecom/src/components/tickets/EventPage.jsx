@@ -200,7 +200,7 @@ export default function EventPage({ product }) {
               <div className="flex flex-col gap-1.5 mt-4">
                 <span className="flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase font-bold text-gray-600"><Check size={12} /> Free delivery - it's an e-ticket</span>
                 <span className="flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase font-bold text-gray-600"><Check size={12} /> No location needed</span>
-                <span className="flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase font-bold text-gray-600"><Check size={12} /> Instant QR e-ticket by email</span>
+                <span className="flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase font-bold text-gray-600"><Check size={12} /> Instant e-ticket codes by email</span>
               </div>
             )}
           </div>

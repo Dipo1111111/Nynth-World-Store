@@ -5,6 +5,7 @@ import {
     ShoppingBag,
     Package,
     ShoppingCart,
+    Ticket,
     Image as ImageIcon,
     Settings,
     LogOut,
@@ -25,6 +26,7 @@ const NAV_GROUPS = [
             { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
             { label: "Products", href: "/admin/products", icon: ShoppingBag },
             { label: "Orders", href: "/admin/orders", icon: Package },
+            { label: "Door Check-In", href: "/admin/check-in", icon: Ticket },
             { label: "Abandoned Checkouts", href: "/admin/abandoned-checkouts", icon: ShoppingCart },
         ],
     },
@@ -57,7 +59,7 @@ export default function AdminLayout({ children, title }) {
 
     return (
         <div className="min-h-screen admin-app admin-paper flex">
-            {/* Sidebar — ink rail */}
+            {/* Sidebar - ink rail */}
             <aside
                 className={`
                     w-64 bg-[#0b0b0c] text-white fixed inset-y-0 left-0 z-40 flex flex-col

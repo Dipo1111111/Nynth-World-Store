@@ -58,6 +58,10 @@ vi.mock("./cloudinary", () => ({
 
 import {
   addOrder,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  markTicketUsed,
   fetchProducts,
   fetchOrder,
   getAllOrders,
@@ -258,5 +262,77 @@ describe("payment edge function calls", () => {
     const out = await verifyOrderPayment("o1", "REF1");
     expect(h.supabase.functions.invoke).toHaveBeenCalledWith("paystack-verify", { body: { reference: "REF1" } });
     expect(out.success).toBe(true);
+  });
+});
+describe("product mutations (admin add/edit/delete must not 400)", () => {
+  it("addProduct inserts a normalized payload with safe defaults", async () => {
+    h.setQuery({ data: { id: "p1" }, error: null });
+    const id = await addProduct({ name: "Tee", category: "APPAREL", price: "15000", stockQuantity: "10" });
+    expect(id).toBe("p1");
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.name).toBe("Tee");
+    expect(payload.category).toBe("apparel");
+    expect(payload.price).toBe(15000);
+    expect(payload.stock_quantity).toBe(10);
+    expect(payload.is_public).toBe(true);
+  });
+
+  it("addProduct survives missing price and stock (never NaN to the DB)", async () => {
+    h.setQuery({ data: { id: "p2" }, error: null });
+    await addProduct({ name: "Cap" });
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.price).toBe(0);
+    expect(payload.stock_quantity).toBe(0);
+    expect(Number.isNaN(payload.price)).toBe(false);
+  });
+
+  it("updateProduct patches only provided fields and throws on zero rows", async () => {
+    h.setQuery({ data: [{ id: "p1" }], error: null });
+    await updateProduct("p1", { price: "20000", isPublic: false });
+    const payload = h.record.find((c) => c.method === "update").args[0];
+    expect(payload.price).toBe(20000);
+    expect(payload.is_public).toBe(false);
+    expect(payload.name).toBeUndefined();
+
+    h.reset();
+    h.setQuery({ data: [], error: null });
+    await expect(updateProduct("ghost", { price: 1 })).rejects.toThrow("no rows affected");
+  });
+
+  it("deleteProduct throws on zero rows (RLS misconfig surfaces loudly)", async () => {
+    h.setQuery({ data: [{ id: "p1" }], error: null });
+    await expect(deleteProduct("p1")).resolves.toBe(true);
+
+    h.reset();
+    h.setQuery({ data: [], error: null });
+    await expect(deleteProduct("ghost")).rejects.toThrow("no rows affected");
+  });
+});
+
+describe("markTicketUsed (door check-in)", () => {
+  const orderWith = (tickets) => ({ data: { id: "o1", tickets }, error: null });
+
+  it("marks the matching code used, case-insensitively", async () => {
+    h.setQuery(orderWith([{ code: "NWT-ABC", title: "Show" }]));
+    const t = await markTicketUsed("o1", "nwt-abc");
+    expect(t.used).toBe(true);
+    expect(t.used_at).toBeTruthy();
+    const payload = h.record.find((c) => c.method === "update").args[0];
+    expect(payload.tickets[0].used).toBe(true);
+  });
+
+  it("refuses unknown codes and already-used tickets", async () => {
+    h.setQuery(orderWith([{ code: "NWT-ABC", title: "Show" }]));
+    await expect(markTicketUsed("o1", "NWT-NOPE")).rejects.toThrow("not found");
+
+    h.reset();
+    h.setQuery(orderWith([{ code: "NWT-ABC", title: "Show", used: true }]));
+    await expect(markTicketUsed("o1", "NWT-ABC")).rejects.toThrow("already used");
+  });
+
+  it("refuses blank codes and missing orders", async () => {
+    await expect(markTicketUsed("o1", "   ")).rejects.toThrow("ticket code");
+    h.setQuery({ data: null, error: null });
+    await expect(markTicketUsed("ghost", "NWT-ABC")).rejects.toThrow("Order not found");
   });
 });

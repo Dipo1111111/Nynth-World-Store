@@ -13,7 +13,7 @@ export default function ShippingReturns() {
                     <div className="space-y-4">
                         <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">SHIPPING POLICY</h3>
                         <p className="text-[13px] text-gray-600 leading-[1.8]">
-                            We currently ship within Nigeria. Orders are processed within 3–10 business days.
+                            We currently ship within Nigeria. Orders are processed within 3-10 business days.
                         </p>
                     </div>
 
@@ -22,11 +22,11 @@ export default function ShippingReturns() {
                         <ul className="space-y-2">
                             <li className="text-[13px] text-gray-600 leading-[1.8] flex items-start gap-3">
                                 <span className="w-1 h-1 rounded-full bg-black mt-2 shrink-0"></span>
-                                Lagos Deliveries: 3–5 business days
+                                Lagos Deliveries: 3-5 business days
                             </li>
                             <li className="text-[13px] text-gray-600 leading-[1.8] flex items-start gap-3">
                                 <span className="w-1 h-1 rounded-full bg-black mt-2 shrink-0"></span>
-                                Nationwide Deliveries (Outside Lagos): 5–10 business days
+                                Nationwide Deliveries (Outside Lagos): 5-10 business days
                             </li>
                         </ul>
                         <p className="text-[13px] text-gray-600 leading-[1.8]">

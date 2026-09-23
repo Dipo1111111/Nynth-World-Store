@@ -1,4 +1,4 @@
-// Motion helpers for the admin — lean GSAP wrappers only.
+// Motion helpers for the admin - lean GSAP wrappers only.
 // GSAP is already bundled for the storefront, so nothing new is shipped.
 
 import gsap from "gsap";

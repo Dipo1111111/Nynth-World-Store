@@ -190,7 +190,7 @@ const Checkout = () => {
 
   const payWithPaystack = async (orderId, totalToPay) => {
     // Hosted payment page: Paystack redirects the browser back to /thank-you
-    // (with trxref + orderId) once payment completes — no popup callback to break.
+    // (with trxref + orderId) once payment completes - no popup callback to break.
     setLoading(true);
     try {
       const { authorization_url } = await initializePayment({

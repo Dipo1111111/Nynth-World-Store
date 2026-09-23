@@ -1,4 +1,4 @@
-// get-ga4-analytics — admin only. Returns {status:'unconfigured'} until GA_PROPERTY_ID +
+// get-ga4-analytics - admin only. Returns {status:'unconfigured'} until GA_PROPERTY_ID +
 // GA_SERVICE_ACCOUNT_KEY (base64 JSON) are set. Full GA Data API call added at cutover.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 Deno.serve(async (req) => {

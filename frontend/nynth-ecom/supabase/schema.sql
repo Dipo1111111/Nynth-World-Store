@@ -1,4 +1,4 @@
--- Nynth World Store — Supabase Postgres schema (LOCAL ONLY, not applied yet)
+-- Nynth World Store - Supabase Postgres schema (LOCAL ONLY, not applied yet)
 -- Mirrors Firestore collections. IDs preserved as TEXT (Firestore doc IDs).
 -- Timestamps: created_at / updated_at timestamptz. Run this in Supabase SQL editor
 -- AFTER admin creates the real project. No secrets in this file.
@@ -96,7 +96,7 @@ create policy "orders_admin_delete" on public.orders for delete using (public.is
 create index if not exists orders_user_idx on public.orders (user_id);
 create index if not exists orders_payment_idx on public.orders (payment_status);
 
--- ===== discount_codes (Firestore had NO rule — we lock to admin read, validate via Edge Function) =====
+-- ===== discount_codes (Firestore had NO rule - we lock to admin read, validate via Edge Function) =====
 create table if not exists public.discount_codes (
   id text primary key,
   code text unique not null,

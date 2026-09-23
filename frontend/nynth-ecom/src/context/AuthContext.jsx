@@ -1,4 +1,4 @@
-// AuthContext.supabase.jsx — Supabase version. Same API as AuthContext.jsx (Firebase).
+// AuthContext.supabase.jsx - Supabase version. Same API as AuthContext.jsx (Firebase).
 // Swap: rename this file to AuthContext.jsx at cutover, or re-point imports.
 // Admin = VITE_ADMIN_EMAILS whitelist written to public.users.role on signup.
 import React, { createContext, useContext, useEffect, useState } from "react";

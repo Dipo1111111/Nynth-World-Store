@@ -14,6 +14,10 @@ const STATUS_CONFIG = {
         label: 'Order Pending',
         className: 'bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]'
     },
+    confirmed: {
+        label: 'Confirmed - Ready',
+        className: 'bg-white/[0.12] text-[#EDEAE2] border-white/20'
+    },
     packaging: {
         label: 'In Packaging',
         className: 'bg-[var(--tint-violet-bg)] text-[var(--tint-violet-fg)] border-[var(--tint-violet-line)]'

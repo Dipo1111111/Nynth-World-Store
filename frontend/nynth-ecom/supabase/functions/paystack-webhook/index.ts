@@ -1,6 +1,6 @@
-// paystack-webhook — verifies x-paystack-signature HMAC-SHA512 (Web Crypto), finalizes
+// paystack-webhook - verifies x-paystack-signature HMAC-SHA512 (Web Crypto), finalizes
 // order (paid/confirmed, NWT tickets, stock decrement, idempotent on paid),
-// fire-and-forget Resend emails. No JWT (Paystack calls it) — set verify_jwt=false.
+// fire-and-forget Resend emails. No JWT (Paystack calls it) - set verify_jwt=false.
 // Secrets (dashboard, NOT in code): PAYSTACK_SECRET_KEY, RESEND_API_KEY, EMAIL_FROM,
 // ADMIN_NOTIFY_EMAIL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
         if (p) await supabase.from("products").update({ stock_quantity: Math.max(0, (p.stock_quantity ?? 0) - (item.quantity || 1)) }).eq("id", item.id);
       }
       const adminTo = Deno.env.get("ADMIN_NOTIFY_EMAIL") ?? "";
+      const adminList = adminTo.split(",").map((s) => s.trim()).filter(Boolean);
       let customerSent = false, adminSent = false;
       const shortId = orderId.slice(0, 8).toUpperCase();
       const ticketBlock = codes.length
@@ -74,14 +75,20 @@ Deno.serve(async (req) => {
         + `<p>Thanks ${order.customer?.firstName ?? "there"}, your payment of ${naira(order.total)} went through. Order <strong>#${shortId}</strong> is being prepared.</p>`
         + ticketBlock
         + `<p style="color:#666666;font-size:13px">Questions? Just reply to this email.</p></div>`;
-      const adminHtml = `<p>New paid order <strong>#${orderId}</strong> for ${naira(order.total)}. Paystack ref ${reference}.</p>`;
+      const adminHtml = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111111;line-height:1.6">`
+        + `<p style="font-size:11px;letter-spacing:3px;font-weight:bold;margin:0">NYNTH WORLD - NEW SALE</p>`
+        + `<h1 style="font-size:24px;margin:8px 0 16px">${naira(order.total)} paid.</h1>`
+        + `<p>Order <strong>#${shortId}</strong> just confirmed. Paystack ref ${reference}.</p>`
+        + `<p><strong>Buyer:</strong> ${(order.customer?.firstName ?? "") + " " + (order.customer?.lastName ?? "")} (${order.customer?.email ?? "no email"}, ${order.customer?.phone ?? "no phone"})</p>`
+        + `<p><strong>Ship to:</strong> ${order.customer?.address ?? ""}, ${order.customer?.city ?? ""}, ${order.customer?.state ?? ""}</p>`
+        + `<p><strong>Items:</strong><br>${(order.items ?? []).map((i: any) => `${i.name || i.title || "Item"} x${i.quantity || 1}`).join("<br>")}</p></div>`;
       if (order.customer?.email) { try { await sendResend(order.customer.email, "Your NYNTH order is confirmed #" + shortId, customerHtml); customerSent = true; } catch(e) { console.error(e); } }
-      if (adminTo) { try { await sendResend(adminTo, "New NYNTH sale: " + naira(order.total), adminHtml); adminSent = true; } catch(e) { console.error(e); } }
+      for (const admin of adminList) { try { await sendResend(admin, "New NYNTH sale: " + naira(order.total), adminHtml); adminSent = true; } catch(e) { console.error(e); } }
       if (customerSent || adminSent) {
         await supabase.from("orders").update({ customer_confirmation_sent_at: customerSent ? new Date().toISOString() : null, admin_notification_sent_at: adminSent ? new Date().toISOString() : null }).eq("id", orderId);
       }
     } else {
-      // Already finalized earlier — still correct the mode stamp (covers orders
+      // Already finalized earlier - still correct the mode stamp (covers orders
       // created before the is_test column existed).
       await supabase.from("orders").update({ is_test: isTest }).eq("id", orderId);
     }

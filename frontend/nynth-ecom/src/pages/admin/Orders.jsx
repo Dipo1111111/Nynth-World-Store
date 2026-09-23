@@ -130,7 +130,7 @@ const Orders = () => {
     const applyFilters = () => {
         let result = [...orders];
 
-        // Test/Live Filter (default: live only — test traffic never counts as normal)
+        // Test/Live Filter (default: live only - test traffic never counts as normal)
         if (testFilter === "live") {
             result = result.filter(o => !o.isTest);
         } else if (testFilter === "test") {
@@ -238,7 +238,7 @@ const Orders = () => {
         toast.success("CSV Downloaded");
     };
 
-    // Calculate Summary — always LIVE orders only. Test traffic is badged and
+    // Calculate Summary - always LIVE orders only. Test traffic is badged and
     // inspectable but never counted in the bookkeeping numbers.
     const liveOrders = filteredOrders.filter(o => !o.isTest);
     const summary = {
@@ -256,7 +256,7 @@ const Orders = () => {
     const unpaidRef = useCountUp(summary.unpaidOrders);
     const paidRef = useCountUp(summary.paidOrders);
 
-    // Status counts for the filter tabs — scoped to the Live/Test view so the
+    // Status counts for the filter tabs - scoped to the Live/Test view so the
     // ledger reads true to what is on the page right now.
     const scopedOrders = orders.filter(o =>
         testFilter === "all" ? true : testFilter === "live" ? !o.isTest : o.isTest
@@ -291,7 +291,7 @@ const Orders = () => {
 
     return (
         <AdminLayout title="Orders">
-            {/* Ledger matter — one dominant number, ruled secondary counts, no icon chips */}
+            {/* Ledger matter - one dominant number, ruled secondary counts, no icon chips */}
             <div className="mb-10">
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                     <div className="min-w-0">
@@ -325,7 +325,7 @@ const Orders = () => {
                 </div>
             </div>
 
-            {/* Commander row — segmented scope, search, selects, export */}
+            {/* Commander row - segmented scope, search, selects, export */}
             <div className="mb-8">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
                     <div className="segmented-control shrink-0">
@@ -425,7 +425,7 @@ const Orders = () => {
                         <p className="text-[#EDEAE2]/55 text-sm">Try adjusting your search or filters.</p>
                         {testFilter === "live" && orders.some((o) => o.isTest) && (
                             <p className="text-xs text-[#EDEAE2]/42 mt-3 max-w-sm text-center">
-                                {orders.filter((o) => o.isTest).length} TEST order{orders.filter((o) => o.isTest).length === 1 ? "" : "s"} are hidden — switch the filter to
+                                {orders.filter((o) => o.isTest).length} TEST order{orders.filter((o) => o.isTest).length === 1 ? "" : "s"} are hidden - switch the filter to
                                 <span className="text-[#EDEAE2]/65 font-medium"> Test orders </span>or<span className="text-[#EDEAE2]/65 font-medium"> All orders </span>to see them.
                             </p>
                         )}
@@ -447,10 +447,11 @@ const Orders = () => {
                     <CardContent className="p-0">
                         {/* Mobile Card View */}
                         <div className="md:hidden divide-y divide-white/[0.08]">
-                            {filteredOrders.map((order) => {
-                                const isExpanded = expandedOrders.has(order.id);
-                                return (
-                                    <div key={order.id} className="p-4 bg-[#0a0a0a] flex flex-col gap-3">
+                                {filteredOrders.map((order) => {
+                                    const isExpanded = expandedOrders.has(order.id);
+                                    const needsAction = (order.payment_status === 'paid' || order.payment_status === 'success') && !['packaging', 'shipped', 'delivered', 'cancelled'].includes(order.order_status || 'pending');
+                                    return (
+                                        <div key={order.id} className="p-4 bg-[#0a0a0a] flex flex-col gap-3">
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="flex items-center gap-2 min-w-0 flex-1">
                                                 <button
@@ -461,8 +462,9 @@ const Orders = () => {
                                                     {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                                 </button>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-mono text-xs font-medium tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            {needsAction && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" title="Paid - needs fulfillment" />}
+                                                            <span className="font-mono text-xs font-medium tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
                                                         {order.isTest && <TestBadge />}
                                                         {order.items?.some(i => i.category === "tickets") && <ETicketBadge />}
                                                     </div>
@@ -617,6 +619,7 @@ const Orders = () => {
                                 <tbody className="bg-[#0a0a0a]">
                                     {filteredOrders.map((order) => {
                                         const isExpanded = expandedOrders.has(order.id);
+                                        const needsAction = (order.payment_status === 'paid' || order.payment_status === 'success') && !['packaging', 'shipped', 'delivered', 'cancelled'].includes(order.order_status || 'pending');
                                         return (
                                             <React.Fragment key={order.id}>
                                                 <tr className="border-b border-white/[0.06] hover:bg-white/[0.05] transition-colors">
@@ -631,6 +634,7 @@ const Orders = () => {
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2">
+                                                            {needsAction && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" title="Paid - needs fulfillment" />}
                                                             <span className="font-mono text-xs md:text-sm font-medium tracking-tight">#{order.id.slice(0, 8)}</span>
                                                             {order.isTest && <TestBadge />}
                                                             {order.items?.some(i => i.category === "tickets") && <ETicketBadge />}
@@ -720,7 +724,7 @@ const Orders = () => {
                                                                     )}
                                                                 </div>
 
-                                                                {/* Dispatch sheet — shipping, contact, money */}
+                                                                {/* Dispatch sheet - shipping, contact, money */}
                                                                 <div className="lg:col-span-2 space-y-6">
                                                                     <div>
                                                                         <h4 className={`${SECTION_LABEL}`}>

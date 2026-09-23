@@ -44,8 +44,8 @@ class ErrorBoundary extends React.Component {
                     </h1>
                     <p className="text-sm text-black/60 max-w-sm mb-8 leading-relaxed">
                         {stale
-                            ? "Your cached version can't load the latest build. Refresh to update — your cart is safe."
-                            : "An unexpected error stopped this page. Your cart is safe — try again or head home."}
+                            ? "Your cached version can't load the latest build. Refresh to update - your cart is safe."
+                            : "An unexpected error stopped this page. Your cart is safe - try again or head home."}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         {stale ? (

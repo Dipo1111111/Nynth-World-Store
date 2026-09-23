@@ -1,4 +1,4 @@
-// initialize-payment — min 100 NGN, returns authorization_url + reference.
+// initialize-payment - min 100 NGN, returns authorization_url + reference.
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",

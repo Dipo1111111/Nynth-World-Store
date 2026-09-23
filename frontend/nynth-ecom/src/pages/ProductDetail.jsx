@@ -1,5 +1,5 @@
 // src/pages/ProductDetail.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -49,6 +49,8 @@ export default function ProductDetail() {
   const timerRef = React.useRef(null);
   const [showLightbox, setShowLightbox] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const zoomAreaRef = useRef(null);
+  const gestureRef = useRef(null);
 
   const startAutoScroll = React.useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -307,7 +309,7 @@ export default function ProductDetail() {
                   <button
                     key={i}
                     onClick={() => handleManualImageChange(i)}
-                    className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
+                    className={`w-10 h-10 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
                       selectedImage === i
                         ? 'bg-black text-white'
                         : 'bg-white/80 backdrop-blur-sm text-black hover:bg-black hover:text-white'
@@ -473,8 +475,8 @@ This item is available on a pre-order basis.
 
 Each piece is individually produced after your order is confirmed to ensure the highest quality and attention to detail.
 
-Production: 2–5 business days
-Dispatch: Orders are dispatched within 1–3 business days after production is completed.
+Production: 2-5 business days
+Dispatch: Orders are dispatched within 1-3 business days after production is completed.
                 </div>
               )}
             </div>
@@ -538,13 +540,13 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
               {/* Arrows */}
               <button
                 onClick={prevImage}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 text-black opacity-80 hover:opacity-100"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center bg-gray-100/80 text-black opacity-80 hover:opacity-100"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-100/80 text-black opacity-80 hover:opacity-100"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center bg-gray-100/80 text-black opacity-80 hover:opacity-100"
               >
                 <ChevronRight size={18} />
               </button>
@@ -555,7 +557,7 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
                   <button
                     key={i}
                     onClick={() => handleManualImageChange(i)}
-                    className={`w-7 h-7 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
+                    className={`w-9 h-9 flex items-center justify-center text-[10px] font-bold tracking-wider transition-all duration-300 ${
                       i === selectedImage
                         ? "bg-black text-white"
                         : "bg-white/80 backdrop-blur-sm text-black"
@@ -709,8 +711,8 @@ This item is available on a pre-order basis.
 
 Each piece is individually produced after your order is confirmed to ensure the highest quality and attention to detail.
 
-Production: 2–5 business days
-Dispatch: Orders are dispatched within 1–3 business days after production is completed.
+Production: 2-5 business days
+Dispatch: Orders are dispatched within 1-3 business days after production is completed.
               </div>
             )}
           </div>
@@ -768,13 +770,48 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
             </button>
           </div>
 
-          {/* Scrollable / pannable image area */}
-          <div className="flex-1 overflow-auto flex items-center justify-center p-6 select-none">
+          {/* Scrollable / pannable image area - pinch to zoom, drag to pan, double-tap to toggle */}
+          <div
+            ref={zoomAreaRef}
+            className="flex-1 overflow-auto flex items-center justify-center p-6 select-none touch-none"
+            onTouchStart={(e) => {
+              if (e.touches.length === 2) {
+                const dist = Math.hypot(
+                  e.touches[0].clientX - e.touches[1].clientX,
+                  e.touches[0].clientY - e.touches[1].clientY
+                );
+                gestureRef.current = { mode: "pinch", dist, zoom: zoomLevel };
+              } else if (e.touches.length === 1) {
+                gestureRef.current = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY };
+              }
+            }}
+            onTouchMove={(e) => {
+              const g = gestureRef.current;
+              if (!g) return;
+              if (g.mode === "pinch" && e.touches.length === 2) {
+                const dist = Math.hypot(
+                  e.touches[0].clientX - e.touches[1].clientX,
+                  e.touches[0].clientY - e.touches[1].clientY
+                );
+                if (g.dist > 0) {
+                  setZoomLevel(Math.min(4, Math.max(1, +(g.zoom * dist / g.dist).toFixed(2))));
+                }
+              } else if (g.mode === "pan" && e.touches.length === 1 && zoomLevel > 1 && zoomAreaRef.current) {
+                const dx = g.x - e.touches[0].clientX;
+                const dy = g.y - e.touches[0].clientY;
+                zoomAreaRef.current.scrollLeft += dx;
+                zoomAreaRef.current.scrollTop += dy;
+                gestureRef.current = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY };
+              }
+            }}
+            onTouchEnd={() => { gestureRef.current = null; }}
+          >
             <img
               src={product.images?.[selectedImage] || product.thumbnail || "/placeholder.jpg"}
               alt={`${product.title} - zoom`}
               draggable={false}
               onClick={(e) => e.stopPropagation()}
+              onDoubleClick={(e) => { e.stopPropagation(); setZoomLevel((z) => (z > 1 ? 1 : 2.5)); }}
               className="w-full h-full object-contain transition-[width] duration-200"
               style={{ width: `${zoomLevel * 100}%`, maxWidth: `${zoomLevel * 100}vw` }}
             />

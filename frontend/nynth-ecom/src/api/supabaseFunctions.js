@@ -1,4 +1,4 @@
-// src/api/supabaseFunctions.js — drop-in replacement for firebaseFunctions.js
+// src/api/supabaseFunctions.js - drop-in replacement for firebaseFunctions.js
 // Same export names + signatures, backed by Supabase. Cloudinary stays as-is.
 // Products: id (text, preserved Firestore ID), name/title, category, price,
 //   stock_quantity, is_public, featured, best_seller, tags[], display_order, data{...}
@@ -69,19 +69,34 @@ const mergeProductData = async (id, updates) => {
     if (dataPatch) patch.data = dataPatch;
     const { data, error } = await supabase.from("products").update(patch).eq("id", id).select("id");
     if (error) throw error;
-    if (!data || data.length === 0) throw new Error("Update failed — no rows affected. Check that you are an admin and authenticated.");
+    if (!data || data.length === 0) throw new Error("Update failed - no rows affected. Check that you are an admin and authenticated.");
     return true;
   };
  export const deleteProduct = async (id) => {
     const { data, error } = await supabase.from("products").delete().eq("id", id).select("id");
     if (error) throw error;
-    if (!data || data.length === 0) throw new Error("Delete failed — no rows affected. Check that you are an admin and authenticated.");
+    if (!data || data.length === 0) throw new Error("Delete failed - no rows affected. Check that you are an admin and authenticated.");
     return true;
   };
+export const markTicketUsed = async (orderId, code) => {
+  const normalized = String(code ?? "").trim().toUpperCase();
+  if (!normalized) throw new Error("Enter a ticket code.");
+  const { data: order, error: fetchError } = await supabase.from("orders").select("tickets").eq("id", orderId).maybeSingle();
+  if (fetchError) throw fetchError;
+  if (!order) throw new Error("Order not found.");
+  const tickets = Array.isArray(order.tickets) ? order.tickets : [];
+  const idx = tickets.findIndex((t) => String(t.code ?? "").toUpperCase() === normalized);
+  if (idx === -1) throw new Error("Ticket code not found on this order.");
+  if (tickets[idx].used) throw new Error("Ticket already used.");
+  const next = tickets.map((t, i) => (i === idx ? { ...t, used: true, used_at: new Date().toISOString() } : t));
+  const { error } = await supabase.from("orders").update({ tickets: next }).eq("id", orderId);
+  if (error) throw error;
+  return next[idx];
+};
  export const updateProductOrderBatch = async (productsArray) => {
     const results = await Promise.all(productsArray.map((p, i) => supabase.from("products").update({ display_order: i }).eq("id", p.id).select("id")));
     const failed = results.filter((r) => !r.error && (!r.data || r.data.length === 0));
-    if (failed.length > 0) throw new Error("Batch update failed — some rows affected by RLS. Check admin permissions.");
+    if (failed.length > 0) throw new Error("Batch update failed - some rows affected by RLS. Check admin permissions.");
     return true;
   };
 

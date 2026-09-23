@@ -1,4 +1,4 @@
-// send-bulk-email — admin only (checks users.role), sends via Resend.
+// send-bulk-email - admin only (checks users.role), sends via Resend.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 Deno.serve(async (req) => {
   const jwt = (req.headers.get("Authorization") ?? "").replace("Bearer ", "");
