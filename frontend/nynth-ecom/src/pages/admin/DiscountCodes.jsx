@@ -204,7 +204,7 @@ export default function DiscountCodes() {
  {codes.map((code) => (
  <div
  key={code.id}
- className={`bg-[#131316] p-4 rounded-xl border ${
+ className={`bg-[#0a0a0a] p-4 rounded-xl border ${
  isExpired(code) ? "border-rose-500/25 opacity-60" : "border-white/10"
  } shadow-card`}
  >
@@ -283,7 +283,7 @@ export default function DiscountCodes() {
  </div>
 
  {/* Desktop Table */}
- <div className="hidden md:block bg-[#131316] rounded-xl border border-white/10 shadow-card overflow-hidden">
+ <div className="hidden md:block bg-[#0a0a0a] rounded-xl border border-white/10 shadow-card overflow-hidden">
  <table className="w-full admin-table">
  <thead>
  <tr className="border-b border-white/10 bg-white/[0.05]">
@@ -405,7 +405,7 @@ export default function DiscountCodes() {
  {/* Add / Edit Modal */}
  {isModalOpen && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-[#131316] rounded-2xl w-full max-w-md shadow-raised border border-white/10">
+ <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-md shadow-raised border border-white/10">
  <div className="flex items-center justify-between p-6 border-b border-white/10">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">
@@ -452,7 +452,7 @@ export default function DiscountCodes() {
  onChange={(e) =>
  setForm({ ...form, type: e.target.value })
  }
- className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors bg-[#131316] cursor-pointer"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors bg-[#0a0a0a] cursor-pointer"
  >
  <option value="percentage">Percentage (%)</option>
  <option value="fixed">Fixed Amount (₦)</option>
@@ -511,7 +511,7 @@ export default function DiscountCodes() {
  }`}
  >
  <div
- className={`w-5 h-5 rounded-lg bg-[#131316] shadow transition-transform ${
+ className={`w-5 h-5 rounded-lg bg-[#0a0a0a] shadow transition-transform ${
  form.isActive ? "translate-x-5" : "translate-x-0"
  }`}
  />

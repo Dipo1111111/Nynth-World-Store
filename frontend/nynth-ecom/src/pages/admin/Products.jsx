@@ -22,7 +22,7 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <div ref={setNodeRef} style={style} className={`bg-[#131316] p-4 rounded-xl border ${isDragging ? "border-white/25 shadow-card opacity-80" : "border-white/10 shadow-card"} flex flex-col gap-3 group transition-all`}>
+ <div ref={setNodeRef} style={style} className={`bg-[#0a0a0a] p-4 rounded-xl border ${isDragging ? "border-white/25 shadow-card opacity-80" : "border-white/10 shadow-card"} flex flex-col gap-3 group transition-all`}>
  <div className="flex gap-4">
  <div className="w-20 h-20 bg-white/[0.07] rounded-lg overflow-hidden flex-shrink-0 border border-white/10">
  {(product.images?.[0] || product.imageUrl) ? (
@@ -486,9 +486,9 @@ export default function AdminProducts() {
  </button>
  </div>
 
- <div className="bg-transparent sm:bg-[#131316] sm:rounded-xl sm:border sm:border-white/10 sm:shadow-card overflow-hidden">
+ <div className="bg-transparent sm:bg-[#0a0a0a] sm:rounded-xl sm:border sm:border-white/10 sm:shadow-card overflow-hidden">
  {loading ? (
- <div className="p-12 flex justify-center bg-[#131316] rounded-xl border border-white/10">
+ <div className="p-12 flex justify-center bg-[#0a0a0a] rounded-xl border border-white/10">
  <Loader2 className="animate-spin text-white/25" size={32} />
  </div>
  ) : (
@@ -502,7 +502,7 @@ export default function AdminProducts() {
  <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
  ))}
  {products.length === 0 && (
- <div className="text-center py-20 bg-[#131316] rounded-xl border border-dashed border-white/22">
+ <div className="text-center py-20 bg-[#0a0a0a] rounded-xl border border-dashed border-white/22">
  <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.09] flex items-center justify-center mb-3">
  <Package className="h-6 w-6 text-[#EDEAE2]/35" />
  </div>
@@ -553,7 +553,7 @@ export default function AdminProducts() {
  {/* Modal */}
  {isModalOpen && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-[#131316] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-white/10">
+ <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-white/10">
  <div className="flex justify-between items-center mb-6">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">Catalog</p>
@@ -617,7 +617,7 @@ export default function AdminProducts() {
  <div className="space-y-2">
  <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Category</label>
  <select
- className="w-full px-4 py-3 border border-white/14 rounded-lg bg-[#131316] focus-ring cursor-pointer"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg bg-[#0a0a0a] focus-ring cursor-pointer"
  value={formData.category}
  onChange={e => setFormData({ ...formData, category: e.target.value })}
  >
@@ -639,7 +639,7 @@ export default function AdminProducts() {
  <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Event Date &amp; Time (WAT)</label>
  <input
  type="datetime-local"
- className="w-full px-4 py-3 border border-white/14 rounded-lg bg-[#131316] focus-ring"
+ className="w-full px-4 py-3 border border-white/14 rounded-lg bg-[#0a0a0a] focus-ring"
  value={formData.eventDateTime || ""}
  onChange={e => setFormData({ ...formData, eventDateTime: e.target.value })}
  />
@@ -684,7 +684,7 @@ export default function AdminProducts() {
  onClick={() => toggleSelection("sizes", size)}
  className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.sizes.includes(size)
  ? "bg-[#EDEAE2] text-[#0d0d0f] border-white/25"
- : "bg-[#131316] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
+ : "bg-[#0a0a0a] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
  }`}
  >
  {size}
@@ -704,7 +704,7 @@ export default function AdminProducts() {
  onClick={() => toggleSelection("colors", color)}
  className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.colors.includes(color)
  ? "bg-[#EDEAE2] text-[#0d0d0f] border-white/25"
- : "bg-[#131316] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
+ : "bg-[#0a0a0a] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
  }`}
  >
  {color}
@@ -723,7 +723,7 @@ export default function AdminProducts() {
  onClick={() => toggleSelection("tags", tag)}
  className={`focus-ring px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${formData.tags.includes(tag)
  ? "bg-[#EDEAE2] text-[#0d0d0f] border-white/25"
- : "bg-[#131316] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
+ : "bg-[#0a0a0a] text-[#EDEAE2]/65 border-white/14 hover:border-white/60"
  }`}
  >
  {tag}
@@ -737,7 +737,7 @@ export default function AdminProducts() {
  {formData.category !== "headwear" && formData.category !== "tickets" ? (
  formData.sizes.length > 0 && (
  <div className="bg-white/[0.05] p-4 rounded-xl border border-white/10 space-y-4">
- <div className="flex justify-between items-center bg-[#131316] p-3 rounded-lg border border-white/10 shadow-card">
+ <div className="flex justify-between items-center bg-[#0a0a0a] p-3 rounded-lg border border-white/10 shadow-card">
  <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]">Inventory per Size</label>
  <div className="flex items-center gap-3">
  <div className="flex items-center gap-2 border-r border-white/10 pr-3">

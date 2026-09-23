@@ -105,7 +105,8 @@ stays light. Tokens live in `src/index.css`.
 ## Color
 - **Shell**: `--background` indal `oklch(0.155 0.002 85)` (#161619-ish); sidebar `#0b0b0c`.
 - **Bone type**: `#EDEAE2` (type ramp: `text-[#EDEAE2]`, muted `text-[#EDEAE2]/42`).
-- **Panels**: `bg-[#131316]`, hairlines `border-white/10`–`border-white/14` + `border-white/[0.07]` rail.
+- **Panels**: `bg-[#0a0a0a]` (true ink — was `#131316`, read navy next to the warm shell), hairlines `border-white/10`–`border-white/14` + `border-white/[0.07]` rail.
+- **All admin surfaces are true black** — no light-gray layers: `--card`/`--popover` `oklch(0.12 0 0)`, `--secondary`/`--muted`/`--accent` `oklch(0.14 0 0)` (hover step), toolbars/segmented controls/table headers/tooltips/select dropdowns all black (was `oklch(0.17–0.255 0.002 85)` which read as navy/white on the black panels).
 - **Tint chips** are variable-driven (`--tint-{emerald,amber,sky,rose,violet,slate}-{bg,fg,line}`)
   so `ui/badge.jsx` + `StatusDropdown` work on both light (storefront) and dark (admin):
   `bg-emerald-500/[0.14] text-emerald-300` style under `.admin-app`.

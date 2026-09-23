@@ -171,7 +171,7 @@ const DashboardSkeleton = () => (
     <div className="space-y-6 md:space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-xl border border-white/10 bg-[#131316] shadow-card p-5">
+                <div key={i} className="rounded-xl border border-white/10 bg-[#0a0a0a] shadow-card p-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="skeleton h-4 w-24" />
                         <div className="skeleton h-10 w-10 rounded-lg" />
@@ -183,7 +183,7 @@ const DashboardSkeleton = () => (
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
             {[...Array(3)].map((_, i) => (
-                <div key={i} className="rounded-xl border border-white/10 bg-[#131316] shadow-card p-5">
+                <div key={i} className="rounded-xl border border-white/10 bg-[#0a0a0a] shadow-card p-5">
                     <div className="skeleton h-5 w-40 mb-5" />
                     <div className="skeleton h-32 w-full" />
                 </div>
@@ -487,7 +487,7 @@ const AdminDashboard = () => {
                     {/* Top stats */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
                         {/* 1. Total Sales - paid orders only (real money in) */}
-                        <Card hover className="admin-reveal bg-[#131316]">
+                        <Card hover className="admin-reveal bg-[#0a0a0a]">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-1">
                                     <p className="text-sm font-medium text-[#EDEAE2]/65">Total sales (paid)</p>
@@ -510,7 +510,7 @@ const AdminDashboard = () => {
                         </Card>
 
                         {/* 2. Pending payment - surfaced for attention, NEVER added to sales */}
-                        <Card hover className="admin-reveal bg-[#131316]">
+                        <Card hover className="admin-reveal bg-[#0a0a0a]">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-1">
                                     <p className="text-sm font-medium text-amber-300">Pending payment</p>
@@ -538,7 +538,7 @@ const AdminDashboard = () => {
                         </Card>
 
                         {/* 3. Total orders (paid) */}
-                        <Card hover className="admin-reveal bg-[#131316]">
+                        <Card hover className="admin-reveal bg-[#0a0a0a]">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-1">
                                     <p className="text-sm font-medium text-[#EDEAE2]/65">Total orders (paid)</p>
@@ -561,7 +561,7 @@ const AdminDashboard = () => {
 
                         {/* 4. Live visitors + Delivered */}
                         <div className="flex flex-col gap-4 md:gap-5">
-                            <Card hover className="admin-reveal bg-[#131316] flex-1 flex flex-col justify-center">
+                            <Card hover className="admin-reveal bg-[#0a0a0a] flex-1 flex flex-col justify-center">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-[#EDEAE2]/65">Online store visitors</p>
@@ -574,7 +574,7 @@ const AdminDashboard = () => {
                                 </CardContent>
                             </Card>
 
-                            <Card hover className="admin-reveal bg-[#131316] flex-1 flex flex-col justify-center">
+                            <Card hover className="admin-reveal bg-[#0a0a0a] flex-1 flex flex-col justify-center">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-[#EDEAE2]/65">Delivered</p>
@@ -603,7 +603,7 @@ const AdminDashboard = () => {
                                         {dashboardData.topProducts.map((prod, i) => (
                                             <div key={i} className="flex items-center justify-between p-4 hover:bg-white/[0.05] transition-colors">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <div className="w-10 h-10 rounded-lg border border-white/10 overflow-hidden bg-[#131316] shrink-0 shadow-card">
+                                                    <div className="w-10 h-10 rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a] shrink-0 shadow-card">
                                                         <img src={prod.image || "/placeholder.jpg"} className="w-full h-full object-cover" alt="" />
                                                     </div>
                                                     <p className="text-sm font-medium text-[#E3E0D6] line-clamp-1">{prod.title}</p>

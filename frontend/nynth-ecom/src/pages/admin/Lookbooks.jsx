@@ -140,7 +140,7 @@ export default function AdminLookbooks() {
  ))}
  </div>
  ) : lookbooks.length === 0 ? (
- <div className="bg-[#131316] border border-dashed border-white/22 rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-card">
+ <div className="bg-[#0a0a0a] border border-dashed border-white/22 rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-card">
  <div className="w-16 h-16 bg-white/[0.09] rounded-2xl flex items-center justify-center mb-6">
  <Upload className="w-8 h-8 text-[#EDEAE2]/35" />
  </div>
@@ -157,13 +157,13 @@ export default function AdminLookbooks() {
  ) : (
  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
  {lookbooks.map((look) => (
- <div key={look.id} className="bg-[#131316] border border-white/10 rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover relative group aspect-[3/4]">
+ <div key={look.id} className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover relative group aspect-[3/4]">
  <img src={look.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
 
  {/* Persistent Delete Button for Mobile/Desktop Accessibility */}
  <button
  onClick={() => setDeleteConfirmId(look.id)}
- className="absolute bottom-3 right-3 bg-[#131316]/90 backdrop-blur-sm text-rose-300 p-2.5 rounded-lg shadow-card hover:bg-white/15 hover:scale-110 active:scale-90 transition-all duration-300 z-10"
+ className="absolute bottom-3 right-3 bg-[#0a0a0a]/90 backdrop-blur-sm text-rose-300 p-2.5 rounded-lg shadow-card hover:bg-white/15 hover:scale-110 active:scale-90 transition-all duration-300 z-10"
  aria-label="Delete Look"
  >
  <Trash2 size={16} />
@@ -184,7 +184,7 @@ export default function AdminLookbooks() {
  }
  }}
  >
- <div className="bg-[#131316] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-white/10">
+ <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-white/10">
  <div className="flex justify-between items-center mb-8">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">New Editorial Image</p>
@@ -243,7 +243,7 @@ export default function AdminLookbooks() {
  </>
  ) : (
  <>
- <div className="w-1.5 h-1.5 bg-[#131316] rounded-lg animate-pulse"></div>
+ <div className="w-1.5 h-1.5 bg-[#0a0a0a] rounded-lg animate-pulse"></div>
  <span>Create Look</span>
  </>
  )}
@@ -257,7 +257,7 @@ export default function AdminLookbooks() {
  {/* DELETE CONFIRMATION MODAL */}
  {deleteConfirmId && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
- <div className="bg-[#131316] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-white/10">
+ <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-white/10">
  <div className="w-20 h-20 bg-rose-500/[0.14] rounded-2xl flex items-center justify-center mx-auto mb-8">
  <AlertTriangle className="text-rose-300" size={32} strokeWidth={1.5} />
  </div>

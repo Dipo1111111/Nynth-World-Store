@@ -74,7 +74,7 @@ export const doughnutOptions = {
       },
     },
     tooltip: {
-      backgroundColor: "oklch(0.17 0.002 85)",
+      backgroundColor: "oklch(0.12 0 0)",
       borderColor: "oklch(1 0 0 / 0.14)",
       borderWidth: 1,
       titleColor: "oklch(0.93 0.005 90)",

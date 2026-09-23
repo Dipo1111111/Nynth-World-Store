@@ -100,7 +100,7 @@ export default function AdminLayout({ children, title }) {
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ease-out ${
                                                 active
-                                                    ? "bg-[#131316] text-[#EDEAE2] shadow-card"
+                                                    ? "bg-[#0a0a0a] text-[#EDEAE2] shadow-card"
                                                     : "text-white/55 hover:text-white hover:bg-white/[0.14] hover:translate-x-0.5"
                                             }`}
                                         >

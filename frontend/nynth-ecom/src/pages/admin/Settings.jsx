@@ -253,7 +253,7 @@ export default function AdminSettings() {
  </div>
 
  {/* General Settings */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -280,7 +280,7 @@ export default function AdminSettings() {
  </div>
 
  {/* PRODUCT VARIANT OPTIONS */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={PackageIcon} title="Product Variant Options" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Manage the preset options available when creating or editing products. Separate items with commas.
@@ -312,7 +312,7 @@ export default function AdminSettings() {
  </div>
 
  {/* LOCK PAGE CONFIGURATION */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
@@ -331,7 +331,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#131316] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
  </label>
  </div>
 
@@ -349,7 +349,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#131316] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
  </label>
  </div>
 
@@ -432,7 +432,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Contact Information */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Mail} title="Contact Information" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -492,7 +492,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Social Media */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Share2} title="Social Media Links" />
  <div className="grid grid-cols-1 gap-6">
  <div className="space-y-2">
@@ -539,7 +539,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Google Analytics Settings */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
  <div className="space-y-4">
  <div className="space-y-2">
@@ -560,13 +560,13 @@ export default function AdminSettings() {
  </div>
 
  {/* Brand Assets Section */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
  <div className="space-y-4">
  <div className="flex justify-between items-center bg-white/[0.05] p-3 rounded-lg border border-white/10">
  <span className="text-[10px] font-bold text-[#EDEAE2] uppercase tracking-widest leading-none">Currently Active Banner</span>
  {!settings.hero_banner && (
- <span className="text-[9px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest bg-[#131316] px-2 py-1 rounded border border-white/[0.06]">Default System Asset</span>
+ <span className="text-[9px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest bg-[#0a0a0a] px-2 py-1 rounded border border-white/[0.06]">Default System Asset</span>
  )}
  </div>
  <div className="flex flex-col gap-4">
@@ -606,7 +606,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Banner Hover Color */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Banner Hover Style" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-4 leading-relaxed">
  Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
@@ -619,7 +619,7 @@ export default function AdminSettings() {
  className={`flex items-center gap-3 px-5 py-3 border transition-all ${
  settings.banner_hover_color === 'red'
 ? 'border-rose-500/60 bg-rose-500/[0.14] text-rose-300'
-  : 'border-white/14 bg-[#131316] text-[#EDEAE2]/42 hover:border-white/32'
+  : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
  }`}
  >
  <div className="w-4 h-4 rounded-lg bg-red-600"></div>
@@ -631,7 +631,7 @@ export default function AdminSettings() {
  className={`flex items-center gap-3 px-5 py-3 border transition-all ${
  settings.banner_hover_color === 'black'
 ? 'border-white/25 bg-[#EDEAE2] text-[#0d0d0f]'
-  : 'border-white/14 bg-[#131316] text-[#EDEAE2]/42 hover:border-white/32'
+  : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
  }`}
  >
  <div className="w-4 h-4 rounded-lg bg-[#EDEAE2]"></div>
@@ -641,7 +641,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Shipping Settings */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
  <label className="text-sm font-medium text-[#EDEAE2]/78">Default Shipping Fee ({settings.currency_symbol})</label>
@@ -656,7 +656,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Free Delivery Discount */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Percent} title="Free Delivery Discount" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
@@ -675,7 +675,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#131316] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
  </label>
  </div>
 
@@ -716,7 +716,7 @@ export default function AdminSettings() {
  />
 
  {/* Shipping Location Toggles */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Truck} title="Shipping Locations" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Toggle delivery locations on or off. Disabled locations will not appear in checkout.
@@ -762,7 +762,7 @@ export default function AdminSettings() {
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
  ? "border-white/10 text-[#EDEAE2]/42 bg-white/[0.05] line-through"
- : "border-white/18 text-[#EDEAE2] bg-[#131316] hover:border-white/32"
+ : "border-white/18 text-[#EDEAE2] bg-[#0a0a0a] hover:border-white/32"
  }`}
  >
  {area}
@@ -812,7 +812,7 @@ export default function AdminSettings() {
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
  ? "border-white/10 text-[#EDEAE2]/42 bg-white/[0.05] line-through"
- : "border-white/18 text-[#EDEAE2] bg-[#131316] hover:border-white/32"
+ : "border-white/18 text-[#EDEAE2] bg-[#0a0a0a] hover:border-white/32"
  }`}
  >
  {area}
@@ -862,7 +862,7 @@ export default function AdminSettings() {
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
  ? "border-white/10 text-[#EDEAE2]/42 bg-white/[0.05] line-through"
- : "border-white/18 text-[#EDEAE2] bg-[#131316] hover:border-white/32"
+ : "border-white/18 text-[#EDEAE2] bg-[#0a0a0a] hover:border-white/32"
  }`}
  >
  {state}
@@ -874,7 +874,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Announcement Bar */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
@@ -893,7 +893,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#131316] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
  </label>
  </div>
 
@@ -913,7 +913,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Promotional Marquee */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Promotional Marquee" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A scrolling banner that appears above the hero image on Shop and Home pages.
@@ -932,7 +932,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#131316] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
  </label>
  </div>
 
@@ -952,7 +952,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Email Section Settings */}
- <div className="bg-[#131316] p-6 rounded-xl border border-rose-500/25 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-rose-500/25 shadow-card">
  <SectionTitle icon={Mail} title="Email Section Settings" />
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -975,7 +975,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Size Chart Settings */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-6">
  <div className="flex items-center justify-between p-4 bg-white/[0.05] rounded-lg border border-white/10">
@@ -988,7 +988,7 @@ export default function AdminSettings() {
  onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
  className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
  >
- <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#131316] transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
+ <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
  </button>
  </div>
 
@@ -1113,7 +1113,7 @@ export default function AdminSettings() {
 
 
  {/* Our Story Editor */}
- <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
  <SectionTitle icon={BookOpen} title="Our Story" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Edit the content shown on the /our-story page. Fields are pre-filled with the current content -

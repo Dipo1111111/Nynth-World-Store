@@ -260,7 +260,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     ];
 
     return (
-        <div className="bg-[#131316] p-6 rounded-xl border border-white/10 shadow-card">
+        <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                     <Truck size={18} className="text-[#EDEAE2]/42" />
@@ -294,7 +294,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                             const bulkKey = `${region}:${group.id}`;
                             const editedCount = group.areas.filter((a) => rates[region]?.[a] != null).length;
                             return (
-                                <div key={group.id} className="border border-white/10 rounded-lg p-4 bg-[#131316]">
+                                <div key={group.id} className="border border-white/10 rounded-lg p-4 bg-[#0a0a0a]">
                                     <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                         <div className="flex items-center gap-2">
                                             <span className="text-[11px] font-bold uppercase tracking-widest text-[#EDEAE2]">{group.name}</span>
@@ -364,7 +364,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 <div
                                                     key={area}
                                                     className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                                        off ? "border-white/10 bg-white/[0.05] opacity-60" : overridden ? "border-white/32 bg-white/[0.05]" : "border-white/18 bg-[#131316]"
+                                                        off ? "border-white/10 bg-white/[0.05] opacity-60" : overridden ? "border-white/32 bg-white/[0.05]" : "border-white/18 bg-[#0a0a0a]"
                                                     }`}
                                                 >
                                                     <span className="flex items-center gap-1.5 min-w-0 mr-2">
@@ -460,7 +460,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                         const bulkKey = `interstate:${group.id}`;
                         const editedCount = group.states.filter((s) => rates.interstate?.[s] != null).length;
                         return (
-                            <div key={group.id} className="border border-white/10 rounded-lg p-4 bg-[#131316]">
+                            <div key={group.id} className="border border-white/10 rounded-lg p-4 bg-[#0a0a0a]">
                                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[11px] font-bold uppercase tracking-widest text-[#EDEAE2]">{group.name}</span>
@@ -528,7 +528,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             <div
                                                 key={state}
                                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                                    off ? "border-white/10 bg-white/[0.05] opacity-60" : overridden ? "border-white/32 bg-white/[0.05]" : "border-white/18 bg-[#131316]"
+                                                    off ? "border-white/10 bg-white/[0.05] opacity-60" : overridden ? "border-white/32 bg-white/[0.05]" : "border-white/18 bg-[#0a0a0a]"
                                                 }`}
                                             >
                                                 <span className="flex items-center gap-1.5 min-w-0 mr-2">
@@ -626,7 +626,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                         );
                     })}
                     {customInterstate.filter((s) => !Object.keys(INTERSTATE_SHIPPING_DATA).includes(s)).length > 0 && (
-                        <div className="border border-dashed border-white/22 rounded-lg p-4 bg-[#131316]">
+                        <div className="border border-dashed border-white/22 rounded-lg p-4 bg-[#0a0a0a]">
                             <span className="text-[11px] font-bold uppercase tracking-widest text-[#EDEAE2]">Custom states</span>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
                                 {customInterstate.filter((s) => !Object.keys(INTERSTATE_SHIPPING_DATA).includes(s)).map((state) => {
@@ -634,7 +634,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                     if (!eff) return null;
                                     const off = isAreaDisabled("interstate", state);
                                     return (
-                                        <div key={state} className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${off ? "border-white/10 bg-white/[0.05] opacity-60" : "border-white/18 bg-[#131316]"}`}>
+                                        <div key={state} className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${off ? "border-white/10 bg-white/[0.05] opacity-60" : "border-white/18 bg-[#0a0a0a]"}`}>
                                             <span className="flex items-center gap-1.5 min-w-0 mr-2">
                                                 <button type="button" onClick={() => toggleArea("interstate", state)} className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-white/[0.12] text-[#EDEAE2]/42" : "bg-white/[0.05] text-emerald-300"}`}>
                                                     <Power size={11} />

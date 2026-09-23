@@ -346,7 +346,7 @@ const Orders = () => {
                         <input
                             type="text"
                             placeholder="Search by order ID or customer..."
-                            className="w-full pl-10 pr-4 py-2 bg-[#131316] border border-white/14 rounded-lg text-sm focus-ring placeholder:text-[#EDEAE2]/42"
+                            className="w-full pl-10 pr-4 py-2 bg-[#0a0a0a] border border-white/14 rounded-lg text-sm focus-ring placeholder:text-[#EDEAE2]/42"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -450,7 +450,7 @@ const Orders = () => {
                             {filteredOrders.map((order) => {
                                 const isExpanded = expandedOrders.has(order.id);
                                 return (
-                                    <div key={order.id} className="p-4 bg-[#131316] flex flex-col gap-3">
+                                    <div key={order.id} className="p-4 bg-[#0a0a0a] flex flex-col gap-3">
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="flex items-center gap-2 min-w-0 flex-1">
                                                 <button
@@ -499,7 +499,7 @@ const Orders = () => {
                                                         <div className="space-y-2">
                                                             {order.items?.map((item, idx) => (
                                                                 <div key={idx} className="flex gap-3 p-3 bg-white/[0.05] rounded-lg border border-white/10">
-                                                                    <div className="w-14 h-16 bg-[#131316] rounded overflow-hidden flex-shrink-0 border border-white/10">
+                                                                    <div className="w-14 h-16 bg-[#0a0a0a] rounded overflow-hidden flex-shrink-0 border border-white/10">
                                                                         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                     </div>
                                                                     <div className="flex-1 min-w-0">
@@ -531,7 +531,7 @@ const Orders = () => {
                                                                 </h4>
                                                                 <div className="space-y-1.5">
                                                                     {order.tickets.map((t, i) => (
-                                                                        <div key={i} className="flex items-center justify-between gap-2 bg-[#131316] rounded-lg border border-white/10 px-3 py-2">
+                                                                        <div key={i} className="flex items-center justify-between gap-2 bg-[#0a0a0a] rounded-lg border border-white/10 px-3 py-2">
                                                                             <span className="font-mono text-[11px] font-bold tracking-wider">{t.code}</span>
                                                                             <span className="text-[9px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest truncate ml-2">{t.title}</span>
                                                                         </div>
@@ -614,7 +614,7 @@ const Orders = () => {
                                         <th className="px-4 md:px-6 py-3 text-right text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-[#131316]">
+                                <tbody className="bg-[#0a0a0a]">
                                     {filteredOrders.map((order) => {
                                         const isExpanded = expandedOrders.has(order.id);
                                         return (
@@ -677,7 +677,7 @@ const Orders = () => {
                                                                     </h4>
                                                                     <div className="space-y-3">
                                                                         {order.items?.map((item, idx) => (
-                                                                            <div key={idx} className="flex gap-4 p-3 bg-[#131316] rounded-lg border border-white/10">
+                                                                            <div key={idx} className="flex gap-4 p-3 bg-[#0a0a0a] rounded-lg border border-white/10">
                                                                                 <div className="w-16 h-20 bg-white/[0.07] rounded overflow-hidden flex-shrink-0">
                                                                                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                                 </div>
@@ -710,7 +710,7 @@ const Orders = () => {
                                                                             </h4>
                                                                             <div className="space-y-2">
                                                                                 {order.tickets.map((t, i) => (
-                                                                                    <div key={i} className="flex items-center justify-between gap-3 bg-[#131316] rounded-lg border border-white/10 px-3 py-2.5">
+                                                                                    <div key={i} className="flex items-center justify-between gap-3 bg-[#0a0a0a] rounded-lg border border-white/10 px-3 py-2.5">
                                                                                         <span className="font-mono text-xs font-bold tracking-wider">{t.code}</span>
                                                                                         <span className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest truncate">{t.title}</span>
                                                                                     </div>
@@ -727,7 +727,7 @@ const Orders = () => {
                                                                             <MapPin size={15} />
                                                                             Shipping
                                                                         </h4>
-                                                                        <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-2">
+                                                                        <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-2">
                                                                             <p className="font-medium text-sm text-[#EDEAE2]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.address}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.city}, {order.customer?.state}</p>
@@ -740,7 +740,7 @@ const Orders = () => {
                                                                             <User size={15} />
                                                                             Contact
                                                                         </h4>
-                                                                        <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-3">
+                                                                        <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-3">
                                                                             <div className="flex items-center justify-between gap-3">
                                                                                 <div className="flex items-center gap-2 text-sm min-w-0">
                                                                                     <Mail size={14} className="text-[#EDEAE2]/42 shrink-0" />
@@ -770,7 +770,7 @@ const Orders = () => {
                                                                             <CreditCard size={15} />
                                                                             Status & Money
                                                                         </h4>
-                                                                        <div className="p-4 bg-[#131316] rounded-lg border border-white/10 space-y-3">
+                                                                        <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-3">
                                                                             <div className="flex justify-between items-center text-sm">
                                                                                 <span className="text-[#EDEAE2]/55">Fulfillment</span>
                                                                                 <StatusDropdown

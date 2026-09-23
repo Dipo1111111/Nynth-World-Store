@@ -250,7 +250,7 @@ const Subscribers = () => {
  placeholder="Search emails..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-2 bg-[#131316] border border-white/14 rounded-lg focus-ring text-sm placeholder:text-[#EDEAE2]/42"
+ className="w-full pl-10 pr-4 py-2 bg-[#0a0a0a] border border-white/14 rounded-lg focus-ring text-sm placeholder:text-[#EDEAE2]/42"
  />
  </div>
 
@@ -326,7 +326,7 @@ const Subscribers = () => {
  {/* Mobile Card View */}
  <div className="sm:hidden divide-y divide-white/[0.08]">
  {filteredSubscribers.map((sub) => (
- <div key={sub.id} className="p-4 bg-[#131316] flex flex-col gap-3">
+ <div key={sub.id} className="p-4 bg-[#0a0a0a] flex flex-col gap-3">
  <div className="flex items-start justify-between gap-2">
  <div className="flex items-center gap-3 min-w-0 flex-1">
  <button onClick={() => toggleEmail(sub.email)} className="focus-ring shrink-0 rounded" aria-label="Toggle select">
@@ -380,7 +380,7 @@ const Subscribers = () => {
  <th className="px-4 py-4 text-right text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest">Signed Up</th>
  </tr>
  </thead>
- <tbody className="divide-y divide-white/10 bg-[#131316]">
+ <tbody className="divide-y divide-white/10 bg-[#0a0a0a]">
  {filteredSubscribers.map((sub) => (
  <tr key={sub.id} className="transition-colors group hover:bg-white/[0.05]">
  <td className="px-4 py-4 whitespace-nowrap">
@@ -424,7 +424,7 @@ const Subscribers = () => {
  {/* Email Modal */}
  {showEmailModal && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
- <div className="bg-[#131316] rounded-2xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/10">
+ <div className="bg-[#0a0a0a] rounded-2xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/10">
  <div className="flex items-center justify-between p-6 border-b border-white/10">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">BCC Campaign</p>
