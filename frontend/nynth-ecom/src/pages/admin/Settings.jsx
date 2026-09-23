@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, Info, RotateCcw } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
@@ -239,21 +239,30 @@ export default function AdminSettings() {
 
  return (
  <AdminLayout title="Settings">
- <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
- {/* Save model explainer */}
- <div className="bg-amber-500/[0.14] border border-amber-500/30 rounded-xl px-5 py-4 flex items-start gap-3">
- <Info size={18} className="text-amber-300 shrink-0 mt-0.5" />
- <div>
- <p className="text-xs font-bold uppercase tracking-widest text-amber-200">Changes are staged until you save</p>
- <p className="text-xs text-amber-200 mt-1 leading-relaxed">
- Nothing here goes live while you edit. When you have unsaved changes, a save bar appears at the
- bottom of the screen - press <span className="font-bold">Save All Settings</span> to publish them to your storefront.
- </p>
- </div>
- </div>
+  <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
+  <header className="flex flex-wrap items-end justify-between gap-3">
+  <div>
+  <h1 className="text-3xl md:text-4xl font-extrabold tracking-[-0.02em] text-[#EDEAE2]">Settings</h1>
+  <p className="text-sm text-[#EDEAE2]/55 mt-1">Storefront configuration. Changes stay staged until you save.</p>
+  </div>
+  {isDirty && (
+  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-200">
+  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
+  Unsaved changes
+  </span>
+  )}
+  </header>
 
- {/* General Settings */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+  <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur px-2 py-2">
+  {[["Store", "#set-store"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
+  <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/55 hover:text-[#EDEAE2] hover:bg-white/[0.06] transition-colors focus-ring">
+  {label}
+  </a>
+  ))}
+  </nav>
+
+  {/* General Settings */}
+  <div id="set-store" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -311,8 +320,8 @@ export default function AdminSettings() {
  </div>
  </div>
 
- {/* LOCK PAGE CONFIGURATION */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+  {/* LOCK PAGE CONFIGURATION */}
+  <div id="set-lock" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
@@ -640,8 +649,8 @@ export default function AdminSettings() {
  </div>
  </div>
 
- {/* Shipping Settings */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+  {/* Shipping Settings */}
+  <div id="set-shipping" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
  <label className="text-sm font-medium text-[#EDEAE2]/78">Default Shipping Fee ({settings.currency_symbol})</label>
@@ -873,8 +882,8 @@ export default function AdminSettings() {
  </div>
  </div>
 
- {/* Announcement Bar */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+  {/* Announcement Bar */}
+  <div id="set-announce" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
  <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
@@ -951,8 +960,8 @@ export default function AdminSettings() {
  )}
  </div>
 
- {/* Email Section Settings */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-rose-500/25 shadow-card">
+  {/* Email Section Settings */}
+  <div id="set-cleanup" className="bg-[#0a0a0a] p-6 rounded-xl border border-rose-500/25 shadow-card scroll-mt-28">
  <SectionTitle icon={Mail} title="Email Section Settings" />
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -974,8 +983,8 @@ export default function AdminSettings() {
  </div>
  </div>
 
- {/* Size Chart Settings */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+  {/* Size Chart Settings */}
+  <div id="set-content" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-6">
  <div className="flex items-center justify-between p-4 bg-white/[0.05] rounded-lg border border-white/10">
@@ -1305,7 +1314,7 @@ export default function AdminSettings() {
 
  {/* Sticky save bar - appears whenever there are unsaved changes */}
  {isDirty && (
- <div className="fixed bottom-0 inset-x-0 z-50 border-t border-amber-400/35 bg-amber-500/[0.7] backdrop-blur">
+  <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur">
  <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-2.5 min-w-0">
  <span className="w-2 h-2 rounded-lg bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
