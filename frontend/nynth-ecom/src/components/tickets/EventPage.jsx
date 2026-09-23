@@ -79,7 +79,7 @@ export default function EventPage({ product }) {
         if (!active) return;
         const others = all.filter((p) => p.category !== "tickets").slice(0, 4);
         setMerch(others);
-      } catch (e) {
+      } catch {
         // cross-sell is non-critical
       }
     })();
@@ -92,7 +92,7 @@ export default function EventPage({ product }) {
       setAdding(true);
       await addToCart(product, quantity, "", "");
       toast.success(`${quantity} ticket${quantity > 1 ? "s" : ""} added`);
-    } catch (e) {
+    } catch {
       toast.error("Failed to add tickets");
     } finally {
       setAdding(false);

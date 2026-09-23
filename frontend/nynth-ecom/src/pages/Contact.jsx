@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Mail, MapPin, Phone } from "lucide-react";
-import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
-import { saveContactMessage, sendTriggerEmail } from "../api/firebaseFunctions";
 
 export default function Contact() {
     const { settings } = useSettings();

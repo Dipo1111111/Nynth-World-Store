@@ -68,7 +68,7 @@ const formatEventDateText = (iso) => {
                 hour12: true,
             })
             .toUpperCase();
-    } catch (e) {
+    } catch {
         return "";
     }
 };
@@ -111,7 +111,7 @@ async function buildEticketQrs(tickets = []) {
                 width: 220,
                 errorCorrectionLevel: "M",
             });
-        } catch (e) {
+        } catch {
             qrByCode[t.code] = "";
         }
     }
@@ -143,7 +143,7 @@ async function getSiteSettings() {
     try {
         const doc = await db.collection("settings").doc("site_config").get();
         return doc.exists ? doc.data() : {};
-    } catch (e) {
+    } catch {
         return {};
     }
 }

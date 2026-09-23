@@ -218,7 +218,7 @@ export default function AdminProducts() {
  return (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0);
  });
  setProducts(data);
- } catch (error) {
+ } catch {
  toast.error("Failed to load products");
  } finally {
  setLoading(false);

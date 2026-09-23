@@ -24,6 +24,7 @@ export default function Signup() {
         if (currentUser) {
             navigate(getRedirectTarget(), { replace: true });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser, navigate, location]);
 
     if (currentUser) {

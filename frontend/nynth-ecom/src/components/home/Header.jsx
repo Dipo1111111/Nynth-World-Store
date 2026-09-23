@@ -74,7 +74,7 @@ export default function Header() {
     const timer = setInterval(updateTimer, 1000);
     updateTimer();
     return () => clearInterval(timer);
-  }, [settings?.launch_date, isLaunchFinished]);
+  }, [settings?.launch_date, isLaunchFinished, dropLabel]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,6 +99,7 @@ export default function Header() {
 
   // Close search on navigation
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSearchOpen(false);
     setSearchQuery("");
   }, [location.pathname]);

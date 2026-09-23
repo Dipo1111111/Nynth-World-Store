@@ -171,7 +171,7 @@ export default function ProductDetail() {
           }
           setSelectedSize(firstInStock);
         }
-      } catch (error) {
+      } catch {
         setError("Failed to load product.");
       } finally {
         setLoading(false);
@@ -185,6 +185,7 @@ export default function ProductDetail() {
     if (product) {
       fetchRecommendedProducts(product, 4).then(setRecommendedProducts);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id]);
 
   // For headwear, ignore sizeStock entirely and use stockQuantity directly
@@ -209,7 +210,7 @@ export default function ProductDetail() {
       await addToCart(product, 1, selectedSize, selectedColor);
       setShowCartNotification(true);
       setTimeout(() => setShowCartNotification(false), 3000);
-    } catch (error) {
+    } catch {
       alert("Failed to add to cart.");
     } finally {
       setAddingToCart(false);
@@ -360,7 +361,7 @@ export default function ProductDetail() {
               <div className="mb-10">
                 <p className="text-[8px] tracking-[0.25em] font-bold uppercase mb-4 text-black">CHOOSE COLOR:</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {product.availableColors.map((color, idx) => (
+                  {product.availableColors.map((color) => (
                     <button
                       key={color}
                       onClick={() => {
@@ -591,7 +592,7 @@ Dispatch: Orders are dispatched within 1–3 business days after production is c
             <div className="mb-6">
               <p className="text-[9px] tracking-[0.2em] font-bold uppercase mb-3 text-gray-500">CHOOSE COLOR:</p>
               <div className="flex flex-wrap gap-2">
-                {product.availableColors.map((color, idx) => (
+                {product.availableColors.map((color) => (
                   <button
                     key={color}
                     onClick={() => {

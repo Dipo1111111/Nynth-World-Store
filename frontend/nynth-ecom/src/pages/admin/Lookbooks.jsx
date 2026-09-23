@@ -100,7 +100,7 @@ export default function AdminLookbooks() {
  await deleteLookbook(deleteConfirmId);
  toast.success("Look deleted");
  setDeleteConfirmId(null);
- } catch (error) {
+ } catch {
  toast.error("Failed to delete");
  } finally {
  setIsDeleting(false);

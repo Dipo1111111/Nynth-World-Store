@@ -10,8 +10,8 @@ import { getOptimizedImageUrl } from "../../api/cloudinary";
 export default function ProductCard({ product, displayMode = 'model' }) {
   const { settings } = useSettings();
   const { addToCart } = useCart();
-  const [selectedColor, setSelectedColor] = useState(product.availableColors?.[0] || "");
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedColor] = useState(product.availableColors?.[0] || "");
+  const [selectedImageIndex] = useState(0);
 
   const isSightMode = displayMode === 'view';
 
@@ -53,13 +53,6 @@ export default function ProductCard({ product, displayMode = 'model' }) {
     incrementCounter('clicks');
     addToCart(product, 1, product.availableSizes?.[0] || "M", selectedColor);
     toast.success(`Added to bag`);
-  };
-
-  const handleColorSelect = (e, color, index) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSelectedColor(color);
-    if (product.images?.[index]) setSelectedImageIndex(index);
   };
 
   // ===== SIGHT MODE (4x4 Grid but Richer Info) =====

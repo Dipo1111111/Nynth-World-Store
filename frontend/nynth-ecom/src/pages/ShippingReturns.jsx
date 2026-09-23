@@ -1,10 +1,8 @@
 import React from "react";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { useSettings } from "../context/SettingsContext";
 
 export default function ShippingReturns() {
-    const { settings } = useSettings();
     return (
         <div className="min-h-screen bg-white text-black flex flex-col">
             <Header />

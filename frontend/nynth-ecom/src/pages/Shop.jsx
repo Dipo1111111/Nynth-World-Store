@@ -1,6 +1,6 @@
 // pages/Shop.jsx
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useLocation, Link } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import ProductCard from "../components/products/ProductCard";
@@ -14,8 +14,7 @@ import { getOptimizedImageUrl } from "../api/cloudinary";
 import Marquee from "../components/common/Marquee";
 
 export default function Shop() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);

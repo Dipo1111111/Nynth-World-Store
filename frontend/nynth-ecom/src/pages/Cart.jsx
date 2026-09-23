@@ -1,22 +1,18 @@
 // src/pages/cart.jsx - REDESIGNED
 import React from "react";
 import { useCart } from "../context/CartContext.jsx";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Minus, Plus, Trash2, ArrowRight, Ticket } from "lucide-react";
-import toast from "react-hot-toast";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
-import { useAuth } from "../context/AuthContext.jsx";
 import { isTicketItem, hasTickets, hasPhysicalItems, ticketCount, formatEventDate } from "../utils/tickets";
 
 export default function Cart() {
-  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
   const { settings } = useSettings();
-  const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,

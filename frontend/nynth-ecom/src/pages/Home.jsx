@@ -3,8 +3,6 @@ import Header from "../components/home/Header.jsx";
 import Footer from "../components/home/Footer.jsx";
 import SEO from "../components/SEO";
 import { fetchProducts } from "../api/firebaseFunctions";
-import { useCart } from "../context/CartContext";
-import toast from "react-hot-toast";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 

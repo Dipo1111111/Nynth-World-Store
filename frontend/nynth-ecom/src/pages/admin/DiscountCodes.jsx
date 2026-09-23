@@ -37,16 +37,17 @@ export default function DiscountCodes() {
  const [form, setForm] = useState(initialFormState);
  const [isSubmitting, setIsSubmitting] = useState(false);
 
- useEffect(() => {
- loadCodes();
- }, []);
-
- const loadCodes = async () => {
+ async function loadCodes() {
  setLoading(true);
  const data = await fetchDiscountCodes();
  setCodes(data);
  setLoading(false);
- };
+ }
+
+ useEffect(() => {
+ // eslint-disable-next-line react-hooks/set-state-in-effect
+ loadCodes();
+ }, []);
 
  const openModal = (code = null) => {
  if (code) {
@@ -115,7 +116,7 @@ export default function DiscountCodes() {
  }
  closeModal();
  loadCodes();
- } catch (err) {
+ } catch {
  toast.error("Something went wrong");
  }
  setIsSubmitting(false);

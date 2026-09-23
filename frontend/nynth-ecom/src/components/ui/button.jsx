@@ -33,7 +33,7 @@ const buttonVariants = cva(
 )
 
 const Button = React.forwardRef(
-    ({ className, variant, size, asChild = false, ...props }, ref) => {
+    ({ className, variant, size, ...props }, ref) => {
         // If we don't have Radix Slot installed, we fallback to just standard HTML button behavior for simplicity
         // But since cva/clsx are typically paired with Radix in shadcn, I'll assume standard button usage for now.
         // If @radix-ui/react-slot is missing, we can remove 'asChild' logic or install it.

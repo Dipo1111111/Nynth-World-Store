@@ -1,5 +1,5 @@
 // components/shop/FiltersSidebar.jsx
-import React, { useState } from "react";
+import React from "react";
 import { Filter, X } from "lucide-react";
 
 const FiltersSidebar = ({

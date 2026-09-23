@@ -158,7 +158,7 @@ export default function AdminSettings() {
  if (result.success) {
  toast.success(`Succesfully merged ${result.mergedCount} duplicates.`);
  }
- } catch (error) {
+ } catch {
  toast.error("Failed to merge duplicates");
  } finally {
  setIsMerging(false);
@@ -174,7 +174,7 @@ export default function AdminSettings() {
  setSettings(loaded);
  setSavedSnapshot(JSON.parse(JSON.stringify(loaded)));
  }
- } catch (error) {
+ } catch {
  toast.error("Failed to load settings");
  } finally {
  setLoading(false);
@@ -213,7 +213,7 @@ export default function AdminSettings() {
  } else {
  toast.error("Failed to update settings");
  }
- } catch (error) {
+ } catch {
  toast.error("Error updating settings");
  } finally {
  setSaving(false);

@@ -80,7 +80,7 @@ export default function LockPage() {
             } else {
                 toast.error(result.message.toUpperCase());
             }
-        } catch (error) {
+        } catch {
             toast.error('SOMETHING WENT WRONG');
         } finally {
             setWaitlistLoading(false);

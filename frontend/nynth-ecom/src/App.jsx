@@ -181,10 +181,9 @@ function App() {
   );
 }
 
-function AppContent({ isSiteUnlocked, setIsSiteUnlocked }) {
+function AppContent({ isSiteUnlocked }) {
   const { settings, loading: settingsLoading } = useSettings();
-  const { currentUser, isAdmin, isAdminLoading } = useAuth();
-  const location = window.location;
+  const { isAdmin, isAdminLoading } = useAuth();
 
   // The site is "Globally Locked" if the setting is true
   const isGloballyLocked = settings?.lock_page_enabled;

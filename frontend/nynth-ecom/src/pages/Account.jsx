@@ -43,17 +43,6 @@ export default function Account() {
         }
     };
 
-    const getStatusVariant = (status) => {
-        switch (status) {
-            case "pending": return "warning";
-            case "processing": return "info";
-            case "shipped": return "default";
-            case "delivered": return "success";
-            case "cancelled": return "destructive";
-            default: return "secondary";
-        }
-    };
-
     if (!currentUser) return null;
 
     return (

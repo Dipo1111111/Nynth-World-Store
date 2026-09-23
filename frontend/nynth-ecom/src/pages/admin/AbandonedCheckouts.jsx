@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { getAllOrders } from "../../api/firebaseFunctions";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
  LayoutDashboard,
  Package,
@@ -29,13 +28,10 @@ import StatusDropdown from "../../components/admin/StatusDropdown";
 import toast from "react-hot-toast";
 
 const AbandonedCheckouts = () => {
- const { currentUser, logout } = useAuth();
- const navigate = useNavigate();
  const [orders, setOrders] = useState([]);
  const [filteredOrders, setFilteredOrders] = useState([]);
  const [loading, setLoading] = useState(true);
  const [expandedOrders, setExpandedOrders] = useState(new Set());
- const [sidebarOpen, setSidebarOpen] = useState(false);
 
  // Filters
  const [searchTerm, setSearchTerm] = useState("");
@@ -111,25 +107,6 @@ const AbandonedCheckouts = () => {
  newExpanded.add(orderId);
  }
  setExpandedOrders(newExpanded);
- };
-
- const handleStatusChange = (orderId, newStatus) => {
- setOrders(prevOrders =>
- prevOrders.map(order =>
- order.id === orderId
- ? { ...order, order_status: newStatus }
- : order
- )
- );
- };
-
- const handleLogout = async () => {
- try {
- await logout();
- navigate('/');
- } catch (error) {
- console.error('Logout error:', error);
- }
  };
 
  const downloadCSV = () => {

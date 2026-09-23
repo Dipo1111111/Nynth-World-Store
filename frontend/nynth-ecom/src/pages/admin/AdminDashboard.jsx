@@ -107,8 +107,46 @@ const STATUS_LABELS = {
 
 const isPaid = (o) => o.payment_status === 'paid' || o.payment_status === 'success';
 
+const GrowthBadge = ({ value }) => {
+ const isUp = value >= 0;
+ const colorClass = isUp ? "text-emerald-600" : "text-rose-600";
+ const Icon = isUp ? ArrowUpRight : ArrowDownRight;
+ return (
+ <span className={`flex items-center text-xs font-semibold ${colorClass}`}>
+ <Icon size={14} className="mr-0.5" />
+ {Math.abs(value).toFixed(1)}%
+ </span>
+ );
+};
+
+const FilterChips = ({ value, onChange }) => {
+ const options = [
+ { id: 'all', label: 'All orders' },
+ { id: 'pending', label: '⏳ Pending' },
+ { id: 'paid', label: '✅ Paid' },
+ { id: 'delivered', label: '📦 Delivered' },
+ ];
+ return (
+ <div className="flex flex-wrap items-center gap-1.5">
+ {options.map(option => (
+ <button
+ key={option.id}
+ onClick={() => onChange(option.id)}
+ className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors ${
+ value === option.id
+ ? 'bg-black text-white border-black'
+ : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+ }`}
+ >
+ {option.label}
+ </button>
+ ))}
+ </div>
+ );
+};
+
 const AdminDashboard = () => {
- const { currentUser, logout, isAdmin } = useAuth();
+ const { isAdmin } = useAuth();
  const navigate = useNavigate();
  
  const [orders, setOrders] = useState(null);
@@ -119,6 +157,43 @@ const AdminDashboard = () => {
  const [liveVisitors, setLiveVisitors] = useState(0);
  const alertedStatus = useRef(new Map());
  const alertsBooted = useRef(false);
+
+ // --- SALE ALERTS (cha-ching + browser notification + toast) ---
+ function triggerSaleAlert(order, kind) {
+ try {
+ const audio = new Audio('/sounds/cha-ching.mp3');
+ audio.play().catch(e => console.log('Audio playback blocked', e));
+ } catch { /* autoplay may be blocked */ }
+
+ const customer = order.customer?.firstName || order.customer?.email || "a customer";
+ const amount = `₦${(order.total || 0).toLocaleString()}`;
+
+ if (kind === 'paid') {
+ if ('Notification' in window && Notification.permission === 'granted') {
+ new Notification('NYNTH 💰 Sale confirmed!', {
+ body: `${amount} collected from ${customer}`,
+ icon: '/favicon.png'
+ });
+ }
+ toast.success(`💰 Paid: ${amount} from ${customer}`, { duration: 6000, position: 'top-right' });
+ } else if (kind === 'confirmed') {
+ if ('Notification' in window && Notification.permission === 'granted') {
+ new Notification('NYNTH ✅ Payment confirmed!', {
+ body: `${amount} from ${customer} is now paid`,
+ icon: '/favicon.png'
+ });
+ }
+ toast.success(`✅ Payment confirmed: ${amount} from ${customer}`, { duration: 6000, position: 'top-right' });
+ } else {
+ if ('Notification' in window && Notification.permission === 'granted') {
+ new Notification('NYNTH 🛍️ New order!', {
+ body: `${amount} from ${customer} - pending payment`,
+ icon: '/favicon.png'
+ });
+ }
+ toast("🛍️ New order: " + amount + " from " + customer + " (awaiting payment)", { duration: 6000, position: 'top-right', icon: '🧾' });
+ }
+ }
 
  // --- LIVE VISITORS ---
  useEffect(() => {
@@ -181,42 +256,6 @@ const AdminDashboard = () => {
 
  return () => unsubscribe();
  }, []);
-
- const triggerSaleAlert = (order, kind) => {
- try {
- const audio = new Audio('/sounds/cha-ching.mp3');
- audio.play().catch(e => console.log('Audio playback blocked', e));
- } catch (err) {}
-
- const customer = order.customer?.firstName || order.customer?.email || "a customer";
- const amount = `₦${(order.total || 0).toLocaleString()}`;
-
- if (kind === 'paid') {
- if ('Notification' in window && Notification.permission === 'granted') {
- new Notification('NYNTH 💰 Sale confirmed!', {
- body: `${amount} collected from ${customer}`,
- icon: '/favicon.png'
- });
- }
- toast.success(`💰 Paid: ${amount} from ${customer}`, { duration: 6000, position: 'top-right' });
- } else if (kind === 'confirmed') {
- if ('Notification' in window && Notification.permission === 'granted') {
- new Notification('NYNTH ✅ Payment confirmed!', {
- body: `${amount} from ${customer} is now paid`,
- icon: '/favicon.png'
- });
- }
- toast.success(`✅ Payment confirmed: ${amount} from ${customer}`, { duration: 6000, position: 'top-right' });
- } else {
- if ('Notification' in window && Notification.permission === 'granted') {
- new Notification('NYNTH 🛍️ New order!', {
- body: `${amount} from ${customer} - pending payment`,
- icon: '/favicon.png'
- });
- }
- toast("🛍️ New order: " + amount + " from " + customer + " (awaiting payment)", { duration: 6000, position: 'top-right', icon: '🧾' });
- }
- };
 
  // --- DATA CALCULATIONS ---
  const dashboardData = useMemo(() => {
@@ -364,18 +403,6 @@ const AdminDashboard = () => {
  };
 
  // --- TREND RENDERER ---
- const GrowthBadge = ({ value }) => {
- const isUp = value >= 0;
- const colorClass = isUp ? "text-emerald-600" : "text-rose-600";
- const Icon = isUp ? ArrowUpRight : ArrowDownRight;
- return (
- <span className={`flex items-center text-xs font-semibold ${colorClass}`}>
- <Icon size={14} className="mr-0.5" />
- {Math.abs(value).toFixed(1)}%
- </span>
- );
- };
-
 const PAYMENT_PILLS = {
  pending: "bg-gray-50 text-gray-600",
  paid: "bg-gray-50 text-green-500",
@@ -393,32 +420,6 @@ const PaymentPill = ({ status }) => {
  </span>
  );
 };
-
- const FilterChips = ({ value, onChange }) => {
- const options = [
- { id: 'all', label: 'All orders' },
- { id: 'pending', label: '⏳ Pending' },
- { id: 'paid', label: '✅ Paid' },
- { id: 'delivered', label: '📦 Delivered' },
- ];
- return (
- <div className="flex flex-wrap items-center gap-1.5">
- {options.map(option => (
- <button
- key={option.id}
- onClick={() => onChange(option.id)}
- className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors ${
- value === option.id
- ? 'bg-black text-white border-black'
- : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
- }`}
- >
- {option.label}
- </button>
- ))}
- </div>
- );
- };
 
  return (
  <AdminLayout>

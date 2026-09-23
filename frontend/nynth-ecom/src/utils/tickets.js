@@ -27,7 +27,7 @@ export const formatEventDate = (eventDateTime) => {
         hour12: true,
       })
       .toUpperCase();
-  } catch (error) {
+  } catch {
     return "DATE TBC";
   }
 };
@@ -56,7 +56,7 @@ export const formatEventDateParts = (eventDateTime) => {
         })
         .toUpperCase(),
     };
-  } catch (error) {
+  } catch {
     return { date: "DATE TBC", time: "" };
   }
 };

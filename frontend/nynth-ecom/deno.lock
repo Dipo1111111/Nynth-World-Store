@@ -60,6 +60,7 @@
         "npm:clsx@^2.1.1",
         "npm:eslint-plugin-react-hooks@^7.0.1",
         "npm:eslint-plugin-react-refresh@~0.4.24",
+        "npm:eslint-plugin-react@^7.37.5",
         "npm:eslint@^9.39.1",
         "npm:firebase-admin@^13.10.0",
         "npm:firebase@^12.6.0",

@@ -31,7 +31,7 @@ const h = vi.hoisted(() => {
         getUser: vi.fn(async () => ({ data: { user: authUser }, error: null })),
       },
       functions: {
-        invoke: vi.fn(async (_name, opts) => invokeResult),
+        invoke: vi.fn(async () => invokeResult),
       },
       channel: vi.fn(() => ({ on: vi.fn(() => ({ subscribe: vi.fn() })) })),
       removeChannel: vi.fn(),

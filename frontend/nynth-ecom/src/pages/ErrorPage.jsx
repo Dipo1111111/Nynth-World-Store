@@ -5,8 +5,6 @@ import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 
 export default function ErrorPage({ status = 500, message }) {
-    const is403 = status === 403;
-
     const content = {
         403: {
             icon: <ShieldAlert size={32} className="text-orange-600" />,

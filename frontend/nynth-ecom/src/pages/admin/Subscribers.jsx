@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSubscribers, getAllOrders } from "../../api/firebaseFunctions";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import {
  Users,
  Mail,
@@ -17,8 +15,6 @@ import { Button } from "../../components/ui/button";
 import toast from "react-hot-toast";
 
 const Subscribers = () => {
- const { currentUser, logout } = useAuth();
- const navigate = useNavigate();
  const [subscribers, setSubscribers] = useState([]);
  const [filteredSubscribers, setFilteredSubscribers] = useState([]);
  const [loading, setLoading] = useState(true);

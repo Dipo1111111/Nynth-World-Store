@@ -176,7 +176,7 @@ const Checkout = () => {
         });
         setDiscountError("");
       }
-    } catch (err) {
+    } catch {
       setDiscountError("Failed to validate code");
     }
     setDiscountLoading(false);

@@ -13,11 +13,6 @@ export function AuthProvider({ children }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminLoading, setIsAdminLoading] = useState(false);
 
-  const isAdminEmail = (email) => {
-    const list = (import.meta.env.VITE_ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
-    return list.includes(String(email).toLowerCase());
-  };
-
    async function ensureProfile(user) {
      const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
      const isAdmin = adminEmails.includes(String(user.email).toLowerCase());

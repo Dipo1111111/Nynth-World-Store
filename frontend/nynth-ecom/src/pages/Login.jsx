@@ -24,6 +24,7 @@ export default function Login() {
         if (currentUser && !authLoading) {
             navigate(getRedirectTarget(), { replace: true });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser, authLoading, navigate, location]);
 
     if (currentUser) {

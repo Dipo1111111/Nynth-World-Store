@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { subscribeOrders, getAllOrders, updateOrderPaymentStatus } from "../../api/firebaseFunctions";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
  LayoutDashboard,
  Package,
@@ -82,13 +81,10 @@ const PaymentStatusDropdown = ({ status, onStatusChange }) => {
 };
 
 const Orders = () => {
- const { currentUser, logout } = useAuth();
- const navigate = useNavigate();
  const [orders, setOrders] = useState([]);
  const [filteredOrders, setFilteredOrders] = useState([]);
  const [loading, setLoading] = useState(true);
  const [expandedOrders, setExpandedOrders] = useState(new Set());
- const [sidebarOpen, setSidebarOpen] = useState(false);
 
  // Filters
  const [searchTerm, setSearchTerm] = useState("");
@@ -191,15 +187,6 @@ const Orders = () => {
  toast.error('Failed to update payment status');
  }
  });
- };
-
- const handleLogout = async () => {
- try {
- await logout();
- navigate('/');
- } catch (error) {
- console.error('Logout error:', error);
- }
  };
 
  const downloadCSV = () => {
