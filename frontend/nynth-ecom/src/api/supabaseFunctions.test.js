@@ -1,0 +1,211 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+// Controllable fake for the Supabase client. `record` captures every call so
+// tests can assert exact payloads, and whether insert accidentally selects
+// (the guest RLS bug from checkout: insert + .select("id") failed for guests).
+const h = vi.hoisted(() => {
+  const record = [];
+  let queryResult = { data: null, error: null };
+  let invokeResult = { data: null, error: null };
+  let authUser = null;
+
+  const buildChain = () => {
+    const q = {
+      then: (res, rej) => Promise.resolve(queryResult).then(res, rej),
+      catch: (rej) => Promise.resolve(queryResult).catch(rej),
+      finally: (cb) => Promise.resolve(queryResult).finally(cb),
+    };
+    ["select", "order", "eq", "in", "ilike", "contains", "limit", "maybeSingle", "single"].forEach((m) => {
+      q[m] = (...args) => { record.push({ method: m, args }); return q; };
+    });
+    ["insert", "update", "upsert", "delete"].forEach((m) => {
+      q[m] = (...args) => { record.push({ method: m, args }); return q; };
+    });
+    return q;
+  };
+
+  return {
+    supabase: {
+      from: vi.fn((table) => { record.push({ method: "from", args: [table] }); return buildChain(); }),
+      auth: {
+        getUser: vi.fn(async () => ({ data: { user: authUser }, error: null })),
+      },
+      functions: {
+        invoke: vi.fn(async (_name, opts) => invokeResult),
+      },
+      channel: vi.fn(() => ({ on: vi.fn(() => ({ subscribe: vi.fn() })) })),
+      removeChannel: vi.fn(),
+      rpc: vi.fn(),
+    },
+    record,
+    setQuery: (result) => { queryResult = result; },
+    setInvoke: (result) => { invokeResult = result; },
+    setAuthUser: (user) => { authUser = user; },
+    reset: () => {
+      record.length = 0;
+      queryResult = { data: null, error: null };
+      invokeResult = { data: null, error: null };
+      authUser = null;
+    },
+  };
+});
+
+vi.mock("./supabase", () => ({ supabase: h.supabase }));
+vi.mock("./cloudinary", () => ({
+  uploadImageToCloudinary: vi.fn(),
+  uploadMultipleImagesToCloudinary: vi.fn(),
+}));
+
+import {
+  addOrder,
+  fetchProducts,
+  fetchOrder,
+  getAllOrders,
+  validateDiscountCode,
+  initializePayment,
+  verifyOrderPayment,
+} from "./supabaseFunctions";
+
+beforeEach(() => h.reset());
+
+describe("finalNumber guard (checkout NaN-total bug)", () => {
+  it("inserts wallet-safe numbers into the orders table", async () => {
+    h.setInvoke({ data: null, error: null });
+    h.setAuthUser(null);
+    await addOrder({
+      userId: null,
+      customer: { email: "a@b.com" },
+      items: [],
+      subtotal: NaN,
+      shippingFee: undefined,
+      discountAmount: Number("not-a-number"),
+      total: NaN,
+    });
+
+    const insert = h.record.find((c) => c.method === "insert");
+    const payload = insert.args[0];
+    expect(payload.subtotal).toBe(0);
+    expect(payload.shipping_fee).toBe(0);
+    expect(payload.discount_amount).toBe(0);
+    expect(payload.total).toBe(0);
+  });
+
+  it("inserts with NO .select() so guests pass RLS (checkout 400 bug)", async () => {
+    h.setInvoke({ data: null, error: null });
+    h.setAuthUser(null);
+    await addOrder({ items: [], total: 100 });
+
+    const ops = h.record.map((c) => c.method);
+    expect(ops).toContain("insert");
+    expect(ops).not.toContain("select");
+  });
+
+  it("uses the provided order id and maps user_id for a guest to null", async () => {
+    h.setInvoke({ data: null, error: null });
+    h.setAuthUser(null);
+    const id = await addOrder({ id: "fixed-id", items: [], total: 100 });
+
+    expect(id).toBe("fixed-id");
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.user_id).toBeNull();
+    expect(payload.payment_status).toBe("pending");
+    expect(payload.order_status).toBe("pending");
+  });
+
+  it("falls back to the signed-in user id when no order.userId", async () => {
+    h.setInvoke({ data: null, error: null });
+    h.setAuthUser({ id: "user-123" });
+    await addOrder({ items: [], total: 100 });
+
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.user_id).toBe("user-123");
+  });
+});
+
+describe("rowToProduct (stale data snapshot bug)", () => {
+  it("lets the column override a stale snapshot inside data", async () => {
+    h.setQuery({ data: [{ id: "p1", is_public: true, best_seller: false, stock_quantity: 3, display_order: 4, data: { isPublic: false, bestSeller: true } }], error: null });
+    const [p] = await fetchProducts();
+    expect(p.isPublic).toBe(true);
+    expect(p.bestSeller).toBe(false);
+    expect(p.inStock).toBe(true);
+    expect(p.stockQuantity).toBe(3);
+    expect(p.displayOrder).toBe(4);
+  });
+
+  it("filters hidden products out of the public listing", async () => {
+    h.setQuery({ data: [{ id: "hidden", is_public: false, stock_quantity: 1, data: {} }, { id: "shown", is_public: true, stock_quantity: 1, data: {} }], error: null });
+    const list = await fetchProducts();
+    expect(list.map((p) => p.id)).toEqual(["shown"]);
+  });
+});
+
+describe("rowToOrder", () => {
+  it("reads money fields as numbers and maps firebase-style aliases", async () => {
+    h.setQuery({ data: [{ id: "o1", user_id: null, customer: {}, items: [], tickets: [], subtotal: "1500", shipping_fee: "2500", discount_amount: null, discount_code: null, total: "4000", payment_status: "pending", order_status: "pending", payment_reference: null, paid_at: null }], error: null });
+    const [o] = await getAllOrders();
+    expect(o.subtotal).toBe(1500);
+    expect(o.shippingFee).toBe(2500);
+    expect(o.shipping_fee).toBe(2500);
+    expect(o.total).toBe(4000);
+  });
+
+  it("returns an empty object for a missing order", async () => {
+    h.setQuery({ data: null, error: null });
+    const o = await fetchOrder("missing");
+    expect(o).toBeNull();
+  });
+});
+
+describe("validateDiscountCode (NaN discount bug)", () => {
+  it("returns discountType/discountValue for a percentage code", async () => {
+    h.setQuery({ data: { code: "SAVE10", active: true, percent_off: 10, amount_off: null, expires_at: null }, error: null });
+    const r = await validateDiscountCode(" save10 ");
+    expect(r.valid).toBe(true);
+    expect(r.discountType).toBe("percentage");
+    expect(r.discountValue).toBe(10);
+  });
+
+  it("returns discountType fixed for an amount-off code", async () => {
+    h.setQuery({ data: { code: "NGN500", active: true, percent_off: null, amount_off: 500, expires_at: null }, error: null });
+    const r = await validateDiscountCode("NGN500");
+    expect(r.valid).toBe(true);
+    expect(r.discountType).toBe("fixed");
+    expect(r.discountValue).toBe(500);
+  });
+
+  it("labels inactive/invalid codes", async () => {
+    h.setQuery({ data: null, error: null });
+    const r = await validateDiscountCode("NOPE");
+    expect(r.valid).toBe(false);
+    expect(r.error).toBeTruthy();
+  });
+
+  it("labels expired codes", async () => {
+    h.setQuery({ data: { code: "OLDPASS", active: true, percent_off: 5, expires_at: new Date(Date.now() - 86400000).toISOString() }, error: null });
+    const r = await validateDiscountCode("OLDPASS");
+    expect(r.valid).toBe(false);
+    expect(r.reason).toBe("expired");
+  });
+});
+
+describe("payment edge function calls", () => {
+  it("initializePayment invokes the initialize-payment function with the body", async () => {
+    h.setInvoke({ data: { authorization_url: "https://checkout.paystack.com/x", reference: "R1" }, error: null });
+    const out = await initializePayment({ amount: 100, email: "a@b.com", metadata: { orderId: "o1" } });
+    expect(h.supabase.functions.invoke).toHaveBeenCalledWith("initialize-payment", { body: { amount: 100, email: "a@b.com", metadata: { orderId: "o1" } } });
+    expect(out.authorization_url).toContain("checkout.paystack.com");
+  });
+
+  it("initializePayment throws when the edge function errors", async () => {
+    h.setInvoke({ data: null, error: new Error("boom") });
+    await expect(initializePayment({ amount: 100, email: "a@b.com" })).rejects.toThrow("boom");
+  });
+
+  it("verifyOrderPayment sends the reference to paystack-verify", async () => {
+    h.setInvoke({ data: { success: true, orderId: "o1", alreadyPaid: false }, error: null });
+    const out = await verifyOrderPayment("o1", "REF1");
+    expect(h.supabase.functions.invoke).toHaveBeenCalledWith("paystack-verify", { body: { reference: "REF1" } });
+    expect(out.success).toBe(true);
+  });
+});

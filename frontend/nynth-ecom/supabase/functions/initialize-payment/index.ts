@@ -1,11 +1,11 @@
 // initialize-payment — min 100 NGN, returns authorization_url + reference.
-const corsHeaders = {
+export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
 };
 
-Deno.serve(async (req) => {
+export async function handler(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const { amount, email, metadata } = await req.json().catch(() => ({}));
   if (!amount || !email) return Response.json({ error: "amount + email required" }, { status: 400, headers: corsHeaders });
@@ -16,4 +16,6 @@ Deno.serve(async (req) => {
   const body = await res.json();
   if (!body.status) return Response.json({ error: body.message ?? "init failed" }, { status: 400, headers: corsHeaders });
   return Response.json({ authorization_url: body.data.authorization_url, reference: body.data.reference }, { headers: corsHeaders });
-});
+}
+
+if (import.meta.main) Deno.serve(handler);

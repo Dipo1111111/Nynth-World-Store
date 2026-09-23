@@ -37,7 +37,7 @@ async function sendResend(to: string, subject: string, html: string) {
   return res.json();
 }
 
-Deno.serve(async (req) => {
+export async function handler(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const { reference } = await req.json().catch(() => ({}));
   if (!reference) return Response.json({ error: "reference required" }, { status: 400, headers: corsHeaders });
@@ -67,4 +67,6 @@ Deno.serve(async (req) => {
     }
     return Response.json({ success: true, orderId, alreadyPaid: false }, { headers: corsHeaders });
   } catch (e) { console.error(e); return Response.json({ error: "Transaction failed" }, { status: 500, headers: corsHeaders }); }
-});
+}
+
+if (import.meta.main) Deno.serve(handler);
