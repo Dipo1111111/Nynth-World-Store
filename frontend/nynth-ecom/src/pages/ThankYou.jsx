@@ -7,7 +7,8 @@ import { useCart } from "../context/CartContext";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import ProductCard from "../components/products/ProductCard";
-import { fetchOrder, fetchProducts } from "../api/firebaseFunctions";
+import { fetchOrder, fetchProducts, verifyOrderPayment } from "../api/firebaseFunctions";
+import { trackConversion } from "../utils/monitoring";
 import { isTicketItem, ticketCount } from "../utils/tickets";
 
 const REDIRECT_SECONDS = 8;
@@ -28,6 +29,22 @@ const ThankYou = () => {
 
   const [order, setOrder] = useState(null);
   const [merch, setMerch] = useState([]);
+  const finalized = useRef(false);
+
+  // Finalize the order server-side (idempotent: webhook/popup may have done it
+  // already) so guests landing here from the Paystack redirect still get their
+  // order marked paid, tickets minted and confirmation email queued.
+  useEffect(() => {
+    if (!reference || finalized.current) return;
+    finalized.current = true;
+    verifyOrderPayment(orderId, reference)
+      .then((res) => {
+        if (!res?.alreadyPaid) {
+          trackConversion("purchase", { order_id: orderId, reference });
+        }
+      })
+      .catch((err) => console.error("Finalization check failed:", err));
+  }, [reference, orderId]);
 
   const orderHasTickets = order?.items?.some((i) => isTicketItem(i)) || false;
   const orderTicketCount = order ? ticketCount(order.items) : 0;

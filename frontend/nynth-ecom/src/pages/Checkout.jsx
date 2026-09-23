@@ -2,14 +2,13 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { addOrder, verifyOrderPayment, fetchOrder, validateDiscountCode } from "../api/firebaseFunctions";
+import { addOrder, initializePayment, validateDiscountCode } from "../api/firebaseFunctions";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { ArrowLeft, Lock, CreditCard, Ticket } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
-import { trackConversion } from "../utils/monitoring";
 
 import Logo from "../components/common/Logo";
 import { effectiveLagosRates, effectiveAbujaRates, effectiveInterstateRates } from "../utils/shippingRates";
@@ -17,7 +16,7 @@ import { hasTickets, hasPhysicalItems, isTicketItem, ticketCount, nonTicketSubto
 
 const Checkout = () => {
   const { settings } = useSettings();
-  const { cartItems, totalAmount, clearCart } = useCart();
+  const { cartItems, totalAmount } = useCart();
   const { currentUser, isAdmin } = useAuth(); // Get current user and admin status
   const navigate = useNavigate();
 
@@ -89,22 +88,7 @@ const Checkout = () => {
     }
   }, [currentUser]);
 
-  const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [isOrderCompleted, setIsOrderCompleted] = useState(false); // New state to prevent redirect loop
-
-  // Check if Paystack script has loaded
-  useEffect(() => {
-    const checkPaystack = () => {
-      if (window.PaystackPop) {
-        setPaystackLoaded(true);
-      } else {
-        // Retry until script loads
-        const timer = setTimeout(checkPaystack, 500);
-        return () => clearTimeout(timer);
-      }
-    };
-    checkPaystack();
-  }, []);
 
   // Redirect if cart is empty, ONLY if order is not completed
   useEffect(() => {
@@ -204,65 +188,35 @@ const Checkout = () => {
     setDiscountError("");
   };
 
-  const payWithPaystack = (orderId, totalToPay) => {
-    const handler = window.PaystackPop.setup({
-      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-      email: form.email,
-      amount: Math.round(totalToPay * 100), // convert to kobo
-      metadata: {
-        orderId,
-        customerName: `${form.firstName} ${form.lastName}`,
-        items: cartItems.map(item => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          size: item.size,
-          color: item.color,
-          category: item.category
-        })),
-      },
-      onClose: () => {
-        setLoading(false);
-        // Poll the order briefly: user may have paid then closed the popup.
-        // The webhook (or Paystack redirect) will have marked it paid - give
-        // it a few seconds to arrive and land the customer on the ThankYou page.
-        const MAX_ATTEMPTS = 6;
-        let attempt = 0;
-        const poll = async () => {
-          attempt++;
-          const doc = await fetchOrder(orderId);
-          if (doc && (doc.payment_status === "paid" || doc.payment_status === "success")) {
-            clearCart();
-            navigate(`/thank-you?ref=${doc.payment_reference || ""}&orderId=${orderId}`);
-            return;
-          }
-          if (attempt < MAX_ATTEMPTS) setTimeout(poll, 2000);
-        };
-        poll().catch(() => {});
-        toast.error("Payment window closed. If you completed payment, your order is being confirmed - check your email shortly.");
-      },
-      onSuccess: function (response) {
-        setIsOrderCompleted(true);
-        // Mark order as PAID in Firestore
-        verifyOrderPayment(orderId, response.reference)
-          .then(() => {
-            trackConversion("purchase", {
-              order_id: orderId,
-              amount: totalToPay,
-              reference: response.reference
-            });
-            clearCart();
-            navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
-          })
-          .catch((err) => {
-            console.error("Payment verification error:", err);
-            clearCart();
-            navigate(`/thank-you?ref=${response.reference}&orderId=${orderId}`);
-          });
-      }
-    });
-
-    handler.openIframe();
+  const payWithPaystack = async (orderId, totalToPay) => {
+    // Hosted payment page: Paystack redirects the browser back to /thank-you
+    // (with trxref + orderId) once payment completes — no popup callback to break.
+    setLoading(true);
+    try {
+      const { authorization_url } = await initializePayment({
+        amount: Math.round(totalToPay),
+        email: form.email,
+        metadata: {
+          orderId,
+          customerName: `${form.firstName} ${form.lastName}`,
+          items: cartItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+            category: item.category
+          })),
+        },
+      });
+      if (!authorization_url) throw new Error("No authorization URL returned");
+      setIsOrderCompleted(true);
+      window.location.href = authorization_url;
+    } catch (err) {
+      console.error("Payment initialization error:", err);
+      setLoading(false);
+      toast.error("Could not open payment page. Please try again.");
+    }
   };
 
   const handleCheckout = async (e) => {
@@ -362,8 +316,8 @@ const Checkout = () => {
         return;
       }
 
-      // Open Paystack popup
-      payWithPaystack(orderId, grandTotal);
+      // Send customer to Paystack's hosted payment page
+      await payWithPaystack(orderId, grandTotal);
 
     } catch (error) {
       console.error("Checkout error:", error);
@@ -607,7 +561,7 @@ const Checkout = () => {
             <div className="pt-12">
               <button
                 type="submit"
-                disabled={loading || !paystackLoaded}
+                disabled={loading}
                 className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-4"
               >
                 {loading ? (
