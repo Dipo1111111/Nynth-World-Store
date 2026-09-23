@@ -376,7 +376,7 @@ const Orders = () => {
                                 <option key={m} value={m}>{getMonthName(m)}</option>
                             ))}
                         </select>
-                        <Button variant="outline" className="gap-2 shrink-0" onClick={downloadCSV}>
+                        <Button variant="outline" className="gap-2 shrink-0 h-9" onClick={downloadCSV}>
                             <Download size={15} />
                             <span className="hidden sm:inline">Export CSV</span>
                         </Button>
@@ -455,14 +455,14 @@ const Orders = () => {
                                             <div className="flex items-center gap-2 min-w-0 flex-1">
                                                 <button
                                                     onClick={() => toggleOrderExpansion(order.id)}
-                                                    className="w-8 h-8 rounded-lg bg-white/[0.09] flex items-center justify-center text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors shrink-0"
+                                                    className="w-11 h-11 rounded-lg bg-white/[0.09] flex items-center justify-center text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors shrink-0"
                                                     aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                 >
-                                                    {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                                    {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                                 </button>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
+                                                        <span className="font-mono text-xs font-medium tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
                                                         {order.isTest && <TestBadge />}
                                                         {order.items?.some(i => i.category === "tickets") && <ETicketBadge />}
                                                     </div>
@@ -476,7 +476,7 @@ const Orders = () => {
                                             </div>
                                             <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
                                                 <span className="font-bold text-sm leading-none mt-1 tabular-nums">₦{order.total?.toLocaleString()}</span>
-                                                <div className="scale-[0.8] origin-right -mr-2">
+                                                <div className="[&_button]:h-8 [&_button]:min-w-0 [&_button]:px-3 [&_button]:text-[11px] flex justify-end">
                                                     <StatusDropdown
                                                         orderId={order.id}
                                                         currentStatus={order.order_status || 'pending'}
@@ -503,8 +503,8 @@ const Orders = () => {
                                                                         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                     </div>
                                                                     <div className="flex-1 min-w-0">
-                                                                        <p className="font-bold text-[11px] truncate uppercase">{item.name || item.title}</p>
-                                                                        <p className="text-[9px] text-[#EDEAE2]/55 mt-1 uppercase tracking-widest font-bold">
+                                                                        <p className="font-medium text-xs text-[#EDEAE2]/90 truncate">{item.name || item.title}</p>
+                                                                        <p className="text-[10px] text-[#EDEAE2]/55 mt-1">
                                                                             {item.category === "tickets" ? (
                                                                                 <span className="inline-flex items-center gap-1">
                                                                                     <Ticket size={10} className="shrink-0" />
@@ -517,7 +517,7 @@ const Orders = () => {
                                                                         <p className="text-[10px] text-[#EDEAE2]/55 font-medium mt-1">Qty: {item.quantity}</p>
                                                                     </div>
                                                                     <div className="text-right pt-1 flex flex-col justify-between">
-                                                                        <p className="font-bold text-xs tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                                                        <p className="font-medium text-sm tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
                                                             ))}
@@ -525,7 +525,7 @@ const Orders = () => {
 
                                                         {order.tickets?.length > 0 && (
                                                             <div className="mt-3 pt-3 border-t border-white/10">
-                                                                <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                                                <h4 className={SECTION_LABEL}>
                                                                     <Ticket size={14} />
                                                                     E-Ticket Codes
                                                                 </h4>
@@ -544,7 +544,7 @@ const Orders = () => {
                                                     {/* Contact & Shipping */}
                                                     <div className="space-y-5">
                                                         <div>
-                                                            <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                                            <h4 className={SECTION_LABEL}>
                                                                 <MapPin size={14} /> Shipping
                                                             </h4>
                                                             <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-2">
@@ -559,7 +559,7 @@ const Orders = () => {
                                                         </div>
 
                                                         <div>
-                                                            <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
+                                                            <h4 className={SECTION_LABEL}>
                                                                 <CreditCard size={14} /> Payment
                                                             </h4>
                                                             <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 flex items-center justify-between">
@@ -573,17 +573,17 @@ const Orders = () => {
 
                                                         {/* Order Summary */}
                                                         <div>
-                                                            <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
+                                                            <h4 className={SECTION_LABEL}>
                                                                 <TrendingUp size={14} /> Summary
                                                             </h4>
                                                             <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-3">
                                                                 <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
                                                                     <span>Subtotal</span>
-                                                                    <span className="text-right tabular-nums">₦{order.subtotal?.toLocaleString()}</span>
+                                                                    <span className="text-right tabular-nums font-medium">₦{order.subtotal?.toLocaleString()}</span>
                                                                 </div>
                                                                 <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
                                                                     <span>Shipping</span>
-                                                                    <span className="text-right tabular-nums">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                    <span className="text-right tabular-nums font-medium">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
                                                                 </div>
                                                                 <div className="flex justify-between items-baseline font-bold pt-3 border-t border-white/14">
                                                                     <span className="text-[11px] uppercase tracking-widest">Total</span>
@@ -623,7 +623,7 @@ const Orders = () => {
                                                     <td className="px-4 md:px-6 py-4">
                                                         <button
                                                             onClick={() => toggleOrderExpansion(order.id)}
-                                                            className="text-[#EDEAE2]/42 hover:text-[#EDEAE2]/65 transition-colors"
+                                                            className="text-[#EDEAE2]/42 hover:text-[#EDEAE2]/65 transition-colors p-2 -m-2"
                                                             aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                         >
                                                             {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
@@ -678,7 +678,7 @@ const Orders = () => {
                                                                     <div className="space-y-3">
                                                                         {order.items?.map((item, idx) => (
                                                                             <div key={idx} className="flex gap-4 p-3 bg-[#0a0a0a] rounded-lg border border-white/10">
-                                                                                <div className="w-16 h-20 bg-white/[0.07] rounded overflow-hidden flex-shrink-0">
+                                                                                <div className="w-16 h-20 bg-[#0a0a0a] rounded overflow-hidden flex-shrink-0 border border-white/10">
                                                                                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                                 </div>
                                                                                 <div className="flex-1 min-w-0">
