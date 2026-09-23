@@ -210,7 +210,7 @@ const AdminDashboard = () => {
         const productMap = {};
         currentPaid.forEach(o => {
             o.items?.forEach(item => {
-                if (!productMap[item.id]) productMap[item.id] = { title: item.title || item.name || 'Item', quantity: 0, revenue: 0 };
+                if (!productMap[item.id]) productMap[item.id] = { title: item.title || item.name || 'Item', quantity: 0, revenue: 0, image: item.image || item.thumbnail };
                 productMap[item.id].quantity += (item.quantity || 1);
                 productMap[item.id].revenue += ((item.price || 0) * (item.quantity || 1));
             });
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
         datasets: [{
             data: statusLabels.length ? Object.keys(dashboardData.statusBreakdown).map(s => dashboardData.statusBreakdown[s]) : [1],
             backgroundColor: statusLabels.length ? Object.keys(dashboardData.statusBreakdown).map(s => ADMIN_STATUS_COLORS[s] || '#9ca3af') : ['#e5e7eb'],
-            borderWidth: 3, borderColor: 'oklch(1 0 0)', borderRadius: 6, spacing: 2, hoverOffset: 4,
+            borderWidth: 0, borderColor: 'transparent', borderRadius: 6, spacing: 2, hoverOffset: 4,
         }],
     };
     const donutOpts = { ...doughnutOptions, cutout: '72%' };
