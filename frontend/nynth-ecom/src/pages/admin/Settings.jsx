@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import headerBanner from "../../assets/header.JPEG";
@@ -107,8 +107,17 @@ export default function AdminSettings() {
  const [isMerging, setIsMerging] = useState(false);
  // Snapshot of the last persisted state. Any difference from `settings` is
  // an unsaved change that has not been published to the storefront.
- const [savedSnapshot, setSavedSnapshot] = useState(null);
- const isDirty = savedSnapshot !== null && JSON.stringify(settings) !== JSON.stringify(savedSnapshot);
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
+  const isDirty = savedSnapshot !== null && JSON.stringify(settings) !== JSON.stringify(savedSnapshot);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Back-to-top pill for the long settings page.
+  useEffect(() => {
+  const onScroll = () => setShowBackToTop(window.scrollY > 600);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
  // Warn before the admin navigates away with unsaved changes.
  useEffect(() => {
@@ -240,11 +249,8 @@ export default function AdminSettings() {
  return (
  <AdminLayout title="Settings">
   <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
-  <header className="flex flex-wrap items-end justify-between gap-3">
-  <div>
-  <h1 className="text-3xl md:text-4xl font-extrabold tracking-[-0.02em] text-[#EDEAE2]">Settings</h1>
-  <p className="text-sm text-[#EDEAE2]/55 mt-1">Storefront configuration. Changes stay staged until you save.</p>
-  </div>
+  <header className="flex flex-wrap items-center justify-between gap-3">
+  <p className="text-sm text-[#EDEAE2]/55">Storefront configuration. Changes stay staged until you save.</p>
   {isDirty && (
   <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-200">
   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
@@ -327,7 +333,7 @@ export default function AdminSettings() {
  Control the content and access for the pre-launch/maintenance page.
  </p>
  
- <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Lock Page</h4>
  <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
@@ -345,7 +351,7 @@ export default function AdminSettings() {
  </div>
 
  {/* Timer Toggle */}
- <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Countdown Timer</h4>
  <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
@@ -671,7 +677,7 @@ export default function AdminSettings() {
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
  </p>
 
- <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Free Delivery Discount</h4>
  <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
@@ -889,7 +895,7 @@ export default function AdminSettings() {
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
  </p>
 
- <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Announcement Bar</h4>
  <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
@@ -928,7 +934,7 @@ export default function AdminSettings() {
  A scrolling banner that appears above the hero image on Shop and Home pages.
  </p>
 
- <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Marquee</h4>
  <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
@@ -987,7 +993,7 @@ export default function AdminSettings() {
   <div id="set-content" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-6">
- <div className="flex items-center justify-between p-4 bg-white/[0.05] rounded-lg border border-white/10">
+  <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10">
  <div>
  <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Enable Size Chart</h4>
  <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
@@ -1310,9 +1316,21 @@ export default function AdminSettings() {
  {saving ? "Saving Changes..." : "Save All Settings"}
  </button>
  </div>
- </form>
+  </form>
 
- {/* Sticky save bar - appears whenever there are unsaved changes */}
+  {/* Back to top */}
+  {showBackToTop && (
+  <button
+  type="button"
+  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+  aria-label="Back to top"
+  className={`fixed right-4 md:right-6 z-40 w-11 h-11 rounded-full bg-[#EDEAE2] text-[#0d0d0f] flex items-center justify-center shadow-card hover:opacity-90 transition-all focus-ring ${isDirty ? "bottom-20" : "bottom-6"}`}
+  >
+  <ArrowUp size={18} />
+  </button>
+  )}
+
+  {/* Sticky save bar - appears whenever there are unsaved changes */}
  {isDirty && (
   <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur">
  <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">

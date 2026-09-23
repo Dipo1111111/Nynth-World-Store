@@ -1,5 +1,4 @@
 import React from "react";
-import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 
 // A chunk that dies with a module/MIME/network error after a redeploy means
 // the user's app shell is older than the live bundle. A hard refresh is the
@@ -28,36 +27,47 @@ class ErrorBoundary extends React.Component {
         });
     }
 
+    handleRetry = () => {
+        this.setState({ hasError: false, error: null });
+    };
+
     render() {
         if (this.state.hasError) {
             const stale = isStaleChunkError(this.state.error);
             return (
-                <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-                    <div className="w-16 h-16 bg-red-50 text-red-600 flex items-center justify-center mb-6">
-                        <AlertTriangle size={32} />
-                    </div>
-                    <h1 className="text-[11px] tracking-[0.3em] font-bold uppercase mb-4">
-                        {stale ? "NEW VERSION AVAILABLE" : "SOMETHING WENT WRONG"}
-                    </h1>
-                    <p className="text-[10px] tracking-[0.15em] text-gray-400 max-w-md mb-8 uppercase leading-relaxed">
-                        {stale
-                            ? "An update just went live and your cached version can no longer load it. Don't worry — your cart is safe. Refresh to get the latest build."
-                            : "We encountered an unexpected error. Don't worry, your cart is safe. Try refreshing the page or head back home."}
+                <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center p-6 text-center">
+                    <p className="text-[11px] tracking-[0.3em] font-bold uppercase text-black/40 mb-3">
+                        {stale ? "Update available" : "Something broke"}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                            onClick={() => window.location.reload()}
-                            className={`flex items-center justify-center gap-2 px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase transition-all hover:opacity-90 ${stale ? "bg-emerald-500 text-white" : "bg-black text-white"}`}
-                        >
-                            <RefreshCw size={14} />
-                            {stale ? "Load Latest Version" : "Refresh Page"}
-                        </button>
+                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight mb-4 max-w-md">
+                        {stale ? "A new version is live." : "This page crashed."}
+                    </h1>
+                    <p className="text-sm text-black/60 max-w-sm mb-8 leading-relaxed">
+                        {stale
+                            ? "Your cached version can't load the latest build. Refresh to update — your cart is safe."
+                            : "An unexpected error stopped this page. Your cart is safe — try again or head home."}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        {stale ? (
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-all"
+                            >
+                                Refresh to update
+                            </button>
+                        ) : (
+                            <button
+                                onClick={this.handleRetry}
+                                className="bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-all"
+                            >
+                                Try again
+                            </button>
+                        )}
                         <a
                             href="/"
-                            className="flex items-center justify-center gap-2 border border-black/10 px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black hover:text-white transition-all"
+                            className="text-[10px] tracking-[0.3em] font-bold uppercase text-black/60 hover:text-black transition-colors underline underline-offset-8 decoration-black/20"
                         >
-                            <Home size={14} />
-                            Go Home
+                            Back to home
                         </a>
                     </div>
                 </div>

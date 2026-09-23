@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import SEO from "../components/SEO";
-import { Home, Search } from "lucide-react";
 
 export default function NotFound() {
     return (
@@ -16,26 +15,24 @@ export default function NotFound() {
 
             <main className="flex-1 flex items-center justify-center section-pad">
                 <div className="text-center max-w-lg">
-                    <h1 className="text-[11px] tracking-[0.3em] font-bold uppercase mb-4">404</h1>
-                    <h2 className="text-[11px] tracking-[0.3em] font-bold uppercase mb-4">PAGE NOT FOUND</h2>
-                    <p className="text-[10px] tracking-[0.15em] text-gray-400 mb-8 uppercase">
-                        The page you're looking for doesn't exist or has been moved.
+                    <p className="text-[11px] tracking-[0.3em] font-bold uppercase text-black/40 mb-3">Error 404</p>
+                    <h1 className="text-7xl md:text-8xl font-extrabold tracking-[-0.04em] leading-none mb-4">404</h1>
+                    <p className="text-sm text-black/60 max-w-sm mx-auto mb-8 leading-relaxed">
+                        This page doesn't exist or was moved. The shop is still open — let's get you back to it.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <Link
                             to="/"
-                            className="bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                            className="bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 transition-all"
                         >
-                            <Home size={14} />
-                            BACK TO SHOP
+                            Back to shop
                         </Link>
                         <Link
                             to="/shop"
-                            className="border border-black/10 px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black hover:text-white transition-all flex items-center justify-center gap-2"
+                            className="text-[10px] tracking-[0.3em] font-bold uppercase text-black/60 hover:text-black transition-colors underline underline-offset-8 decoration-black/20"
                         >
-                            <Search size={14} />
-                            BROWSE SHOP
+                            Browse all products
                         </Link>
                     </div>
                 </div>
