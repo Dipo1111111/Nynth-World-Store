@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
 import {
  fetchProducts,
@@ -550,8 +551,8 @@ export default function AdminProducts() {
  )}
  </div>
 
- {/* Modal */}
- {isModalOpen && (
+ {/* Modal - portaled to document.body so no layout ancestor can offset it */}
+ {isModalOpen && createPortal(
 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
 <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-white/10 my-auto">
  <div className="flex justify-between items-center mb-6">
@@ -997,10 +998,11 @@ export default function AdminProducts() {
  {editingId ? "Save Changes" : "Create Product"}
  </button>
  </div>
- </form>
- </div>
- </div>
- )}
- </AdminLayout>
+  </form>
+  </div>
+  </div>,
+  document.body
+  )}
+  </AdminLayout>
  );
 }
