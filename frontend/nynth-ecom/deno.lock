@@ -1,0 +1,88 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/assert@*": "1.0.19",
+    "jsr:@std/internal@^1.0.12": "1.0.14"
+  },
+  "jsr": {
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
+    }
+  },
+  "redirects": {
+    "https://esm.sh/@supabase/supabase-js@2": "https://esm.sh/@supabase/supabase-js@2.117.0",
+    "https://esm.sh/iceberg-js@^0.8.1?target=denonext": "https://esm.sh/iceberg-js@0.8.1?target=denonext"
+  },
+  "remote": {
+    "https://esm.sh/@supabase/auth-js@2.117.0/denonext/auth-js.mjs": "729ce9ead69e0ef44a09bb068daa3900cea1ae0135ba451b12cda87fa20d3f5a",
+    "https://esm.sh/@supabase/functions-js@2.117.0/denonext/functions-js.mjs": "2191e601c9183afd6e22e9db0300af988679533dd0ce1737244395f9f58a2e34",
+    "https://esm.sh/@supabase/phoenix@0.4.5/denonext/phoenix.mjs": "40bd2a70829cd847848baac58e635bacd83fd62188f6624b44e2c295341004eb",
+    "https://esm.sh/@supabase/postgrest-js@2.117.0/denonext/postgrest-js.mjs": "c335a979f2ea7ee306b99c8f51b7fed0e822a532c5faf358e6165341166d613d",
+    "https://esm.sh/@supabase/realtime-js@2.117.0/denonext/realtime-js.mjs": "35c4a228519d02d8588ed53968d7723df65792a8071e0e36c93fc587fe009cb7",
+    "https://esm.sh/@supabase/storage-js@2.117.0/denonext/storage-js.mjs": "c61b2100732f1865470546136a468c31a835ad2ecdbf9bb0bf583dc41bd0b5fb",
+    "https://esm.sh/@supabase/supabase-js@2.117.0": "52358cc08fc0a25278a2be371821c2eb1fa5c615ba76dbca43a01b2d122f0201",
+    "https://esm.sh/@supabase/supabase-js@2.117.0/denonext/dist/tracingRegistry.mjs": "ce536725dd13107702f9750d2307f05e739b9029f7c66bc48c50c0c487148e56",
+    "https://esm.sh/@supabase/supabase-js@2.117.0/denonext/supabase-js.mjs": "97457acf8f4453ecdeecd6f7f6a31a1d93532e8968364373659d6f7be3002743",
+    "https://esm.sh/iceberg-js@0.8.1/denonext/iceberg-js.mjs": "d839d81a2e3966500ca2cdd0c1cb458e9608bacfc91f7bb67a69b2e878dcdb4f",
+    "https://esm.sh/iceberg-js@0.8.1?target=denonext": "58c849d7fe2bf4eca4a84eb501e83c161a7d8c34ca1bec15a962b3bec3062633",
+    "https://esm.sh/tslib@2.8.1/denonext/tslib.mjs": "c38da5dd6da6281964435002ce204cd586634fe3bdfb24a0ee116f48cf3292e9"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@dnd-kit/core@^6.3.1",
+        "npm:@dnd-kit/sortable@10",
+        "npm:@dnd-kit/utilities@^3.2.2",
+        "npm:@eslint/js@^9.39.1",
+        "npm:@headlessui/react@^2.2.9",
+        "npm:@heroicons/react@^2.2.0",
+        "npm:@radix-ui/react-select@^2.2.6",
+        "npm:@radix-ui/react-slot@^1.2.4",
+        "npm:@sentry/browser@^10.33.0",
+        "npm:@sentry/react@^10.42.0",
+        "npm:@supabase/supabase-js@^2.116.0",
+        "npm:@tailwindcss/vite@^4.1.17",
+        "npm:@types/node@^24.10.1",
+        "npm:@types/react-dom@^19.2.3",
+        "npm:@types/react@^19.2.5",
+        "npm:@vitejs/plugin-legacy@^7.2.1",
+        "npm:@vitejs/plugin-react@^5.1.1",
+        "npm:browser-image-compression@^2.0.2",
+        "npm:canvas-confetti@^1.9.4",
+        "npm:chart.js@^4.5.1",
+        "npm:class-variance-authority@~0.7.1",
+        "npm:clsx@^2.1.1",
+        "npm:eslint-plugin-react-hooks@^7.0.1",
+        "npm:eslint-plugin-react-refresh@~0.4.24",
+        "npm:eslint@^9.39.1",
+        "npm:firebase-admin@^13.10.0",
+        "npm:firebase@^12.6.0",
+        "npm:globals@^16.5.0",
+        "npm:gsap@^3.13.0",
+        "npm:lightningcss@^1.32.0",
+        "npm:lucide-react@0.555",
+        "npm:react-chartjs-2@^5.3.1",
+        "npm:react-dom@^18.3.1",
+        "npm:react-ga4@^2.1.0",
+        "npm:react-helmet-async@^2.0.5",
+        "npm:react-hot-toast@^2.6.0",
+        "npm:react-paystack@6",
+        "npm:react-router-dom@^7.9.6",
+        "npm:react@^18.3.1",
+        "npm:sharp@~0.35.3",
+        "npm:tailwind-merge@^3.4.0",
+        "npm:tailwindcss@^4.1.17",
+        "npm:terser@^5.46.1",
+        "npm:tw-animate-css@^1.4.0",
+        "npm:vite@^7.2.4",
+        "npm:vitest@^5.0.1"
+      ]
+    }
+  }
+}
