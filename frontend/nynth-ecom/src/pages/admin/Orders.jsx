@@ -370,11 +370,17 @@ const Orders = () => {
  </div>
  ) : filteredOrders.length === 0 ? (
  <Card className="border-gray-100 shadow-sm">
- <CardContent className="flex flex-col items-center justify-center py-16">
- <Package className="h-16 w-16 text-gray-300 mb-4" />
- <h3 className="text-lg font-medium mb-2">No orders found</h3>
- <p className="text-gray-500 text-sm">Try adjusting your search or filters.</p>
- </CardContent>
+<CardContent className="flex flex-col items-center justify-center py-16">
+  <Package className="h-16 w-16 text-gray-300 mb-4" />
+  <h3 className="text-lg font-medium mb-2">No orders found</h3>
+  <p className="text-gray-500 text-sm">Try adjusting your search or filters.</p>
+  {testFilter === "live" && orders.some((o) => o.isTest) && (
+  <p className="text-xs text-gray-400 mt-3 max-w-sm text-center">
+  {orders.filter((o) => o.isTest).length} TEST order{orders.filter((o) => o.isTest).length === 1 ? "" : "s"} are hidden — switch the filter to
+  <span className="text-gray-600 font-medium"> Test orders </span>or<span className="text-gray-600 font-medium"> All orders </span>to see them.
+  </p>
+  )}
+  </CardContent>
  </Card>
  ) : (
  <Card className="border-gray-100 shadow-sm">

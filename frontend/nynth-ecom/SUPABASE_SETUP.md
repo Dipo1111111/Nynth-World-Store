@@ -1,36 +1,53 @@
-# Supabase cutover — what the admin needs to give you (plain English)
+# Supabase — setup & operations (cutover complete)
 
-No code changes needed from you. Just collect these 5 things from the site owner:
+The Firebase → Supabase migration is **done**. The store runs on one Supabase project; this doc is what exists, what was deployed, and what operations remain. Local-only `.secrets/` and `.env.local` never get committed.
 
-## 1. Supabase project (owner creates it under THEIR account)
-- Owner goes to supabase.com > New project > name `nynth-world`, region `EU West (Ireland)`.
-- Then Settings > API: copy `Project URL` (= VITE_SUPABASE_URL) and `anon public key` (= VITE_SUPABASE_ANON_KEY) and `service_role secret` (= SUPABASE_SERVICE_ROLE_KEY, click Reveal).
-- Why theirs not yours: billing + ownership stays with the business. Professional.
+## The project
 
-## 2. Firebase service-account JSON (to copy old products/orders over)
-- Firebase Console > Project settings (gear) > Service accounts > Generate new private key. Sends a `.json` file.
-- Paste its contents into env var FIREBASE_SERVICE_ACCOUNT_JSON when running the migration script. One-time use.
+| | |
+|---|---|
+| Project name | `nynth-world` |
+| Ref | `cybcooychgicsnjeummo` |
+| Region | `eu-west-1` (EU West, Ireland) |
+| Project URL | `https://cybcooychgicsnjeummo.supabase.co` |
 
-## 3. Paystack keys
-- dashboard.paystack.com > Settings > API Keys: `sk_...` (secret, server) + `pk_...` (public, frontend).
-- Webhook URL to set LATER (after deploy): `https://YOUR_PROJECT_REF.supabase.co/functions/v1/paystack-webhook`.
+## Schema
 
-## 4. Resend — domains explained simply
-- You already have an API key (`re_...`). That is enough for TESTING.
-- "Domains" only matters for the FROM address: until the owner verifies `nynthworld.com` in Resend > Domains (add 3 DNS records at their domain registrar), emails can ONLY be sent from `onboarding@resend.dev` to the Resend account owner's inbox.
-- So: keep `EMAIL_FROM=NYNTH WORLD <onboarding@resend.dev>` for now. After the owner verifies the domain, switch to `sales@nynthworld.com`.
-- `ADMIN_NOTIFY_EMAIL` = owner's inbox that gets "New sale" alerts.
+`supabase/schema.sql` holds the full schema (tables + Row Level Security + helpers). It was applied once in the Supabase SQL editor at cutover. Tables: `users`, `products`, `orders`, `discount_codes`, `subscribers`, `settings`, `lookbooks`, `contact_messages`, `analytics_counters`, `presence`.
 
-## 5. Google login (optional)
-- Only if keeping "Login with Google": Google Cloud Console > APIs & Services > Credentials > OAuth client: copy Client ID + Secret. Add redirect `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback` in both Google + Supabase Auth > Providers > Google.
+- **RLS:** `products` are public-read; writes are admin-only. Stock decrement on a paid order happens server-side (Edge Function, `service_role` bypasses RLS) — there is no anon write anymore.
+- **Settings** live in the `settings` table under row `id = 'site_config'` — the admin panel edits them through `updateSettings()`. This includes `support_email`, `support_whatsapp`, `disabled_locations`, and `custom_shipping_locations`.
 
-## Files already written (local only, placeholders — nothing applied remotely)
-- `supabase/schema.sql` — run in Supabase SQL editor at cutover
-- `supabase/functions/*` — 5 Edge Functions (deploy with `supabase functions deploy`)
-- `src/api/supabase.js` + `src/api/supabaseFunctions.js` — same function names as Firebase version
-- `src/context/AuthContext.supabase.jsx` — rename to AuthContext.jsx at cutover
-- `scripts/migrate-firestore-to-supabase.mjs` — one-time data copy
-- `.env.supabase.example` — fill at cutover
+## Edge Functions
 
-## Re-auth note
-Yes — when the owner creates their own Supabase account, run `/supabase` again + `opencode mcp auth supabase` and restart. That swaps the MCP login to their project.
+Five Deno Edge Functions in `supabase/functions/`, all deployed and active on the live project:
+
+| Function | Job |
+|---|---|
+| `paystack-webhook` | Verifies `x-paystack-signature` HMAC, finalizes paid orders, mints `NWT-` ticket codes, decrements stock (idempotent), sends customer + admin emails |
+| `paystack-verify` | Same finalization path driven by the frontend after the Paystack popup returns |
+| `initialize-payment` | Creates the Paystack transaction |
+| `send-bulk-email` | Newsletter / bulk sends via Resend |
+| `get-ga4-analytics` | Reads GA4 data for the admin dashboard charts |
+
+Deploy one (or all):
+
+```bash
+supabase functions deploy paystack-webhook --project-ref cybcooychgicsnjeummo --legacy-bundle --no-verify-jwt
+```
+
+Secrets set on these functions: `PAYSTACK_SECRET_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_NOTIFY_EMAIL`, `SUPABASE_SERVICE_ROLE_KEY`.
+
+## Frontend wiring
+
+`src/api/supabase.js` builds the client from `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`. `src/api/supabaseFunctions.js` is the data layer; `src/api/firebaseFunctions.js` is a zero-churn alias (`export * from "./supabaseFunctions"`). Auth runs on Supabase Auth via `src/context/AuthContext.jsx`.
+
+Local dev: copy `.env.supabase.example` to `.env.local`, fill the `VITE_` values from the project dashboard, and use `pk_test_...` if you want Paystack test mode.
+
+## Outstanding operations (blocked on the owner)
+
+1. **Paystack production webhook** — set in Paystack dashboard → Settings → Webhooks: `https://cybcooychgicsnjeummo.supabase.co/functions/v1/paystack-webhook`. Until it's set, payments that succeed outside the Paystack popup won't be finalized.
+2. **Resend domain** — until `nynthworld.com` is verified in Resend (3 DNS records), email can only be sent from `onboarding@resend.dev` to the account owner's inbox. After verification, set `EMAIL_FROM` to `sales@nynthworld.com`.
+3. **Google login (optional)** — only if kept: add Supabase callback `https://cybcooychgicsnjeummo.supabase.co/auth/v1/callback` to Google Cloud Console, and set `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` on Supabase.
+
+Supabase MCP is connected via `https://mcp.supabase.com/mcp` for both OpenCode and Claude Code.

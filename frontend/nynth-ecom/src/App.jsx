@@ -21,7 +21,6 @@ import { useAuth } from "./context/AuthContext";
 
 
 // Public Pages - regular imports (safe, no code-splitting)
-import Home from "./pages/Home.jsx";
 import Shop from "./pages/Shop.jsx";
 import Lookbook from "./pages/Lookbook.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";

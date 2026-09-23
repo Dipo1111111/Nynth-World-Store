@@ -171,6 +171,36 @@ describe("rowToOrder", () => {
     expect(o.isTest).toBe(true);
   });
 
+  it("normalizes created_at ISO strings to firebase-style { seconds } so date/month filtering works (dashboard-zeros regression)", async () => {
+    const iso = "2026-09-23T00:34:59.007Z";
+    h.setQuery({ data: [{ id: "o5", is_test: false, items: [], tickets: [], customer: {}, created_at: iso }], error: null });
+    const [o] = await getAllOrders();
+    expect(o.created_at).not.toBeNull();
+    // Firestore-style {seconds} drops sub-second precision by design.
+    expect(o.created_at.seconds).toBe(Math.floor(new Date(iso).getTime() / 1000));
+  });
+
+  it("does not crash when created_at is missing (legacy rows render with no date, never as zero)", async () => {
+    h.setQuery({ data: [{ id: "o6", is_test: false, items: [], tickets: [], customer: {} }], error: null });
+    const [o] = await getAllOrders();
+    expect(o.created_at).toBeNull();
+    expect(o.id).toBe("o6");
+  });
+
+  it("serves test and live orders together so the admin live filter is the only split point (never hides live orders in the data layer)", async () => {
+    h.setQuery({
+      data: [
+        { id: "live-1", is_test: false, items: [], tickets: [], customer: {}, created_at: "2026-09-01T10:00:00Z" },
+        { id: "test-1", is_test: true, items: [], tickets: [], customer: {}, created_at: "2026-09-02T10:00:00Z" },
+      ],
+      error: null,
+    });
+    const list = await getAllOrders();
+    expect(list).toHaveLength(2);
+    expect(list.map((o) => o.isTest)).toEqual([false, true]);
+    expect(list.every((o) => o.created_at?.seconds)).toBe(true);
+  });
+
   it("returns an empty object for a missing order", async () => {
     h.setQuery({ data: null, error: null });
     const o = await fetchOrder("missing");

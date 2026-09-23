@@ -3,6 +3,7 @@
 **Date:** 2026-07-24
 **Pages audited:** Shop, Product Detail, Checkout, Cart, Cart Drawer, Header, Footer, ThankYou, ShippingReturns, ErrorBoundary, ErrorPage, NotFound, ForgotPassword, App
 **Scope:** Layout, structural, and consistency issues. Design system alignment.
+**Status (2026-09-23): resolved.** All 25 individual fixes shipped the same session. **S1 was subsequently built** — the mobile category filter bar exists in `src/pages/Shop.jsx` (the `md:hidden` scrollable category row). **P1** stays as-is per the founder's decision; **P2**, **H1**, **S4**, and **X1** were intentionally not built. This file is kept as a historical record.
 
 ---
 
@@ -238,12 +239,12 @@
 | E10 | ProductCard: rounded-full + shadow on quick-add | ✅ Fixed |
 | E11 | ProductDetail: rounded-full + shadow on arrows | ✅ Fixed |
 
-### LARGER FIXES (10-20 minutes each) - NEEDS DECISION
+### LARGER FIXES (10-20 minutes each)
 | ID | Issue | Status |
 |----|-------|--------|
-| S1 | Add mobile category filter bar | ⏳ Needs build - affects mobile browsing |
-| P1 | Change mobile images to object-contain | ⏳ Deferred per user request |
-| P2 | Add thumbnail selector on mobile | ⏳ Needs build - adds mobile UI |
+| S1 | Add mobile category filter bar | ✅ Built (category row in Shop.jsx, `md:hidden`) |
+| P1 | Change mobile images to object-contain | ⏳ Left as-is per founder request |
+| P2 | Add thumbnail selector on mobile | ⏳ Not built |
 
 ### DEFERRED (post-launch or low priority)
 | ID | Issue | Reason |
@@ -255,6 +256,5 @@
 ---
 
 **Total issues found: 32**
-**Fixed this session: 25**
-**Deferred: 3**
-**Needs decision: 1 (S1 - mobile category filter)**
+**Fixed: 26** (25 shipped 2026-07-24 + S1 mobile category filter)
+**Not built / intentionally kept: 6** (P1 per founder, P2, H1, S4, X1)
