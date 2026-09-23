@@ -30,8 +30,8 @@ function ticketCodes(items: any[] = []) {
 
 async function sendResend(to: string, subject: string, html: string) {
   const key = Deno.env.get("RESEND_API_KEY");
-  if (!key) { console.warn("RESEND_API_KEY not set — skipping email to " + to); return { skipped: true }; }
-  const from = Deno.env.get("EMAIL_FROM") || "NYNTH WORLD <onboarding@resend.dev>";
+  if (!key) { console.warn("RESEND_API_KEY not set - skipping email to " + to); return { skipped: true }; }
+  const from = Deno.env.get("EMAIL_FROM") || "NYNTH WORLD <hello@nynthworld.com>";
   const res = await fetch("https://api.resend.com/emails", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + key }, body: JSON.stringify({ from, to, subject, html }) });
   if (!res.ok) throw new Error("Resend error " + res.status);
   return res.json();
@@ -62,8 +62,19 @@ export async function handler(req: Request): Promise<Response> {
     }
     const adminTo = Deno.env.get("ADMIN_NOTIFY_EMAIL") ?? "";
     let customerSent = false, adminSent = false;
-    if (order.customer?.email) { try { await sendResend(order.customer.email, "Your NYNTH order is confirmed — #" + orderId.slice(0, 8).toUpperCase(), "<p>Thanks " + (order.customer?.firstName ?? "") + "! Total " + naira(order.total) + ". Tickets: " + codes.map((t: any) => t.code).join(", ") + "</p>"); customerSent = true; } catch(e) { console.error(e); } }
-    if (adminTo) { try { await sendResend(adminTo, "New NYNTH sale: " + naira(order.total), "<p>Order #" + orderId + " paid. Ref " + reference + "</p>"); adminSent = true; } catch(e) { console.error(e); } }
+    const shortId = orderId.slice(0, 8).toUpperCase();
+    const ticketBlock = codes.length
+      ? `<p style="margin:16px 0 0">Your ticket codes: <strong>${codes.map((t: any) => t.code).join(", ")}</strong></p>`
+      : "";
+    const customerHtml = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111111;line-height:1.6">`
+      + `<p style="font-size:11px;letter-spacing:3px;font-weight:bold;margin:0">NYNTH WORLD</p>`
+      + `<h1 style="font-size:24px;margin:8px 0 16px">Order confirmed.</h1>`
+      + `<p>Thanks ${order.customer?.firstName ?? "there"}, your payment of ${naira(order.total)} went through. Order <strong>#${shortId}</strong> is being prepared.</p>`
+      + ticketBlock
+      + `<p style="color:#666666;font-size:13px">Questions? Just reply to this email.</p></div>`;
+    const adminHtml = `<p>New paid order <strong>#${orderId}</strong> for ${naira(order.total)}. Paystack ref ${reference}.</p>`;
+    if (order.customer?.email) { try { await sendResend(order.customer.email, "Your NYNTH order is confirmed #" + shortId, customerHtml); customerSent = true; } catch(e) { console.error(e); } }
+    if (adminTo) { try { await sendResend(adminTo, "New NYNTH sale: " + naira(order.total), adminHtml); adminSent = true; } catch(e) { console.error(e); } }
     if (customerSent || adminSent) {
       await supabase.from("orders").update({ customer_confirmation_sent_at: customerSent ? new Date().toISOString() : null, admin_notification_sent_at: adminSent ? new Date().toISOString() : null }).eq("id", orderId);
     }
