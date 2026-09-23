@@ -14,7 +14,7 @@ const toTimestamp = (v) => {
   const ms = v instanceof Date ? v.getTime() : new Date(v).getTime();
   return isNaN(ms) ? null : { seconds: Math.floor(ms / 1000) };
 };
-const rowToProduct = (r) => ({ id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, ...(r.data ?? {}), name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
+const rowToProduct = (r) => ({ ...(r.data ?? {}), id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
 const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, created_at: toTimestamp(r.created_at) });
 
 // --- PRODUCTS CRUD ---
@@ -36,6 +36,16 @@ export const fetchSingleProduct = async (id, { admin = false } = {}) => {
   const p = rowToProduct(data);
   return admin ? p : (p.isPublic !== false ? p : null);
 };
+ const PRODUCT_COLUMN_KEYS = new Set(["id", "name", "title", "category", "price", "stockQuantity", "stock_quantity", "inStock", "isPublic", "is_public", "featured", "bestSeller", "best_seller", "tags", "displayOrder", "display_order", "data", "created_at", "updated_at"]);
+const mergeProductData = async (id, updates) => {
+  const flexible = {};
+  for (const [k, v] of Object.entries(updates)) {
+    if (!PRODUCT_COLUMN_KEYS.has(k) && v !== undefined) flexible[k] = v;
+  }
+  if (Object.keys(flexible).length === 0) return null;
+  const { data: existing } = await supabase.from("products").select("data").eq("id", id).maybeSingle();
+  return { ...(existing?.data ?? {}), ...flexible };
+};
  export const updateProduct = async (id, updates) => {
     const patch = { updated_at: new Date().toISOString() };
     if (updates.name !== undefined) patch.name = updates.name;
@@ -48,6 +58,8 @@ export const fetchSingleProduct = async (id, { admin = false } = {}) => {
     if (updates.bestSeller !== undefined) patch.best_seller = updates.bestSeller;
     if (updates.tags !== undefined) patch.tags = updates.tags;
     if (updates.displayOrder !== undefined) patch.display_order = updates.displayOrder;
+    const dataPatch = await mergeProductData(id, updates);
+    if (dataPatch) patch.data = dataPatch;
     const { data, error } = await supabase.from("products").update(patch).eq("id", id).select("id");
     if (error) throw error;
     if (!data || data.length === 0) throw new Error("Update failed — no rows affected. Check that you are an admin and authenticated.");
