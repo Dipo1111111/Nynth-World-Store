@@ -22,13 +22,13 @@ import {
 
 const TicketsBand = ({ products, onTicketsView, limit }) => (
   <section className="w-full">
-    <div className="flex items-center justify-between px-4 md:px-10 py-3 bg-black">
-      <span className="text-[8px] tracking-[0.25em] font-bold uppercase text-white">
+    <div className="flex flex-col gap-2 px-4 py-3.5 bg-black sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:px-10">
+      <span className="text-[8px] md:text-[9px] leading-relaxed tracking-[0.2em] font-bold uppercase text-white">
         INSTANT E-TICKETS · NO DELIVERY · NO FEES
       </span>
       <Link
         to={onTicketsView ? "/shop" : "/shop?category=tickets"}
-        className="text-[8px] tracking-[0.25em] font-bold uppercase text-white/60 hover:text-white transition-colors"
+        className="shrink-0 whitespace-nowrap self-end sm:self-auto sm:ml-auto text-[8px] md:text-[9px] tracking-[0.2em] font-bold uppercase text-white/60 hover:text-white transition-colors py-2 sm:py-1 pl-4"
       >
         {onTicketsView ? "SHOW ALL PRODUCTS" : "VIEW ALL TICKETS"} →
       </Link>

@@ -358,7 +358,7 @@ describe("markTicketUsed (door check-in)", () => {
   });
 });
 
-describe("storefront visibility rule (hidden and sold-out never list)", () => {
+describe("storefront visibility rule (hidden never lists, sold-out stays visible)", () => {
   const rows = [
     { id: "live", name: "Live Tee", stock_quantity: 5, is_public: true },
     { id: "hidden", name: "Hidden Tee", stock_quantity: 5, is_public: false },
@@ -366,31 +366,31 @@ describe("storefront visibility rule (hidden and sold-out never list)", () => {
     { id: "nostock", name: "Mystery Tee", stock_quantity: null, is_public: true },
   ];
 
-  it("recommendations exclude hidden, sold-out, and the current product", async () => {
+  it("recommendations exclude hidden and the current product but keep sold-out visible", async () => {
     h.setQuery({ data: rows, error: null });
     const list = await fetchRelatedProducts("apparel", "live", 4);
     const ids = list.map((p) => p.id);
     expect(ids).not.toContain("hidden");
-    expect(ids).not.toContain("soldout");
+    expect(ids).toContain("soldout");
     expect(ids).not.toContain("live");
     expect(ids).toContain("nostock");
   });
 
-  it("search never surfaces hidden or sold-out products", async () => {
+  it("search never surfaces hidden products but keeps sold-out visible", async () => {
     h.setQuery({ data: rows, error: null });
     const list = await searchProducts("tee");
     const ids = list.map((p) => p.id);
     expect(ids).not.toContain("hidden");
-    expect(ids).not.toContain("soldout");
+    expect(ids).toContain("soldout");
     expect(ids).toContain("live");
   });
 
-  it("category lists never surface hidden or sold-out products", async () => {
+  it("category lists never surface hidden products but keep sold-out visible", async () => {
     h.setQuery({ data: rows, error: null });
     const list = await fetchProductsByCategory("apparel", 15);
     const ids = list.map((p) => p.id);
     expect(ids).not.toContain("hidden");
-    expect(ids).not.toContain("soldout");
+    expect(ids).toContain("soldout");
     expect(ids).toContain("live");
   });
 });

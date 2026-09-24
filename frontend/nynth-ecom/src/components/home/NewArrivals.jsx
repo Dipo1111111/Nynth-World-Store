@@ -8,10 +8,12 @@ import toast from "react-hot-toast";
 function ProductCard({ product }) {
   const { addToCart } = useCart();
   const image = (product.images && product.images[0]) || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1000";
+  const isOutOfStock = Number(product.stockQuantity) <= 0 && product.stockQuantity !== null && product.stockQuantity !== undefined;
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
 
     // Add with default size and color
     const defaultSize = product.sizes?.[0] || "M";
@@ -54,9 +56,10 @@ function ProductCard({ product }) {
         </div>
         <button
           onClick={handleAddToCart}
-          className="w-full py-2 text-sm font-medium border border-black rounded-lg hover:bg-black hover:text-white transition-colors"
+          disabled={isOutOfStock}
+          className="w-full py-2 text-sm font-medium border border-black rounded-lg hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black"
         >
-          Add to Cart
+          {isOutOfStock ? "Sold Out" : "Add to Cart"}
         </button>
       </div>
     </div>

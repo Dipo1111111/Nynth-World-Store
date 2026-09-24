@@ -19,9 +19,10 @@ const finalNumber = (v) => { const n = Number(v); return Number.isFinite(n) ? n 
 const rowToProduct = (r) => ({ ...(r.data ?? {}), id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
 const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, isTest: r.is_test === true, created_at: toTimestamp(r.created_at) });
 
-// Storefront rule: hidden products never list. Exact-zero stock (deliberately
-// sold out) never lists either. Null stock means unknown, stays visible.
-const isLiveProduct = (p) => p.isPublic !== false && p.stockQuantity !== 0;
+// Storefront rule: hidden products never list. Sold-out (exact-zero stock)
+// stays visible with a SOLD OUT badge so shoppers see it is gone. Null stock
+// means unknown, stays visible.
+const isLiveProduct = (p) => p.isPublic !== false;
 
 // Test-mode detection: the storefront runs on Paystack test keys until launch, so
 // an order created under those keys is test traffic. Server (edge) re-stamps this
@@ -300,7 +301,16 @@ export const addSubscriber = async (email, source = "newsletter") => {
 };
 export const fetchSubscribers = async () => {
   const { data } = await supabase.from("subscribers").select("*").order("created_at", { ascending: false });
-  return data ?? [];
+  // Subscribers table carries created_at (timestamptz), not subscribed_at, and
+  // has no status column. Normalize to the admin UI shape so dates never render
+  // as N/A and status filters keep working.
+  return (data ?? []).map((r) => ({
+    ...r,
+    source: r.source ?? "newsletter",
+    status: r.status ?? "active",
+    subscribed_at: r.subscribed_at ?? toTimestamp(r.created_at),
+    created_at: toTimestamp(r.created_at) ?? r.created_at,
+  }));
 };
 export const mergeSubscriberDuplicates = async () => ({ merged: 0, note: "unique constraint on email prevents duplicates on Supabase" });
 

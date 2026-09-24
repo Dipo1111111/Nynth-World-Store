@@ -170,16 +170,28 @@ const Subscribers = () => {
  setFilteredSubscribers(results);
  }, [searchTerm, activeFilter, subscribers]);
 
- const formatDate = (timestamp) => {
- if (!timestamp || !timestamp.seconds) return 'N/A';
- return new Date(timestamp.seconds * 1000).toLocaleString('en-US', {
- year: 'numeric',
- month: 'short',
- day: 'numeric',
- hour: '2-digit',
- minute: '2-digit'
- });
- };
+  const formatDate = (timestamp) => {
+  let date = null;
+  if (!timestamp) return 'N/A';
+  if (typeof timestamp === 'object' && timestamp.seconds) {
+  date = new Date(timestamp.seconds * 1000);
+  } else if (timestamp instanceof Date) {
+  date = timestamp;
+  } else if (typeof timestamp === 'number') {
+  date = new Date(timestamp > 1e12 ? timestamp : timestamp * 1000);
+  } else if (typeof timestamp === 'string') {
+  const parsed = new Date(timestamp);
+  if (!isNaN(parsed.getTime())) date = parsed;
+  }
+  if (!date || isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+  });
+  };
 
  // Count-up stats (live across the whole dataset, not the filtered view).
  const stats = useMemo(() => {
@@ -352,9 +364,9 @@ const Subscribers = () => {
  <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-white/[0.18]'}`}></div>
  <span className="text-[#EDEAE2]/55 font-bold uppercase tracking-widest">{sub.status || 'active'}</span>
  </div>
- <span className="text-[#EDEAE2]/42 font-bold uppercase tracking-widest">
- {formatDate(sub.subscribed_at).split(',')[0]}
- </span>
+  <span className="text-[#EDEAE2]/42 font-bold uppercase tracking-widest">
+  {formatDate(sub.subscribed_at ?? sub.created_at).split(',')[0]}
+  </span>
  </div>
  </div>
  ))}
@@ -410,7 +422,7 @@ const Subscribers = () => {
  </div>
  </td>
  <td className="px-4 py-4 whitespace-nowrap text-right">
- <span className="text-xs text-[#EDEAE2]/55 font-inter">{formatDate(sub.subscribed_at)}</span>
+  <span className="text-xs text-[#EDEAE2]/55 font-inter">{formatDate(sub.subscribed_at ?? sub.created_at)}</span>
  </td>
  </tr>
  ))}
