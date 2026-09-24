@@ -176,10 +176,12 @@ export default function Account() {
                                                                         <>
                                                                             <p className="text-[10px] text-gray-400 tracking-wider uppercase font-bold mt-1 flex items-center gap-1">
                                                                                 <Ticket size={11} className="shrink-0" />
-                                                                                E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}
+                                                                                E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}{item.venue ? ` · ${item.venue}` : ""}
                                                                             </p>
                                                                             {order.tickets?.filter(t => t.productId === item.id).map((t, i) => (
-                                                                                <p key={i} className="text-[10px] font-mono font-bold tracking-widest mt-1">{t.code}</p>
+                                                                                <Link key={i} to={`/ticket/${t.code}`} className="block font-mono text-[10px] font-bold tracking-widest mt-1 underline underline-offset-4 decoration-black/20 hover:decoration-black">
+                                                                                    {t.code} {t.used ? "- USED" : "- VIEW PASS"}
+                                                                                </Link>
                                                                             ))}
                                                                         </>
                                                                     ) : (

@@ -16,7 +16,7 @@ export async function handler(req: Request): Promise<Response> {
   if (!normalized) return Response.json({ found: false }, { headers: corsHeaders });
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   try {
-    const { data: orders, error } = await supabase.from("orders").select("id,tickets,customer").not("tickets", "is", null);
+    const { data: orders, error } = await supabase.from("orders").select("id,tickets,customer,payment_status,order_status,is_test").not("tickets", "is", null);
     if (error) throw error;
     for (const order of orders ?? []) {
       const ticket = (order.tickets ?? []).find((t: any) => String(t.code ?? "").toUpperCase() === normalized);
@@ -31,6 +31,9 @@ export async function handler(req: Request): Promise<Response> {
           venue: ticket.venue ?? null,
           orderId: order.id,
           buyer: order.customer?.firstName ?? null,
+          payment_status: order.payment_status ?? null,
+          order_status: order.order_status ?? null,
+          isTest: order.is_test === true,
         }, { headers: corsHeaders });
       }
     }

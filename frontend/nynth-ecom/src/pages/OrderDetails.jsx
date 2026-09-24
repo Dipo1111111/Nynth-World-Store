@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import SEO from "../components/SEO";
 import { useAuth } from "../context/AuthContext";
-import { fetchOrder } from "../api/firebaseFunctions";
+import { fetchOrder, fetchOrderByReference } from "../api/firebaseFunctions";
 import { formatEventDate } from "../utils/tickets";
 import { Ticket, ArrowLeft } from "lucide-react";
 
-// Full detail for one of the signed-in buyer's orders. Ticket codes link
+// Full detail for one of the buyer's orders. Ticket codes link
 // out to their public passes, so the pass page is one tap away.
+// Guests open this from the email link (/order/:id?ref=...): ownership is
+// proven with the Paystack reference because RLS blocks guest reads.
 export default function OrderDetails() {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const ref = searchParams.get("ref") || "";
     const { currentUser } = useAuth();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,8 +25,13 @@ export default function OrderDetails() {
         (async () => {
             try {
                 const data = await fetchOrder(id);
-                const mine = data && (!data.userId || data.userId === currentUser?.id);
-                if (!cancelled) setOrder(mine ? data : null);
+                let mine = data && (!data.userId || data.userId === currentUser?.id);
+                let resolved = mine ? data : null;
+                if (!resolved && ref) {
+                    const viaLookup = await fetchOrderByReference(id, ref);
+                    if (viaLookup) resolved = viaLookup;
+                }
+                if (!cancelled) setOrder(resolved);
             } catch {
                 if (!cancelled) setOrder(null);
             } finally {
@@ -30,7 +39,7 @@ export default function OrderDetails() {
             }
         })();
         return () => { cancelled = true; };
-    }, [id, currentUser]);
+    }, [id, currentUser, ref]);
 
     return (
         <div className="min-h-screen bg-white text-black flex flex-col">
@@ -38,8 +47,8 @@ export default function OrderDetails() {
             <Header />
             <main className="flex-1 section-pad">
                 <div className="max-w-3xl mx-auto">
-                    <Link to="/account" className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] font-bold uppercase text-black/50 hover:text-black mb-8">
-                        <ArrowLeft size={13} /> All orders
+                    <Link to={currentUser ? "/account" : "/shop"} className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] font-bold uppercase text-black/50 hover:text-black mb-8">
+                        <ArrowLeft size={13} /> {currentUser ? "All orders" : "Back to shop"}
                     </Link>
 
                     {loading && <p className="text-sm text-black/50 tracking-widest uppercase font-bold">Loading order</p>}
@@ -47,7 +56,7 @@ export default function OrderDetails() {
                     {!loading && !order && (
                         <div className="text-center py-16">
                             <h1 className="text-3xl font-extrabold tracking-tight mb-3">Order not found</h1>
-                            <p className="text-sm text-black/60 mb-8">It may belong to a different account, or the link is wrong.</p>
+                            <p className="text-sm text-black/60 mb-8">It may belong to a different account, or the link is wrong. Guests should open the order from the link in the confirmation email.</p>
                             <Link to="/account" className="bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase">Back to account</Link>
                         </div>
                     )}
@@ -71,7 +80,7 @@ export default function OrderDetails() {
                                                 <>
                                                     <p className="text-[10px] text-gray-400 tracking-wider uppercase font-bold mt-1 flex items-center gap-1">
                                                         <Ticket size={11} className="shrink-0" />
-                                                        E-TICKET{item.eventDateTime ? ` - ${formatEventDate(item.eventDateTime)}` : ""}
+                                                        E-TICKET{item.eventDateTime ? ` - ${formatEventDate(item.eventDateTime)}` : ""}{item.venue ? ` · ${item.venue}` : ""}
                                                     </p>
                                                     {(order.tickets || []).filter((t) => t.productId === item.id).map((t, i) => (
                                                         <Link key={i} to={`/ticket/${t.code}`} className="block font-mono text-[11px] font-bold tracking-widest mt-1 underline underline-offset-4 decoration-black/20 hover:decoration-black">
@@ -91,12 +100,14 @@ export default function OrderDetails() {
                             </div>
 
                             <div className="grid md:grid-cols-2 gap-6 text-sm">
-                                <div>
-                                    <p className="text-[10px] tracking-[0.3em] font-bold uppercase text-black/40 mb-2">Shipping</p>
-                                    <p className="font-bold uppercase text-xs tracking-widest">{order.customer?.firstName} {order.customer?.lastName}</p>
-                                    <p className="text-black/60 text-xs mt-1 uppercase">{order.customer?.address}</p>
-                                    <p className="text-black/60 text-xs uppercase">{order.customer?.city}, {order.customer?.state}</p>
-                                </div>
+                                {(order.customer?.firstName || order.customer?.address) && (
+                                    <div>
+                                        <p className="text-[10px] tracking-[0.3em] font-bold uppercase text-black/40 mb-2">Shipping</p>
+                                        <p className="font-bold uppercase text-xs tracking-widest">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                        <p className="text-black/60 text-xs mt-1 uppercase">{order.customer?.address}</p>
+                                        <p className="text-black/60 text-xs uppercase">{order.customer?.city}, {order.customer?.state}</p>
+                                    </div>
+                                )}
                                 <div>
                                     <p className="text-[10px] tracking-[0.3em] font-bold uppercase text-black/40 mb-2">Summary</p>
                                     <div className="flex justify-between text-xs text-black/60 uppercase font-bold tracking-widest py-1">

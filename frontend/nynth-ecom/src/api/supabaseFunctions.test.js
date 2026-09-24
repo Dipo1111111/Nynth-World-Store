@@ -67,6 +67,7 @@ import {
   searchProducts,
   fetchProductsByCategory,
   fetchOrder,
+  fetchOrderByReference,
   getAllOrders,
   validateDiscountCode,
   initializePayment,
@@ -265,6 +266,23 @@ describe("payment edge function calls", () => {
     const out = await verifyOrderPayment("o1", "REF1");
     expect(h.supabase.functions.invoke).toHaveBeenCalledWith("paystack-verify", { body: { reference: "REF1" } });
     expect(out.success).toBe(true);
+  });
+
+  it("fetchOrderByReference maps a found lookup to an order shape with no PII", async () => {
+    h.setInvoke({ data: { found: true, id: "o9", items: [{ id: "t1" }], tickets: [{ code: "NWT-X" }], subtotal: 100, shippingFee: 0, discountAmount: 0, discountCode: null, total: 100, payment_status: "paid", order_status: "confirmed", isTest: false }, error: null });
+    const out = await fetchOrderByReference("o9", "REF9");
+    expect(h.supabase.functions.invoke).toHaveBeenCalledWith("order-lookup", { body: { orderId: "o9", reference: "REF9" } });
+    expect(out.id).toBe("o9");
+    expect(out.tickets[0].code).toBe("NWT-X");
+    expect(out.customer).toEqual({});
+  });
+
+  it("fetchOrderByReference returns null when the lookup misses or errors", async () => {
+    h.setInvoke({ data: { found: false }, error: null });
+    await expect(fetchOrderByReference("o9", "WRONG")).resolves.toBeNull();
+    h.setInvoke({ data: null, error: new Error("boom") });
+    await expect(fetchOrderByReference("o9", "REF9")).resolves.toBeNull();
+    await expect(fetchOrderByReference("", "")).resolves.toBeNull();
   });
 });
 describe("product mutations (admin add/edit/delete must not 400)", () => {

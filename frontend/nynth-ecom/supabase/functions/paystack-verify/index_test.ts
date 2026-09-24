@@ -51,8 +51,11 @@ Deno.test("finalizes a pending order after a successful Paystack charge", async 
     }
     if (u.includes("/rest/v1/orders")) {
       if (method === "PATCH") {
-        patches.push(JSON.parse(String(init?.body)));
-        return jsonResponse([]);
+        const patch = JSON.parse(String(init?.body));
+        patches.push(patch);
+        // Conditional finalize: PostgREST returns the claimed rows, or [] when
+        // a concurrent finalizer already flipped the order to paid.
+        return jsonResponse(patch.payment_status === "paid" ? [{ id: "ord-9" }] : []);
       }
       return jsonResponse({ id: "ord-9", user_id: null, customer: { email: "buyer@x.com", firstName: "Ada" }, items: [], total: 15000, payment_status: "pending", order_status: "pending", tickets: [] });
     }
@@ -100,7 +103,10 @@ Deno.test("ticket orders email the event title, date, venue, and price", async (
       return jsonResponse({ id: "email-2" });
     }
     if (u.includes("/rest/v1/orders")) {
-      if (method === "PATCH") return jsonResponse([]);
+      if (method === "PATCH") {
+        const patch = JSON.parse(String(init?.body));
+        return jsonResponse(patch.payment_status === "paid" ? [{ id: "ord-10" }] : []);
+      }
       return jsonResponse({
         id: "ord-10",
         customer: { email: "buyer@x.com", firstName: "Ada" },
@@ -143,8 +149,7 @@ Deno.test("ticket orders email the event title, date, venue, and price", async (
   }
 });
 
-Deno.test("returns alreadyPaid true and sends no mails for an already-paid order", async () => {
-  const realFetch = globalThis.fetch;
+Deno.test("returns alreadyPaid true and sends no mails for an already-paid order", async () => {  const realFetch = globalThis.fetch;
   let resendCalls = 0;
 
   (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
@@ -173,6 +178,111 @@ Deno.test("returns alreadyPaid true and sends no mails for an already-paid order
     const json = await res.json();
     assertEquals(json.alreadyPaid, true);
     assertEquals(resendCalls, 0);
+  } finally {
+    (globalThis as any).fetch = realFetch;
+  }
+});
+
+Deno.test("loses the finalize race gracefully when a concurrent webhook won", async () => {
+  const realFetch = globalThis.fetch;
+  let resendCalls = 0;
+
+  (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+    const u = String(url);
+    const method = init?.method ?? "GET";
+    if (u.includes("api.paystack.co")) {
+      return jsonResponse({ status: true, message: "ok", data: { status: "success", reference: "REF1", metadata: { orderId: "ord-9" } } });
+    }
+    if (u.includes("api.resend.com")) {
+      resendCalls++;
+      return jsonResponse({ id: "email-1" });
+    }
+    if (u.includes("/rest/v1/orders")) {
+      // Conditional update claims zero rows: someone else finalized first.
+      if (method === "PATCH") return jsonResponse([]);
+      return jsonResponse({ id: "ord-9", items: [], payment_status: "pending", order_status: "pending", tickets: [] });
+    }
+    return jsonResponse({ message: "unhandled " + u }, 500);
+  };
+
+  for (const [k, v] of Object.entries(env)) Deno.env.set(k, v);
+
+  try {
+    const res = await handler(new Request("https://x.supabase.co/functions/v1/paystack-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reference: "REF1" }),
+    }));
+    const json = await res.json();
+    assertEquals(json.success, true);
+    assertEquals(json.alreadyPaid, true);
+    assertEquals(resendCalls, 0, "the race loser must not mint stock moves or emails");
+  } finally {
+    (globalThis as any).fetch = realFetch;
+  }
+});
+
+Deno.test("orderId fallback verifies through the reference stamped at initialize", async () => {
+  const realFetch = globalThis.fetch;
+
+  (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+    const u = String(url);
+    const method = init?.method ?? "GET";
+    if (u.includes("api.paystack.co")) {
+      return jsonResponse({ status: true, message: "ok", data: { status: "success", reference: "REF9", metadata: { orderId: "ord-9" } } });
+    }
+    if (u.includes("api.resend.com")) return jsonResponse({ id: "email-1" });
+    if (u.includes("/rest/v1/orders")) {
+      if (method === "PATCH") {
+        const patch = JSON.parse(String(init?.body));
+        return jsonResponse(patch.payment_status === "paid" ? [{ id: "ord-9" }] : []);
+      }
+      if (u.includes("select=payment_reference")) {
+        return jsonResponse({ id: "ord-9", payment_reference: "REF9" });
+      }
+      return jsonResponse({ id: "ord-9", user_id: null, customer: { email: "buyer@x.com", firstName: "Ada" }, items: [], total: 15000, payment_status: "pending", order_status: "pending", tickets: [] });
+    }
+    return jsonResponse({ message: "unhandled " + u }, 500);
+  };
+
+  for (const [k, v] of Object.entries(env)) Deno.env.set(k, v);
+
+  try {
+    const res = await handler(new Request("https://x.supabase.co/functions/v1/paystack-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: "ord-9" }),
+    }));
+    assertEquals(res.status, 200);
+    const json = await res.json();
+    assertEquals(json.success, true);
+    assertEquals(json.alreadyPaid, false);
+    assertEquals(json.orderId, "ord-9");
+  } finally {
+    (globalThis as any).fetch = realFetch;
+  }
+});
+
+Deno.test("rejects a reference that does not belong to the given order", async () => {
+  const realFetch = globalThis.fetch;
+
+  (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+    const u = String(url);
+    if (u.includes("api.paystack.co")) {
+      return jsonResponse({ status: true, message: "ok", data: { status: "success", reference: "REF1", metadata: { orderId: "ord-other" } } });
+    }
+    return jsonResponse({ message: "unhandled " + u }, 500);
+  };
+
+  for (const [k, v] of Object.entries(env)) Deno.env.set(k, v);
+
+  try {
+    const res = await handler(new Request("https://x.supabase.co/functions/v1/paystack-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reference: "REF1", orderId: "ord-9" }),
+    }));
+    assertEquals(res.status, 400);
   } finally {
     (globalThis as any).fetch = realFetch;
   }

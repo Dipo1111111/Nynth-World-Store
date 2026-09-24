@@ -245,6 +245,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/thank-you" element={<ThankYou />} />
                     <Route path="/ticket/:code" element={<TicketPass />} />
+                    <Route path="/order/:id" element={<OrderDetails />} />
                     <Route
                       path="/account/orders/:id"
                       element={

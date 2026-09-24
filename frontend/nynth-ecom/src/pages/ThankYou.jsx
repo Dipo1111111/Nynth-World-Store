@@ -7,9 +7,9 @@ import { useCart } from "../context/CartContext";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import ProductCard from "../components/products/ProductCard";
-import { fetchOrder, fetchProducts, verifyOrderPayment } from "../api/firebaseFunctions";
+import { fetchOrder, fetchOrderByReference, fetchProducts, verifyOrderPayment } from "../api/firebaseFunctions";
 import { trackConversion } from "../utils/monitoring";
-import { isTicketItem, ticketCount } from "../utils/tickets";
+import { isTicketItem, ticketCount, formatEventDate } from "../utils/tickets";
 
 const ThankYou = () => {
   const { currentUser } = useAuth();
@@ -24,8 +24,25 @@ const ThankYou = () => {
   const cleared = useRef(false);
 
   const [order, setOrder] = useState(null);
+  const [orderLoaded, setOrderLoaded] = useState(false);
   const [merch, setMerch] = useState([]);
   const finalized = useRef(false);
+
+  // Direct reads fail RLS for guests, so fall back to proving ownership with
+  // the Paystack reference from the redirect URL.
+  const loadOrder = async () => {
+    if (!orderId) { setOrderLoaded(true); return; }
+    try {
+      const direct = await fetchOrder(orderId);
+      if (direct) { setOrder(direct); return; }
+      if (reference) {
+        const viaLookup = await fetchOrderByReference(orderId, reference);
+        if (viaLookup) setOrder(viaLookup);
+      }
+    } catch { /* keep generic success state */ } finally {
+      setOrderLoaded(true);
+    }
+  };
 
   // Finalize the order server-side (idempotent: webhook/popup may have done it
   // already) so guests landing here from the Paystack redirect still get their
@@ -38,20 +55,22 @@ const ThankYou = () => {
         if (!res?.alreadyPaid) {
           trackConversion("purchase", { order_id: orderId, reference });
         }
+        // The first order load can race the server finalize that mints the
+        // pass codes, so reload once verify settles and pick up order.tickets.
+        return loadOrder();
       })
       .catch((err) => console.error("Finalization check failed:", err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reference, orderId]);
 
   const orderHasTickets = order?.items?.some((i) => isTicketItem(i)) || false;
   const orderTicketCount = order ? ticketCount(order.items) : 0;
 
-  // Load the order so ticket buyers get their e-ticket message
+  // Load the order so ticket buyers get their e-ticket message.
+  // Guests cannot read orders directly (RLS), the reference fallback covers them.
   useEffect(() => {
-    if (orderId) {
-      fetchOrder(orderId)
-        .then((doc) => { if (doc) setOrder(doc); })
-        .catch(() => {});
-    }
+    loadOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
   // Cross-sell: the whole point of selling tickets - turn every ticket buyer into a brand fan
@@ -76,7 +95,6 @@ const ThankYou = () => {
   }, [reference, clearCart]);
   // Celebration: confetti + mount animation
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const duration = 4 * 1000;
     const animationEnd = Date.now() + duration;
@@ -139,6 +157,12 @@ const ThankYou = () => {
             A confirmation email has been sent to your inbox.
           </p>
 
+          {orderId && orderLoaded && !order && (
+            <p className="text-[10px] tracking-[0.2em] text-gray-400 font-bold uppercase mb-12 leading-relaxed -mt-8">
+              Still confirming your payment - your tickets land in your inbox the moment it clears. Keep this page open a little longer.
+            </p>
+          )}
+
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             {currentUser && (
               <Link
@@ -173,14 +197,32 @@ const ThankYou = () => {
               <Mail size={12} className="inline mr-1.5" />
               Sent straight to the email you used at checkout. Present it at the gate - no printing. While you're here, grab the gear for the night.
             </p>
-            {order.items
+            {(order.items || [])
               .filter((i) => isTicketItem(i))
-              .map((item, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase font-bold text-zinc-300 mb-1.5">
-                  <span>{item.name || item.title}</span>
-                  {item.eventDateTime && <span className="text-zinc-500">· {new Date(item.eventDateTime).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }).toUpperCase()}</span>}
-                </div>
-              ))}
+              .map((item, idx) => {
+                const passes = (order.tickets || []).filter((t) => t.productId === item.id);
+                return (
+                  <div key={idx} className="w-full max-w-xl border border-white/15 bg-white/[0.04] px-5 py-4 mb-3 text-left">
+                    <p className="text-[11px] font-bold tracking-[0.2em] uppercase">{item.name || item.title}</p>
+                    <p className="text-[10px] tracking-[0.18em] uppercase text-zinc-400 mt-1.5">
+                      {item.eventDateTime ? formatEventDate(item.eventDateTime) : "DATE TBC"}
+                      {item.venue ? ` · ${item.venue}` : ""}
+                    </p>
+                    {passes.length > 0 ? (
+                      <div className="mt-2.5 space-y-1.5">
+                        {passes.map((t) => (
+                          <Link key={t.code} to={`/ticket/${t.code}`} className="flex items-center justify-between gap-3 text-[10px] font-bold tracking-[0.18em] uppercase text-white hover:text-zinc-300 transition-colors">
+                            <span className="font-mono">{t.code}</span>
+                            <span className="underline underline-offset-4 decoration-white/30">Open your pass</span>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[9px] tracking-[0.2em] uppercase text-zinc-500 mt-2">Pass codes are on the way to your inbox</p>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         </section>
       )}

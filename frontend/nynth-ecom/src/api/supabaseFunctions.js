@@ -255,6 +255,15 @@ export const fetchOrder = async (orderId) => {
   const { data } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
   return data ? rowToOrder(data) : null;
 };
+// Guest order read: RLS blocks guests from reading orders directly, so prove
+// ownership with the Paystack reference via the order-lookup edge function.
+// Returns an order-shaped object with no customer PII.
+export const fetchOrderByReference = async (orderId, reference) => {
+  if (!orderId || !reference) return null;
+  const { data, error } = await supabase.functions.invoke("order-lookup", { body: { orderId, reference } });
+  if (error || !data?.found) return null;
+  return { id: data.id, userId: null, customer: {}, items: data.items ?? [], tickets: data.tickets ?? [], subtotal: Number(data.subtotal ?? 0), shippingFee: Number(data.shippingFee ?? 0), shipping_fee: Number(data.shippingFee ?? 0), discountAmount: Number(data.discountAmount ?? 0), discountCode: data.discountCode ?? null, total: Number(data.total ?? 0), payment_status: data.payment_status, order_status: data.order_status, payment_reference: reference, paid_at: data.paid_at, isTest: data.isTest === true, created_at: toTimestamp(data.created_at), viaLookup: true };
+};
 export const subscribeOrders = (callback) => {
   const ch = supabase.channel("orders-admin").on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => getAllOrders().then(callback)).subscribe();
   return () => supabase.removeChannel(ch);

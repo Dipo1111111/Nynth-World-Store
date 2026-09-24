@@ -77,10 +77,14 @@ export default function TicketPass() {
                     {!loading && pass?.found && (
                         <>
                             <p className="text-[11px] tracking-[0.3em] font-bold uppercase text-black/40 mb-3">
-                                {pass.used ? "Already used" : eventHasPassed(pass.eventDateTime) ? "Event ended" : "Valid e-ticket"}
+                                {pass.order_status === "cancelled" || (pass.payment_status && pass.payment_status !== "paid")
+                                    ? "No longer valid"
+                                    : pass.isTest
+                                        ? "Test pass"
+                                        : pass.used ? "Already used" : eventHasPassed(pass.eventDateTime) ? "Event ended" : "Valid e-ticket"}
                             </p>
                             <div className={`border p-8 mb-6 ${pass.used ? "border-amber-300 bg-amber-50" : "border-black"}`}>
-                                {!pass.used && !eventHasPassed(pass.eventDateTime) && (
+                                {!pass.used && !eventHasPassed(pass.eventDateTime) && !pass.isTest && pass.order_status !== "cancelled" && (!pass.payment_status || pass.payment_status === "paid") && (
                                     <div className="bg-white p-4 inline-block mb-4">
                                         <QRCode value={`${window.location.origin}/ticket/${pass.code}`} size={200} level="M" />
                                     </div>
@@ -94,8 +98,18 @@ export default function TicketPass() {
                                         <AlertTriangle size={12} /> Admitted{pass.used_at ? ` ${new Date(pass.used_at).toLocaleString()}` : ""}
                                     </p>
                                 )}
+                                {pass.isTest && (
+                                    <p className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-black/50">
+                                        <AlertTriangle size={12} /> Test pass - not a live ticket
+                                    </p>
+                                )}
+                                {(pass.order_status === "cancelled" || (pass.payment_status && pass.payment_status !== "paid")) && (
+                                    <p className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-black/50">
+                                        <AlertTriangle size={12} /> {pass.order_status === "cancelled" ? "Order cancelled or refunded" : "Order never paid"}
+                                    </p>
+                                )}
                             </div>
-                            {!pass.used && !eventHasPassed(pass.eventDateTime) && isAdmin && (
+                            {!pass.used && !eventHasPassed(pass.eventDateTime) && !pass.isTest && pass.order_status !== "cancelled" && (!pass.payment_status || pass.payment_status === "paid") && isAdmin && (
                                 <button
                                     onClick={confirmEntry}
                                     disabled={marking}

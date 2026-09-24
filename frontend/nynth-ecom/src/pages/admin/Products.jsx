@@ -382,12 +382,17 @@ export default function AdminProducts() {
  setIsSubmitting(false);
  return;
  }
- if (!formData.venue.trim()) {
- toast.error("VENUE IS REQUIRED FOR TICKETS");
- setIsSubmitting(false);
- return;
- }
- }
+  if (!formData.venue.trim()) {
+  toast.error("VENUE IS REQUIRED FOR TICKETS");
+  setIsSubmitting(false);
+  return;
+  }
+  if (Number(formData.stockQuantity) <= 0) {
+  toast.error("SET HOW MANY TICKETS ARE AVAILABLE - 0 KEEPS THE EVENT HIDDEN AND SOLD OUT");
+  setIsSubmitting(false);
+  return;
+  }
+  }
 
  toast.loading(editingId ? "Saving changes..." : "Creating product...", { id: "upload-status" });
 
@@ -668,7 +673,7 @@ export default function AdminProducts() {
  value={formData.stockQuantity}
  onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
  />
- <p className="text-[11px] text-[#EDEAE2]/42">Auto-reduced per ticket sold. Hits 0 = SOLD OUT on the storefront.</p>
+  <p className="text-[11px] text-[#EDEAE2]/42">Auto-reduced per ticket sold. Hits 0 = SOLD OUT on the storefront. New events must start above 0 or buyers will never see them.</p>
  </div>
  </div>
  )}

@@ -309,7 +309,7 @@ const AbandonedCheckouts = () => {
  {item.category === "tickets" ? (
  <span className="inline-flex items-center gap-1">
  <Ticket size={10} className="shrink-0" />
- E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}
+  E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}{item.venue ? ` · ${item.venue}` : ""}
  </span>
  ) : (
  `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
@@ -453,7 +453,7 @@ const AbandonedCheckouts = () => {
  {item.category === "tickets" ? (
  <span className="inline-flex items-center gap-1">
  <Ticket size={10} className="shrink-0" />
- E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}
+  E-TICKET{item.eventDateTime ? ` · ${formatEventDate(item.eventDateTime)}` : ""}{item.venue ? ` · ${item.venue}` : ""}
  </span>
  ) : (
  `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
