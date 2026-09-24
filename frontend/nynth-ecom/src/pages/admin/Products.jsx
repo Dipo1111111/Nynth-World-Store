@@ -138,6 +138,20 @@ export default function AdminProducts() {
  const [editingId, setEditingId] = useState(null);
  const [isSubmitting, setIsSubmitting] = useState(false);
 
+ // Modal behavior: freeze the page behind the dialog and let Escape close it.
+ // Backdrop clicks close through the overlay onClick below.
+ useEffect(() => {
+ if (!isModalOpen) return;
+ const prev = document.body.style.overflow;
+ document.body.style.overflow = "hidden";
+ const onKey = (e) => { if (e.key === "Escape") setIsModalOpen(false); };
+ window.addEventListener("keydown", onKey);
+ return () => {
+ document.body.style.overflow = prev;
+ window.removeEventListener("keydown", onKey);
+ };
+ }, [isModalOpen]);
+
  // Form State
  const initialFormState = {
  title: "",
@@ -559,10 +573,19 @@ export default function AdminProducts() {
  )}
  </div>
 
- {/* Modal - portaled to document.body so no layout ancestor can offset it */}
+ {/* Modal - portaled to document.body so no layout ancestor can offset it.
+     m-auto (not items-center) keeps the top reachable on short screens. */}
  {isModalOpen && createPortal(
-<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-<div className="bg-[#0a0a0a] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-white/10 my-auto">
+<div
+className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-4 flex animate-in fade-in duration-200"
+onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}
+>
+<div
+role="dialog"
+aria-modal="true"
+aria-label={editingId ? "Edit product" : "New product"}
+className="bg-[#0a0a0a] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-raised border border-white/10 m-auto animate-in fade-in zoom-in-95 duration-200"
+>
  <div className="flex justify-between items-center mb-6">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">Catalog</p>

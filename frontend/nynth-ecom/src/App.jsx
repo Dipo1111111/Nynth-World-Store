@@ -54,6 +54,7 @@ const Subscribers = lazy(() => import("./pages/admin/Subscribers"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 const DiscountCodes = lazy(() => import("./pages/admin/DiscountCodes"));
 const CheckIn = lazy(() => import("./pages/admin/CheckIn"));
+const Events = lazy(() => import("./pages/admin/Events"));
 
 // Admin Loading Fallback
 const AdminLoader = () => (
@@ -353,6 +354,16 @@ function AppContent({ isSiteUnlocked }) {
                         <ProtectedRoute requireAdmin={true}>
                           <Suspense fallback={<AdminLoader />}>
                             <CheckIn />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/events"
+                      element={
+                        <ProtectedRoute requireAdmin={true}>
+                          <Suspense fallback={<AdminLoader />}>
+                            <Events />
                           </Suspense>
                         </ProtectedRoute>
                       }

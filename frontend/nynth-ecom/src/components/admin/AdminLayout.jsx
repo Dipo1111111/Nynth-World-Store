@@ -6,6 +6,7 @@ import {
     Package,
     ShoppingCart,
     Ticket,
+    Calendar,
     Image as ImageIcon,
     Settings,
     LogOut,
@@ -25,6 +26,7 @@ const NAV_GROUPS = [
         items: [
             { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
             { label: "Products", href: "/admin/products", icon: ShoppingBag },
+            { label: "Events", href: "/admin/events", icon: Calendar },
             { label: "Orders", href: "/admin/orders", icon: Package },
             { label: "Door Check-In", href: "/admin/check-in", icon: Ticket },
             { label: "Abandoned Checkouts", href: "/admin/abandoned-checkouts", icon: ShoppingCart },

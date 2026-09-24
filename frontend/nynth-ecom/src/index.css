@@ -438,4 +438,10 @@
 .admin-app select,
 .admin-app textarea {
   caret-color: oklch(0.93 0.005 90);
+  color: oklch(0.93 0.005 90);
+  color-scheme: dark;
+}
+.admin-app input::placeholder,
+.admin-app textarea::placeholder {
+  color: oklch(0.93 0.005 90 / 0.35);
 }
