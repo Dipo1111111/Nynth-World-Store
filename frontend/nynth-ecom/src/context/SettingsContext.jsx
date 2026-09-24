@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { fetchSettings } from "../api/firebaseFunctions";
 import { withRetry } from "../utils/errorHandlers";
+import { DEFAULT_CATEGORY_ORDER, DEFAULT_BAND_LIMIT } from "../utils/shopConfig";
 
 const SettingsContext = createContext();
 
@@ -46,7 +47,11 @@ export function SettingsProvider({ children }) {
           { size: "L", chest: "97-102", waist: "81-86", length: "74" },
           { size: "XL", chest: "102-107", waist: "86-91", length: "76" },
           { size: "XXL", chest: "107-112", waist: "91-97", length: "78" },
-        ]
+        ],
+        shop_category_order: [...DEFAULT_CATEGORY_ORDER],
+        tickets_band_position: "top",
+        tickets_band_scope: "all",
+        tickets_band_limit: DEFAULT_BAND_LIMIT,
     });
     const [loading, setLoading] = useState(true);
 

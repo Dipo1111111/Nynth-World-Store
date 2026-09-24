@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp, ArrowDown, LayoutList } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
+import { DEFAULT_CATEGORY_ORDER, categoryLabel } from "../../utils/shopConfig";
 import headerBanner from "../../assets/header.JPEG";
 import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA, EMPTY_SHIPPING_RATES } from "../../data/locationData";
 import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
@@ -50,7 +51,11 @@ const SETTINGS_DEFAULTS = {
  free_delivery_threshold: 50000,
  our_story_content: null,
  shipping_rates: { lagos: {}, abuja: {}, interstate: {} },
- custom_shipping_locations: { lagos: {}, abuja: {}, interstate: {} }
+ custom_shipping_locations: { lagos: {}, abuja: {}, interstate: {} },
+ shop_category_order: [...DEFAULT_CATEGORY_ORDER],
+ tickets_band_position: "top",
+ tickets_band_scope: "all",
+ tickets_band_limit: 3,
 };
 
 // Merge persisted settings over the defaults, filling gaps so the editor always
@@ -77,6 +82,10 @@ const mergeSettingsDefaults = (part = {}) => ({
  free_delivery_enabled: part.free_delivery_enabled !== undefined ? part.free_delivery_enabled : SETTINGS_DEFAULTS.free_delivery_enabled,
  free_delivery_threshold: part.free_delivery_threshold || SETTINGS_DEFAULTS.free_delivery_threshold,
  our_story_content: part.our_story_content || SETTINGS_DEFAULTS.our_story_content,
+ shop_category_order: Array.isArray(part.shop_category_order) ? part.shop_category_order : [...DEFAULT_CATEGORY_ORDER],
+ tickets_band_position: part.tickets_band_position || SETTINGS_DEFAULTS.tickets_band_position,
+ tickets_band_scope: part.tickets_band_scope || SETTINGS_DEFAULTS.tickets_band_scope,
+ tickets_band_limit: part.tickets_band_limit !== undefined ? Number(part.tickets_band_limit) : SETTINGS_DEFAULTS.tickets_band_limit,
 });
 
 // Default Our Story content - mirrors /our-story page fallbacks. Pre-fills the
@@ -196,9 +205,39 @@ export default function AdminSettings() {
  const { name, value, type, checked } = e.target;
  setSettings(prev => ({
  ...prev,
- [name]: type === "checkbox" ? checked : ((name === "shipping_fee" || name === "free_delivery_threshold") ? Number(value) : value)
- }));
- };
+[name]: type === "checkbox" ? checked : ((name === "shipping_fee" || name === "free_delivery_threshold" || name === "tickets_band_limit") ? Number(value) : value)
+  }));
+  };
+
+  const moveCategory = (idx, dir) => {
+  setSettings(prev => {
+  const list = [...(prev.shop_category_order || [])];
+  const target = idx + dir;
+  if (idx === 0 || target < 0 || target >= list.length) return prev;
+  [list[idx], list[target]] = [list[target], list[idx]];
+  return { ...prev, shop_category_order: list };
+  });
+  };
+
+  const removeCategory = (idx) => {
+  setSettings(prev => ({
+  ...prev,
+  shop_category_order: (prev.shop_category_order || []).filter((_, i) => i !== idx)
+  }));
+  };
+
+  const addCategory = (cat) => {
+  if (!cat) return;
+  setSettings(prev => {
+  const current = prev.shop_category_order || [];
+  if (current.includes(cat)) return prev;
+  return { ...prev, shop_category_order: [...current, cat] };
+  });
+  };
+
+  const hiddenCategories = DEFAULT_CATEGORY_ORDER.filter(
+  (cat) => !(settings.shop_category_order || []).includes(cat)
+  );
 
  const handleSubmit = async (e) => {
  if (e && typeof e.preventDefault === "function") e.preventDefault();
@@ -260,7 +299,7 @@ export default function AdminSettings() {
   </header>
 
   <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur px-2 py-2">
-  {[["Store", "#set-store"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
+  {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
   <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/55 hover:text-[#EDEAE2] hover:bg-white/[0.06] transition-colors focus-ring">
   {label}
   </a>
@@ -290,6 +329,143 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
  placeholder="₦"
  />
+ </div>
+ </div>
+ </div>
+
+ {/* Shop Page Layout */}
+ <div id="set-shop" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+ <SectionTitle icon={LayoutList} title="Shop Page Layout" />
+ <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ Control the category tabs and the bold tickets band on the shop page. Changes stay staged until you save.
+ </p>
+
+ <div className="mb-8">
+ <div className="flex items-center justify-between mb-3">
+ <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Category Tab Order</h4>
+ <button
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, shop_category_order: [...DEFAULT_CATEGORY_ORDER] }))}
+ className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+ >
+ <RotateCcw size={11} /> Restore Default
+ </button>
+ </div>
+ <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-3">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
+ <div className="border border-white/10 rounded-lg divide-y divide-white/10">
+ {(settings.shop_category_order || []).map((cat, idx) => (
+ <div key={`${cat}-${idx}`} className="flex items-center justify-between gap-3 px-3 py-2.5">
+ <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#EDEAE2]">
+ <span className="text-[#EDEAE2]/42 tabular-nums">{String(idx + 1).padStart(2, "0")}</span>
+ {categoryLabel(cat)}
+ </span>
+ <span className="flex items-center gap-1">
+ <button
+ type="button"
+ disabled={idx === 0}
+ onClick={() => moveCategory(idx, -1)}
+ className="p-1.5 rounded hover:bg-white/[0.08] text-[#EDEAE2]/60 hover:text-[#EDEAE2] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ title="Move up"
+ aria-label={`Move ${categoryLabel(cat)} up`}
+ >
+ <ArrowUp size={14} />
+ </button>
+ <button
+ type="button"
+ disabled={idx === (settings.shop_category_order || []).length - 1}
+ onClick={() => moveCategory(idx, 1)}
+ className="p-1.5 rounded hover:bg-white/[0.08] text-[#EDEAE2]/60 hover:text-[#EDEAE2] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ title="Move down"
+ aria-label={`Move ${categoryLabel(cat)} down`}
+ >
+ <ArrowDown size={14} />
+ </button>
+ <button
+ type="button"
+ disabled={idx === 0}
+ onClick={() => removeCategory(idx)}
+ className="p-1.5 rounded hover:bg-rose-500/10 text-[#EDEAE2]/60 hover:text-rose-300 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ title="Hide tab"
+ aria-label={`Hide ${categoryLabel(cat)} tab`}
+ >
+ <Trash2 size={14} />
+ </button>
+ </span>
+ </div>
+ ))}
+ </div>
+ {hiddenCategories.length > 0 && (
+ <div className="flex gap-2 mt-3">
+ <select
+ value=""
+ onChange={(e) => { if (e.target.value) addCategory(e.target.value); }}
+ className="flex-1 px-3 py-2 border border-white/14 rounded-lg bg-[#0a0a0a] text-[#EDEAE2] focus-ring text-xs"
+ aria-label="Add a hidden category back"
+ >
+ <option value="">Add hidden tab...</option>
+ {hiddenCategories.map((c) => (
+ <option key={c} value={c}>{categoryLabel(c).toUpperCase()}</option>
+ ))}
+ </select>
+ </div>
+ )}
+ </div>
+
+ <div className="space-y-6">
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-[#EDEAE2]/78">Bold Tickets Band Position</label>
+ <div className="flex flex-wrap gap-2">
+ {[["top", "TOP (BELOW TABS)"], ["bottom", "BOTTOM (BELOW PRODUCTS)"], ["hidden", "HIDDEN"]].map(([val, label]) => (
+ <button
+ key={val}
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, tickets_band_position: val }))}
+ className={`flex items-center gap-2 px-4 py-3 border transition-all text-[10px] font-bold uppercase tracking-widest ${
+ settings.tickets_band_position === val
+ ? 'border-white/25 bg-[#EDEAE2] text-[#0d0d0f]'
+ : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
+ }`}
+ >
+ {label}
+ </button>
+ ))}
+ </div>
+ <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
+ </div>
+
+ <div className="space-y-2">
+ <label className="text-sm font-medium text-[#EDEAE2]/78">Bold Tickets Band Shows On</label>
+ <div className="flex flex-wrap gap-2">
+ {[["all", "ALL SECTIONS"], ["tickets_only", "TICKETS TAB ONLY"]].map(([val, label]) => (
+ <button
+ key={val}
+ type="button"
+ onClick={() => setSettings(prev => ({ ...prev, tickets_band_scope: val }))}
+ className={`flex items-center gap-2 px-4 py-3 border transition-all text-[10px] font-bold uppercase tracking-widest ${
+ settings.tickets_band_scope === val
+ ? 'border-white/25 bg-[#EDEAE2] text-[#0d0d0f]'
+ : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
+ }`}
+ >
+ {label}
+ </button>
+ ))}
+ </div>
+ <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">When set to tickets tab only, the bold band is skipped on All and other views.</p>
+ </div>
+
+ <div className="max-w-xs space-y-2">
+ <label className="text-sm font-medium text-[#EDEAE2]/78">Max Tickets in Bold Band</label>
+ <input
+ name="tickets_band_limit"
+ type="number"
+ min="1"
+ max="6"
+ value={settings.tickets_band_limit}
+ onChange={handleChange}
+ className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ />
+ <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
  </div>
  </div>
  </div>

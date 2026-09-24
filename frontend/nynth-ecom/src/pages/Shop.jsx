@@ -12,6 +12,36 @@ import headerBanner from "../assets/header.JPEG";
 import { useSettings } from "../context/SettingsContext";
 import { getOptimizedImageUrl } from "../api/cloudinary";
 import Marquee from "../components/common/Marquee";
+import {
+  normalizeCategoryOrder,
+  normalizeBandPosition,
+  normalizeBandScope,
+  normalizeBandLimit,
+  categoryLabel,
+} from "../utils/shopConfig";
+
+const TicketsBand = ({ products, onTicketsView, limit }) => (
+  <section className="w-full">
+    <div className="flex items-center justify-between px-4 md:px-10 py-3 bg-black">
+      <span className="text-[8px] tracking-[0.25em] font-bold uppercase text-white">
+        INSTANT E-TICKETS · NO DELIVERY · NO FEES
+      </span>
+      <Link
+        to={onTicketsView ? "/shop" : "/shop?category=tickets"}
+        className="text-[8px] tracking-[0.25em] font-bold uppercase text-white/60 hover:text-white transition-colors"
+      >
+        {onTicketsView ? "SHOW ALL PRODUCTS" : "VIEW ALL TICKETS"} →
+      </Link>
+    </div>
+    <div className="w-full bg-white px-4 md:px-10 py-8">
+      <div className="grid grid-cols-1 gap-5 w-full">
+        {products.slice(0, limit).map((p) => (
+          <TicketCard key={p.id} product={p} wide />
+        ))}
+      </div>
+    </div>
+  </section>
+);
 
 export default function Shop() {
   const [searchParams] = useSearchParams();
@@ -27,6 +57,11 @@ export default function Shop() {
 
   const [displayMode, setDisplayMode] = useState("view");
   const { settings } = useSettings();
+
+  const categoryOrder = normalizeCategoryOrder(settings.shop_category_order);
+  const bandPosition = normalizeBandPosition(settings.tickets_band_position);
+  const bandScope = normalizeBandScope(settings.tickets_band_scope);
+  const bandLimit = normalizeBandLimit(settings.tickets_band_limit);
 
   // Dynamically preload LCP hero banner - works in both dev and production
   useEffect(() => {
@@ -83,6 +118,13 @@ export default function Shop() {
     setFilteredProducts(result);
   }, [products, selectedCategory, searchQuery, sortBy]);
 
+  const ticketProducts = filteredProducts.filter((p) => p.category === "tickets");
+  const onTicketsView = selectedCategory?.toLowerCase() === "tickets";
+  const bandVisible =
+    ticketProducts.length > 0 &&
+    bandPosition !== "hidden" &&
+    (bandScope === "all" || onTicketsView);
+
   return (
     <div className="min-h-screen bg-white text-black font-inter flex flex-col">
       <SEO title="Shop Collection | NYNTH" description="Premium Minimal Streetwear" url="/shop" />
@@ -115,7 +157,7 @@ export default function Shop() {
         </section>
 
         {/* Free Delivery Notice - surfaced before the drop-off point */}
-        {selectedCategory !== "tickets" && settings?.free_delivery_enabled !== false && (
+        {!onTicketsView && settings?.free_delivery_enabled !== false && (
           <div className="bg-black text-white text-center py-3 px-6">
             <p className="text-[9px] md:text-[10px] tracking-[0.25em] font-bold uppercase">
               FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()} · CALCULATED AT CHECKOUT
@@ -151,57 +193,35 @@ export default function Shop() {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            {["all", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves", "tickets"].map((cat) => (
+            {categoryOrder.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`text-[9px] tracking-[0.25em] font-bold uppercase transition-all duration-300 whitespace-nowrap ${selectedCategory === cat ? "text-black underline underline-offset-[10px]" : "text-gray-300 hover:text-black"
                   }`}
               >
-                {cat === 'tees' ? 't-shirts' : cat}
+                {categoryLabel(cat)}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Mobile Category Chips - always visible, tickets included */}
+        {/* Mobile Category Chips - always visible, admin ordered */}
         <div className="md:hidden flex items-center gap-2 overflow-x-auto px-4 py-3 border-b border-black/5 bg-white scrollbar-hide no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {["all", "tickets", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves"].map((cat) => (
+          {categoryOrder.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`shrink-0 px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.2em] border transition-all whitespace-nowrap ${selectedCategory === cat ? "bg-black text-white border-black" : "border-gray-200 text-gray-500 hover:border-black hover:text-black"}`}
             >
-              {cat === 'tees' ? 't-shirts' : cat}
+              {categoryLabel(cat)}
             </button>
           ))}
         </div>
 
         {/* Tickets Band - Edge to Edge, Long Glossy Wide Cards */}
-        {filteredProducts.some((p) => p.category === "tickets") && (
-          <section className="w-full">
-            <div className="flex items-center justify-between px-4 md:px-10 py-3 bg-black">
-              <span className="text-[8px] tracking-[0.25em] font-bold uppercase text-white">
-                INSTANT E-TICKETS · NO DELIVERY · NO FEES
-              </span>
-              <Link
-                to={selectedCategory === "tickets" ? "/shop" : "/shop?category=tickets"}
-                className="text-[8px] tracking-[0.25em] font-bold uppercase text-white/60 hover:text-white transition-colors"
-              >
-                {selectedCategory === "tickets" ? "SHOW ALL PRODUCTS" : "VIEW ALL TICKETS"} →
-              </Link>
-            </div>
-            <div className="w-full bg-white px-4 md:px-10 py-8">
-              <div className="grid grid-cols-1 gap-5 w-full">
-                {filteredProducts
-                  .filter((p) => p.category === "tickets")
-                  .slice(0, 3)
-                  .map((p) => (
-                    <TicketCard key={p.id} product={p} wide />
-                  ))}
-              </div>
-            </div>
-          </section>
+        {bandPosition === "top" && bandVisible && (
+          <TicketsBand products={ticketProducts} onTicketsView={onTicketsView} limit={bandLimit} />
         )}
 
         {/* Grid Layer - 100% Full Width, 0 Padding, 1px Gaps */}
@@ -239,6 +259,11 @@ export default function Shop() {
             </section>
           )}
         </div>
+
+        {/* Tickets Band - bottom placement, below the full product grid */}
+        {bandPosition === "bottom" && bandVisible && (
+          <TicketsBand products={ticketProducts} onTicketsView={onTicketsView} limit={bandLimit} />
+        )}
       </main>
 
       <Footer />

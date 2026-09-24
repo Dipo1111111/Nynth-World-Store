@@ -84,6 +84,65 @@ Deno.test("finalizes a pending order after a successful Paystack charge", async 
   }
 });
 
+Deno.test("ticket orders email the event title, date, venue, and price", async () => {
+  const realFetch = globalThis.fetch;
+  const resendBodies: any[] = [];
+
+  (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+    const u = String(url);
+    const method = init?.method ?? "GET";
+
+    if (u.includes("api.paystack.co")) {
+      return jsonResponse({ status: true, message: "ok", data: { status: "success", reference: "REF2", metadata: { orderId: "ord-10" } } });
+    }
+    if (u.includes("api.resend.com")) {
+      resendBodies.push(JSON.parse(String(init?.body)));
+      return jsonResponse({ id: "email-2" });
+    }
+    if (u.includes("/rest/v1/orders")) {
+      if (method === "PATCH") return jsonResponse([]);
+      return jsonResponse({
+        id: "ord-10",
+        customer: { email: "buyer@x.com", firstName: "Ada" },
+        items: [{ id: "tix1", category: "tickets", quantity: 2, name: "AFRO FUTURE FEST", title: "AFRO FUTURE FEST", price: 15000, eventDateTime: "2026-12-01T18:00:00+01:00", venue: "Eko Convention Centre" }],
+        total: 30000,
+        payment_status: "pending",
+        order_status: "pending",
+        tickets: [],
+      });
+    }
+    if (u.includes("/rest/v1/products")) {
+      if (method === "PATCH") return jsonResponse([]);
+      return jsonResponse({ id: "tix1", stock_quantity: 5 });
+    }
+    return jsonResponse({ message: "unhandled " + u }, 500);
+  };
+
+  for (const [k, v] of Object.entries(env)) Deno.env.set(k, v);
+
+  try {
+    const res = await handler(new Request("https://x.supabase.co/functions/v1/paystack-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reference: "REF2" }),
+    }));
+    assertEquals(res.status, 200);
+    const customer = resendBodies.find((b) => b.to === "buyer@x.com");
+    assert(customer, "customer confirmation should be sent");
+    assert(customer.html.includes("AFRO FUTURE FEST"), "customer email must name the event");
+    assert(customer.html.includes("Eko Convention Centre"), "customer email must include the venue");
+    assert(customer.html.includes("DEC"), "customer email must include the event date");
+    assert(customer.html.includes("NWT-"), "customer email must include the pass code");
+    assert(customer.html.includes("Open your pass"), "customer email must link each pass");
+    assert(customer.html.includes("15,000"), "customer email must include the price");
+    const admin = resendBodies.find((b) => b.to === "admin@nynth.com");
+    assert(admin, "admin alert should be sent");
+    assert(admin.html.includes("AFRO FUTURE FEST"), "admin email must identify the event too");
+  } finally {
+    (globalThis as any).fetch = realFetch;
+  }
+});
+
 Deno.test("returns alreadyPaid true and sends no mails for an already-paid order", async () => {
   const realFetch = globalThis.fetch;
   let resendCalls = 0;

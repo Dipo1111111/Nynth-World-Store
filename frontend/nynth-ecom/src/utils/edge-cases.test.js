@@ -16,6 +16,13 @@ import {
 import { getLagosPrice, effectiveLagosRates, cartNeedsShipping } from "./shippingRates";
 import { getAuthErrorMessage, withRetry } from "./errorHandlers";
 import { cn } from "../lib/utils";
+import {
+  normalizeCategoryOrder,
+  normalizeBandPosition,
+  normalizeBandScope,
+  normalizeBandLimit,
+  categoryLabel,
+} from "./shopConfig";
 
 describe("tickets: items that are barely there", () => {
     it("null, undefined, and category-less items are never tickets", () => {
@@ -138,5 +145,50 @@ describe("styling helper", () => {
     it("cn() resolves conflicting classes instead of stacking them", () => {
         expect(cn("px-4 px-8")).toBe("px-8");
         expect(cn("text-sm", null, undefined, "font-bold")).toContain("font-bold");
+    });
+});
+
+describe("shop config: admin-controlled tab order", () => {
+    it("missing or broken order falls back to the default", () => {
+        expect(normalizeCategoryOrder()).toEqual(["all", "tees", "hoodies", "headwear", "accessories", "pants", "polo", "sleeves", "tickets"]);
+        expect(normalizeCategoryOrder([null, "", 4])).toContain("all");
+        expect(normalizeCategoryOrder("nope")).toContain("tickets");
+        expect(normalizeCategoryOrder([])).toContain("all");
+    });
+
+    it("drops duplicates and unknown junk, keeps a single all", () => {
+        const out = normalizeCategoryOrder(["all", "tickets", "all", "tees", "tickets", 0]);
+        expect(out).toEqual(["all", "tickets", "tees"]);
+    });
+
+    it("forces all back in first when an admin hides it", () => {
+        const out = normalizeCategoryOrder(["tickets", "tees"]);
+        expect(out[0]).toBe("all");
+        expect(out).toContain("tickets");
+    });
+
+    it("labels t-shirts without touching other categories", () => {
+        expect(categoryLabel("tees")).toBe("t-shirts");
+        expect(categoryLabel("tickets")).toBe("tickets");
+        expect(categoryLabel("all")).toBe("all");
+    });
+});
+
+describe("shop config: bold tickets band controls", () => {
+    it("unknown band position falls back to top, scope to all", () => {
+        expect(normalizeBandPosition(undefined)).toBe("top");
+        expect(normalizeBandPosition("floating")).toBe("top");
+        expect(normalizeBandPosition("bottom")).toBe("bottom");
+        expect(normalizeBandPosition("hidden")).toBe("hidden");
+        expect(normalizeBandScope(undefined)).toBe("all");
+        expect(normalizeBandScope("tickets_only")).toBe("tickets_only");
+    });
+
+    it("limit is clamped to a sane range and never NaN", () => {
+        expect(normalizeBandLimit()).toBe(3);
+        expect(normalizeBandLimit(0)).toBe(1);
+        expect(normalizeBandLimit(99)).toBe(6);
+        expect(normalizeBandLimit("4")).toBe(4);
+        expect(normalizeBandLimit("NaN")).toBe(3);
     });
 });
