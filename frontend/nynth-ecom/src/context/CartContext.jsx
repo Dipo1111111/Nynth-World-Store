@@ -83,6 +83,8 @@ export const CartProvider = ({ children }) => {
             eventDateTime: isTicket ? (product.eventDateTime || product.eventDateTimeISO) : null,
             venue: isTicket ? product.venue : null,
             weight: isTicket ? 0 : (product.weight || 0.5),
+            // Per-product delivery switch - carried so checkout can see it (missing = fee on).
+            deliveryFeeEnabled: product.deliveryFeeEnabled ?? (product.category !== "tickets"),
           },
         ];
       }

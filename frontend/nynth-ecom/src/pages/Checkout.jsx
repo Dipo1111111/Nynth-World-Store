@@ -58,6 +58,8 @@ const Checkout = () => {
     state: availableStates.length > 0 ? availableStates[0].value : "",
     zip: "",
     deliveryMethod: "home", // New: home or park
+    deliveryDate: "", // Optional: shopper tells us when they'll be available
+    deliveryTimeWindow: "", // Optional: preferred part of the day, only with a date
   });
   const [shippingFee, setShippingFee] = useState(0);
 
@@ -66,6 +68,11 @@ const Checkout = () => {
   const cartHasPhysical = hasPhysicalItems(cartItems);
   const ticketsOnly = cartHasTickets && !cartHasPhysical;
   const physicalSubtotal = nonTicketSubtotal(cartItems);
+
+  // Free delivery signal: either every physical item has its fee toggled off,
+  // or the cart clears the storewide free-delivery threshold.
+  const allItemsFreeDelivery = cartHasPhysical && !cartNeedsShipping(cartItems);
+  const minDeliveryDate = new Date().toISOString().split("T")[0];
 
   // Discount code state
   const [discountInput, setDiscountInput] = useState("");
@@ -564,6 +571,42 @@ const Checkout = () => {
                 )}
               </div>
               )}
+
+              {/* Preferred delivery - the optional "when will you be around?" box */}
+              <div className="border border-gray-100 p-5 space-y-5">
+                <div>
+                  <p className="text-[10px] tracking-[0.25em] font-bold uppercase text-black mb-1">Preferred Delivery Date</p>
+                  <p className="text-[9px] text-gray-400 uppercase tracking-widest">Optional - tell us when you will be available to receive your order</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Date</label>
+                    <input
+                      name="deliveryDate"
+                      type="date"
+                      min={minDeliveryDate}
+                      value={form.deliveryDate}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[12px] tracking-wider font-medium bg-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Time of Day</label>
+                    <select
+                      name="deliveryTimeWindow"
+                      value={form.deliveryTimeWindow}
+                      onChange={handleChange}
+                      disabled={!form.deliveryDate}
+                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[12px] tracking-widest uppercase font-medium bg-transparent appearance-none disabled:opacity-40"
+                    >
+                      <option value="">ANY TIME</option>
+                      <option value="morning">MORNING (9AM - 12PM)</option>
+                      <option value="afternoon">AFTERNOON (12PM - 4PM)</option>
+                      <option value="evening">EVENING (4PM - 8PM)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
               </>
             )}
 
@@ -668,7 +711,7 @@ const Checkout = () => {
                 <span className="text-black font-bold uppercase block">
                   {ticketsOnly
                     ? "FREE - INSTANT E-TICKET"
-                    : shippingFee === 0 && settings?.free_delivery_enabled !== false && physicalSubtotal >= (settings?.free_delivery_threshold ?? 50000)
+                    : shippingFee === 0 && (allItemsFreeDelivery || (settings?.free_delivery_enabled !== false && physicalSubtotal >= (settings?.free_delivery_threshold ?? 50000)))
                       ? "FREE DELIVERY"
                       : form.city ? `${form.city.toUpperCase()} - ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"
                   }

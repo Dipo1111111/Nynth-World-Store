@@ -99,12 +99,16 @@ export function adminHtml(order: any, opts: { shortId: string; reference: string
   const shipLine = hasPhysicalItems(order.items)
     ? `<p><strong>Ship to:</strong> ${order.customer?.address ?? ""}, ${order.customer?.city ?? ""}, ${order.customer?.state ?? ""}</p>`
     : `<p><strong>Fulfilment:</strong> e-tickets only, no shipping.</p>`;
+  const prefLine = order.customer?.deliveryDate
+    ? `<p><strong>Preferred delivery:</strong> ${order.customer.deliveryDate}${order.customer.deliveryTimeWindow ? " (" + order.customer.deliveryTimeWindow.toUpperCase() + ")" : ""}</p>`
+    : "";
   return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111111;line-height:1.6">`
     + `<p style="font-size:11px;letter-spacing:3px;font-weight:bold;margin:0">NYNTH WORLD - NEW SALE</p>`
     + `<h1 style="font-size:24px;margin:8px 0 16px">${naira(order.total)} paid.</h1>`
     + `<p>Order <strong>#${opts.shortId}</strong> just confirmed. Paystack ref ${opts.reference}.</p>`
     + `<p><strong>Buyer:</strong> ${(order.customer?.firstName ?? "") + " " + (order.customer?.lastName ?? "")} (${order.customer?.email ?? "no email"}, ${order.customer?.phone ?? "no phone"})</p>`
     + shipLine
+    + prefLine
     + `<p><strong>Items:</strong><br>${opts.itemsHtml}</p></div>`;
 }
 

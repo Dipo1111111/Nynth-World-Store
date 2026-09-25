@@ -6,6 +6,7 @@ import { Plus, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 import { incrementCounter } from "../../api/firebaseFunctions";
 import { getOptimizedImageUrl } from "../../api/cloudinary";
+import { foreignPriceLabel } from "../../utils/currency";
 
 export default function ProductCard({ product, displayMode = 'model' }) {
   const { settings } = useSettings();
@@ -115,6 +116,11 @@ export default function ProductCard({ product, displayMode = 'model' }) {
             )}
             {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
+          {foreignPriceLabel(product.price) && (
+            <p className="text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-gray-400 -mt-3 mb-4">
+              {foreignPriceLabel(product.price)}
+            </p>
+          )}
 
 
           <button
@@ -188,6 +194,11 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           </span>
         </div>
 
+        {foreignPriceLabel(product.price) && (
+          <p className="text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-gray-400 px-3 md:px-4 pb-2 -mt-1">
+            {foreignPriceLabel(product.price)}
+          </p>
+        )}
       </div>
     </div>
   );

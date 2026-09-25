@@ -160,7 +160,7 @@ export default function Shop() {
         {!onTicketsView && settings?.free_delivery_enabled !== false && (
           <div className="bg-black text-white text-center py-3 px-6">
             <p className="text-[9px] md:text-[10px] tracking-[0.25em] font-bold uppercase">
-              FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()} · CALCULATED AT CHECKOUT
+              FREE DELIVERY NATIONWIDE ON EVERY ORDER · CALCULATED AT CHECKOUT
             </p>
           </div>
         )}

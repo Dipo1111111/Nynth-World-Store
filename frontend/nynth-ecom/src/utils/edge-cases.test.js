@@ -16,6 +16,7 @@ import {
 import { getLagosPrice, effectiveLagosRates, cartNeedsShipping } from "./shippingRates";
 import { getAuthErrorMessage, withRetry } from "./errorHandlers";
 import { cn } from "../lib/utils";
+import { foreignPriceLabel } from "./currency";
 import {
   normalizeCategoryOrder,
   normalizeBandPosition,
@@ -145,6 +146,21 @@ describe("styling helper", () => {
     it("cn() resolves conflicting classes instead of stacking them", () => {
         expect(cn("px-4 px-8")).toBe("px-8");
         expect(cn("text-sm", null, undefined, "font-bold")).toContain("font-bold");
+    });
+});
+
+describe("currency: foreign price viewer", () => {
+    it("renders USD and GBP equivalents from a naira price", () => {
+        expect(foreignPriceLabel(30000)).toBe("APPROX $20.00 / £15.00");
+        expect(foreignPriceLabel(10000)).toBe("APPROX $6.67 / £5.00");
+    });
+
+    it("returns empty for missing, zero, or broken prices", () => {
+        expect(foreignPriceLabel(0)).toBe("");
+        expect(foreignPriceLabel(null)).toBe("");
+        expect(foreignPriceLabel(undefined)).toBe("");
+        expect(foreignPriceLabel("abc")).toBe("");
+        expect(foreignPriceLabel(-5000)).toBe("");
     });
 });
 

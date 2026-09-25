@@ -736,6 +736,12 @@ const Orders = () => {
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.address}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.city}, {order.customer?.state}</p>
                                                                             <p className="text-sm text-[#EDEAE2]/65">{order.customer?.country}</p>
+                                                                            {order.customer?.deliveryDate && (
+                                                                                <p className="text-sm text-emerald-400/90 pt-1">
+                                                                                    Preferred: {new Date(`${order.customer.deliveryDate}T00:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
+                                                                                    {order.customer?.deliveryTimeWindow ? ` · ${order.customer.deliveryTimeWindow.toUpperCase()}` : ""}
+                                                                                </p>
+                                                                            )}
                                                                         </div>
                                                                     </div>
 

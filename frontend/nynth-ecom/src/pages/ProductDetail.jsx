@@ -12,6 +12,7 @@ import SizeGuideModal from "../components/products/SizeGuideModal";
 import ProductCard from "../components/products/ProductCard";
 import EventPage from "../components/tickets/EventPage";
 import { isTicket } from "../utils/tickets";
+import { foreignPriceLabel } from "../utils/currency";
 
 const getColorHex = (colorName) => {
   const map = {
@@ -357,6 +358,11 @@ export default function ProductDetail() {
                 {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
+            {foreignPriceLabel(product.price) && (
+              <p className="text-[8px] tracking-[0.25em] uppercase text-gray-400 -mt-10 mb-10">
+                {foreignPriceLabel(product.price)}
+              </p>
+            )}
 
             {/* Color Selection - Exact Suvene Style Boxes */}
             {product.availableColors?.length > 0 && (
@@ -432,10 +438,16 @@ export default function ProductDetail() {
 
             {/* Shipping Badges - Simple minimalist */}
             <div className="space-y-3 mb-16">
-              {settings?.free_delivery_enabled !== false && (
+              {product.deliveryFeeEnabled === false ? (
                 <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
-                  <div className="w-1.5 h-1.5 rounded-full bg-black"></div> FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+                  <div className="w-1.5 h-1.5 rounded-full bg-black"></div> FREE DELIVERY NATIONWIDE
                 </div>
+              ) : (
+                settings?.free_delivery_enabled !== false && (
+                  <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
+                    <div className="w-1.5 h-1.5 rounded-full bg-black"></div> FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+                  </div>
+                )
               )}
               <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 3-5 DAYS SHIPPING
@@ -588,6 +600,11 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
               {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
+          {foreignPriceLabel(product.price) && (
+            <p className="text-[8px] tracking-[0.25em] uppercase text-gray-400 -mt-4 mb-4">
+              {foreignPriceLabel(product.price)}
+            </p>
+          )}
 
           {/* Color Selection */}
           {product.availableColors?.length > 0 && (
@@ -668,10 +685,16 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
 
           {/* Shipping Badges */}
           <div className="space-y-3 mb-8">
-            {settings?.free_delivery_enabled !== false && (
+            {product.deliveryFeeEnabled === false ? (
               <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
-                <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+                <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> FREE DELIVERY NATIONWIDE
               </div>
+            ) : (
+              settings?.free_delivery_enabled !== false && (
+                <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
+                  <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+                </div>
+              )
             )}
             <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
               <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 3-5 DAYS SHIPPING

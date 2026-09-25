@@ -8,6 +8,7 @@ import { Minus, Plus, Trash2, ArrowRight, Ticket } from "lucide-react";
 import SEO from "../components/SEO";
 import { useSettings } from "../context/SettingsContext";
 import { isTicketItem, hasTickets, hasPhysicalItems, ticketCount, formatEventDate } from "../utils/tickets";
+import { cartNeedsShipping } from "../utils/shippingRates";
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
@@ -143,7 +144,9 @@ export default function Cart() {
 
           {hasPhysicalItems(cartItems) && settings?.free_delivery_enabled !== false && (
             <p className="text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">
-              FREE DELIVERY ON ORDERS OVER {settings.currency_symbol || "₦"}{(settings.free_delivery_threshold ?? 50000).toLocaleString()}
+              {!cartNeedsShipping(cartItems)
+                ? "FREE DELIVERY NATIONWIDE ON EVERY ITEM IN YOUR BAG"
+                : `FREE DELIVERY ON ORDERS OVER ${settings.currency_symbol || "₦"}${(settings.free_delivery_threshold ?? 50000).toLocaleString()}`}
             </p>
           )}
 
@@ -155,7 +158,11 @@ export default function Cart() {
             <div className="flex justify-between text-[10px] tracking-[0.15em] text-gray-500 uppercase">
               <span>SHIPPING</span>
               {hasPhysicalItems(cartItems) ? (
-                <span className="text-gray-400">CALCULATED AT CHECKOUT</span>
+                !cartNeedsShipping(cartItems) ? (
+                  <span className="text-green-600 font-bold">FREE DELIVERY</span>
+                ) : (
+                  <span className="text-gray-400">CALCULATED AT CHECKOUT</span>
+                )
               ) : (
                 <span className="text-green-600 font-bold">FREE - E-TICKETS</span>
               )}
