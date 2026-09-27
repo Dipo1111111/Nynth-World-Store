@@ -58,8 +58,8 @@ export default function DiscountCodes() {
  type: code.type || "percentage",
  value: code.value || "",
  expiresAt: code.expiresAt
- ? new Date(code.expiresAt.seconds * 1000).toISOString().split("T")[0]
- : "",
+  ? String(code.expiresAt).slice(0, 10)
+  : "",
  isActive: code.isActive !== false,
  });
  } else {
@@ -104,9 +104,14 @@ export default function DiscountCodes() {
  };
 
  if (editingId) {
- await updateDiscountCode(editingId, data);
- toast.success("Code updated");
- } else {
+  const ok = await updateDiscountCode(editingId, data);
+  if (!ok) {
+  toast.error("Failed to update code");
+  setIsSubmitting(false);
+  return;
+  }
+  toast.success("Code updated");
+  } else {
  const result = await addDiscountCode(data);
  if (!result.success) {
  toast.error(result.error || "Failed to add code");
@@ -148,10 +153,7 @@ export default function DiscountCodes() {
 
  const isExpired = (code) => {
  if (!code.expiresAt) return false;
- const expires = code.expiresAt.seconds
- ? new Date(code.expiresAt.seconds * 1000)
- : new Date(code.expiresAt);
- return expires < new Date();
+ return new Date(code.expiresAt) < new Date();
  };
 
  const activeCount = codes.filter((c) => c.isActive && !isExpired(c)).length;
@@ -242,9 +244,7 @@ export default function DiscountCodes() {
  <p className="text-[10px] text-[#EDEAE2]/42 flex items-center gap-1 mb-3 mt-2">
  <Calendar size={10} />
  Expires{" "}
- {new Date(
- code.expiresAt.seconds * 1000
- ).toLocaleDateString()}
+  {new Date(code.expiresAt).toLocaleDateString()}
  </p>
  )}
  </div>
@@ -342,11 +342,9 @@ export default function DiscountCodes() {
  : `₦${Number(code.value).toLocaleString()}`}
  </td>
  <td className="px-6 py-4 text-sm text-[#EDEAE2]/55">
- {code.expiresAt
- ? new Date(
- code.expiresAt.seconds * 1000
- ).toLocaleDateString()
- : "-"}
+  {code.expiresAt
+  ? new Date(code.expiresAt).toLocaleDateString()
+  : "-"}
  </td>
  <td className="px-6 py-4">
  {isExpired(code) ? (

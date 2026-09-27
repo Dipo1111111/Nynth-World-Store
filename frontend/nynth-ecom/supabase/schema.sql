@@ -111,6 +111,29 @@ alter table public.discount_codes enable row level security;
 drop policy if exists "discount_admin_all" on public.discount_codes;
 create policy "discount_admin_all" on public.discount_codes for all using (public.is_admin()) with check (public.is_admin());
 
+-- validate_discount(): SECURITY DEFINER so shoppers can check a code at checkout
+-- without being able to read or list discount_codes rows through RLS.
+create or replace function public.validate_discount(p_code text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare r public.discount_codes;
+begin
+  select * into r from public.discount_codes where code = upper(trim(p_code)) limit 1;
+  if not found or r.active is not true then
+    return jsonb_build_object('valid', false, 'error', 'Invalid or inactive code');
+  end if;
+  if r.expires_at is not null and r.expires_at < now() then
+    return jsonb_build_object('valid', false, 'error', 'This code has expired', 'reason', 'expired');
+  end if;
+  return jsonb_build_object('valid', true, 'code', r.code, 'percent_off', r.percent_off, 'amount_off', r.amount_off);
+end;
+$$;
+revoke all on function public.validate_discount(text) from public;
+grant execute on function public.validate_discount(text) to anon, authenticated;
+
 -- ===== subscribers =====
 create table if not exists public.subscribers (
   id text primary key,

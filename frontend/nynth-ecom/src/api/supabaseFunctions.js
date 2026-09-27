@@ -373,13 +373,45 @@ export const fetchGA4Analytics = async (propertyId = null) => {
 export const getAdminAnalytics = async () => ({ counters: await fetchAnalyticsCounters(), ga4: await fetchGA4Analytics() });
 
 // --- DISCOUNT CODES ---
+const discountRowToCode = (r) => ({
+  id: r.id,
+  code: r.code,
+  type: r.percent_off != null && Number(r.percent_off) > 0 ? "percentage" : "fixed",
+  value: Number(r.percent_off ?? r.amount_off ?? 0),
+  isActive: r.active !== false,
+  expiresAt: r.expires_at ?? null,
+  created_at: r.created_at,
+});
+
+const discountFormToRow = (d) => {
+  const value = Number(d.value ?? 0);
+  return {
+    code: String(d.code).toUpperCase(),
+    percent_off: d.type === "percentage" ? value : null,
+    amount_off: d.type === "percentage" ? null : value,
+    active: d.isActive !== false,
+    expires_at: d.expiresAt ? new Date(d.expiresAt).toISOString() : null,
+  };
+};
+
 export const addDiscountCode = async (d) => {
-  const { data, error } = await supabase.from("discount_codes").insert({ code: String(d.code).toUpperCase(), percent_off: d.percentOff ?? d.percent_off ?? null, amount_off: d.amountOff ?? d.amount_off ?? null, active: d.active ?? true, expires_at: d.expiresAt ?? d.expires_at ?? null }).select("id").single();
-  if (error) throw error;
-  return data.id;
+  const row = discountFormToRow(d);
+  const id = `dc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const { data, error } = await supabase.from("discount_codes").insert({ id, ...row, updated_at: new Date().toISOString() }).select("id").single();
+  if (error) return { success: false, error: error.code === "23505" ? "That code already exists" : "Failed to save the code" };
+  return { success: true, id: data.id };
 };
 export const updateDiscountCode = async (id, updates) => {
-  const { error } = await supabase.from("discount_codes").update(updates).eq("id", id);
+  const patch = { updated_at: new Date().toISOString() };
+  if (updates.code !== undefined) patch.code = String(updates.code).toUpperCase();
+  if (updates.isActive !== undefined) patch.active = updates.isActive;
+  if (updates.expiresAt !== undefined) patch.expires_at = updates.expiresAt ? new Date(updates.expiresAt).toISOString() : null;
+  if (updates.type !== undefined && updates.value !== undefined) {
+    const value = Number(updates.value);
+    patch.percent_off = updates.type === "percentage" ? value : null;
+    patch.amount_off = updates.type === "percentage" ? null : value;
+  }
+  const { error } = await supabase.from("discount_codes").update(patch).eq("id", id);
   return !error;
 };
 export const deleteDiscountCode = async (id) => {
@@ -387,12 +419,19 @@ export const deleteDiscountCode = async (id) => {
   return !error;
 };
 export const fetchDiscountCodes = async () => {
-  const { data } = await supabase.from("discount_codes").select("*").order("created_at", { ascending: false });
-  return data ?? [];
+  const { data, error } = await supabase.from("discount_codes").select("*").order("created_at", { ascending: false });
+  if (error) return [];
+  return (data ?? []).map(discountRowToCode);
 };
 export const validateDiscountCode = async (code) => {
-  const { data } = await supabase.from("discount_codes").select("*").eq("code", String(code).toUpperCase()).eq("active", true).maybeSingle();
-  if (!data) return { valid: false, error: "Invalid or inactive code" };
-  if (data.expires_at && new Date(data.expires_at) < new Date()) return { valid: false, error: "This code has expired", reason: "expired" };
-  return { valid: true, code: data, discountType: data.percent_off != null && Number(data.percent_off) > 0 ? "percentage" : "fixed", discountValue: Number(data.percent_off ?? data.amount_off ?? 0) };
+  const { data, error } = await supabase.rpc("validate_discount", { p_code: String(code).trim().toUpperCase() });
+  if (error) return { valid: false, error: "Could not check that code. Please try again." };
+  const d = data ?? {};
+  if (!d.valid) return { valid: false, error: d.error || "Invalid or inactive code", reason: d.reason };
+  return {
+    valid: true,
+    code: { code: d.code },
+    discountType: d.percent_off != null && Number(d.percent_off) > 0 ? "percentage" : "fixed",
+    discountValue: Number(d.percent_off ?? d.amount_off ?? 0),
+  };
 };

@@ -7,6 +7,7 @@ const h = vi.hoisted(() => {
   const record = [];
   let queryResult = { data: null, error: null };
   let invokeResult = { data: null, error: null };
+  let rpcResult = { data: null, error: null };
   let authUser = null;
 
   const buildChain = () => {
@@ -35,16 +36,18 @@ const h = vi.hoisted(() => {
       },
       channel: vi.fn(() => ({ on: vi.fn(() => ({ subscribe: vi.fn() })) })),
       removeChannel: vi.fn(),
-      rpc: vi.fn(),
+      rpc: vi.fn(async (...args) => { record.push({ method: "rpc", args }); return rpcResult; }),
     },
     record,
     setQuery: (result) => { queryResult = result; },
     setInvoke: (result) => { invokeResult = result; },
+    setRpc: (result) => { rpcResult = result; },
     setAuthUser: (user) => { authUser = user; },
     reset: () => {
       record.length = 0;
       queryResult = { data: null, error: null };
       invokeResult = { data: null, error: null };
+      rpcResult = { data: null, error: null };
       authUser = null;
     },
   };
@@ -70,6 +73,9 @@ import {
   fetchOrderByReference,
   getAllOrders,
   validateDiscountCode,
+  addDiscountCode,
+  updateDiscountCode,
+  fetchDiscountCodes,
   initializePayment,
   verifyOrderPayment,
 } from "./supabaseFunctions";
@@ -216,17 +222,19 @@ describe("rowToOrder", () => {
   });
 });
 
-describe("validateDiscountCode (NaN discount bug)", () => {
+describe("validateDiscountCode (guest RLS bug: goes through the validate_discount RPC)", () => {
   it("returns discountType/discountValue for a percentage code", async () => {
-    h.setQuery({ data: { code: "SAVE10", active: true, percent_off: 10, amount_off: null, expires_at: null }, error: null });
+    h.setRpc({ data: { valid: true, code: "SAVE10", percent_off: 10, amount_off: null }, error: null });
     const r = await validateDiscountCode(" save10 ");
+    expect(h.supabase.rpc).toHaveBeenCalledWith("validate_discount", { p_code: "SAVE10" });
     expect(r.valid).toBe(true);
+    expect(r.code.code).toBe("SAVE10");
     expect(r.discountType).toBe("percentage");
     expect(r.discountValue).toBe(10);
   });
 
   it("returns discountType fixed for an amount-off code", async () => {
-    h.setQuery({ data: { code: "NGN500", active: true, percent_off: null, amount_off: 500, expires_at: null }, error: null });
+    h.setRpc({ data: { valid: true, code: "NGN500", percent_off: null, amount_off: 500 }, error: null });
     const r = await validateDiscountCode("NGN500");
     expect(r.valid).toBe(true);
     expect(r.discountType).toBe("fixed");
@@ -234,17 +242,83 @@ describe("validateDiscountCode (NaN discount bug)", () => {
   });
 
   it("labels inactive/invalid codes", async () => {
-    h.setQuery({ data: null, error: null });
+    h.setRpc({ data: { valid: false, error: "Invalid or inactive code" }, error: null });
     const r = await validateDiscountCode("NOPE");
     expect(r.valid).toBe(false);
     expect(r.error).toBeTruthy();
   });
 
   it("labels expired codes", async () => {
-    h.setQuery({ data: { code: "OLDPASS", active: true, percent_off: 5, expires_at: new Date(Date.now() - 86400000).toISOString() }, error: null });
+    h.setRpc({ data: { valid: false, error: "This code has expired", reason: "expired" }, error: null });
     const r = await validateDiscountCode("OLDPASS");
     expect(r.valid).toBe(false);
     expect(r.reason).toBe("expired");
+  });
+});
+
+describe("discount code admin CRUD (create-failure bug)", () => {
+  it("inserts with a generated id and maps type/value onto percent_off/amount_off", async () => {
+    h.setQuery({ data: { id: "dc-1" }, error: null });
+    const out = await addDiscountCode({ code: "launch20", type: "percentage", value: "20", expiresAt: null, isActive: true });
+    expect(out.success).toBe(true);
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.id).toBeTruthy();
+    expect(payload.code).toBe("LAUNCH20");
+    expect(payload.percent_off).toBe(20);
+    expect(payload.amount_off).toBeNull();
+    expect(payload.active).toBe(true);
+    expect(payload.expires_at).toBeNull();
+  });
+
+  it("maps fixed amounts onto amount_off and serializes the expiry date", async () => {
+    h.setQuery({ data: { id: "dc-2" }, error: null });
+    const expires = new Date("2026-10-01T23:59:59");
+    const out = await addDiscountCode({ code: "NGN500", type: "fixed", value: 500, expiresAt: expires, isActive: true });
+    expect(out.success).toBe(true);
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.percent_off).toBeNull();
+    expect(payload.amount_off).toBe(500);
+    expect(payload.expires_at).toBe(expires.toISOString());
+  });
+
+  it("reports duplicate codes instead of throwing", async () => {
+    h.setQuery({ data: null, error: { code: "23505", message: "duplicate key value violates unique constraint" } });
+    const out = await addDiscountCode({ code: "LAUNCH20", type: "percentage", value: 20 });
+    expect(out.success).toBe(false);
+    expect(out.error).toBe("That code already exists");
+  });
+
+  it("maps the isActive toggle onto the active column on update", async () => {
+    h.setQuery({ data: null, error: null });
+    const ok = await updateDiscountCode("dc-1", { isActive: false });
+    expect(ok).toBe(true);
+    const payload = h.record.find((c) => c.method === "update").args[0];
+    expect(payload.active).toBe(false);
+    expect(payload).not.toHaveProperty("isActive");
+    expect(payload).not.toHaveProperty("type");
+    expect(payload).not.toHaveProperty("value");
+  });
+
+  it("maps full edits onto the DB columns", async () => {
+    h.setQuery({ data: null, error: null });
+    const ok = await updateDiscountCode("dc-1", { code: "new30", type: "percentage", value: "30", expiresAt: null, isActive: true });
+    expect(ok).toBe(true);
+    const payload = h.record.find((c) => c.method === "update").args[0];
+    expect(payload.code).toBe("NEW30");
+    expect(payload.percent_off).toBe(30);
+    expect(payload.amount_off).toBeNull();
+    expect(payload.active).toBe(true);
+    expect(payload.expires_at).toBeNull();
+  });
+
+  it("normalizes fetched rows into the admin form shape", async () => {
+    h.setQuery({ data: [{ id: "dc-1", code: "X", percent_off: "20", amount_off: null, active: true, expires_at: "2026-10-01T00:00:00+00:00", created_at: "2026-09-27T00:00:00+00:00" }], error: null });
+    const rows = await fetchDiscountCodes();
+    expect(rows).toHaveLength(1);
+    expect(rows[0].type).toBe("percentage");
+    expect(rows[0].value).toBe(20);
+    expect(rows[0].isActive).toBe(true);
+    expect(rows[0].expiresAt).toBe("2026-10-01T00:00:00+00:00");
   });
 });
 
