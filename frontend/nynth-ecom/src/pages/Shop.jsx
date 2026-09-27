@@ -156,15 +156,6 @@ export default function Shop() {
           </div>
         </section>
 
-        {/* Free Delivery Notice - surfaced before the drop-off point */}
-        {!onTicketsView && settings?.free_delivery_enabled !== false && (
-          <div className="bg-black text-white text-center py-3 px-6">
-            <p className="text-[9px] md:text-[10px] tracking-[0.25em] font-bold uppercase">
-              FREE DELIVERY NATIONWIDE ON EVERY ORDER · CALCULATED AT CHECKOUT
-            </p>
-          </div>
-        )}
-
         {/* Categories Bar - Primary Sticky - Edge to Edge */}
         <div className="sticky top-[55px] z-40 w-full bg-white border-b border-black/5 flex justify-between items-center py-5 px-6 md:px-10 transition-all duration-300">
           <div className="flex items-center gap-4">
