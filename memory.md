@@ -1,58 +1,61 @@
-# Memory — Nynth-World Store (discount codes fixed, marquee removed, all pushed)
+# Memory — Nynth-World Store (collections/drop integration for external admin tool)
 
-Last updated: 2026-09-27 (~17:30)
+Last updated: 2026-10-03 (session in progress)
 
 ## Recurring context
 
-- **People (PERMANENT):** Newman (phone 09137207918) is founder/admin/owner. "Newman says X" = direct owner directive. Owner alert inboxes: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com.
-- **Stack:** React 18 + Vite + Tailwind v4 + react-router-dom v7. Frontend in `frontend/nynth-ecom`. Backend fully Supabase (project `nynth-world`, ref `cybcooychgicsnjeummo`, eu-west-1). `src/api/firebaseFunctions.js` is a one-line alias over `supabaseFunctions.js`. Paystack payments, Resend emails, Cloudinary images, Vercel hosting (auto-deploy on push to `main`).
+- **People (PERMANENT):** Newman (phone 09137207918) is founder/admin/owner. "Newman says X" = direct owner directive. Owner alert inboxes: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com. An external developer (pobbagency@gmail.com) is building a separate admin tool against this DB (collections/drops + waitlist emails); he has direct SQL access to the project (he created the `collections` table himself).
+- **Live site:** `https://www.nynthworld.com` (Vercel, auto-deploy on push to `main`). To confirm which build is live: `curl -s https://www.nynthworld.com/ | grep -o 'assets/index-[^"]*\.js'` then grep that bundle for a known string from the change.
+- **Live request tracing (launch-day gold):** Management API unified logs: `GET "https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/analytics/endpoints/logs?sql=<urlencoded>&iso_timestamp_start=...Z&iso_timestamp_end=...Z"` with Bearer token from `.secrets/supabase.env`. Table `logs`, filter `source`: `edge_logs` = per-HTTP-request rows via `log_attributes['request.path']`, `['request.method']`, `['request.search']`, `['response.status_code']`. The old `logs.all` endpoint is removed. Statement bodies/params are NOT logged. `postgrest_logs` is heartbeat noise.
+- **Supabase MCP is connected to the WRONG project** (`Atomic Xp` llwlgzujsyxlseiqiwsp); it lists nynth-world but SQL runs against the wrong DB (verified: `discount_codes` count = 0). Use the Management API instead: `curl -X POST "https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/database/query" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" -d '{"query": "..."}'` with token from `frontend/nynth-ecom/.secrets/supabase.env`.
+- **Stale-tab gotcha (PERMANENT lesson):** after any push, users keep running the pre-fix JS in old tabs. Hard refresh (Cmd+Shift+R) first when someone reports "still broken"; verify server side before changing code.
+- **Stack:** React 18 + Vite + Tailwind v4 + react-router-dom v7. Frontend in `frontend/nynth-ecom`. Backend fully Supabase (project `nynth-world`, ref `cybcooychgicsnjeummo`, eu-west-1). `src/api/firebaseFunctions.js` is a one-line alias over `supabaseFunctions.js`. Paystack payments, Resend emails, Cloudinary images, Vercel hosting.
 - **Standing user rules (never violate):** no em dashes anywhere (copy, chat, code). Zero `style={{}}` except dnd-kit in Products.jsx. Consume `src/components/ui/` primitives. No new npm deps without explicit approval. Never commit/push unless user says "push". Gate before finishing: `npm run lint` (zero warnings), `npm test`, `npm run test:edge`, `npm run build`, `node scripts/verify-dist.mjs`, `npx impeccable detect --json` on touched UI.
-- **Secrets (locations only, never values):** `frontend/nynth-ecom/.secrets/` (gitignored): `supabase.env` (SUPABASE_ACCESS_TOKEN), `paystack.env` (TEST+LIVE keys), `google-oauth.env`, `resend.env`. `frontend/nynth-ecom/.env.local` (gitignored) holds live keys with test fallbacks. Server secrets on Supabase project: RESEND_API_KEY, EMAIL_FROM, ADMIN_NOTIFY_EMAIL, PAYSTACK_SECRET_KEY, SUPABASE_* keys. `VITE_PAYSTACK_PUBLIC_KEY` mirrored in Supabase secrets.
-- **DB writes without MCP:** Supabase MCP is connected to the WRONG project. Use the Management API: `curl -X POST "https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/database/query" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" -d '{"query": "..."}'`. Token in `.secrets/supabase.env`.
-- **Orders model:** `is_test` stamped from Paystack `domain` at verify/webhook. Frontend derives test-mode from `VITE_PAYSTACK_PUBLIC_KEY` starting with `pk_test_`. Test traffic excluded from metrics. Order `customer` jsonb stores the checkout form incl. `deliveryDate`/`deliveryTimeWindow`.
-- **Delivery fees:** per-product `deliveryFeeEnabled` in product `data` jsonb; admin toggles in Products.jsx. `cartNeedsShipping(items)` in `src/utils/shippingRates.js`. Cart items carry the flag (CartContext fixed).
-- **Free delivery:** ALL non-ticket products have `deliveryFeeEnabled=false`, `settings.free_delivery_enabled=true`. Every order ships free nationwide. Top-page free-delivery strip removed 2026-09-27 per Newman: scrolling marquee disabled (`settings.marquee_enabled=false` via Management API; text preserved, re-toggle from Admin > Settings) AND the hardcoded Shop.jsx "FREE DELIVERY NATIONWIDE ON EVERY ORDER" banner block deleted in code. Cart/Checkout/ProductDetail free-delivery lines still render (functional price display, not page-top).
-- **Currency viewer:** `src/utils/currency.js` → `foreignPriceLabel` shows "APPROX $x / £y" (NGN_PER_USD=1500, NGN_PER_GBP=2000). Static rates; update when they drift.
-- **Ticket model:** `category === "tickets"` needs eventDateTime + venue. Codes `NWT-XXXXXXXX` minted at finalize. Pass pages `/ticket/:code`. Door Check-In `/admin/check-in`. Don't break sold-out/countdown flow.
-- **Storefront visibility rule (per Newman):** `isLiveProduct` hides ONLY hidden (`isPublic === false`). Sold-out stays visible with SOLD OUT badge. Null stock visible.
-- **Discount codes:** table `discount_codes` (`id text NOT NULL` with NO default - client MUST generate id `dc-<ts>-<rand>`, `code` unique upper, `percent_off`/`amount_off`, `active`, `expires_at timestamptz`). RLS is admin-only for the table. Checkout validation goes through SECURITY DEFINER RPC `public.validate_discount(p_code)` (anon/authenticated can execute; returns jsonb `{valid, code, percent_off, amount_off | error, reason}`). Admin API layer maps form shape `{code,type,value,expiresAt,isActive}` to DB columns in `supabaseFunctions.js`; `addDiscountCode` returns `{success, id | error}`. "Go timer"/countdown components must not be touched when editing promo/campaign UI.
-- **Key files:** `src/api/supabaseFunctions.js`, `src/pages/Checkout.jsx`, `src/pages/admin/DiscountCodes.jsx`, `src/pages/admin/Settings.jsx`, `src/components/common/Marquee.jsx`, `src/App.jsx`, `src/context/CartContext.jsx`, `src/utils/shippingRates.js`, `src/utils/currency.js`, `supabase/schema.sql`, `supabase/functions/_shared/email.ts`, `supabase/functions/initialize-payment/index.ts`, `supabase/functions/paystack-webhook/index.ts`, `scripts/verify-dist.mjs`.
+- **Secrets (locations only, never values):** `frontend/nynth-ecom/.secrets/` (gitignored): `supabase.env` (SUPABASE_ACCESS_TOKEN), `paystack.env` (TEST+LIVE keys), `google-oauth.env`, `resend.env` (RESEND_API_KEY + EMAIL_FROM; Newman may share this with the admin-tool dev on request). `frontend/nynth-ecom/.env.local` (gitignored) holds live keys with test fallbacks. Server secrets on Supabase project: RESEND_API_KEY, EMAIL_FROM, ADMIN_NOTIFY_EMAIL, PAYSTACK_SECRET_KEY, SUPABASE_* keys.
+- **Orders model:** `is_test` stamped from Paystack `domain` at verify/webhook. Frontend derives test-mode from `VITE_PAYSTACK_PUBLIC_KEY` starting with `pk_test_`. Test traffic excluded from metrics.
+- **Delivery/ free delivery:** ALL non-ticket products `deliveryFeeEnabled=false`, `settings.free_delivery_enabled=true`, every order ships free. Page-top marquee + Shop strip removed 2026-09-27 (commits `79cf192`, marquee off in DB). Cart/Checkout/ProductDetail free-delivery lines stay.
+- **Discount codes:** table `discount_codes`; guest validation via SECURITY DEFINER RPC `public.validate_discount(p_code)` (anon+authenticated). Pattern to copy for any future shopper-facing check (do NOT loosen RLS to let anon read secret-ish tables).
+- **Lock/drop model (as of 2026-10-03):** site-wide lock settings still live in `settings.data` (`lock_page_enabled`, `lock_epoch`, `lock_password`, `lock_timer_*`, `launch_date`); admin Settings page edits them. NEW: `collections` table (id bigint identity BY DEFAULT, name, slug, launch_date timestamptz, status text, password text, created_at) written by the external admin tool; `status='live'` marks the active drop. Storefront reads the live row (fetchLiveCollection) and falls back to settings when none. `lock_epoch` force-relock semantics must stay intact. Lock page unlock is client-side compare + localStorage (`nynth_site_unlocked`, `nynth_lock_epoch`).
+- **subscribers model:** columns `id text`, `email text unique`, `source text` ('waitlist'|'newsletter'|'popup'|'footer'), `created_at`, NEW `collection_id text` (stores collections.id as a string; no FK because types differ), NEW `notified boolean`. RLS: insert anyone, read/write admin only (keep it that way). Admin Subscribers page counts off `source`.
+- **Key files:** `src/api/supabaseFunctions.js`, `src/context/SettingsContext.jsx`, `src/pages/LockPage.jsx`, `src/components/home/Header.jsx`, `src/pages/Checkout.jsx`, `src/pages/Shop.jsx`, `src/pages/admin/DiscountCodes.jsx`, `src/pages/admin/Settings.jsx`, `src/App.jsx`, `src/context/CartContext.jsx`, `src/utils/shippingRates.js`, `supabase/schema.sql`, `supabase/functions/_shared/email.ts`, `scripts/verify-dist.mjs`.
 
-## What was built
+## What was built (this session, 2026-10-03, IN PROGRESS)
 
-- Fixed the entire discount-code path (Newman reported it broken launch-day; the `discount_codes` table was EMPTY - every create had failed):
-  1. `addDiscountCode`: was inserting with no `id` (NOT NULL violation) and reading `percentOff`/`amountOff` keys the admin page never sends. Now generates the id, maps `type`/`value` to `percent_off`/`amount_off`, returns `{success, id}` / `{success:false, error}` incl. duplicate-code message.
-  2. `updateDiscountCode`: was passing admin keys (`type`, `value`, `isActive`) straight into `.update()` (nonexistent columns). Now maps to DB columns; toggle-only updates work.
-  3. `fetchDiscountCodes`: now normalizes DB rows to the admin shape (`type`, `value`, `isActive`, ISO `expiresAt`).
-  4. `validateDiscountCode`: was a direct `select` on the admin-RLS table, so guests ALWAYS got "Invalid or inactive code". Now calls the new `validate_discount` RPC (created + applied live, granted to anon/authenticated, added to `supabase/schema.sql`).
-  5. `DiscountCodes.jsx`: removed Firestore-era `.seconds` timestamp handling (ISO strings now), added error check on update.
-  6. Tests: harness gained `setRpc`; 4 rewritten validate tests + 6 new CRUD tests (78 vitest total, was 72).
-- Removed the FREE SHIPPING/FREE DELIVERY scrolling banner from the top of every page: `settings.marquee_enabled=false` in the live DB (Management API). `Marquee.jsx` renders null when disabled, so no code change or deploy needed.
+- Applied RLS policies on the external dev's new `collections` table (live DB): `collections_public_read` (select using true) + `collections_admin_write` (is_admin()). RLS was enabled with zero policies, so anon reads returned nothing.
+- Fixed `addSubscriber` in `supabaseFunctions.js`: it returned `true` but all three callers (LockPage, Footer, NewsletterPopup) read `{success, message}`; every waitlist/newsletter signup showed an error toast (and LockPage never reached /waitlist-confirmation) even though the row inserted. Now returns `{success:true, message:"ADDED"|"ALREADY_ADDED"}` / `{success:false, message}` and accepts a 3rd arg `collectionId` (stringified into `collection_id`).
+- Added `fetchLiveCollection()` (collections where status='live', newest id, maybeSingle, null when none).
+- SettingsContext: `liveCollection` state added, loaded in parallel with settings via `Promise.allSettled` in `refreshSettings`, exposed on context value (done).
+- LockPage: consuming `liveCollection` for `launchDate` (countdown) - password override, waitlist `collection_id` pass, and effect deps still to finish.
 
 ## Decisions made
 
-- Guest code validation uses a SECURITY DEFINER Postgres RPC instead of loosening RLS or a new edge function: shoppers cannot read/list code rows (no enumeration), exact-match only, active+expiry checked server-side. Matches the schema comment "validate via Edge Function" intent.
-- Marquee removal done via the existing settings switch (admin reversible toggle), not by deleting the component.
+- Storefront falls back to `settings.launch_date` / `settings.lock_password` whenever no live collection row exists, so the site behaves exactly as today while `collections` is empty.
+- Public SELECT on `collections` (password included) is parity with the old world where `settings.lock_password` was already world-readable via the settings table; treat collection passwords as shareable codes, not secrets. Flagged to the dev in the reply.
+- `collections.id` (bigint) vs `subscribers.collection_id` (text) mismatch left as-is (no FK) to avoid breaking the dev's already-built tool; storefront always sends the id as a string.
 
 ## Problems solved
 
-- Launch-day discount outage: three stacked bugs (null id insert, wrong key mapping, RLS-blocked guest validation). Smoke-tested live: inserted a test row via Management API, RPC returned `{valid:true, percent_off:10}` for correct casing/whitespace input, `{valid:false}` for bogus; test row cleaned up. Table left empty for Newman to create his own code.
-- Post-push CI verified: GitHub `tests` + `codeql` runs green on the fix commit.
+- Diagnosed why the admin tool's unlock flow could not work yet: lock page read launch_date/lock_password only from settings, and `collections` was unreadable via RLS (RLS on, zero policies).
+- Found the addSubscriber return-shape mismatch that broke all three signup toasts/confirmation navigation (returned `true`, callers read `{success, message}`).
+- **Live signup breaker found 2026-10-03:** `subscribers.id` is NOT NULL with NO default; addSubscriber never sends id. All 171 existing rows were backfilled on cutover day (2026-09-22) with id = the email address, so anon inserts since then fail 23502 (lock page, popup, footer, and the external admin tool alike). Fix: DB default `('sub-' || gen_random_uuid()::text)` (live + schema.sql) plus client-generated `sub-<ts>-<rand>` id in addSubscriber, mirroring the discount_codes precedent.
 
 ## Current state
 
-- All gates green (re-verified after push): lint zero warnings, 78/78 vitest, 19/19 edge, build OK, verify-dist OK, impeccable [].
-- Everything committed and pushed; working tree clean, `main` synced with origin. Commits this session: `84748e3` (discount fix), `abf21bf` + `3d18bc5` (memory/docs notes). Vercel auto-deploys from main. Countdown/timer files untouched.
-- Newman can create codes in Admin > Discount Codes and customers can redeem them at checkout; top marquee banner is gone.
+- **All code done, gates green, NOT committed/pushed** (standing rule: wait for Newman to say "push"; Vercel auto-deploys on push to main). Gates run 2026-10-03: lint zero, vitest 86, test:edge 19, build + verify-dist OK, impeccable detect [] on LockPage/Header.
+- Live DB changes (applied + verified by anon PostgREST round trip, temp rows cleaned up): `collections_public_read` + `collections_admin_write` policies; `subscribers.id` default `('sub-' || gen_random_uuid()::text)`. Verified both insert shapes return 201 with string collection_id stored.
+- Code: `addSubscriber` returns `{success, message}` (fixes all three callers' toasts), sends client id `sub-<ts>-<rand>` and optional `collection_id` (stringified); `fetchLiveCollection()` added; SettingsContext loads/exposes `liveCollection` (sequential try/catch shape, Promise.allSettled variant failed the react-hooks/set-state-in-effect lint rule); LockPage uses live collection for countdown + password + stamps collection_id on waitlist signups; Header countdown uses live collection launch_date; schema.sql updated (collections table, subscribers columns + id default).
+- `collections` table is still EMPTY, so the site currently behaves exactly as before (settings fallback) until the dev creates a status='live' row.
+- Reply to pobbagency@gmail.com written (humanizer applied): switch-over done, RLS/id/type fixes, lowercase 'live', password readable via anon key (parity), deploys on next push, Resend key in separate message.
 
 ## Next session starts with
 
 1. Run `/remember restore`.
-2. Confirm with Newman that a real customer checkout applied the launch discount (create a code in Admin, redeem in a test order, check `orders.discount_amount`/`total`).
-3. Zone-disable button for delivery fees remains unbuilt (Newman deferred).
+2. If Newman says "push": commit + push the collections switch-over (files: supabaseFunctions.js, SettingsContext.jsx, LockPage.jsx, Header.jsx, supabase/schema.sql, supabaseFunctions.test.js, memory.md).
+3. Remind Newman to send the Resend key (`.secrets/resend.env`, RESEND_API_KEY + EMAIL_FROM) to the dev in a separate message.
+4. Still open: Newman confirmation fresh checkout redeems MEMBER (expires 2026-10-04); zone-disable delivery-fee button deferred; server-side amount recompute in initialize-payment.
 
 ## Open questions
 
-- Paystack amount is client-computed at checkout (pre-existing behavior; discounted total sent to Paystack). Consider server-side total recompute in `initialize-payment` as a hardening task.
+- What `status` values the dev's tool uses besides 'live' (storefront only matches exact 'live').
+- Whether his tool reads collections via anon key (would now see all rows) or direct SQL.
 - Currency viewer rates still static.
-- Whether Newman wants a different top banner (marquee is off with the old text stored; he can re-enable/edit in Admin > Settings).
