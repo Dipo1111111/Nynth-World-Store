@@ -7,13 +7,17 @@ import { addSubscriber } from '../api/firebaseFunctions';
 import { useSettings } from '../context/SettingsContext';
 
 export default function LockPage() {
-    const { settings } = useSettings();
+    const { settings, liveCollection } = useSettings();
     const [waitlistEmail, setWaitlistEmail] = useState('');
     const [waitlistLoading, setWaitlistLoading] = useState(false);
     const navigate = useNavigate();
 
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // The live collection (status='live') drives the countdown and password;
+    // fall back to the site settings when no drop is live.
+    const launchDate = liveCollection?.launch_date || settings?.launch_date || '2026-04-03T18:00:00';
 
     // Countdown state
     const timerEnabled = settings?.lock_timer_enabled === true;
@@ -22,7 +26,6 @@ export default function LockPage() {
     useEffect(() => {
         if (!timerEnabled) return;
 
-        const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
         const target = new Date(launchDate).getTime();
 
         const calculateTimeLeft = () => {
@@ -44,9 +47,9 @@ export default function LockPage() {
         const timer = setInterval(calculateTimeLeft, 1000);
         calculateTimeLeft();
         return () => clearInterval(timer);
-    }, [timerEnabled, settings?.launch_date]);
+    }, [timerEnabled, launchDate]);
 
-    const lockPassword = settings?.lock_password || 'WINNERSONLY';
+    const lockPassword = liveCollection?.password || settings?.lock_password || 'WINNERSONLY';
     const lockTitle1 = settings?.lock_title1 || 'BY WINNERS FOR WINNERS';
     const lockTitle2 = settings?.lock_title2 || 'STAY ABOVE';
     const lockWaitlistTitle = settings?.lock_waitlist_title || 'JOIN THE WAITLIST';
@@ -67,7 +70,7 @@ export default function LockPage() {
 
         setWaitlistLoading(true);
         try {
-            const result = await addSubscriber(waitlistEmail, 'waitlist');
+            const result = await addSubscriber(waitlistEmail, 'waitlist', liveCollection?.id ?? null);
             if (result.success) {
                 if (result.message === 'ALREADY_ADDED') {
                     toast('YOU ARE ALREADY ON THE WAITLIST', {

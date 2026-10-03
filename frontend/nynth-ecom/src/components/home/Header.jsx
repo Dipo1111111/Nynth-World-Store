@@ -28,13 +28,15 @@ export default function Header() {
   // All hooks declared BEFORE any useEffect
   const { totalItems, isCartOpen, setIsCartOpen } = useCart();
   const { currentUser } = useAuth();
-  const { settings } = useSettings();
+  const { settings, liveCollection } = useSettings();
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Live collection (status='live') wins over the site-wide settings date.
+  const launchDate = liveCollection?.launch_date || settings?.launch_date || '2026-04-03T18:00:00';
+
   // Countdown timer - settings is now available
   useEffect(() => {
-    const launchDate = settings?.launch_date || '2026-04-03T18:00:00';
     const target = new Date(launchDate).getTime();
 
     const updateTimer = () => {
@@ -74,7 +76,7 @@ export default function Header() {
     const timer = setInterval(updateTimer, 1000);
     updateTimer();
     return () => clearInterval(timer);
-  }, [settings?.launch_date, isLaunchFinished, dropLabel]);
+  }, [launchDate, isLaunchFinished, dropLabel]);
 
   useEffect(() => {
     const handleScroll = () => {

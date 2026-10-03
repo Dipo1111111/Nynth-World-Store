@@ -78,6 +78,8 @@ import {
   fetchDiscountCodes,
   initializePayment,
   verifyOrderPayment,
+  addSubscriber,
+  fetchLiveCollection,
 } from "./supabaseFunctions";
 
 beforeEach(() => h.reset());
@@ -475,5 +477,66 @@ describe("per-product delivery fee switch", () => {
     await addProduct({ name: "Bonus Tee", price: 10000, deliveryFeeEnabled: false });
     const payload = h.record.find((c) => c.method === "insert").args[0];
     expect(payload.data.deliveryFeeEnabled).toBe(false);
+  });
+});
+
+describe("addSubscriber result shape (LockPage/Footer/Popup contract)", () => {
+  it("returns success with ADDED, lowercases the email and sends an id", async () => {
+    h.setQuery({ data: null, error: null });
+    const res = await addSubscriber("  Foo@Bar.COM ", "waitlist");
+    expect(res).toEqual({ success: true, message: "ADDED" });
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.email).toBe("foo@bar.com");
+    expect(payload.source).toBe("waitlist");
+    expect(payload.id).toMatch(/^sub-\d+-[a-z0-9]+$/);
+  });
+
+  it("reports duplicates as ALREADY_ADDED without throwing", async () => {
+    h.setQuery({ data: null, error: { message: 'duplicate key value violates unique constraint "subscribers_email_key"' } });
+    const res = await addSubscriber("foo@bar.com", "waitlist");
+    expect(res).toEqual({ success: true, message: "ALREADY_ADDED" });
+  });
+
+  it("returns success false with the message on other errors", async () => {
+    h.setQuery({ data: null, error: { message: "permission denied for table subscribers" } });
+    const res = await addSubscriber("foo@bar.com", "waitlist");
+    expect(res.success).toBe(false);
+    expect(res.message).toBe("permission denied for table subscribers");
+  });
+
+  it("stringifies collection_id because the column is text", async () => {
+    h.setQuery({ data: null, error: null });
+    await addSubscriber("a@b.com", "waitlist", 3);
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.collection_id).toBe("3");
+  });
+
+  it("omits collection_id when there is no live collection", async () => {
+    h.setQuery({ data: null, error: null });
+    await addSubscriber("a@b.com", "waitlist", null);
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload).not.toHaveProperty("collection_id");
+  });
+});
+
+describe("fetchLiveCollection", () => {
+  it("queries the newest row with status live", async () => {
+    const row = { id: 7, name: "DROP ONE", slug: "drop-one", launch_date: "2026-11-01T18:00:00+00:00", status: "live", password: "CODE" };
+    h.setQuery({ data: row, error: null });
+    const out = await fetchLiveCollection();
+    expect(out).toEqual(row);
+    expect(h.record.some((c) => c.method === "from" && c.args[0] === "collections")).toBe(true);
+    expect(h.record.some((c) => c.method === "eq" && c.args[0] === "status" && c.args[1] === "live")).toBe(true);
+    expect(h.record.some((c) => c.method === "maybeSingle")).toBe(true);
+  });
+
+  it("returns null when no collection is live", async () => {
+    h.setQuery({ data: null, error: null });
+    expect(await fetchLiveCollection()).toBeNull();
+  });
+
+  it("throws on a query error so the caller can log it", async () => {
+    h.setQuery({ data: null, error: { message: "relation does not exist" } });
+    await expect(fetchLiveCollection()).rejects.toThrow();
   });
 });

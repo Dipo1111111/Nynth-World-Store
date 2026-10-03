@@ -294,10 +294,19 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 
 // --- SUBSCRIBERS ---
-export const addSubscriber = async (email, source = "newsletter") => {
-  const { error } = await supabase.from("subscribers").insert({ email: String(email).toLowerCase().trim(), source });
-  if (error && !String(error.message).includes("duplicate")) throw error;
-  return true;
+// Callers (LockPage, Footer, NewsletterPopup) all read {success, message}:
+// success true with "ADDED" or "ALREADY_ADDED", success false with an error message.
+export const addSubscriber = async (email, source = "newsletter", collectionId = null) => {
+  // id is NOT NULL: generate here like discount_codes do (DB also has a default).
+  const row = { id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, email: String(email).toLowerCase().trim(), source };
+  // collections.id is bigint, subscribers.collection_id is text: send a string.
+  if (collectionId !== null && collectionId !== undefined) row.collection_id = String(collectionId);
+  const { error } = await supabase.from("subscribers").insert(row);
+  if (error) {
+    if (String(error.message).includes("duplicate")) return { success: true, message: "ALREADY_ADDED" };
+    return { success: false, message: error.message || "SUBSCRIBE_FAILED" };
+  }
+  return { success: true, message: "ADDED" };
 };
 export const fetchSubscribers = async () => {
   const { data } = await supabase.from("subscribers").select("*").order("created_at", { ascending: false });
@@ -313,6 +322,21 @@ export const fetchSubscribers = async () => {
   }));
 };
 export const mergeSubscriberDuplicates = async () => ({ merged: 0, note: "unique constraint on email prevents duplicates on Supabase" });
+
+// --- COLLECTIONS (a drop; rows written by the admin tool, read here) ---
+// Returns the row with status='live' (newest first) or null so callers fall
+// back to the settings row. Throws only on a real query error.
+export const fetchLiveCollection = async () => {
+  const { data, error } = await supabase
+    .from("collections")
+    .select("id, name, slug, launch_date, status, password")
+    .eq("status", "live")
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data ?? null;
+};
 
 // --- EMAIL (Resend via Edge Function; Trigger Email / mail collection dropped) ---
 export const sendTriggerEmail = async (to, subject, html) => {

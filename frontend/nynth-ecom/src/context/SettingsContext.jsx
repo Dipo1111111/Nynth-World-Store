@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { fetchSettings } from "../api/firebaseFunctions";
+import { fetchSettings, fetchLiveCollection } from "../api/firebaseFunctions";
 import { withRetry } from "../utils/errorHandlers";
 import { DEFAULT_CATEGORY_ORDER, DEFAULT_BAND_LIMIT } from "../utils/shopConfig";
 
@@ -54,7 +54,10 @@ export function SettingsProvider({ children }) {
         tickets_band_limit: DEFAULT_BAND_LIMIT,
     });
     const [loading, setLoading] = useState(true);
+    const [liveCollection, setLiveCollection] = useState(null);
 
+    // Settings and the live drop collection load together so consumers (Header
+    // countdown, LockPage) only ever see both in the same render pass.
     const refreshSettings = async () => {
         try {
             const data = await withRetry(fetchSettings);
@@ -63,6 +66,13 @@ export function SettingsProvider({ children }) {
             }
         } catch (error) {
             console.error("Failed to fetch settings after retries:", error);
+        }
+        try {
+            const collection = await withRetry(fetchLiveCollection);
+            setLiveCollection(collection ?? null);
+        } catch (error) {
+            console.error("Failed to fetch live collection:", error);
+            setLiveCollection(null);
         } finally {
             setLoading(false);
         }
@@ -74,6 +84,7 @@ export function SettingsProvider({ children }) {
 
     const value = {
         settings,
+        liveCollection,
         loading,
         refreshSettings
     };
