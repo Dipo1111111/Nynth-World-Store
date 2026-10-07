@@ -29,6 +29,8 @@ Last updated: 2026-10-07 (new session, build in progress)
 
 ## What was built (2026-10-07, Newman's fix batch, done but NOT pushed)
 
+- **Checkout restructure DONE (2026-10-07 later), gates green, NOT pushed:** left column rebuilt into numbered collapsible sections matching Newman's reference screenshots: `1 Contact Information` (name/email/phone + new Special Instructions textarea with 0/500 counter), `2 Delivery Details` (State*|City / Area grid, Street Address renamed from "Delivery Address" (form key `address` UNCHANGED), new Zip Code (Optional) using the previously-unrendered `form.zip`), `3 Delivery Method` (Lagos note / home+park radios / "select your state" hint, Preferred Delivery Date box, View Shipping Policy link to /shipping). Local `CheckoutSection` component (number badge + rotating ChevronDown, `first:border-t-0` borders); `openSections` state all true; `handleCheckout` force-opens all sections before validating; required labels got `*`; h1 is now sr-only; shipping summary fallback now "Select state" before "Select area". Special instructions + zip flow into `customer` jsonb automatically via `{...form}` spread (no schema change). Gates: lint zero, 86 vitest, 19 edge, build + verify-dist OK, impeccable [] on Checkout.jsx.
+
 - **Prices:** removed the "APPROX $x / £y" currency line entirely (foreignPriceLabel render blocks deleted from ProductCard desktop+mobile and ProductDetail desktop+mobile; `src/utils/currency.js` file kept but now unused) and removed the `.00` (dropped `minimumFractionDigits: 2`, prices now plain `toLocaleString()` in both files, compare-at strikethrough included).
 - **Checkout state select:** initial `form.state` is now `""` with a `SELECT STATE` placeholder option (was defaulting to Abuja via `availableStates[0]`), added `PLEASE SELECT YOUR STATE` validation before the city check, and the shipping effect returns fee 0 until a state is chosen.
 - **Dropdown arrows:** all 4 `appearance-none` checkout selects (state, Lagos area, Abuja area, delivery time) wrapped in a relative container with a `ChevronDown` icon and `pr-10`.
@@ -52,7 +54,7 @@ Last updated: 2026-10-07 (new session, build in progress)
 
 ## Current state
 
-- 2026-10-07 batch BUILT, gates green, working tree has uncommitted changes, **NOT pushed** (wait for Newman to say "push"; Vercel deploys on push to main). Files touched: `ProductCard.jsx`, `ProductDetail.jsx`, `Checkout.jsx`, `Header.jsx`, `Footer.jsx`, `memory.md`.
+- 2026-10-07 batch BUILT (fix batch + checkout restructure), gates green, working tree has uncommitted changes (Checkout.jsx + memory.md since the pushed batch), **NOT pushed** (wait for Newman to say "push"; Vercel deploys on push to main). Earlier pushed batch files: `ProductCard.jsx`, `ProductDetail.jsx`, `Checkout.jsx` (affordances), `Header.jsx`, `Footer.jsx`.
 - Deferred to later by Newman: full checkout restructure to numbered collapsible sections with simpler labels ("Simpler terms" screenshots from a reference site; he thinks it may need DB work, it does not). Ignored by Newman: AB test layout idea, abandoned-checkout follow-up reminder system. No questions allowed to be asked of him (his instruction: only do what he explicitly requested).
 - From the earlier batch (shipped 2026-10-03): collections/drop switch-over live; `collections` table still EMPTY so storefront still runs on settings fallback until the dev's tool creates a `status='live'` row.
 
