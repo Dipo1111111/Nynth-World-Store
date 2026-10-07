@@ -120,6 +120,7 @@ export default function Header() {
     { name: "SHOP", to: "/shop" },
     { name: "CONTACT", to: "/contact" },
     { name: "LOOKBOOK", to: "/lookbook" },
+    { name: "NEWSLETTER", to: "#newsletter" },
   ];
 
   const isNavLinkActive = (to) => location.pathname === to;
@@ -147,14 +148,26 @@ export default function Header() {
             <nav className="flex-1 flex items-center justify-start gap-8">
               {navLinks.map((link) => {
                 const isActive = isNavLinkActive(link.to);
+                const cls = `
+                      hidden md:block font-inter text-[9px] tracking-[0.3em] font-bold hover:text-black transition-all duration-300
+                      ${isActive ? "text-black" : "text-gray-400"}
+                    `;
+                if (link.to.startsWith("#")) {
+                  return (
+                    <a
+                      key={link.name}
+                      href={link.to}
+                      className="hidden lg:block font-inter text-[9px] tracking-[0.3em] font-bold text-gray-400 hover:text-black transition-all duration-300"
+                    >
+                      {link.name}
+                    </a>
+                  );
+                }
                 return (
                   <NavLink
                     key={link.name}
                     to={link.to}
-                    className={`
-                      hidden md:block font-inter text-[9px] tracking-[0.3em] font-bold hover:text-black transition-all duration-300
-                      ${isActive ? "text-black" : "text-gray-400"}
-                    `}
+                    className={cls}
                   >
                     {link.name}
                   </NavLink>
@@ -215,14 +228,27 @@ export default function Header() {
             <div className="flex flex-col gap-0">
               {navLinks.map((link) => {
                 const isActive = isNavLinkActive(link.to);
+                const cls = `
+                      py-6 border-b border-gray-50 text-[11px] tracking-[0.3em] font-bold uppercase transition-all duration-300
+                      ${isActive ? "text-black" : "text-gray-400"}
+                    `;
+                if (link.to.startsWith("#")) {
+                  return (
+                    <a
+                      key={link.name}
+                      href={link.to}
+                      className={cls}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.name}
+                    </a>
+                  );
+                }
                 return (
                   <NavLink
                     key={link.name}
                     to={link.to}
-                    className={`
-                      py-6 border-b border-gray-50 text-[11px] tracking-[0.3em] font-bold uppercase transition-all duration-300
-                      ${isActive ? "text-black" : "text-gray-400"}
-                    `}
+                    className={cls}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {link.name}

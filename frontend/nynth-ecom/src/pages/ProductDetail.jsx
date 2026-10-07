@@ -12,7 +12,6 @@ import SizeGuideModal from "../components/products/SizeGuideModal";
 import ProductCard from "../components/products/ProductCard";
 import EventPage from "../components/tickets/EventPage";
 import { isTicket } from "../utils/tickets";
-import { foreignPriceLabel } from "../utils/currency";
 
 const getColorHex = (colorName) => {
   const map = {
@@ -352,17 +351,12 @@ export default function ProductDetail() {
               <span className="text-[10px] font-bold tracking-[0.2em] whitespace-nowrap">
                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                   <span className="line-through text-gray-400 mr-2">
-                    {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {settings.currency_symbol}{product.compareAtPrice.toLocaleString()}
                   </span>
                 )}
-                {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {settings.currency_symbol}{product.price?.toLocaleString()}
               </span>
             </div>
-            {foreignPriceLabel(product.price) && (
-              <p className="text-[8px] tracking-[0.25em] uppercase text-gray-400 -mt-10 mb-10">
-                {foreignPriceLabel(product.price)}
-              </p>
-            )}
 
             {/* Color Selection - Exact Suvene Style Boxes */}
             {product.availableColors?.length > 0 && (
@@ -594,17 +588,12 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
             <span className="text-[12px] font-bold tracking-widest whitespace-nowrap">
               {product.compareAtPrice && product.compareAtPrice > product.price && (
                 <span className="line-through text-gray-400 mr-2">
-                  {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {settings.currency_symbol}{product.compareAtPrice.toLocaleString()}
                 </span>
               )}
-              {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {settings.currency_symbol}{product.price?.toLocaleString()}
             </span>
           </div>
-          {foreignPriceLabel(product.price) && (
-            <p className="text-[8px] tracking-[0.25em] uppercase text-gray-400 -mt-4 mb-4">
-              {foreignPriceLabel(product.price)}
-            </p>
-          )}
 
           {/* Color Selection */}
           {product.availableColors?.length > 0 && (

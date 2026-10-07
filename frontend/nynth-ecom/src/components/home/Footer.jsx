@@ -91,7 +91,7 @@ export default function Footer() {
 
 
       {/* Newsletter - persistent capture (visible once the popup is dismissed) */}
-      <div className="section-pad bg-[#fafafa] border-b border-black/5">
+      <div id="newsletter" className="section-pad scroll-mt-24 bg-[#fafafa] border-b border-black/5">
         <div className="md:grid md:grid-cols-2 md:gap-16 items-center">
           <div className="mb-8 md:mb-0">
             <p className="text-[10px] tracking-[0.3em] font-bold text-black uppercase mb-3">JOIN THE LIST</p>
@@ -237,6 +237,24 @@ export default function Footer() {
             <Link to="/contact" className="text-[9px] tracking-[0.2em] font-bold text-gray-400 hover:text-black uppercase transition-colors">Contact</Link>
             <Link to="/shipping" className="text-[9px] tracking-[0.2em] font-bold text-gray-400 hover:text-black uppercase transition-colors">Shipping</Link>
           </div>
+
+          {(settings?.support_phone || settings?.office_address) && (
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
+              {settings?.support_phone && (
+                <a
+                  href={`tel:${settings.support_phone.replace(/\s/g, "")}`}
+                  className="text-[9px] tracking-[0.2em] font-bold text-gray-400 hover:text-black uppercase transition-colors"
+                >
+                  {settings.support_phone}
+                </a>
+              )}
+              {settings?.office_address && (
+                <p className="text-[9px] tracking-[0.2em] font-bold text-gray-400 uppercase">
+                  {settings.office_address}
+                </p>
+              )}
+            </div>
+          )}
 
           <p className="text-[8px] tracking-[0.3em] font-bold text-gray-300 uppercase">
             © {new Date().getFullYear()} NYNTH WORLD. ALL RIGHTS RESERVED.

@@ -6,7 +6,7 @@ import { addOrder, initializePayment, validateDiscountCode } from "../api/fireba
 import { useNavigate } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { ArrowLeft, Lock, CreditCard, Ticket } from "lucide-react";
+import { ArrowLeft, Lock, CreditCard, Ticket, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
 
@@ -55,7 +55,7 @@ const Checkout = () => {
     phone: "",
     address: "",
     city: "",
-    state: availableStates.length > 0 ? availableStates[0].value : "",
+    state: "", // shopper must actively choose (SELECT STATE placeholder)
     zip: "",
     deliveryMethod: "home", // New: home or park
     deliveryDate: "", // Optional: shopper tells us when they'll be available
@@ -127,6 +127,12 @@ const Checkout = () => {
     const freeDeliveryEnabled = settings?.free_delivery_enabled !== false;
     const freeDeliveryThreshold = settings?.free_delivery_threshold ?? 50000;
     if (freeDeliveryEnabled && physicalSubtotal >= freeDeliveryThreshold) {
+      setShippingFee(0);
+      return;
+    }
+
+    // No state picked yet: show no fee until the shopper chooses
+    if (!form.state) {
       setShippingFee(0);
       return;
     }
@@ -259,6 +265,10 @@ const Checkout = () => {
       toast.error("DELIVERY ADDRESS IS REQUIRED");
       return;
     }
+    if (cartHasPhysical && !form.state) {
+      toast.error("PLEASE SELECT YOUR STATE");
+      return;
+    }
     if (cartHasPhysical && !form.city) {
       toast.error("PLEASE SELECT YOUR AREA");
       return;
@@ -385,7 +395,7 @@ const Checkout = () => {
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
                   placeholder="JOHN"
                 />
               </div>
@@ -395,7 +405,7 @@ const Checkout = () => {
                   name="lastName"
                   value={form.lastName}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
                   placeholder="DOE"
                 />
               </div>
@@ -408,7 +418,7 @@ const Checkout = () => {
                 type="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
                 placeholder="JOHN@EXAMPLE.COM"
               />
             </div>
@@ -420,7 +430,7 @@ const Checkout = () => {
                   name="phoneCode"
                   value={form.phoneCode}
                   onChange={handleChange}
-                  className="px-3 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent w-[100px] shrink-0"
+                  className="px-3 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent w-[100px] shrink-0"
                 >
                   <option value="+234">+234 🇳🇬</option>
                   <option value="+1">+1 🇺🇸</option>
@@ -436,7 +446,7 @@ const Checkout = () => {
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
                   placeholder="801 234 5678"
                 />
               </div>
@@ -449,7 +459,7 @@ const Checkout = () => {
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
                 placeholder="123 STREET NAME"
               />
             </div>
@@ -460,22 +470,28 @@ const Checkout = () => {
               <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
-                <select
-                  name="state"
-                  value={form.state}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                >
-                  {availableStates.length === 0 ? (
-                    <option value="">NO DELIVERY AVAILABLE</option>
-                  ) : (
-                    availableStates.map((s) => (
-                      <option key={s.value} value={s.value}>
-                        {s.label}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <div className="relative">
+                  <select
+                    name="state"
+                    value={form.state}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                  >
+                    {availableStates.length === 0 ? (
+                      <option value="">NO DELIVERY AVAILABLE</option>
+                    ) : (
+                      <>
+                        <option value="">SELECT STATE</option>
+                        {availableStates.map((s) => (
+                          <option key={s.value} value={s.value}>
+                            {s.label}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                  <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">City / Area</label>
@@ -485,24 +501,27 @@ const Checkout = () => {
                       NO AREAS AVAILABLE
                     </div>
                   ) : (
-                    <select
-                      name="city"
-                      value={form.city}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                    >
-                      <option value="">SELECT AREA</option>
-                      {isAdmin && (
-                        <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
-                          NYNTH WORLD (TEST)
-                        </option>
-                      )}
-                      {enabledLagosAreas.map((area) => (
-                        <option key={area} value={area}>
-                          {area.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        name="city"
+                        value={form.city}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                      >
+                        <option value="">SELECT AREA</option>
+                        {isAdmin && (
+                          <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
+                            NYNTH WORLD (TEST)
+                          </option>
+                        )}
+                        {enabledLagosAreas.map((area) => (
+                          <option key={area} value={area}>
+                            {area.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                    </div>
                   )
                 ) : form.state === "Abuja" ? (
                   allAbujaDisabled ? (
@@ -510,26 +529,29 @@ const Checkout = () => {
                       NO AREAS AVAILABLE
                     </div>
                   ) : (
-                    <select
-                      name="city"
-                      value={form.city}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                    >
-                      <option value="">SELECT AREA</option>
-                      {enabledAbujaAreas.map((area) => (
-                        <option key={area} value={area}>
-                          {area.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        name="city"
+                        value={form.city}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                      >
+                        <option value="">SELECT AREA</option>
+                        {enabledAbujaAreas.map((area) => (
+                          <option key={area} value={area}>
+                            {area.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                    </div>
                   )
                 ) : (
                   <input
                     name="city"
                     value={form.city}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent"
+                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent"
                     placeholder="ENTER CITY"
                   />
                 )}
@@ -587,23 +609,26 @@ const Checkout = () => {
                       min={minDeliveryDate}
                       value={form.deliveryDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[12px] tracking-wider font-medium bg-transparent"
+                      className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-wider font-medium bg-transparent"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Time of Day</label>
-                    <select
-                      name="deliveryTimeWindow"
-                      value={form.deliveryTimeWindow}
-                      onChange={handleChange}
-                      disabled={!form.deliveryDate}
-                      className="w-full px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[12px] tracking-widest uppercase font-medium bg-transparent appearance-none disabled:opacity-40"
-                    >
-                      <option value="">ANY TIME</option>
-                      <option value="morning">MORNING (9AM - 12PM)</option>
-                      <option value="afternoon">AFTERNOON (12PM - 4PM)</option>
-                      <option value="evening">EVENING (4PM - 8PM)</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        name="deliveryTimeWindow"
+                        value={form.deliveryTimeWindow}
+                        onChange={handleChange}
+                        disabled={!form.deliveryDate}
+                        className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-widest uppercase font-medium bg-transparent appearance-none disabled:opacity-40"
+                      >
+                        <option value="">ANY TIME</option>
+                        <option value="morning">MORNING (9AM - 12PM)</option>
+                        <option value="afternoon">AFTERNOON (12PM - 4PM)</option>
+                        <option value="evening">EVENING (4PM - 8PM)</option>
+                      </select>
+                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -677,19 +702,20 @@ const Checkout = () => {
                 <button onClick={handleRemoveDiscount} className="text-[9px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700">Remove</button>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 border border-black/10 rounded-lg p-3 hover:border-black/30 transition-colors">
                 <input
                   type="text"
                   value={discountInput}
                   onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleApplyDiscount())}
                   placeholder="ENTER CODE"
-                  className="flex-1 px-4 py-3 border-b border-gray-100 focus:border-black transition-all outline-none text-[11px] tracking-widest uppercase font-mono font-bold bg-transparent"
+                  aria-label="Discount code"
+                  className="flex-1 px-4 py-3 border border-black/10 hover:border-black/25 focus:border-black focus-ring transition-all outline-none text-[11px] tracking-widest uppercase font-mono font-bold bg-transparent"
                 />
                 <button
                   onClick={handleApplyDiscount}
                   disabled={discountLoading || !discountInput.trim()}
-                  className="px-5 py-3 text-[9px] font-bold tracking-[0.2em] uppercase border border-black/10 hover:bg-black hover:text-white transition-all disabled:opacity-40"
+                  className="px-5 py-3 text-[9px] font-bold tracking-[0.2em] uppercase bg-black text-white hover:opacity-90 focus-ring transition-all disabled:opacity-40"
                 >
                   {discountLoading ? "..." : "Apply"}
                 </button>

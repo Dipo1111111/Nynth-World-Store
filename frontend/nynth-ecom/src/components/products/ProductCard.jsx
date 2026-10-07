@@ -6,7 +6,6 @@ import { Plus, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 import { incrementCounter } from "../../api/firebaseFunctions";
 import { getOptimizedImageUrl } from "../../api/cloudinary";
-import { foreignPriceLabel } from "../../utils/currency";
 
 export default function ProductCard({ product, displayMode = 'model' }) {
   const { settings } = useSettings();
@@ -111,17 +110,11 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           <p className="text-[9px] md:text-[10px] font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">
             {product.compareAtPrice && product.compareAtPrice > product.price && (
               <span className="line-through text-gray-400 mr-2">
-                {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {settings.currency_symbol}{product.compareAtPrice.toLocaleString()}
               </span>
             )}
-            {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {settings.currency_symbol}{product.price?.toLocaleString()}
           </p>
-          {foreignPriceLabel(product.price) && (
-            <p className="text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-gray-400 -mt-3 mb-4">
-              {foreignPriceLabel(product.price)}
-            </p>
-          )}
-
 
           <button
             onClick={handleAddToCart}
@@ -187,18 +180,12 @@ export default function ProductCard({ product, displayMode = 'model' }) {
           <span className="text-[8px] md:text-[9px] font-bold tracking-[0.15em] uppercase text-black whitespace-nowrap">
             {product.compareAtPrice && product.compareAtPrice > product.price && (
               <span className="line-through text-gray-400 mr-1">
-                {settings.currency_symbol}{product.compareAtPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {settings.currency_symbol}{product.compareAtPrice.toLocaleString()}
               </span>
             )}
-            {settings.currency_symbol}{product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {settings.currency_symbol}{product.price?.toLocaleString()}
           </span>
         </div>
-
-        {foreignPriceLabel(product.price) && (
-          <p className="text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-gray-400 px-3 md:px-4 pb-2 -mt-1">
-            {foreignPriceLabel(product.price)}
-          </p>
-        )}
       </div>
     </div>
   );
