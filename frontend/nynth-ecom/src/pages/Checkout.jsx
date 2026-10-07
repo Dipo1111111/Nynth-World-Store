@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
 import { addOrder, initializePayment, validateDiscountCode } from "../api/firebaseFunctions";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { ArrowLeft, Lock, CreditCard, Ticket, ChevronDown } from "lucide-react";
@@ -13,6 +13,32 @@ import { useSettings } from "../context/SettingsContext";
 import Logo from "../components/common/Logo";
 import { effectiveLagosRates, effectiveAbujaRates, effectiveInterstateRates, cartNeedsShipping } from "../utils/shippingRates";
 import { hasTickets, hasPhysicalItems, isTicketItem, ticketCount, nonTicketSubtotal, formatEventDate } from "../utils/tickets";
+
+// Numbered collapsible checkout section (Contact Information / Delivery Details / Delivery Method)
+const CheckoutSection = ({ num, title, open, onToggle, children }) => (
+  <section className="border-t border-gray-100 first:border-t-0">
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="w-full flex items-center justify-between gap-4 py-5 group focus-ring"
+    >
+      <span className="flex items-center gap-3">
+        <span className="w-5 h-5 bg-black text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">
+          {num}
+        </span>
+        <span className="text-[11px] tracking-[0.25em] font-bold uppercase text-black text-left">
+          {title}
+        </span>
+      </span>
+      <ChevronDown
+        size={15}
+        className={`text-gray-400 group-hover:text-black transition-all flex-shrink-0 ${open ? "rotate-180" : ""}`}
+      />
+    </button>
+    {open && <div className="pb-8 space-y-6">{children}</div>}
+  </section>
+);
 
 const Checkout = () => {
   const { settings } = useSettings();
@@ -57,11 +83,15 @@ const Checkout = () => {
     city: "",
     state: "", // shopper must actively choose (SELECT STATE placeholder)
     zip: "",
+    specialInstructions: "", // optional free-text notes (max 500), stored in customer jsonb
     deliveryMethod: "home", // New: home or park
     deliveryDate: "", // Optional: shopper tells us when they'll be available
     deliveryTimeWindow: "", // Optional: preferred part of the day, only with a date
   });
   const [shippingFee, setShippingFee] = useState(0);
+  // Numbered sections start open; shoppers can collapse them
+  const [openSections, setOpenSections] = useState({ contact: true, delivery: true, method: true });
+  const toggleSection = (key) => setOpenSections((s) => ({ ...s, [key]: !s[key] }));
 
   // Ticket flow flags - tickets are instant e-tickets: no delivery, no location
   const cartHasTickets = hasTickets(cartItems);
@@ -244,6 +274,9 @@ const Checkout = () => {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
+    // Failed validation should never hide behind a collapsed section
+    setOpenSections({ contact: true, delivery: true, method: true });
+
     // Field-by-field validation with specific feedback
     if (!form.firstName.trim()) {
       toast.error("FIRST NAME IS REQUIRED");
@@ -262,7 +295,7 @@ const Checkout = () => {
       return;
     }
     if (cartHasPhysical && !form.address.trim()) {
-      toast.error("DELIVERY ADDRESS IS REQUIRED");
+      toast.error("PLEASE ENTER YOUR STREET ADDRESS");
       return;
     }
     if (cartHasPhysical && !form.state) {
@@ -377,9 +410,7 @@ const Checkout = () => {
       <main className="flex-1 max-w-7xl mx-auto w-full grid lg:grid-cols-2">
         {/* Left Column: Form */}
         <div className="p-6 md:p-10 lg:p-16 lg:border-r border-gray-100">
-          <h1 className="text-[12px] tracking-[0.3em] font-bold uppercase mb-4 text-gray-400">
-            {ticketsOnly ? "Contact Details" : cartHasTickets ? "Contact & Delivery Details" : "Shipping Details"}
-          </h1>
+          <h1 className="sr-only">Checkout</h1>
 
           {cartHasTickets && (
             <div className="flex items-center gap-2 bg-black text-white px-4 py-3 text-[9px] tracking-[0.25em] font-bold uppercase mb-12">
@@ -387,252 +418,298 @@ const Checkout = () => {
             </div>
           )}
 
-          <form onSubmit={handleCheckout} className="space-y-8">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">First Name</label>
-                <input
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
-                  placeholder="JOHN"
-                />
+          <form onSubmit={handleCheckout}>
+            <CheckoutSection num={1} title="Contact Information" open={openSections.contact} onToggle={() => toggleSection("contact")}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">First Name *</label>
+                  <input
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                    placeholder="JOHN"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Last Name *</label>
+                  <input
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                    placeholder="DOE"
+                  />
+                </div>
               </div>
+
               <div className="space-y-2">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Last Name</label>
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Email Address *</label>
                 <input
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
-                  placeholder="DOE"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Email Address</label>
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
-                placeholder="JOHN@EXAMPLE.COM"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Phone</label>
-              <div className="flex items-end gap-2">
-                <select
-                  name="phoneCode"
-                  value={form.phoneCode}
-                  onChange={handleChange}
-                  className="px-3 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent w-[100px] shrink-0"
-                >
-                  <option value="+234">+234 🇳🇬</option>
-                  <option value="+1">+1 🇺🇸</option>
-                  <option value="+44">+44 🇬🇧</option>
-                  <option value="+27">+27 🇿🇦</option>
-                  <option value="+254">+254 🇰🇪</option>
-                  <option value="+233">+233 🇬🇭</option>
-                  <option value="+971">+971 🇦🇪</option>
-                  <option value="+966">+966 🇸🇦</option>
-                </select>
-                <input
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
+                  name="email"
+                  type="email"
+                  value={form.email}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
-                  placeholder="801 234 5678"
+                  placeholder="JOHN@EXAMPLE.COM"
                 />
               </div>
-            </div>
 
-            {cartHasPhysical && (
-            <div className="space-y-2">
-              <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Delivery Address</label>
-              <input
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
-                placeholder="123 STREET NAME"
-              />
-            </div>
-          )}
-
-            {cartHasPhysical && (
-              <>
-              <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State</label>
-                <div className="relative">
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Phone Number *</label>
+                <div className="flex items-end gap-2">
                   <select
-                    name="state"
-                    value={form.state}
+                    name="phoneCode"
+                    value={form.phoneCode}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                    className="px-3 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent w-[100px] shrink-0"
                   >
-                    {availableStates.length === 0 ? (
-                      <option value="">NO DELIVERY AVAILABLE</option>
-                    ) : (
-                      <>
-                        <option value="">SELECT STATE</option>
-                        {availableStates.map((s) => (
-                          <option key={s.value} value={s.value}>
-                            {s.label}
-                          </option>
-                        ))}
-                      </>
-                    )}
+                    <option value="+234">+234 🇳🇬</option>
+                    <option value="+1">+1 🇺🇸</option>
+                    <option value="+44">+44 🇬🇧</option>
+                    <option value="+27">+27 🇿🇦</option>
+                    <option value="+254">+254 🇰🇪</option>
+                    <option value="+233">+233 🇬🇭</option>
+                    <option value="+971">+971 🇦🇪</option>
+                    <option value="+966">+966 🇸🇦</option>
                   </select>
-                  <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                  <input
+                    name="phone"
+                    type="tel"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                    placeholder="801 234 5678"
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">City / Area</label>
-                {form.state === "Lagos" ? (
-                  allLagosDisabled ? (
-                    <div className="w-full px-4 py-3 border-b border-gray-100 text-[11px] tracking-widest uppercase text-gray-400">
-                      NO AREAS AVAILABLE
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <select
-                        name="city"
-                        value={form.city}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                      >
-                        <option value="">SELECT AREA</option>
-                        {isAdmin && (
-                          <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
-                            NYNTH WORLD (TEST)
-                          </option>
-                        )}
-                        {enabledLagosAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
-                    </div>
-                  )
-                ) : form.state === "Abuja" ? (
-                  allAbujaDisabled ? (
-                    <div className="w-full px-4 py-3 border-b border-gray-100 text-[11px] tracking-widest uppercase text-gray-400">
-                      NO AREAS AVAILABLE
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <select
-                        name="city"
-                        value={form.city}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
-                      >
-                        <option value="">SELECT AREA</option>
-                        {enabledAbujaAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
-                    </div>
-                  )
-                ) : (
-                  <input
-                    name="city"
-                    value={form.city}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent"
-                    placeholder="ENTER CITY"
-                  />
-                )}
-              </div>
-            </div>
 
-            {form.state !== "Lagos" && (
-              <div className="space-y-4 pt-4">
-                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Delivery Method</label>
-                <div className="flex gap-8">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="deliveryMethod"
-                      value="home"
-                      checked={form.deliveryMethod === "home"}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-4">
+                    <label htmlFor="specialInstructions" className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Special Instructions (Optional)</label>
+                    <span className="text-[9px] text-gray-400 tabular-nums">{form.specialInstructions.length}/500</span>
+                  </div>
+                  <textarea
+                    id="specialInstructions"
+                    name="specialInstructions"
+                    rows={3}
+                    maxLength={500}
+                    value={form.specialInstructions}
+                    onChange={handleChange}
+                    placeholder="DELIVERY NOTES, GIFT MESSAGE, ANYTHING ELSE"
+                    className="w-full px-4 py-3 border border-black/10 hover:border-black/25 focus:border-black focus-ring rounded-lg outline-none text-[13px] tracking-wide font-medium bg-transparent resize-none"
+                  />
+                </div>
+            </CheckoutSection>
+
+            {cartHasPhysical && (
+              <CheckoutSection num={2} title="Delivery Details" open={openSections.delivery} onToggle={() => toggleSection("delivery")}>
+                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">State *</label>
+                  <div className="relative">
+                    <select
+                      name="state"
+                      value={form.state}
                       onChange={handleChange}
-                      className="w-4 h-4 accent-black"
+                      className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                    >
+                      {availableStates.length === 0 ? (
+                        <option value="">NO DELIVERY AVAILABLE</option>
+                      ) : (
+                        <>
+                          <option value="">SELECT STATE</option>
+                          {availableStates.map((s) => (
+                            <option key={s.value} value={s.value}>
+                              {s.label}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">City / Area *</label>
+                  {form.state === "Lagos" ? (
+                    allLagosDisabled ? (
+                      <div className="w-full px-4 py-3 border-b border-gray-100 text-[11px] tracking-widest uppercase text-gray-400">
+                        NO AREAS AVAILABLE
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <select
+                          name="city"
+                          value={form.city}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                        >
+                          <option value="">SELECT AREA</option>
+                          {isAdmin && (
+                            <option value="NYNTH WORLD (TEST)" className="text-black font-bold bg-gray-50">
+                              NYNTH WORLD (TEST)
+                            </option>
+                          )}
+                          {enabledLagosAreas.map((area) => (
+                            <option key={area} value={area}>
+                              {area.toUpperCase()}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                      </div>
+                    )
+                  ) : form.state === "Abuja" ? (
+                    allAbujaDisabled ? (
+                      <div className="w-full px-4 py-3 border-b border-gray-100 text-[11px] tracking-widest uppercase text-gray-400">
+                        NO AREAS AVAILABLE
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <select
+                          name="city"
+                          value={form.city}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent appearance-none"
+                        >
+                          <option value="">SELECT AREA</option>
+                          {enabledAbujaAreas.map((area) => (
+                            <option key={area} value={area}>
+                              {area.toUpperCase()}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                      </div>
+                    )
+                  ) : (
+                    <input
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-widest uppercase font-medium bg-transparent"
+                      placeholder="ENTER CITY"
                     />
-                    <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Home Delivery</span>
-                  </label>
-                  
-                  {interstateRates[form.state]?.park !== interstateRates[form.state]?.home && (
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="deliveryMethod"
-                        value="park"
-                        checked={form.deliveryMethod === "park"}
-                        onChange={handleChange}
-                        className="w-4 h-4 accent-black"
-                      />
-                      <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Park Pick-up</span>
-                    </label>
                   )}
                 </div>
-                {interstateRates[form.state]?.park === interstateRates[form.state]?.home && (
-                  <p className="text-[9px] text-gray-400 uppercase tracking-widest">Only Home Delivery is available for this state.</p>
-                )}
               </div>
-              )}
 
-              {/* Preferred delivery - the optional "when will you be around?" box */}
-              <div className="border border-gray-100 p-5 space-y-5">
-                <div>
-                  <p className="text-[10px] tracking-[0.25em] font-bold uppercase text-black mb-1">Preferred Delivery Date</p>
-                  <p className="text-[9px] text-gray-400 uppercase tracking-widest">Optional - tell us when you will be available to receive your order</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Date</label>
+                    <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Street Address *</label>
                     <input
-                      name="deliveryDate"
-                      type="date"
-                      min={minDeliveryDate}
-                      value={form.deliveryDate}
+                      name="address"
+                      value={form.address}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-wider font-medium bg-transparent"
+                      className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                      placeholder="123 STREET NAME"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Time of Day</label>
-                    <div className="relative">
-                      <select
-                        name="deliveryTimeWindow"
-                        value={form.deliveryTimeWindow}
+                    <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Zip Code (Optional)</label>
+                    <input
+                      name="zip"
+                      value={form.zip}
+                      onChange={handleChange}
+                      inputMode="numeric"
+                      className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+                      placeholder="OPTIONAL"
+                    />
+                  </div>
+              </CheckoutSection>
+            )}
+
+            {cartHasPhysical && (
+              <CheckoutSection num={3} title="Delivery Method" open={openSections.method} onToggle={() => toggleSection("method")}>
+                                {form.state === "Lagos" ? (
+                                  <p className="text-[10px] tracking-widest uppercase font-bold text-gray-400">
+                                    Home delivery to your selected area
+                                  </p>
+                                ) : !form.state ? (
+                                  <p className="text-[10px] tracking-widest uppercase text-gray-400">
+                                    Select your state in delivery details to see options
+                                  </p>
+                                ) : (
+                                  <div className="space-y-4">
+                                    <div className="flex gap-8">
+                                      <label className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                          type="radio"
+                                          name="deliveryMethod"
+                                          value="home"
+                                          checked={form.deliveryMethod === "home"}
+                                          onChange={handleChange}
+                                          className="w-4 h-4 accent-black"
+                                        />
+                                        <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Home Delivery</span>
+                                      </label>
+
+                                      {interstateRates[form.state]?.park !== interstateRates[form.state]?.home && (
+                                        <label className="flex items-center gap-3 cursor-pointer group">
+                                          <input
+                                            type="radio"
+                                            name="deliveryMethod"
+                                            value="park"
+                                            checked={form.deliveryMethod === "park"}
+                                            onChange={handleChange}
+                                            className="w-4 h-4 accent-black"
+                                          />
+                                          <span className="text-[11px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-black transition-colors">Park Pick-up</span>
+                                        </label>
+                                      )}
+                                    </div>
+                                    {interstateRates[form.state]?.park === interstateRates[form.state]?.home && (
+                                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">Only Home Delivery is available for this state.</p>
+                                    )}
+                                  </div>
+                                )}
+
+                {/* Preferred delivery - the optional "when will you be around?" box */}
+                <div className="border border-gray-100 p-5 space-y-5">
+                  <div>
+                    <p className="text-[10px] tracking-[0.25em] font-bold uppercase text-black mb-1">Preferred Delivery Date</p>
+                    <p className="text-[9px] text-gray-400 uppercase tracking-widest">Optional - tell us when you will be available to receive your order</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Date</label>
+                      <input
+                        name="deliveryDate"
+                        type="date"
+                        min={minDeliveryDate}
+                        value={form.deliveryDate}
                         onChange={handleChange}
-                        disabled={!form.deliveryDate}
-                        className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-widest uppercase font-medium bg-transparent appearance-none disabled:opacity-40"
-                      >
-                        <option value="">ANY TIME</option>
-                        <option value="morning">MORNING (9AM - 12PM)</option>
-                        <option value="afternoon">AFTERNOON (12PM - 4PM)</option>
-                        <option value="evening">EVENING (4PM - 8PM)</option>
-                      </select>
-                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                        className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-wider font-medium bg-transparent"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Time of Day</label>
+                      <div className="relative">
+                        <select
+                          name="deliveryTimeWindow"
+                          value={form.deliveryTimeWindow}
+                          onChange={handleChange}
+                          disabled={!form.deliveryDate}
+                          className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-widest uppercase font-medium bg-transparent appearance-none disabled:opacity-40"
+                        >
+                          <option value="">ANY TIME</option>
+                          <option value="morning">MORNING (9AM - 12PM)</option>
+                          <option value="afternoon">AFTERNOON (12PM - 4PM)</option>
+                          <option value="evening">EVENING (4PM - 8PM)</option>
+                        </select>
+                        <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              </>
+
+                  <div>
+                    <Link to="/shipping" className="inline-block text-[9px] tracking-[0.2em] font-bold uppercase text-gray-400 hover:text-black underline underline-offset-4 transition-colors">
+                      View Shipping Policy
+                    </Link>
+                  </div>
+              </CheckoutSection>
             )}
 
             <div className="pt-12">
@@ -739,7 +816,7 @@ const Checkout = () => {
                     ? "FREE - INSTANT E-TICKET"
                     : shippingFee === 0 && (allItemsFreeDelivery || (settings?.free_delivery_enabled !== false && physicalSubtotal >= (settings?.free_delivery_threshold ?? 50000)))
                       ? "FREE DELIVERY"
-                      : form.city ? `${form.city.toUpperCase()} - ${settings.currency_symbol}${shippingFee.toLocaleString()}` : "Select area"
+                      : form.city ? `${form.city.toUpperCase()} - ${settings.currency_symbol}${shippingFee.toLocaleString()}` : form.state ? "Select area" : "Select state"
                   }
                 </span>
               </div>
