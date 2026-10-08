@@ -102,7 +102,6 @@ const Checkout = () => {
   // Free delivery signal: either every physical item has its fee toggled off,
   // or the cart clears the storewide free-delivery threshold.
   const allItemsFreeDelivery = cartHasPhysical && !cartNeedsShipping(cartItems);
-  const minDeliveryDate = new Date().toISOString().split("T")[0];
 
   // Discount code state
   const [discountInput, setDiscountInput] = useState("");
@@ -427,19 +426,17 @@ const Checkout = () => {
                     name="firstName"
                     value={form.firstName}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
-                    placeholder="JOHN"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Last Name *</label>
-                  <input
-                    name="lastName"
-                    value={form.lastName}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
-                    placeholder="DOE"
-                  />
+                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] tracking-widest uppercase font-bold text-gray-400">Last Name *</label>
+                <input
+                  name="lastName"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider uppercase font-medium bg-transparent"
+                />
                 </div>
               </div>
 
@@ -450,9 +447,8 @@ const Checkout = () => {
                   type="email"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
-                  placeholder="JOHN@EXAMPLE.COM"
-                />
+                className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[13px] tracking-wider font-medium bg-transparent"
+              />
               </div>
 
               <div className="space-y-2">
@@ -496,7 +492,7 @@ const Checkout = () => {
                     maxLength={500}
                     value={form.specialInstructions}
                     onChange={handleChange}
-                    placeholder="DELIVERY NOTES, GIFT MESSAGE, ANYTHING ELSE"
+                    placeholder="DELIVERY NOTES, PREFERRED DATE, GIFT MESSAGE, ANYTHING ELSE"
                     className="w-full px-4 py-3 border border-black/10 hover:border-black/25 focus:border-black focus-ring rounded-lg outline-none text-[13px] tracking-wide font-medium bg-transparent resize-none"
                   />
                 </div>
@@ -665,44 +661,9 @@ const Checkout = () => {
                                   </div>
                                 )}
 
-                {/* Preferred delivery - the optional "when will you be around?" box */}
-                <div className="border border-gray-100 p-5 space-y-5">
-                  <div>
-                    <p className="text-[10px] tracking-[0.25em] font-bold uppercase text-black mb-1">Preferred Delivery Date</p>
-                    <p className="text-[9px] text-gray-400 uppercase tracking-widest">Optional - tell us when you will be available to receive your order</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Date</label>
-                      <input
-                        name="deliveryDate"
-                        type="date"
-                        min={minDeliveryDate}
-                        value={form.deliveryDate}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-wider font-medium bg-transparent"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[9px] tracking-widest uppercase font-bold text-gray-400">Time of Day</label>
-                      <div className="relative">
-                        <select
-                          name="deliveryTimeWindow"
-                          value={form.deliveryTimeWindow}
-                          onChange={handleChange}
-                          disabled={!form.deliveryDate}
-                          className="w-full px-4 py-3 pr-10 border-b border-gray-100 hover:border-black/40 focus:border-black focus-ring transition-all outline-none text-[12px] tracking-widest uppercase font-medium bg-transparent appearance-none disabled:opacity-40"
-                        >
-                          <option value="">ANY TIME</option>
-                          <option value="morning">MORNING (9AM - 12PM)</option>
-                          <option value="afternoon">AFTERNOON (12PM - 4PM)</option>
-                          <option value="evening">EVENING (4PM - 8PM)</option>
-                        </select>
-                        <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/40" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-[9px] text-gray-400 uppercase tracking-widest">
+                  Prefer a certain delivery date or time? Just add it to your special instructions above (optional).
+                </p>
 
                   <div>
                     <Link to="/shipping" className="inline-block text-[9px] tracking-[0.2em] font-bold uppercase text-gray-400 hover:text-black underline underline-offset-4 transition-colors">
