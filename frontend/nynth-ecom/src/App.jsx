@@ -43,6 +43,7 @@ import Sustainability from "./pages/Sustainability.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import LockPage from "./pages/LockPage.jsx";
 import WaitlistConfirmation from "./pages/WaitlistConfirmation.jsx";
+import DropGate from "./pages/DropGate.jsx";
 
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -211,6 +212,7 @@ function AppContent({ isSiteUnlocked }) {
         <BrowserRouter>
           <Routes>
             <Route path="/waitlist-confirmation" element={<WaitlistConfirmation />} />
+            <Route path="/:slug" element={<DropGate />} />
             <Route path="*" element={<LockPage />} />
           </Routes>
         </BrowserRouter>
@@ -368,6 +370,9 @@ function AppContent({ isSiteUnlocked }) {
                         </ProtectedRoute>
                       }
                     />
+
+                    {/* Drop gate — public unlock + signup for /:slug */}
+                    <Route path="/:slug" element={<DropGate />} />
 
                     {/* 404 Catch-All Route */}
                     <Route path="*" element={<NotFound />} />
