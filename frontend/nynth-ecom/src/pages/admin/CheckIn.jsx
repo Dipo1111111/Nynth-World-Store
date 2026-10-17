@@ -38,6 +38,7 @@ const REASON_COPY = {
   revoked: "Revoked. Do not admit.",
   forbidden: "You do not have permission to verify tickets.",
   forbidden_event: "This ticket belongs to an event you are not assigned to.",
+  test: "Test code - not a live ticket. Do not admit.",
   empty: "Type a ticket code first.",
   error: "Something broke on our side. Try again.",
 };
@@ -65,8 +66,18 @@ const CheckIn = () => {
             const data = await lookupTicketStatus(normalized);
             if (!data?.found) {
                 setResult({ state: "invalid", code: normalized, reason: data?.reason ?? "not_found" });
+            } else if (data.is_test) {
+                // Paystack test traffic is never a real admission. Flagged, no
+                // admit button, matching the behaviour before the atomic rewrite.
+                setResult({ state: "test", code: normalized, ticket: data });
+            } else if (data.ticket_status !== "valid") {
+                setResult({ state: "blocked", code: normalized, ticket: data, reason: data.ticket_status });
+            } else if (data.payment_status !== "paid") {
+                setResult({ state: "blocked", code: normalized, ticket: data, reason: "not_paid" });
+            } else if (data.entry_status === "used") {
+                setResult({ state: "used", code: normalized, ticket: data });
             } else {
-                setResult({ state: data.entry_status === "used" ? "used" : "valid", code: normalized, ticket: data });
+                setResult({ state: "valid", code: normalized, ticket: data });
             }
         } catch {
             setResult({ state: "invalid", code: normalized, reason: "error" });
@@ -84,10 +95,8 @@ const CheckIn = () => {
                 setResult({ state: "admitted", code: result.code, ticket: data });
             } else if (data?.reason === "already_used") {
                 setResult({ state: "used", code: result.code, ticket: data });
-            } else if (data?.reason === "forbidden" || data?.reason === "forbidden_event") {
-                setResult({ state: "blocked", code: result.code, ticket: data, reason: data.reason });
             } else {
-                setResult({ state: "blocked", code: result.code, ticket: data, reason: data.reason });
+                setResult({ state: "blocked", code: result.code, ticket: data, reason: data?.reason });
             }
         } catch {
             setResult({ ...result, state: "blocked", reason: "error" });
@@ -249,6 +258,27 @@ const CheckIn = () => {
                         {t?.verified_by && (
                             <p className="text-xs text-[#EDEAE2]/55 mb-5">Verified by {t.verified_by}</p>
                         )}
+                        <button
+                            onClick={reset}
+                            className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                        >
+                            Next code
+                        </button>
+                    </div>
+                )}
+
+                {result?.state === "test" && (
+                    <div className="border border-sky-500/30 bg-sky-500/[0.08] rounded-2xl p-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <AlertTriangle size={15} className="text-sky-300" />
+                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-300">Test code - not a live ticket</p>
+                        </div>
+                        <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
+                        {t?.event_title && <p className="text-sm text-[#EDEAE2]/75 mb-1">{t.event_title}</p>}
+                        {t?.holder_name && <p className="text-xs text-[#EDEAE2]/55 mb-4">{t.holder_name}</p>}
+                        <p className="text-sm text-[#EDEAE2]/65 mb-5">
+                            Paid under a Paystack test key. It is not a real sale, so nobody is admitted on it.
+                        </p>
                         <button
                             onClick={reset}
                             className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
