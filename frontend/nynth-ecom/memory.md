@@ -28,7 +28,7 @@ Last updated: 2026-10-17 17:50 (Africa/Lagos)
 - Do not modify anything under `Documents/dipo-bench/`. That tree is a read-only benchmark fixture.
 - Never put secrets in this file.
 
-## What shipped this session (commit 345beca, pushed and verified live)
+## What shipped this session (commits 345beca, a3dff90, 7edc426, pushed and verified live)
 
 The whole platform brief is now built. Do not redo any of it.
 
@@ -42,7 +42,11 @@ The whole platform brief is now built. Do not redo any of it.
 
 Also: admin nav, routes, and the dashboard finance block all key off permissions now. `paystack-webhook` and `paystack-verify` both call `syncEventTickets()` so new sales appear at the door without a backfill.
 
-Gate at 345beca: lint clean, 152 vitest, 27 deno edge, build green, verify-dist green.
+Gate at 7edc426: lint clean, 173 vitest, 27 deno edge, build green, verify-dist green.
+
+Two defects were found by a deliberate cross-check after the first "done" report and fixed:
+the dropped test-ticket gate (a3dff90) and the ungated CRUD buttons (7edc426). The first
+"it is done" claim was not accurate on either count.
 
 ## Decisions made
 
@@ -58,10 +62,22 @@ Gate at 345beca: lint clean, 152 vitest, 27 deno edge, build green, verify-dist 
 ## Problems solved
 
 - Supabase 502 outage mid-session. Fell back to the management API, then resumed when it recovered.
+- **The Check-In rewrite silently dropped the test-ticket gate.** Replacing the client-side `isTest` check with `verify_ticket_entry()` did not carry the rule into the function, so a Paystack test ticket became admissible. Every ticket in the DB is test traffic, so this was wide open. Fixed in the function (migration `20261017190000_verify_ticket_blocks_test.sql`, is_test checked before the paid check) and the test panel was restored in CheckIn.jsx. `permissions.wiring.test.js` guards it. Lesson: when a rewrite moves a rule from the client into a function, enumerate the rules the client used to enforce and move each one.
+- Broadening admin routes from founder-only to permission-based exposed Add/Edit/Delete/status/send-email buttons to Vice Admins. Postgres always blocked them, but the brief's "monitor, not edit" means the buttons should be hidden. Gated on `can()` in Products, Orders, DiscountCodes, Subscribers, Lookbooks, plus a `canManageProduct` helper in AuthContext.
 - The SQL backfill failed first time round: `jsonb_array_elements` yields `jsonb`, so `t.code` does not exist. Needs `t ->> 'code'`.
 - `auth.uid()` casts to uuid, so simulating a session with a Firebase-format id throws 22P02 inside `is_admin()`. Use a real uuid in the test claims.
-- RLS test results looked wrong at first because the SQL tool bypasses RLS. Fixed with `set local role authenticated` inside the transaction. Every scoping assertion below was confirmed under that role: organizer sees 0 subscribers and 0 foreign tickets, vice admin sees 0 tickets and cannot edit products or verify, neither can write settings.
+- **Batched `execute_sql` calls are unreliable for RLS testing.** A loop of queries inside one `begin ... set local role authenticated ...` returned mutually impossible results in a single batch (an organizer appearing to see 174 subscribers AND 0 tickets). Re-running each as its own independent statement gave a consistent, correct matrix. Always run each permission probe as its own query and await it; do not trust a batched loop for RLS results.
+- To check whether a change is live, grep the served bundle for a **string literal** (`store.orders.manage`), not a local variable name (`canManageOrders`), because production builds mangle the latter.
 - `roleDefaults()` originally returned an array-shaped object and the tests wanted keys. Split into `roleDefaults()` (map) and `rolePermissionKeys()` (list).
+- `permissions.wiring.test.js`'s own first draft listed TicketPlatform as in-page gated; its own test caught that TicketPlatform is read-only and route-gated, which is the correct shape. Let the tests correct the plan.
+
+## Verification matrix (confirmed live, each probe an independent statement)
+
+- Ticket organizer scoped to one event: sees that event's 4 tickets, 0 subscribers, 0 staff rows, only their own purchases as a buyer, cannot manage clothing, cannot see finance.
+- Vice Admin: sees 0 tickets (no event scope), 0 ticket orders (only their own), cannot manage orders, cannot manage staff, cannot write settings.
+- Two doors, one code: first call `verified`, second `already_used` carrying the original timestamp and staff email.
+- Test ticket: `verify_ticket_entry` returns reason `test`, before the paid check.
+- Founder (`is_admin`): unchanged, holds everything.
 
 ## Current state
 
