@@ -64,7 +64,14 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
-  markTicketUsed,
+  verifyTicketEntry,
+  lookupTicketStatus,
+  refundTicket,
+  setTicketStatus,
+  fetchEventFinance,
+  fetchMyAccess,
+  addStaffRole,
+  claimStaffInvitation,
   fetchProducts,
   fetchRelatedProducts,
   searchProducts,
@@ -406,31 +413,108 @@ describe("product mutations (admin add/edit/delete must not 400)", () => {
   });
 });
 
-describe("markTicketUsed (door check-in)", () => {
-  const orderWith = (tickets) => ({ data: { id: "o1", tickets }, error: null });
-
-  it("marks the matching code used, case-insensitively", async () => {
-    h.setQuery(orderWith([{ code: "NWT-ABC", title: "Show" }]));
-    const t = await markTicketUsed("o1", "nwt-abc");
-    expect(t.used).toBe(true);
-    expect(t.used_at).toBeTruthy();
-    const payload = h.record.find((c) => c.method === "update").args[0];
-    expect(payload.tickets[0].used).toBe(true);
+describe("verifyTicketEntry (door check-in, atomic in Postgres)", () => {
+  it("calls the rpc with an upper-cased code and returns the result", async () => {
+    h.setRpc({ data: { ok: true, code: "NWT-ABC", reason: "verified" }, error: null });
+    const result = await verifyTicketEntry("nwt-abc");
+    expect(result.ok).toBe(true);
+    const call = h.record.find((c) => c.method === "rpc");
+    expect(call.args[0]).toBe("verify_ticket_entry");
+    expect(call.args[1]).toEqual({ p_code: "NWT-ABC" });
   });
 
-  it("refuses unknown codes and already-used tickets", async () => {
-    h.setQuery(orderWith([{ code: "NWT-ABC", title: "Show" }]));
-    await expect(markTicketUsed("o1", "NWT-NOPE")).rejects.toThrow("not found");
+  it("never reads or writes a table, so there is no window between the check and the write", async () => {
+    h.setRpc({ data: { ok: true }, error: null });
+    await verifyTicketEntry("NWT-ABC");
+    expect(h.record.some((c) => c.method === "update")).toBe(false);
+    expect(h.record.some((c) => c.method === "from")).toBe(false);
+  });
 
+  it("passes the refusal reasons straight through", async () => {
+    h.setRpc({ data: { ok: false, reason: "already_used" }, error: null });
+    await expect(verifyTicketEntry("NWT-ABC")).resolves.toMatchObject({ ok: false, reason: "already_used" });
     h.reset();
-    h.setQuery(orderWith([{ code: "NWT-ABC", title: "Show", used: true }]));
-    await expect(markTicketUsed("o1", "NWT-ABC")).rejects.toThrow("already used");
+    h.setRpc({ data: { ok: false, reason: "not_paid" }, error: null });
+    await expect(verifyTicketEntry("NWT-ABC")).resolves.toMatchObject({ reason: "not_paid" });
   });
 
-  it("refuses blank codes and missing orders", async () => {
-    await expect(markTicketUsed("o1", "   ")).rejects.toThrow("ticket code");
-    h.setQuery({ data: null, error: null });
-    await expect(markTicketUsed("ghost", "NWT-ABC")).rejects.toThrow("Order not found");
+  it("does not call the server at all for a blank code", async () => {
+    await expect(verifyTicketEntry("   ")).resolves.toEqual({ ok: false, reason: "empty" });
+    expect(h.record.some((c) => c.method === "rpc")).toBe(false);
+  });
+
+  it("surfaces a transport error rather than swallowing it", async () => {
+    h.setRpc({ data: null, error: new Error("network") });
+    await expect(verifyTicketEntry("NWT-ABC")).rejects.toThrow("network");
+  });
+});
+
+describe("lookupTicketStatus (read-only door lookup)", () => {
+  it("asks for the scoped rpc rather than reading event_tickets directly", async () => {
+    h.setRpc({ data: { found: true, entry_status: "unused" }, error: null });
+    const result = await lookupTicketStatus("nwt-abc");
+    expect(result.found).toBe(true);
+    const call = h.record.find((c) => c.method === "rpc");
+    expect(call.args[0]).toBe("ticket_status_for");
+  });
+
+  it("treats a scoped-out code as not found", async () => {
+    h.setRpc({ data: { found: false, reason: "forbidden_event" }, error: null });
+    await expect(lookupTicketStatus("NWT-ABC")).resolves.toMatchObject({ found: false });
+  });
+});
+
+describe("ticket money moves only through the server", () => {
+  it("refunds through the rpc and refuses an unpaid ticket", async () => {
+    h.setRpc({ data: { ok: false, error: "only a paid ticket can be refunded" }, error: null });
+    await expect(refundTicket("NWT-ABC")).rejects.toThrow("only a paid ticket");
+  });
+
+  it("cancels through the rpc", async () => {
+    h.setRpc({ data: { ok: true, ticket_status: "cancelled" }, error: null });
+    await expect(setTicketStatus("NWT-ABC", "cancelled")).resolves.toMatchObject({ ok: true });
+  });
+
+  it("reads the finance view, never the raw ledger", async () => {
+    h.setQuery({ data: [{ event_id: "e1", gross_collected: "5000" }], error: null });
+    const rows = await fetchEventFinance();
+    expect(rows).toHaveLength(1);
+    expect(h.record.find((c) => c.method === "from").args[0]).toBe("event_finance");
+  });
+});
+
+describe("staff access", () => {
+  it("reads the founder-only my_access rpc", async () => {
+    h.setRpc({ data: { is_admin: false, permissions: {}, event_ids: [] }, error: null });
+    await fetchMyAccess();
+    expect(h.record.find((c) => c.method === "rpc").args[0]).toBe("my_access");
+  });
+
+  it("falls back to no access instead of throwing when the rpc fails", async () => {
+    h.setRpc({ data: null, error: new Error("boom") });
+    await expect(fetchMyAccess()).resolves.toMatchObject({ is_admin: false });
+  });
+
+  it("claims an invitation on load", async () => {
+    h.setRpc({ data: { ok: true }, error: null });
+    await expect(claimStaffInvitation()).resolves.toMatchObject({ ok: true });
+    expect(h.record.find((c) => c.method === "rpc").args[0]).toBe("bind_staff_profile");
+  });
+
+  it("requires an email and lower-cases it", async () => {
+    h.reset();
+    await expect(addStaffRole({ role: "vice_admin" })).resolves.toMatchObject({ success: false });
+    h.setQuery({ data: { id: "sr-1" }, error: null });
+    await addStaffRole({ email: "  Ada@Example.COM ", role: "ticket_staff" });
+    const payload = h.record.find((c) => c.method === "insert").args[0];
+    expect(payload.email).toBe("ada@example.com");
+    expect(payload.status).toBe("invited");
+  });
+
+  it("explains a duplicate email instead of leaking the raw driver error", async () => {
+    h.setQuery({ data: null, error: { code: "23505", message: "duplicate key" } });
+    await expect(addStaffRole({ email: "ada@example.com", role: "vice_admin" }))
+      .resolves.toMatchObject({ success: false, error: expect.stringContaining("already") });
   });
 });
 

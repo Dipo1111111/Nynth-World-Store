@@ -17,7 +17,7 @@ const toTimestamp = (v) => {
 // Coerce to a finite number; NaN/undefined -> 0 so PostgREST never rejects with 400.
 const finalNumber = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 const rowToProduct = (r) => ({ ...(r.data ?? {}), id: r.id, stockQuantity: r.stock_quantity, inStock: r.stock_quantity > 0, isPublic: r.is_public, bestSeller: r.best_seller, displayOrder: r.display_order, name: r.name ?? r.data?.name, title: r.title ?? r.data?.title, category: r.category ?? r.data?.category, price: Number(r.price ?? r.data?.price ?? 0), featured: r.featured, tags: r.tags ?? [], created_at: toTimestamp(r.created_at) });
-const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, isTest: r.is_test === true, created_at: toTimestamp(r.created_at) });
+const rowToOrder = (r) => ({ id: r.id, userId: r.user_id, customer: r.customer ?? {}, items: r.items ?? [], tickets: r.tickets ?? [], subtotal: Number(r.subtotal ?? 0), shippingFee: Number(r.shipping_fee ?? 0), shipping_fee: Number(r.shipping_fee ?? 0), discountAmount: Number(r.discount_amount ?? 0), discountCode: r.discount_code, total: Number(r.total ?? 0), payment_status: r.payment_status, order_status: r.order_status, payment_reference: r.payment_reference, paid_at: r.paid_at, isTest: r.is_test === true, salesChannel: r.sales_channel ?? "store", organizerStaffId: r.organizer_staff_id ?? null, commissionRate: Number(r.commission_rate ?? 0), paymentFee: Number(r.payment_fee ?? 0), refundedAmount: Number(r.refunded_amount ?? 0), nynthCommission: Number(r.nynth_commission ?? 0), organizerNet: Number(r.organizer_net ?? 0), created_at: toTimestamp(r.created_at) });
 
 // Storefront rule: hidden products never list. Sold-out (exact-zero stock)
 // stays visible with a SOLD OUT badge so shoppers see it is gone. Null stock
@@ -83,21 +83,164 @@ const mergeProductData = async (id, updates) => {
     if (!data || data.length === 0) throw new Error("Delete failed - no rows affected. Check that you are an admin and authenticated.");
     return true;
   };
-export const markTicketUsed = async (orderId, code) => {
+// Entry is one atomic Postgres statement, not a client read-then-write. The
+// old markTicketUsed(orderId, code) let two doors admit the same screenshot
+// at the same instant; verify_ticket_entry() cannot, and it also refuses an
+// unpaid, cancelled or revoked ticket without ever changing its payment state.
+export const verifyTicketEntry = async (code) => {
   const normalized = String(code ?? "").trim().toUpperCase();
-  if (!normalized) throw new Error("Enter a ticket code.");
-  const { data: order, error: fetchError } = await supabase.from("orders").select("tickets").eq("id", orderId).maybeSingle();
-  if (fetchError) throw fetchError;
-  if (!order) throw new Error("Order not found.");
-  const tickets = Array.isArray(order.tickets) ? order.tickets : [];
-  const idx = tickets.findIndex((t) => String(t.code ?? "").toUpperCase() === normalized);
-  if (idx === -1) throw new Error("Ticket code not found on this order.");
-  if (tickets[idx].used) throw new Error("Ticket already used.");
-  const next = tickets.map((t, i) => (i === idx ? { ...t, used: true, used_at: new Date().toISOString() } : t));
-  const { error } = await supabase.from("orders").update({ tickets: next }).eq("id", orderId);
+  if (!normalized) return { ok: false, reason: "empty" };
+  const { data, error } = await supabase.rpc("verify_ticket_entry", { p_code: normalized });
   if (error) throw error;
-  return next[idx];
+  return data ?? { ok: false, reason: "not_found" };
 };
+
+// Read-only door lookup. Scoped server side, so it returns nothing at all for
+// an event outside the caller's assignment.
+export const lookupTicketStatus = async (code) => {
+  const normalized = String(code ?? "").trim().toUpperCase();
+  if (!normalized) return { found: false };
+  const { data, error } = await supabase.rpc("ticket_status_for", { p_code: normalized });
+  if (error) throw error;
+  return data ?? { found: false };
+};
+
+export const setTicketStatus = async (code, status) => {
+  const { data, error } = await supabase.rpc("set_ticket_status", {
+    p_code: String(code ?? "").trim().toUpperCase(),
+    p_status: status,
+  });
+  if (error) throw error;
+  if (!data?.ok) throw new Error(data?.error || "Could not change the ticket");
+  return data;
+};
+
+export const refundTicket = async (code) => {
+  const { data, error } = await supabase.rpc("refund_ticket", {
+    p_code: String(code ?? "").trim().toUpperCase(),
+  });
+  if (error) throw error;
+  if (!data?.ok) throw new Error(data?.error || "Could not refund the ticket");
+  return data;
+};
+
+// Issued tickets for the events this person may see. RLS does the scoping, so
+// there is no event filter to get wrong in the client.
+export const fetchEventTickets = async ({ eventId = null, limit = 300 } = {}) => {
+  let query = supabase.from("event_tickets").select("*").order("created_at", { ascending: false }).limit(limit);
+  if (eventId) query = query.eq("event_id", eventId);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data ?? [];
+};
+
+// Ticket money per event: collected, fees, refunds, NYNTH commission, and the
+// organizer's share, kept apart from the clothing ledger.
+export const fetchEventFinance = async () => {
+  const { data, error } = await supabase.from("event_finance").select("*");
+  if (error) return [];
+  return data ?? [];
+};
+
+export const assignEventOrganizer = async (eventId, staffId, commissionRate) => {
+  const { data, error } = await supabase.rpc("assign_event_organizer", {
+    p_event_id: eventId,
+    p_staff_id: staffId || null,
+    p_commission_rate: Number(commissionRate) || 0,
+  });
+  if (error) throw error;
+  if (!data?.ok) throw new Error(data?.error || "Could not assign the organizer");
+  return data;
+};
+
+// --- STAFF & ACCESS ---
+const staffRow = (r) => ({
+  id: r.id,
+  userId: r.user_id,
+  email: r.email,
+  fullName: r.full_name,
+  department: r.department,
+  role: r.role,
+  permissions: r.permissions ?? {},
+  eventIds: r.event_ids ?? [],
+  status: r.status,
+  notes: r.notes,
+  lastSeenAt: r.last_seen_at,
+  createdAt: r.created_at,
+});
+
+export const fetchStaffRoles = async () => {
+  const { data, error } = await supabase.from("staff_roles").select("*").order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(staffRow);
+};
+
+export const addStaffRole = async (person) => {
+  const email = String(person.email ?? "").trim().toLowerCase();
+  if (!email) return { success: false, error: "Enter an email address" };
+  const id = `sr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const { data, error } = await supabase
+    .from("staff_roles")
+    .insert({
+      id,
+      email,
+      full_name: person.fullName?.trim() || null,
+      department: person.department?.trim() || null,
+      role: person.role,
+      permissions: person.permissions ?? {},
+      event_ids: person.eventIds ?? [],
+      status: "invited",
+      notes: person.notes?.trim() || null,
+      invited_by: person.invitedBy ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) {
+    const message = error.code === "23505" ? "That email already has an account here" : error.message;
+    return { success: false, error: message };
+  }
+  return { success: true, id: data.id };
+};
+
+export const updateStaffRole = async (id, updates) => {
+  const patch = { updated_at: new Date().toISOString() };
+  if (updates.email !== undefined) patch.email = String(updates.email).trim().toLowerCase();
+  if (updates.fullName !== undefined) patch.full_name = updates.fullName?.trim() || null;
+  if (updates.department !== undefined) patch.department = updates.department?.trim() || null;
+  if (updates.role !== undefined) patch.role = updates.role;
+  if (updates.permissions !== undefined) patch.permissions = updates.permissions;
+  if (updates.eventIds !== undefined) patch.event_ids = updates.eventIds;
+  if (updates.status !== undefined) patch.status = updates.status;
+  if (updates.notes !== undefined) patch.notes = updates.notes?.trim() || null;
+  const { error } = await supabase.from("staff_roles").update(patch).eq("id", id);
+  if (error) throw error;
+  return true;
+};
+
+// Suspend first, delete only when the record has to go. A suspended person
+// loses access on their next request; their audit trail stays put.
+export const suspendStaffRole = async (id) => updateStaffRole(id, { status: "suspended" });
+export const restoreStaffRole = async (id) => updateStaffRole(id, { status: "active" });
+export const deleteStaffRole = async (id) => {
+  const { error } = await supabase.from("staff_roles").delete().eq("id", id);
+  if (error) throw error;
+  return true;
+};
+
+// Who am I, and what may I do. Claimed on login so an invited email works the
+// first time it signs in, with no invite-accept step.
+export const fetchMyAccess = async () => {
+  const { data, error } = await supabase.rpc("my_access");
+  if (error) return { is_admin: false, permissions: {}, event_ids: [], role: null };
+  return data ?? { is_admin: false, permissions: {}, event_ids: [], role: null };
+};
+
+export const claimStaffInvitation = async () => {
+  const { data, error } = await supabase.rpc("bind_staff_profile");
+  if (error) return { ok: false };
+  return data ?? { ok: false };
+};
+
  export const updateProductOrderBatch = async (productsArray) => {
     const results = await Promise.all(productsArray.map((p, i) => supabase.from("products").update({ display_order: i }).eq("id", p.id).select("id")));
     const failed = results.filter((r) => !r.error && (!r.data || r.data.length === 0));

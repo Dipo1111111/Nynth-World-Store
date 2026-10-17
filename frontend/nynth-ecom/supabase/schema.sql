@@ -2,6 +2,12 @@
 -- Mirrors Firestore collections. IDs preserved as TEXT (Firestore doc IDs).
 -- Timestamps: created_at / updated_at timestamptz. Run this in Supabase SQL editor
 -- AFTER admin creates the real project. No secrets in this file.
+--
+-- APPLIED TO THE LIVE PROJECT via supabase/migrations/*.sql, which is the
+-- source of truth. The roles, ticketing and revenue layer is mirrored at the
+-- bottom of this file but lives in
+-- supabase/migrations/20261017180000_staff_roles_and_ticketing.sql. If the two
+-- ever disagree, the migration file and the live database win.
 
 -- ===== helpers =====
 create extension if not exists "pgcrypto";
@@ -242,3 +248,105 @@ drop policy if exists "presence_delete_any" on public.presence;
 create policy "presence_delete_any" on public.presence for delete using (true);
 drop policy if exists "presence_admin_read" on public.presence;
 create policy "presence_admin_read" on public.presence for select using (public.is_admin());
+
+-- =========================================================================
+-- MIRROR of supabase/migrations/20261017180000_staff_roles_and_ticketing.sql
+-- Roles, permissions, per-event scoping, atomic ticket entry, ticket state
+-- separation, ticket revenue separation. See the migration file for the full
+-- text; this section exists so schema.sql is not silently missing them.
+-- =========================================================================
+
+create table if not exists public.staff_roles (
+  id text primary key,
+  user_id text references public.users(id) on delete set null,
+  email text not null,
+  full_name text,
+  department text,
+  role text not null check (role in ('vice_admin','ticket_organizer','ticket_admin','ticket_staff')),
+  permissions jsonb not null default '{}'::jsonb,  -- overrides layered on role defaults
+  event_ids text[] not null default '{}',         -- empty = sees no events at all
+  status text not null default 'invited' check (status in ('invited','active','suspended')),
+  notes text,
+  invited_by text,
+  last_seen_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Payment status, ticket status and entry status are three separate axes.
+create table if not exists public.event_tickets (
+  id text primary key,
+  code text not null unique,
+  order_id text references public.orders(id) on delete cascade,
+  event_id text not null,
+  event_title text,
+  event_date_time timestamptz,
+  venue text,
+  ticket_type text,
+  holder_name text,
+  holder_email text,
+  amount numeric not null default 0,
+  payment_status text not null default 'pending'
+    check (payment_status in ('pending','paid','failed','refunded')),
+  ticket_status text not null default 'valid'
+    check (ticket_status in ('valid','cancelled','revoked')),
+  entry_status text not null default 'unused'
+    check (entry_status in ('unused','used')),
+  verified_at timestamptz,
+  verified_by text,
+  verified_by_email text,
+  payment_fee numeric not null default 0,
+  commission_rate numeric not null default 0,
+  nynth_commission numeric not null default 0,
+  organizer_share numeric not null default 0,
+  organizer_staff_id text,
+  is_test boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Ticket money never mixes with the clothing ledger.
+alter table public.orders
+  add column if not exists sales_channel text not null default 'store'
+    check (sales_channel in ('store','tickets','mixed')),
+  add column if not exists organizer_staff_id text,
+  add column if not exists commission_rate numeric not null default 0,
+  add column if not exists payment_fee numeric not null default 0,
+  add column if not exists refunded_amount numeric not null default 0,
+  add column if not exists nynth_commission numeric not null default 0,
+  add column if not exists organizer_net numeric not null default 0;
+
+-- Functions, all SECURITY DEFINER, so a policy can ask the question without
+-- exposing the table behind it:
+--   staff_role_defaults(text)      role defaults, mirrored in src/utils/permissions.js
+--   current_staff_role()           the caller's active row, matched on user_id or email
+--   my_permissions()               role defaults || per-person overrides
+--   has_permission(text)           is_admin() OR the key is granted
+--   my_event_ids()                 the caller's assigned events
+--   can_access_event(text)         is_admin() OR the event is assigned
+--   order_touches_my_events(jsonb) any line item on the order is an assigned event
+--   my_access()                    one call the client makes on login
+--   bind_staff_profile()           claim an invitation by email, promote to active
+--   verify_ticket_entry(text)      ATOMIC check-and-mark; the door cannot double-admit
+--   ticket_status_for(text)        read-only scoped door lookup
+--   set_ticket_status(text,text)   valid | cancelled | revoked, never deletes
+--   refund_ticket(text)            paid -> refunded, revokes the ticket
+--   assign_event_organizer(text,text,numeric)  founder-only director appointment
+
+create or replace view public.event_finance
+with (security_invoker = true)
+as
+select
+  t.event_id,
+  max(t.event_title) as event_title,
+  max(t.organizer_staff_id) as organizer_staff_id,
+  count(*) filter (where t.payment_status = 'paid') as tickets_sold,
+  count(*) filter (where t.entry_status = 'used') as tickets_used,
+  coalesce(sum(t.amount) filter (where t.payment_status = 'paid'), 0) as gross_collected,
+  coalesce(sum(t.amount) filter (where t.payment_status = 'refunded'), 0) as refunded,
+  coalesce(sum(t.payment_fee) filter (where t.payment_status = 'paid'), 0) as payment_fees,
+  coalesce(sum(t.nynth_commission) filter (where t.payment_status = 'paid'), 0) as nynth_commission,
+  coalesce(sum(t.organizer_share) filter (where t.payment_status = 'paid'), 0) as organizer_share
+from public.event_tickets t
+where t.is_test = false
+group by t.event_id;

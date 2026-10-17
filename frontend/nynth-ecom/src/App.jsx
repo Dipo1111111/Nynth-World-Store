@@ -44,6 +44,8 @@ import ErrorPage from "./pages/ErrorPage.jsx";
 import LockPage from "./pages/LockPage.jsx";
 import WaitlistConfirmation from "./pages/WaitlistConfirmation.jsx";
 import DropGate from "./pages/DropGate.jsx";
+import Landing from "./pages/Landing.jsx";
+import Tickets from "./pages/Tickets.jsx";
 
 // Lazy Loaded Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -56,6 +58,8 @@ const Settings = lazy(() => import("./pages/admin/Settings"));
 const DiscountCodes = lazy(() => import("./pages/admin/DiscountCodes"));
 const CheckIn = lazy(() => import("./pages/admin/CheckIn"));
 const Events = lazy(() => import("./pages/admin/Events"));
+const StaffAccess = lazy(() => import("./pages/admin/StaffAccess"));
+const TicketPlatform = lazy(() => import("./pages/admin/TicketPlatform"));
 
 // Admin Loading Fallback
 const AdminLoader = () => (
@@ -224,9 +228,10 @@ function AppContent({ isSiteUnlocked }) {
             <WhatsAppButton />
             <Routes>
                     {/* Public Routes */}
-                    <Route path="/" element={<Navigate to="/shop" replace />} />
+                    <Route path="/" element={<Landing />} />
                     <Route path="/home" element={<Navigate to="/shop" replace />} />
                     <Route path="/shop" element={<Shop />} />
+                    <Route path="/tickets" element={<Tickets />} />
                     <Route path="/lookbook" element={<Lookbook />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/cart" element={<Cart />} />
@@ -273,7 +278,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute>
                           <Suspense fallback={<AdminLoader />}>
                             <AdminDashboard />
                           </Suspense>
@@ -283,7 +288,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/orders"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="store.orders.view">
                           <Suspense fallback={<AdminLoader />}>
                             <Orders />
                           </Suspense>
@@ -293,7 +298,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/abandoned-checkouts"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="store.carts.view">
                           <Suspense fallback={<AdminLoader />}>
                             <AbandonedCheckouts />
                           </Suspense>
@@ -303,7 +308,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/products"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission={["store.products.view", "ticketing.events.edit"]}>
                           <Suspense fallback={<AdminLoader />}>
                             <Products />
                           </Suspense>
@@ -313,7 +318,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/lookbooks"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="store.lookbooks.view">
                           <Suspense fallback={<AdminLoader />}>
                             <Lookbooks />
                           </Suspense>
@@ -323,7 +328,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/subscribers"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="store.subscribers.view">
                           <Suspense fallback={<AdminLoader />}>
                             <Subscribers />
                           </Suspense>
@@ -333,7 +338,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/settings"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="store.settings.manage">
                           <Suspense fallback={<AdminLoader />}>
                             <Settings />
                           </Suspense>
@@ -343,7 +348,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/discount-codes"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="store.discounts.view">
                           <Suspense fallback={<AdminLoader />}>
                             <DiscountCodes />
                           </Suspense>
@@ -353,7 +358,7 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/check-in"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="ticketing.verify">
                           <Suspense fallback={<AdminLoader />}>
                             <CheckIn />
                           </Suspense>
@@ -363,9 +368,29 @@ function AppContent({ isSiteUnlocked }) {
                     <Route
                       path="/admin/events"
                       element={
-                        <ProtectedRoute requireAdmin={true}>
+                        <ProtectedRoute requirePermission="ticketing.events.view">
                           <Suspense fallback={<AdminLoader />}>
                             <Events />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/ticket-platform"
+                      element={
+                        <ProtectedRoute requirePermission="ticketing.revenue.view">
+                          <Suspense fallback={<AdminLoader />}>
+                            <TicketPlatform />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/staff"
+                      element={
+                        <ProtectedRoute requirePermission="staff.manage">
+                          <Suspense fallback={<AdminLoader />}>
+                            <StaffAccess />
                           </Suspense>
                         </ProtectedRoute>
                       }

@@ -182,6 +182,28 @@ export default function AdminSettings() {
  }
  };
 
+ const handleLandingImageUpload = (slot) => async (e) => {
+ const file = e.target.files[0];
+ if (!file) return;
+ try {
+ setIsUploading(true);
+ toast.loading("Uploading landing image...", { id: "landing-upload" });
+ const compressed = await compressImage(file, { maxSizeMB: 2, maxWidthOrHeight: 2000 });
+ const url = await uploadImage(compressed);
+ setSettings(prev => ({ ...prev, landing: { ...(prev.landing || {}), [slot]: url } }));
+ toast.success("Image ready - press Save All Settings to publish it.", { id: "landing-upload" });
+ } catch {
+ toast.error("Upload failed.", { id: "landing-upload" });
+ } finally {
+ setIsUploading(false);
+ e.target.value = "";
+ }
+ };
+
+ const setLandingField = (key, value) => {
+ setSettings(prev => ({ ...prev, landing: { ...(prev.landing || {}), [key]: value } }));
+ };
+
  const handleMerge = async () => {
  if (!window.confirm("This will find all duplicate emails and merge them into single entries (keeping the oldest signup). Proceed?")) return;
  
@@ -327,7 +349,7 @@ export default function AdminSettings() {
   </header>
 
   <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur px-2 py-2">
-  {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Product page", "#set-product"], ["Revenue", "#set-revenue"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
+  {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Product page", "#set-product"], ["Landing", "#set-landing"], ["Revenue", "#set-revenue"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
   <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/55 hover:text-[#EDEAE2] hover:bg-white/[0.06] transition-colors focus-ring">
   {label}
   </a>
@@ -605,6 +627,73 @@ export default function AdminSettings() {
       />
       <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
     </div>
+  </div>
+
+  {/* LANDING SPLIT */}
+  <div id="set-landing" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+ <SectionTitle icon={ImageIcon} title="Landing Page Split" />
+ <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ The front page is two boxes. One for the store, one for tickets. Drop an image on either and it goes live the moment you save.
+ </p>
+
+ <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10 mb-6">
+ <div>
+ <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Two-box Landing Page</h4>
+ <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Off sends visitors straight to the shop, as before</p>
+ </div>
+ <button
+ type="button"
+ aria-label="Toggle the two-box landing page"
+ aria-pressed={(settings.landing || {}).enabled !== false}
+ onClick={() => setLandingField("enabled", (settings.landing || {}).enabled === false)}
+ className={`w-12 h-6 rounded-lg transition-colors relative ${(settings.landing || {}).enabled !== false ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+ >
+ <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${(settings.landing || {}).enabled !== false ? 'left-7' : 'left-1'}`} />
+ </button>
+ </div>
+
+ <div className="grid md:grid-cols-2 gap-6">
+ {[["storeImage", "Store box image", "storeTitle", "Store box title"], ["ticketImage", "Ticket box image", "ticketTitle", "Ticket box title"]].map(([imageKey, imageLabel, titleKey, titleLabel]) => (
+ <div key={imageKey} className="space-y-3">
+ <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden border border-white/[0.06]">
+ {(settings.landing || {})[imageKey] ? (
+ <>
+ <img src={settings.landing[imageKey]} alt="" className="w-full h-full object-cover" />
+ <button
+ type="button"
+ onClick={() => setLandingField(imageKey, "")}
+ className="absolute top-3 right-3 bg-black/60 text-white p-2 rounded-lg hover:bg-black/70 transition-colors shadow-card"
+ title="Remove image"
+ >
+ <X size={16} />
+ </button>
+ </>
+ ) : (
+ <div className="w-full h-full flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/35 bg-white/[0.03]">
+ No image
+ </div>
+ )}
+ </div>
+ <div className="relative border-2 border-dashed border-white/26 rounded-lg p-6 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
+ <input type="file" accept="image/*" onChange={handleLandingImageUpload(imageKey)} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer" />
+ <Upload size={20} className="text-[#EDEAE2]/42 mb-2 group-hover:text-[#EDEAE2] transition-colors" />
+ <span className="text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest group-hover:text-[#EDEAE2]">
+ {isUploading ? "Uploading..." : imageLabel}
+ </span>
+ <p className="text-[10px] text-[#EDEAE2]/42 mt-2">Recommended: 1200 x 1500 px (portrait)</p>
+ </div>
+ <div>
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">{titleLabel}</label>
+ <input
+ value={(settings.landing || {})[titleKey] ?? ""}
+ onChange={(e) => setLandingField(titleKey, e.target.value)}
+ placeholder={imageKey === "storeImage" ? "NYNTH WORLD STORE" : "TICKET"}
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] uppercase tracking-widest"
+ />
+ </div>
+ </div>
+ ))}
+ </div>
   </div>
 
   {/* REVENUE PRIVACY */}

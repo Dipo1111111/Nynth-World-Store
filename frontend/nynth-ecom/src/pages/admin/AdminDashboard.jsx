@@ -116,7 +116,8 @@ const DashboardSkeleton = () => (
 );
 
 const AdminDashboard = () => {
-    const { isAdmin } = useAuth();
+    const { isAdmin, can } = useAuth();
+    const canSeeFinance = can("store.finance.view");
     const { settings } = useSettings();
     const [orders, setOrders] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -286,7 +287,9 @@ const AdminDashboard = () => {
 
             {loading || !dashboardData ? <DashboardSkeleton /> : (
                 <div ref={revealScope} className="space-y-5 md:space-y-6">
-                    {/* Lead metric - editorial block */}
+                    {/* Lead metric - editorial block. Hidden without store.finance.view:
+                        a Vice Admin oversees operations but never sees company money. */}
+                    {canSeeFinance && (
                     <section className="border border-white/10 bg-[#0a0a0a] rounded-2xl p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
                             <div>
@@ -317,6 +320,18 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     </section>
+                    )}
+
+                    {!canSeeFinance && (
+                        <section className="border border-white/10 bg-[#0a0a0a] rounded-2xl p-6 md:p-8">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#EDEAE2]/45 mb-2">
+                                Company financials
+                            </p>
+                            <p className="text-sm text-[#EDEAE2]/55">
+                                Not part of your access. Revenue stays with the founder.
+                            </p>
+                        </section>
+                    )}
 
                     {/* Dense editorial row */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">

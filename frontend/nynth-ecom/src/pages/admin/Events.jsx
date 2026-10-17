@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { fetchProducts, getAllOrders, updateProduct } from "../../api/supabaseFunctions";
+import { fetchProducts, getAllOrders, updateProduct, fetchEventTickets } from "../../api/firebaseFunctions";
+import { useAuth } from "../../context/AuthContext";
 import { summarizeEvents, summarizeTotals } from "../../utils/eventStats";
 import { formatEventDate } from "../../utils/tickets";
-import { Calendar, MapPin, Eye, EyeOff, ArrowUpRight, Ticket, Plus } from "lucide-react";
+import { Calendar, MapPin, Eye, EyeOff, ArrowUpRight, Ticket, Plus, Lock, TicketCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
 const STATUS_CHIP = {
@@ -19,15 +20,31 @@ const STATUS_LABEL = { live: "ON SALE", hidden: "HIDDEN", soldout: "SOLD OUT", e
 // One command view per event: sold, left, checked in, revenue, plus the
 // levers Newman reaches for (hide/show, open check-in, jump to edit).
 // Test traffic never counts; the note under the totals says so.
+//
+// Scoping is enforced by the database: a staff member assigned to two events
+// only ever receives those two events' products and orders here, so there is
+// nothing to filter out in the browser. What this page decides is which
+// affordances to offer, not who can see what.
 export default function Events() {
+  const { can, isAdmin, canAccessEvents } = useAuth();
   const [summaries, setSummaries] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(null);
 
+  const canEdit = can("ticketing.events.edit");
+  const canSeeRevenue = can("ticketing.revenue.view");
+  const canVerify = can("ticketing.verify");
+
   const load = async () => {
     try {
-      const [products, orders] = await Promise.all([fetchProducts({ admin: true }), getAllOrders()]);
+      const [products, orders, issued] = await Promise.all([
+        fetchProducts({ admin: true }),
+        getAllOrders(),
+        can("ticketing.orders.view") ? fetchEventTickets() : Promise.resolve([]),
+      ]);
       setSummaries(summarizeEvents(products, orders));
+      setTickets(issued);
     } catch {
       toast.error("Failed to load events");
     } finally {
@@ -37,6 +54,7 @@ export default function Events() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleVisibility = async (s) => {
@@ -46,7 +64,7 @@ export default function Events() {
       setSummaries((prev) =>
         prev.map((x) =>
           x.id === s.id
-            ? { ...x, isPublic: !s.isPublic, status: !s.isPublic ? (x.status === "hidden" ? "live" : x.status) : "hidden" }
+            ? { ...x, isPublic: !x.isPublic, status: !x.isPublic ? (x.status === "hidden" ? "live" : x.status) : "hidden" }
             : x
         )
       );
@@ -59,12 +77,16 @@ export default function Events() {
   };
 
   const totals = summarizeTotals(summaries);
+  const issuedByEvent = tickets.reduce((acc, t) => {
+    acc[t.event_id] = (acc[t.event_id] ?? 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <AdminLayout title="Events">
       <div className="max-w-5xl">
         <p className="text-sm text-[#EDEAE2]/55 mb-6">
-          Every event in one place. Dates, venue, and prices are edited in Products; this page runs the show.
+          Every event you are allowed to see. Dates, venue, and prices are edited in Products; this page runs the show.
         </p>
 
         {!loading && (
@@ -72,7 +94,7 @@ export default function Events() {
             {[
               ["EVENTS", String(totals.events)],
               ["TICKETS SOLD", String(totals.sold)],
-              ["REVENUE", `₦${totals.revenue.toLocaleString()}`],
+              canSeeRevenue ? ["REVENUE", `₦${totals.revenue.toLocaleString()}`] : ["CODES ISSUED", String(tickets.length)],
               ["CHECKED IN", `${totals.checkedIn}/${totals.codes}`],
             ].map(([label, value]) => (
               <div key={label} className="border border-white/10 rounded-2xl bg-white/[0.03] px-5 py-4">
@@ -93,19 +115,24 @@ export default function Events() {
         {!loading && summaries.length === 0 && (
           <div className="border border-dashed border-white/15 rounded-2xl p-10 text-center">
             <Ticket size={28} className="mx-auto mb-3 text-[#EDEAE2]/25" />
-            <p className="text-sm text-[#EDEAE2]/65 mb-5">No events yet. Create one as a Tickets product and it lands here.</p>
-            <Link
-              to="/admin/products"
-              className="inline-flex items-center gap-2 bg-[#EDEAE2] text-[#0d0d0f] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all focus-ring"
-            >
-              <Plus size={14} /> New event
-            </Link>
+            <p className="text-sm text-[#EDEAE2]/65 mb-2">
+              {isAdmin ? "No events yet. Create one as a Tickets product and it lands here." : "No events are assigned to you yet."}
+            </p>
+            {isAdmin && (
+              <Link
+                to="/admin/products"
+                className="inline-flex items-center gap-2 mt-4 bg-[#EDEAE2] text-[#0d0d0f] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all focus-ring"
+              >
+                <Plus size={14} /> New event
+              </Link>
+            )}
           </div>
         )}
 
         <div className="grid md:grid-cols-2 gap-4">
           {summaries.map((s) => {
             const filled = s.capacity ? Math.round((s.sold / s.capacity) * 10) : 0;
+            const inScope = isAdmin || canAccessEvents(s.id);
             return (
               <div key={s.id} className="border border-white/10 rounded-2xl bg-white/[0.03] p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -131,7 +158,7 @@ export default function Events() {
                     ["SOLD", String(s.sold)],
                     ["LEFT", s.remaining == null ? "OPEN" : String(s.remaining)],
                     ["IN", `${s.checkedIn}/${s.codes}`],
-                    ["₦", s.revenue.toLocaleString()],
+                    canSeeRevenue ? ["₦", s.revenue.toLocaleString()] : ["CODES", String(issuedByEvent[s.id] ?? 0)],
                   ].map(([label, value]) => (
                     <div key={label}>
                       <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42 mb-1">{label}</p>
@@ -152,33 +179,50 @@ export default function Events() {
                   </p>
                 )}
 
+                {!canSeeRevenue && (
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/35 mb-4 flex items-center gap-1.5">
+                    <Lock size={10} /> Revenue is not part of your access
+                  </p>
+                )}
+                {!canVerify && (
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/35 mb-4 flex items-center gap-1.5">
+                    <Lock size={10} /> Door verification is not part of your access
+                  </p>
+                )}
+
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => toggleVisibility(s)}
-                    disabled={toggling === s.id}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/15 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/75 hover:text-[#EDEAE2] transition-colors disabled:opacity-40 focus-ring"
-                  >
-                    {s.isPublic ? <EyeOff size={12} /> : <Eye size={12} />}
-                    {toggling === s.id ? "Saving" : s.isPublic ? "Hide" : "Show"}
-                  </button>
+                  {canEdit && inScope && (
+                    <button
+                      onClick={() => toggleVisibility(s)}
+                      disabled={toggling === s.id}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/15 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/75 hover:text-[#EDEAE2] transition-colors disabled:opacity-40 focus-ring"
+                    >
+                      {s.isPublic ? <EyeOff size={12} /> : <Eye size={12} />}
+                      {toggling === s.id ? "Saving" : s.isPublic ? "Hide" : "Show"}
+                    </button>
+                  )}
                   <Link
                     to={`/product/${s.id}`}
                     className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/15 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/75 hover:text-[#EDEAE2] transition-colors focus-ring"
                   >
                     View <ArrowUpRight size={12} />
                   </Link>
-                  <Link
-                    to="/admin/check-in"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/15 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/75 hover:text-[#EDEAE2] transition-colors focus-ring"
-                  >
-                    Check-in
-                  </Link>
-                  <Link
-                    to="/admin/products"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#EDEAE2] text-[#0d0d0f] text-[9px] font-bold uppercase tracking-widest hover:opacity-90 transition-all focus-ring"
-                  >
-                    Edit details
-                  </Link>
+                  {canVerify && inScope && (
+                    <Link
+                      to="/admin/check-in"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/15 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/75 hover:text-[#EDEAE2] transition-colors focus-ring"
+                    >
+                      <TicketCheck size={12} /> Check-in
+                    </Link>
+                  )}
+                  {canEdit && inScope && (
+                    <Link
+                      to="/admin/products"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#EDEAE2] text-[#0d0d0f] text-[9px] font-bold uppercase tracking-widest hover:opacity-90 transition-all focus-ring"
+                    >
+                      Edit details
+                    </Link>
+                  )}
                 </div>
               </div>
             );

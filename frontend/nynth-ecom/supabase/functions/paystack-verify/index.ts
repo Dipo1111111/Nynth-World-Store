@@ -10,6 +10,7 @@
 // ADMIN_NOTIFY_EMAIL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { naira, ticketCodes, ticketPassBlock, itemsText, customerHtml, adminHtml, sendResend } from "../_shared/email.ts";
+import { syncEventTickets } from "../_shared/eventTickets.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -55,6 +56,8 @@ export async function handler(req: Request): Promise<Response> {
       const { data: p } = await supabase.from("products").select("stock_quantity").eq("id", item.id).maybeSingle();
       if (p) await supabase.from("products").update({ stock_quantity: Math.max(0, (p.stock_quantity ?? 0) - (item.quantity || 1)) }).eq("id", item.id);
     }
+    // Mint the door ledger inside the claimed branch, so codes are never doubled.
+    await syncEventTickets(supabase, { ...order, payment_status: "paid", is_test: isTest }, codes);
     const adminTo = Deno.env.get("ADMIN_NOTIFY_EMAIL") ?? "";
     const adminList = adminTo.split(",").map((s) => s.trim()).filter(Boolean);
     let customerSent = false, adminSent = false;

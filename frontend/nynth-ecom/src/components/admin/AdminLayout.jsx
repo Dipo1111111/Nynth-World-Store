@@ -16,40 +16,76 @@ import {
     Users,
     Tag,
     ShieldCheck,
+    Landmark,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { PAGE_PERMISSIONS } from "../../utils/permissions";
 import Logo from "../common/Logo";
 
+// Each item names the permission that opens its page. The founder holds
+// everything, so can() is true for them without a special case here.
 const NAV_GROUPS = [
     {
         label: "Shop",
         items: [
             { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-            { label: "Products", href: "/admin/products", icon: ShoppingBag },
-            { label: "Events", href: "/admin/events", icon: Calendar },
-            { label: "Orders", href: "/admin/orders", icon: Package },
-            { label: "Door Check-In", href: "/admin/check-in", icon: Ticket },
-            { label: "Abandoned Checkouts", href: "/admin/abandoned-checkouts", icon: ShoppingCart },
+            { label: "Products", href: "/admin/products", icon: ShoppingBag, permission: ["store.products.view", "ticketing.events.edit"] },
+            { label: "Events", href: "/admin/events", icon: Calendar, permission: "ticketing.events.view" },
+            { label: "Orders", href: "/admin/orders", icon: Package, permission: "store.orders.view" },
+            { label: "Door Check-In", href: "/admin/check-in", icon: Ticket, permission: "ticketing.verify" },
+            { label: "Abandoned Checkouts", href: "/admin/abandoned-checkouts", icon: ShoppingCart, permission: "store.carts.view" },
         ],
     },
     {
         label: "Growth",
         items: [
-            { label: "Discount Codes", href: "/admin/discount-codes", icon: Tag },
-            { label: "Lookbooks", href: "/admin/lookbooks", icon: ImageIcon },
-            { label: "Subscribers", href: "/admin/subscribers", icon: Users },
+            { label: "Discount Codes", href: "/admin/discount-codes", icon: Tag, permission: "store.discounts.view" },
+            { label: "Lookbooks", href: "/admin/lookbooks", icon: ImageIcon, permission: "store.lookbooks.view" },
+            { label: "Subscribers", href: "/admin/subscribers", icon: Users, permission: "store.subscribers.view" },
+        ],
+    },
+    {
+        label: "Ticketing",
+        items: [
+            { label: "Ticket Platform", href: "/admin/ticket-platform", icon: Landmark, permission: "ticketing.revenue.view" },
+            { label: "Staff & Access", href: "/admin/staff", icon: ShieldCheck, permission: "staff.manage" },
         ],
     },
     {
         label: "System",
-        items: [{ label: "Settings", href: "/admin/settings", icon: Settings }],
+        items: [{ label: "Settings", href: "/admin/settings", icon: Settings, permission: "store.settings.manage" }],
     },
 ];
 
+const allowedFor = (item, can) => {
+    const needed = item.permission ?? PAGE_PERMISSIONS[item.href];
+    if (!needed) return true;
+    return Array.isArray(needed) ? needed.some((k) => can(k)) : can(needed);
+};
+
 export default function AdminLayout({ children, title }) {
     const location = useLocation();
-    const { logout } = useAuth();
+    const { logout, can, isAdmin, access } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const roleLabel = isAdmin
+        ? "Main Admin"
+        : access?.role
+          ? { vice_admin: "Vice Admin", ticket_organizer: "Ticket Organizer", ticket_admin: "Ticketing Admin", ticket_staff: "Ticketing Staff" }[access.role]
+          : "Staff";
+    const initials = (access?.full_name || access?.email || "A")
+        .replace(/@.*$/, "")
+        .split(/[\s._-]+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((s) => s[0])
+        .join("")
+        .toUpperCase() || "A";
+
+    const groups = NAV_GROUPS.map((group) => ({
+        ...group,
+        items: group.items.filter((item) => allowedFor(item, can)),
+    })).filter((group) => group.items.length > 0);
 
     const isActive = (path) => {
         if (path === "/admin" && location.pathname === "/admin") return true;
@@ -89,7 +125,7 @@ export default function AdminLayout({ children, title }) {
 
                 {/* Navigation */}
                 <nav className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto scrollbar-hide">
-                    {NAV_GROUPS.map((group) => (
+                    {groups.map((group) => (
                         <div key={group.label}>
                             <p className="px-3 mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-white/30">
                                 {group.label}
@@ -126,12 +162,12 @@ export default function AdminLayout({ children, title }) {
                 <div className="px-4 pb-5 pt-3 border-t border-white/10">
                     <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-lg bg-white/[0.06]">
                         <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-[11px] font-bold tracking-wider shrink-0">
-                            A
+                            {initials}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="text-[12px] font-semibold">Administrator</p>
-                            <p className="text-[10px] text-white/45 flex items-center gap-1">
-                                <ShieldCheck size={11} /> Nynth HQ
+                            <p className="text-[12px] font-semibold truncate">{access?.full_name || "Administrator"}</p>
+                            <p className="text-[10px] text-white/45 flex items-center gap-1 truncate">
+                                <ShieldCheck size={11} className="shrink-0" /> {roleLabel}
                             </p>
                         </div>
                     </div>

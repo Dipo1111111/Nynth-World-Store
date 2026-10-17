@@ -8,6 +8,7 @@
 // ADMIN_NOTIFY_EMAIL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { naira, ticketCodes, ticketPassBlock, itemsText, customerHtml, adminHtml, sendResend } from "../_shared/email.ts";
+import { syncEventTickets } from "../_shared/eventTickets.ts";
 
 async function validSignature(secret: string, raw: string, sig: string) {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-512" }, false, ["sign"]);
@@ -38,6 +39,9 @@ Deno.serve(async (req) => {
       // Conditional transition: only the first finalizer wins.
       const { data: claimed } = await supabase.from("orders").update({ payment_status: "paid", order_status: "confirmed", payment_reference: reference, payment_gateway: "paystack", is_test: isTest, tickets: codes.length ? codes : order.tickets, paid_at: new Date().toISOString() }).eq("id", orderId).eq("payment_status", "pending").select("id");
       if (claimed && claimed.length > 0) {
+        // One row per code, in the ledger the door reads. Runs inside the same
+        // claimed branch as the stock decrement, so it happens exactly once.
+        await syncEventTickets(supabase, { ...order, payment_status: "paid", is_test: isTest }, codes);
         for (const item of order.items ?? []) {
           const { data: p } = await supabase.from("products").select("stock_quantity").eq("id", item.id).maybeSingle();
           if (p) await supabase.from("products").update({ stock_quantity: Math.max(0, (p.stock_quantity ?? 0) - (item.quantity || 1)) }).eq("id", item.id);

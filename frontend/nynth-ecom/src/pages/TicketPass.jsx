@@ -5,16 +5,18 @@ import Footer from "../components/home/Footer";
 import SEO from "../components/SEO";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../api/supabase";
-import { markTicketUsed } from "../api/supabaseFunctions";
+import { verifyTicketEntry } from "../api/supabaseFunctions";
 import { formatEventDate, eventHasPassed } from "../utils/tickets";
 import { Ticket, Check, XCircle, AlertTriangle } from "lucide-react";
 import QRCode from "react-qr-code";
 
 // Public ticket pass: opened from the email link or a door scan.
-// Anyone can see validity + event. Only signed-in admins can mark used.
+// Anyone can see validity + event. Admitting goes through the same atomic
+// Postgres function the check-in desk uses, so a pass cannot be admitted twice
+// from two different screens at the same moment.
 export default function TicketPass() {
     const { code } = useParams();
-    const { isAdmin } = useAuth();
+    const { can } = useAuth();
     const [pass, setPass] = useState(null);
     const [loading, setLoading] = useState(true);
     const [marking, setMarking] = useState(false);
@@ -37,20 +39,25 @@ export default function TicketPass() {
     }, [code]);
 
     const confirmEntry = async () => {
-        if (!pass?.orderId) return;
+        if (!pass?.code) return;
         setMarking(true);
         try {
-            const updated = await markTicketUsed(pass.orderId, pass.code);
-            setPass({ ...pass, used: true, used_at: updated.used_at });
-        } catch {
-            // Someone may have admitted it first: refetch so the pass shows the truth.
-            try {
-                const { data } = await supabase.functions.invoke("ticket-lookup", { body: { code: pass.code } });
-                if (data?.found) setPass(data);
-                else setPass({ ...pass, error: true });
-            } catch {
-                setPass({ ...pass, error: true });
+            const result = await verifyTicketEntry(pass.code);
+            if (result?.ok) {
+                setPass({ ...pass, used: true, used_at: result.verified_at });
+            } else {
+                // Somebody may have admitted it first, or it may not be payable.
+                // Refetch so the pass shows the truth rather than our guess.
+                try {
+                    const { data } = await supabase.functions.invoke("ticket-lookup", { body: { code: pass.code } });
+                    if (data?.found) setPass(data);
+                    else setPass({ ...pass, error: true });
+                } catch {
+                    setPass({ ...pass, error: true });
+                }
             }
+        } catch {
+            setPass({ ...pass, error: true });
         } finally {
             setMarking(false);
         }
@@ -109,17 +116,17 @@ export default function TicketPass() {
                                     </p>
                                 )}
                             </div>
-                            {!pass.used && !eventHasPassed(pass.eventDateTime) && !pass.isTest && pass.order_status !== "cancelled" && (!pass.payment_status || pass.payment_status === "paid") && isAdmin && (
+                            {!pass.used && !eventHasPassed(pass.eventDateTime) && !pass.isTest && pass.order_status !== "cancelled" && (!pass.payment_status || pass.payment_status === "paid") && can("ticketing.verify") && (
                                 <button
                                     onClick={confirmEntry}
                                     disabled={marking}
                                     className="w-full bg-black text-white px-8 py-4 text-[10px] tracking-[0.3em] font-bold uppercase hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Check size={14} />
-                                    {marking ? "Marking" : "Admit - mark used"}
+                                    {marking ? "Admitting" : "Admit - verify entry"}
                                 </button>
                             )}
-                            {!pass.used && !isAdmin && pass.buyer && (
+                            {!pass.used && !can("ticketing.verify") && pass.buyer && (
                                 <p className="text-sm text-black/60">See you there, {pass.buyer}.</p>
                             )}
                         </>

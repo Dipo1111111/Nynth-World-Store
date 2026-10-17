@@ -37,6 +37,7 @@ Deno.test("finalizes a pending order after a successful Paystack charge", async 
   const realFetch = globalThis.fetch;
   const patches: any[] = [];
   let resendCalls = 0;
+  const mintedTickets: any[] = [];
 
   (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
     const u = String(url);
@@ -58,6 +59,12 @@ Deno.test("finalizes a pending order after a successful Paystack charge", async 
         return jsonResponse(patch.payment_status === "paid" ? [{ id: "ord-9" }] : []);
       }
       return jsonResponse({ id: "ord-9", user_id: null, customer: { email: "buyer@x.com", firstName: "Ada" }, items: [], total: 15000, payment_status: "pending", order_status: "pending", tickets: [] });
+    }
+    if (u.includes("/rest/v1/event_tickets")) {
+      // The door ledger the finalizer mints. Recorded, not asserted here; the
+      // row shape is covered in _shared/eventTickets_test.ts.
+      if (method === "POST") mintedTickets.push(JSON.parse(String(init?.body)));
+      return jsonResponse([]);
     }
     if (u.includes("/rest/v1/products")) {
       if (method === "PATCH") return jsonResponse([]);
@@ -90,6 +97,7 @@ Deno.test("finalizes a pending order after a successful Paystack charge", async 
 Deno.test("ticket orders email the event title, date, venue, and price", async () => {
   const realFetch = globalThis.fetch;
   const resendBodies: any[] = [];
+  const mintedTickets: any[] = [];
 
   (globalThis as any).fetch = async (url: RequestInfo | URL, init?: RequestInit) => {
     const u = String(url);
@@ -116,6 +124,10 @@ Deno.test("ticket orders email the event title, date, venue, and price", async (
         order_status: "pending",
         tickets: [],
       });
+    }
+    if (u.includes("/rest/v1/event_tickets")) {
+      if (method === "POST") mintedTickets.push(JSON.parse(String(init?.body)));
+      return jsonResponse([]);
     }
     if (u.includes("/rest/v1/products")) {
       if (method === "PATCH") return jsonResponse([]);
@@ -144,6 +156,13 @@ Deno.test("ticket orders email the event title, date, venue, and price", async (
     const admin = resendBodies.find((b) => b.to === "admin@nynth.com");
     assert(admin, "admin alert should be sent");
     assert(admin.html.includes("AFRO FUTURE FEST"), "admin email must identify the event too");
+    // A paid ticket order also mints the door ledger, so the codes on the email
+    // are the same codes staff will search at the entrance.
+    assertEquals(mintedTickets.length, 1);
+    assertEquals(mintedTickets[0].length, 2);
+    assertEquals(mintedTickets[0][0].payment_status, "paid");
+    assertEquals(mintedTickets[0][0].event_id, "tix1");
+    assert(mintedTickets[0].every((r: any) => r.code.startsWith("NWT-")));
   } finally {
     (globalThis as any).fetch = realFetch;
   }
