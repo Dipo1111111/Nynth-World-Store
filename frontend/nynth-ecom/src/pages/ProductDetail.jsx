@@ -12,6 +12,7 @@ import SizeGuideModal from "../components/products/SizeGuideModal";
 import ProductCard from "../components/products/ProductCard";
 import EventPage from "../components/tickets/EventPage";
 import { isTicket } from "../utils/tickets";
+import { isProductNoteEnabled, resolveProductNote } from "../utils/productCopy";
 
 const getColorHex = (colorName) => {
   const map = {
@@ -204,6 +205,12 @@ export default function ProductDetail() {
     : product?.sizeStock
       ? Object.values(product.sizeStock).some(qty => qty > 0)
       : (product?.inStock !== false && (product?.stockQuantity > 0 || product?.stockQuantity === undefined));
+
+  // Product page note: per-product override, then the store default from
+  // Settings > Product page, then the built-in copy. The panel can also be
+  // switched off entirely from settings.
+  const productNote = resolveProductNote(product, settings);
+  const showProductNote = isProductNoteEnabled(settings);
 
   const handleAddToCart = async () => {
     if (!product || !isSizeAvailable) return;
@@ -446,9 +453,6 @@ export default function ProductDetail() {
               <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 3-5 DAYS SHIPPING
               </div>
-              <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] font-bold uppercase text-black">
-                <div className="w-1.5 h-1.5 rounded-full bg-black"></div> 7 DAYS RETURN POLICY
-              </div>
             </div>
 
             {/* Accordions - Simple borders */}
@@ -466,24 +470,21 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              <button
-                onClick={() => setIsOpenShipping(!isOpenShipping)}
-                className="w-full flex justify-between items-center py-7 border-t border-black/5 text-[9px] tracking-[0.25em] font-bold uppercase hover:opacity-50 transition-all"
-              >
-                <span>SHIPPING & RETURNS</span>
-                <Plus size={14} className={`transition-transform duration-500 ${isOpenShipping ? "rotate-45" : ""}`} />
-              </button>
-              {isOpenShipping && (
-                <div className="pb-10 text-[10px] leading-[2] text-gray-500 tracking-wide pr-10">
-                  PRE-ORDER
-
-This item is available on a pre-order basis.
-
-Each piece is individually produced after your order is confirmed to ensure the highest quality and attention to detail.
-
-Production: 2-5 business days
-Dispatch: Orders are dispatched within 1-3 business days after production is completed.
-                </div>
+              {showProductNote && (
+                <>
+                  <button
+                    onClick={() => setIsOpenShipping(!isOpenShipping)}
+                    className="w-full flex justify-between items-center py-7 border-t border-black/5 text-[9px] tracking-[0.25em] font-bold uppercase hover:opacity-50 transition-all"
+                  >
+                    <span>{productNote.title}</span>
+                    <Plus size={14} className={`transition-transform duration-500 ${isOpenShipping ? "rotate-45" : ""}`} />
+                  </button>
+                  {isOpenShipping && (
+                    <div className="pb-10 text-[10px] leading-[2] text-gray-500 tracking-wide pr-10 whitespace-pre-line">
+                      {productNote.text}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -688,9 +689,6 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
             <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
               <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 3-5 DAYS SHIPPING
             </div>
-            <div className="flex items-center gap-3 text-[10px] tracking-widest font-bold uppercase text-black">
-              <ShieldCheck size={14} strokeWidth={2} className="text-green-600" /> 7 DAYS RETURN POLICY
-            </div>
           </div>
 
           {/* Accordions - Description & Shipping before recommendations */}
@@ -708,24 +706,21 @@ Dispatch: Orders are dispatched within 1-3 business days after production is com
               </div>
             )}
 
-            <button
-              onClick={() => setIsOpenShipping(!isOpenShipping)}
-              className="w-full flex justify-between items-center py-5 border-t border-gray-200 text-[10px] tracking-[0.2em] font-bold uppercase hover:opacity-70 transition-opacity"
-            >
-              <span>SHIPPING & RETURNS</span>
-              {isOpenShipping ? <Minus size={14} /> : <Plus size={14} />}
-            </button>
-            {isOpenShipping && (
-              <div className="pb-6 text-[11px] leading-[1.8] text-gray-500 tracking-wide">
-                PRE-ORDER
-
-This item is available on a pre-order basis.
-
-Each piece is individually produced after your order is confirmed to ensure the highest quality and attention to detail.
-
-Production: 2-5 business days
-Dispatch: Orders are dispatched within 1-3 business days after production is completed.
-              </div>
+            {showProductNote && (
+              <>
+                <button
+                  onClick={() => setIsOpenShipping(!isOpenShipping)}
+                  className="w-full flex justify-between items-center py-5 border-t border-gray-200 text-[10px] tracking-[0.2em] font-bold uppercase hover:opacity-70 transition-opacity"
+                >
+                  <span>{productNote.title}</span>
+                  {isOpenShipping ? <Minus size={14} /> : <Plus size={14} />}
+                </button>
+                {isOpenShipping && (
+                  <div className="pb-6 text-[11px] leading-[1.8] text-gray-500 tracking-wide whitespace-pre-line">
+                    {productNote.text}
+                  </div>
+                )}
+              </>
             )}
           </div>
 

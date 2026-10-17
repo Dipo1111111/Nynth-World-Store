@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { fetchSettings, fetchLiveCollection } from "../api/firebaseFunctions";
 import { withRetry } from "../utils/errorHandlers";
 import { DEFAULT_CATEGORY_ORDER, DEFAULT_BAND_LIMIT } from "../utils/shopConfig";
+import { DEFAULT_PRODUCT_NOTE, DEFAULT_PRODUCT_NOTE_TITLE, DEFAULT_RETURNS_PAGE_POLICY } from "../utils/productCopy";
+import { DEFAULT_REVENUE_DISPLAY } from "../utils/revenueDisplay";
 
 const SettingsContext = createContext();
 
@@ -52,6 +54,11 @@ export function SettingsProvider({ children }) {
         tickets_band_position: "top",
         tickets_band_scope: "all",
         tickets_band_limit: DEFAULT_BAND_LIMIT,
+        product_note_enabled: true,
+        product_note_title: DEFAULT_PRODUCT_NOTE_TITLE,
+        product_note_text: DEFAULT_PRODUCT_NOTE,
+        returns_page_policy: DEFAULT_RETURNS_PAGE_POLICY,
+        revenue_display: { ...DEFAULT_REVENUE_DISPLAY },
     });
     const [loading, setLoading] = useState(true);
     const [liveCollection, setLiveCollection] = useState(null);

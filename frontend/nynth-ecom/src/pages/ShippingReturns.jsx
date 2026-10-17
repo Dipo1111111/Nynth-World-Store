@@ -1,8 +1,14 @@
 import React from "react";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
+import { useSettings } from "../context/SettingsContext";
+import { resolveReturnsPagePolicy } from "../utils/productCopy";
 
 export default function ShippingReturns() {
+    const { settings } = useSettings();
+    // Editable in Admin > Settings > Product page. Clearing it hides the block.
+    const returnPolicy = resolveReturnsPagePolicy(settings);
+
     return (
         <div className="min-h-screen bg-white text-black flex flex-col">
             <Header />
@@ -34,18 +40,16 @@ export default function ShippingReturns() {
                         </p>
                     </div>
 
-                    <div className="space-y-4">
-                        <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">RETURN POLICY</h3>
-                        <p className="text-[13px] text-gray-600 leading-[1.8]">
-                            We operate a 4-day return policy. This means you have 4 days after receiving your item to request a return.
-                        </p>
-                        <p className="text-[13px] text-gray-600 leading-[1.8]">
-                            To be eligible, items must be returned in the same condition they were received - unworn, unused, with all tags intact and in original packaging. Proof of purchase is required.
-                        </p>
-                        <p className="text-[13px] text-gray-600 leading-[1.8]">
-                            Returns are only accepted in cases of incorrect items or verified defects. All requests are subject to approval.
-                        </p>
-                    </div>
+                    {returnPolicy && (
+                        <div className="space-y-4">
+                            <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">RETURN POLICY</h3>
+                            {returnPolicy.split(/\n{2,}/).map((paragraph, index) => (
+                                <p key={index} className="text-[13px] text-gray-600 leading-[1.8] whitespace-pre-line">
+                                    {paragraph.trim()}
+                                </p>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="space-y-4">
                         <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">DAMAGES AND ISSUES</h3>

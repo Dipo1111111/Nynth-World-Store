@@ -9,7 +9,7 @@ import {
  updateProductOrderBatch,
  uploadImage
 } from "../../api/firebaseFunctions";
-import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical, Eye, EyeOff, Ticket } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, X, Upload, Check, ImageIcon, Package, ChevronLeft, ChevronRight, Star, GripVertical, Eye, EyeOff, Ticket, FileText } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -178,6 +178,8 @@ export default function AdminProducts() {
  displayOrder: 999, // Default for new products
  eventDateTime: null, // Ticket (event) products only
  venue: "", // Ticket (event) products only
+ productNoteTitle: "", // Overrides Settings > Product page title for this product
+ productNote: "", // Overrides Settings > Product page text for this product
  };
 
  const [formData, setFormData] = useState(initialFormState);
@@ -274,6 +276,8 @@ export default function AdminProducts() {
  ? new Date(product.eventDateTime).toLocaleString("sv-SE").slice(0, 16)
  : "",
  venue: product.venue || "",
+ productNoteTitle: product.productNoteTitle || "",
+ productNote: product.productNote || "",
  });
  setIsModalOpen(true);
  };
@@ -651,6 +655,35 @@ className="bg-[#0a0a0a] text-[#EDEAE2] rounded-2xl w-full max-w-3xl max-h-[90vh]
  onChange={e => setFormData({ ...formData, description: e.target.value })}
  />
  </div>
+
+ {formData.category !== "tickets" && (
+ <div className="space-y-3 pt-4 border-t border-white/10 bg-white/[0.05] p-4 rounded-xl">
+ <div className="flex items-center gap-2">
+ <FileText size={16} className="text-[#EDEAE2]" />
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]">Product page note - shipping &amp; returns</span>
+ </div>
+ <div className="space-y-2">
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Panel Title (optional)</label>
+ <input
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
+ placeholder="SHIPPING & RETURNS"
+ value={formData.productNoteTitle || ""}
+ onChange={e => setFormData({ ...formData, productNoteTitle: e.target.value })}
+ />
+ </div>
+ <div className="space-y-2">
+ <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Panel Text (optional)</label>
+ <textarea
+ rows={5}
+ className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
+ placeholder="Leave both fields blank to use the store default from Settings > Product page."
+ value={formData.productNote || ""}
+ onChange={e => setFormData({ ...formData, productNote: e.target.value })}
+ />
+ <p className="text-[11px] text-[#EDEAE2]/42">Overrides the store default for this product only. Line breaks are preserved.</p>
+ </div>
+ </div>
+ )}
 
  <div className="space-y-2">
  <label className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 block mb-1.5">Category</label>

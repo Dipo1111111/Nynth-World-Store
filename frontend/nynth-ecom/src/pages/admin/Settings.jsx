@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp, ArrowDown, LayoutList } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp, ArrowDown, LayoutList, FileText, EyeOff } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
 import { DEFAULT_CATEGORY_ORDER, categoryLabel } from "../../utils/shopConfig";
+import { DEFAULT_PRODUCT_NOTE, DEFAULT_PRODUCT_NOTE_TITLE, DEFAULT_RETURNS_PAGE_POLICY } from "../../utils/productCopy";
+import { DEFAULT_REVENUE_DISPLAY, formatNaira, normalizeRevenueDisplay } from "../../utils/revenueDisplay";
 import headerBanner from "../../assets/header.JPEG";
 import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA, EMPTY_SHIPPING_RATES } from "../../data/locationData";
 import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
@@ -56,6 +58,14 @@ const SETTINGS_DEFAULTS = {
  tickets_band_position: "top",
  tickets_band_scope: "all",
  tickets_band_limit: 3,
+ // Product page copy - the SHIPPING & RETURNS panel. Products can override.
+ product_note_enabled: true,
+ product_note_title: DEFAULT_PRODUCT_NOTE_TITLE,
+ product_note_text: DEFAULT_PRODUCT_NOTE,
+ // Return policy body on /shipping. Empty string hides the block.
+ returns_page_policy: DEFAULT_RETURNS_PAGE_POLICY,
+ // Net sales figure on the dashboard: masked on first paint, optional manual figure.
+ revenue_display: { ...DEFAULT_REVENUE_DISPLAY },
 };
 
 // Merge persisted settings over the defaults, filling gaps so the editor always
@@ -86,6 +96,11 @@ const mergeSettingsDefaults = (part = {}) => ({
  tickets_band_position: part.tickets_band_position || SETTINGS_DEFAULTS.tickets_band_position,
  tickets_band_scope: part.tickets_band_scope || SETTINGS_DEFAULTS.tickets_band_scope,
  tickets_band_limit: part.tickets_band_limit !== undefined ? Number(part.tickets_band_limit) : SETTINGS_DEFAULTS.tickets_band_limit,
+ product_note_enabled: part.product_note_enabled !== undefined ? part.product_note_enabled : SETTINGS_DEFAULTS.product_note_enabled,
+ product_note_title: part.product_note_title || SETTINGS_DEFAULTS.product_note_title,
+ product_note_text: part.product_note_text !== undefined ? part.product_note_text : SETTINGS_DEFAULTS.product_note_text,
+ returns_page_policy: part.returns_page_policy !== undefined ? part.returns_page_policy : SETTINGS_DEFAULTS.returns_page_policy,
+ revenue_display: { ...DEFAULT_REVENUE_DISPLAY, ...normalizeRevenueDisplay(part.revenue_display) },
 });
 
 // Default Our Story content - mirrors /our-story page fallbacks. Pre-fills the
@@ -209,6 +224,19 @@ export default function AdminSettings() {
   }));
   };
 
+  // Nested revenue display settings (masked-on-load flag + manual figure).
+  const setRevenueDisplay = (patch) => {
+  setSettings(prev => ({
+  ...prev,
+  revenue_display: { ...DEFAULT_REVENUE_DISPLAY, ...(prev.revenue_display || {}), ...patch },
+  }));
+  };
+
+  const revenuePreview = formatNaira(
+  normalizeRevenueDisplay(settings.revenue_display).override ?? 0,
+  settings.currency_symbol || "₦"
+  );
+
   const moveCategory = (idx, dir) => {
   setSettings(prev => {
   const list = [...(prev.shop_category_order || [])];
@@ -299,7 +327,7 @@ export default function AdminSettings() {
   </header>
 
   <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur px-2 py-2">
-  {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
+  {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Product page", "#set-product"], ["Revenue", "#set-revenue"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
   <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/55 hover:text-[#EDEAE2] hover:bg-white/[0.06] transition-colors focus-ring">
   {label}
   </a>
@@ -501,6 +529,130 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+
+  {/* PRODUCT PAGE COPY */}
+  <div id="set-product" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+    <SectionTitle icon={FileText} title="Product Page Copy" />
+    <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+      The SHIPPING &amp; RETURNS panel shown on every product page. Any single product can override this in Products &gt; Edit &gt; Product page note. The 7-day return badge has been removed from product pages.
+    </p>
+
+    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10">
+      <div>
+        <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Show The Panel</h4>
+        <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Off hides the accordion on every product page</p>
+      </div>
+      <button
+        type="button"
+        aria-label="Show the product page note panel"
+        aria-pressed={settings.product_note_enabled !== false}
+        onClick={() => setSettings(prev => ({ ...prev, product_note_enabled: prev.product_note_enabled === false }))}
+        className={`w-12 h-6 rounded-lg transition-colors relative ${settings.product_note_enabled !== false ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+      >
+        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${settings.product_note_enabled !== false ? 'left-7' : 'left-1'}`} />
+      </button>
+    </div>
+
+    <div className="space-y-2 mb-5">
+      <label htmlFor="product_note_title" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Panel Title</label>
+      <input
+        id="product_note_title"
+        name="product_note_title"
+        value={settings.product_note_title || ""}
+        onChange={handleChange}
+        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
+        placeholder={DEFAULT_PRODUCT_NOTE_TITLE}
+      />
+    </div>
+
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor="product_note_text" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Panel Text</label>
+        <button
+          type="button"
+          onClick={() => setSettings(prev => ({
+            ...prev,
+            product_note_title: DEFAULT_PRODUCT_NOTE_TITLE,
+            product_note_text: DEFAULT_PRODUCT_NOTE,
+          }))}
+          className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+        >
+          <RotateCcw size={11} /> Restore Default
+        </button>
+      </div>
+      <textarea
+        id="product_note_text"
+        name="product_note_text"
+        value={settings.product_note_text ?? ""}
+        onChange={handleChange}
+        rows={9}
+        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
+        placeholder={DEFAULT_PRODUCT_NOTE}
+      />
+      <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
+    </div>
+
+    <div className="space-y-2 mt-8 pt-6 border-t border-white/10">
+      <label htmlFor="returns_page_policy" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Shipping Page - Return Policy</label>
+      <textarea
+        id="returns_page_policy"
+        name="returns_page_policy"
+        value={settings.returns_page_policy ?? ""}
+        onChange={handleChange}
+        rows={5}
+        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
+        placeholder={DEFAULT_RETURNS_PAGE_POLICY}
+      />
+      <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
+    </div>
+  </div>
+
+  {/* REVENUE PRIVACY */}
+  <div id="set-revenue" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+    <SectionTitle icon={EyeOff} title="Revenue Privacy" />
+    <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+      Controls the Net sales figure at the top of the admin dashboard. Hidden figures show as ****.*** until you click the eye.
+    </p>
+
+    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10">
+      <div>
+        <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Hide By Default</h4>
+        <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Masked every time the dashboard loads</p>
+      </div>
+      <button
+        type="button"
+        aria-label="Hide revenue by default"
+        aria-pressed={normalizeRevenueDisplay(settings.revenue_display).hide_by_default}
+        onClick={() => setRevenueDisplay({ hide_by_default: !normalizeRevenueDisplay(settings.revenue_display).hide_by_default })}
+        className={`w-12 h-6 rounded-lg transition-colors relative ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+      >
+        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'left-7' : 'left-1'}`} />
+      </button>
+    </div>
+
+    <div className="space-y-2">
+      <label htmlFor="revenue_override" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Manual Display Figure ({settings.currency_symbol || "\u20A6"})</label>
+      <input
+        id="revenue_override"
+        type="number"
+        min="0"
+        step="1"
+        value={normalizeRevenueDisplay(settings.revenue_display).override ?? ""}
+        onChange={(e) => setRevenueDisplay({ override: e.target.value === "" ? null : Number(e.target.value) })}
+        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring tabular-nums"
+        placeholder="Leave empty to show the real paid total"
+      />
+      <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">
+        When set, the dashboard shows this number instead of the ledger total and marks it with a red dot. Only the red dot tells you it is not the real figure. Leave empty to show the real paid total.
+      </p>
+      {normalizeRevenueDisplay(settings.revenue_display).override !== null && (
+        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-rose-300 pt-1">
+          <span className="inline-block h-2 w-2 rounded-full bg-rose-500" aria-hidden="true" />
+          Manual figure active - dashboard will read {revenuePreview}
+        </p>
+      )}
+    </div>
+  </div>
 
   {/* LOCK PAGE CONFIGURATION */}
   <div id="set-lock" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">

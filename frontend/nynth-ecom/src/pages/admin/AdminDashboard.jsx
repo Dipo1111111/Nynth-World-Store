@@ -2,11 +2,13 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { subscribeOrders, subscribePresence, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
+import { useSettings } from "../../context/SettingsContext";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import AdminPWAPrompt from "../../components/admin/AdminPWAPrompt";
-import { useCountUp, useStaggerReveal } from "../../lib/motion";
+import RevenueValue from "../../components/admin/RevenueValue";
+import { useStaggerReveal } from "../../lib/motion";
 import toast from "react-hot-toast";
 import {
     Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement,
@@ -115,6 +117,7 @@ const DashboardSkeleton = () => (
 
 const AdminDashboard = () => {
     const { isAdmin } = useAuth();
+    const { settings } = useSettings();
     const [orders, setOrders] = useState(null);
     const [loading, setLoading] = useState(true);
     const [globalFilter, setGlobalFilter] = useState("all");
@@ -249,8 +252,6 @@ const AdminDashboard = () => {
         return <span className={`text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded border inline-block ${PAYMENT_PILLS[normalized] || PAYMENT_PILLS.pending}`}>{normalized === 'paid' ? 'Paid' : (status || 'pending')}</span>;
     };
 
-    const salesRef = useCountUp(dashboardData?.totalSales || 0);
-
     const filterOptions = [
         { id: 'all', label: 'All', dot: 'bg-[#EDEAE2]' },
         { id: 'pending', label: 'Pending', dot: 'bg-amber-500' },
@@ -291,10 +292,11 @@ const AdminDashboard = () => {
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#EDEAE2]/45 mb-1">Net sales</p>
                                 <div className="flex items-end gap-3">
-                                    <span className="text-[56px] leading-none font-extrabold tracking-[-0.03em] tabular-nums text-[#EDEAE2]">
-                                        <span className="text-xl text-[#EDEAE2]/55 font-semibold">₦</span>
-                                        <span ref={salesRef}>0</span>
-                                    </span>
+                                    <RevenueValue
+                                        amount={dashboardData.totalSales}
+                                        display={settings?.revenue_display}
+                                        symbol={settings?.currency_symbol || "₦"}
+                                    />
                                     <GrowthBadge value={dashboardData.salesGrowth} />
                                 </div>
                                 <p className="text-sm text-[#EDEAE2]/55 mt-2">Paid orders this period</p>
