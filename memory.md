@@ -1,68 +1,74 @@
-# Memory — Nynth-World Store (Newman fix batch + checkout restructure shipped)
+# Memory - Nynth-World Store (product page copy + revenue privacy)
 
-Last updated: 2026-10-07 (session complete; follow-up batch in progress)
-
-## Follow-up batch (2026-10-07 late, BUILT, not pushed, gates green)
-
-- Done: removed JOHN/DOE name placeholders AND the JOHN@EXAMPLE.COM email placeholder (labels First Name/Last Name/Email kept); removed the Preferred Delivery Date/Time picker box from section 3 and the now-unused `minDeliveryDate` const; replaced it with one small gray note: "Prefer a certain delivery date or time? Just add it to your special instructions above (optional)."; Special Instructions placeholder now leads with "DELIVERY NOTES, PREFERRED DATE, ...". form keys `deliveryDate`/`deliveryTimeWindow` kept (stay "", email templates skip the pref line when empty). Files: Checkout.jsx only. Newman's philosophy quote: "Easy, clean, minimal, but exceptional."
+Last updated: 2026-10-17 (evening session; pushed to main)
 
 ## Recurring context
 
-- **People (PERMANENT):** Newman (phone 09137207918) is founder/admin/owner. "Newman says X" = direct owner directive. Owner alert inboxes: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com. An external developer (pobbagency@gmail.com) builds a separate admin tool against this DB (collections/drops + waitlist emails); he has direct SQL access (created the `collections` table himself). Newman relays requirements as WhatsApp screenshots from a "WEBSITE OBS SURVEY DEPARTMENT" group, often including competitor/reference-site screenshots mixed with our own.
-- **Live site:** `https://www.nynthworld.com` (Vercel, auto-deploy on push to `main`). Verify a deploy by grepping the served bundle for a string UNIQUE to the change (`curl -s https://www.nynthworld.com/ | grep -o 'assets/index-[^"]*\.js'` then fetch it). Generic strings like "Contact Information" give false positives; use markers like "Zip Code (Optional)". Deploy takes ~1-3 min, poll.
-- **Live request tracing (launch-day gold):** Management API unified logs: `GET "https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/analytics/endpoints/logs?sql=<urlencoded>&iso_timestamp_start=...Z&iso_timestamp_end=...Z"` with Bearer token from `.secrets/supabase.env`. Table `logs`, filter `source`: `edge_logs` = per-HTTP-request rows via `log_attributes['request.path']`, `['request.method']`, `['request.search']`, `['response.status_code']`. The old `logs.all` endpoint is removed. Statement bodies/params are NOT logged. `postgrest_logs` is heartbeat noise.
-- **Supabase MCP is connected to the WRONG project** (`Atomic Xp` llwlgzujsyxlseiqiwsp); it lists nynth-world but SQL runs against the wrong DB (verified: `discount_codes` count = 0). Use the Management API instead: `curl -X POST "https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/database/query" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" -d '{"query": "..."}'` with token from `frontend/nynth-ecom/.secrets/supabase.env`. `.env.local` must NOT be shell-sourced (line 9 breaks zsh); parse key=value in python instead.
-- **Stale-tab gotcha (PERMANENT lesson):** after any push, users keep running the pre-fix JS in old tabs. Hard refresh (Cmd+Shift+R) first when someone reports "still broken"; verify server side before changing code.
+- **People (PERMANENT):** Newman (phone 09137207918) is founder/admin/owner. "Newman says X" = direct owner directive. Owner alert inboxes: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com. An external developer (pobbagency@gmail.com) builds a separate admin tool against this DB (collections/drops + waitlist emails); he has direct SQL access (created the `collections` table himself). Newman relays requirements as WhatsApp screenshots and voicemail transcripts, often mixing competitor/reference-site screenshots with our own, and writes in fragmented bursts that need interpretation into concrete edits.
+- **Newman's design philosophy (2026-10-07):** "Easy, clean, minimal, but exceptional."
+- **Live site:** `https://www.nynthworld.com` (Vercel, auto-deploy on push to `main`). Verify a deploy by grepping the served bundle for a string UNIQUE to the change (`curl -s https://www.nynthworld.com/ | grep -o 'assets/index-[^"]*\.js'` then fetch it). Generic strings give false positives. Deploy takes ~1-3 min, poll. Last verified bundle: `index-CQSoQgq9.js` (2026-10-07; not re-verified after the 2026-10-17 push).
+- **Platform spec:** the owner's 13-page platform brief lives at `/Users/igbojuwooladipupo/Downloads/NYNTH WORLD PLATFORM .pdf` (roles: Main Admin, Vice Admin, Ticket Admin, Ticket Staff; per-event scoping; revenue privacy). Most of it is already built (admin panel, events, ticketing, check-in, discount codes, lookbooks, abandoned checkouts). The unimplemented parts are the full RBAC/permission model and per-event organizer isolation; `users.role` only allows `admin|customer` today (`supabase/schema.sql:21`) and every admin route is gated by `ProtectedRoute requireAdmin` only.
+- **Supabase MCP is connected to the WRONG project** (`Atomic Xp` llwlgzujsyxlseiqiwsp); SQL runs against the wrong DB. Use the Management API instead: `curl -X POST "https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/database/query" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" -d '{"query": "..."}'` with token from `frontend/nynth-ecom/.secrets/supabase.env`. `.env.local` must NOT be shell-sourced (line 9 breaks zsh); parse key=value in python instead.
+- **Stale-tab gotcha (PERMANENT lesson):** after any push, users keep running the pre-fix JS in old tabs. Hard refresh (Cmd+Shift+R) first when someone reports "still broken"; verify server side before changing code. Bare apex domain 307-redirects to www.
 - **Stack:** React 18 + Vite + Tailwind v4 + react-router-dom v7. Frontend in `frontend/nynth-ecom`. Backend fully Supabase (project `nynth-world`, ref `cybcooychgicsnjeummo`, eu-west-1). `src/api/firebaseFunctions.js` is a one-line alias over `supabaseFunctions.js`. Paystack payments, Resend emails, Cloudinary images, Vercel hosting. Footer is rendered per-page (imported by ~19 page components; Lookbook and LockPage have none).
 - **Standing user rules (never violate):** no em dashes anywhere (copy, chat, code). Zero `style={{}}` except dnd-kit in Products.jsx. Consume `src/components/ui/` primitives. No new npm deps without explicit approval. Never commit/push unless user says "push". Gate before finishing: `npm run lint` (zero warnings), `npm test`, `npm run test:edge`, `npm run build`, `node scripts/verify-dist.mjs`, `npx impeccable detect --json` on touched UI.
-- **Newman triage rules (2026-10-07):** do only what he explicitly asked; do not ask him questions to clarify (owner's instruction); AB test layout idea and abandoned-checkout follow-up reminder system were explicitly ignored; competitor-screenshot redesigns get deferred when he signals "later".
-- **Secrets (locations only, never values):** `frontend/nynth-ecom/.secrets/` (gitignored): `supabase.env` (SUPABASE_ACCESS_TOKEN), `paystack.env` (TEST+LIVE keys), `google-oauth.env`, `resend.env` (RESEND_API_KEY + EMAIL_FROM; opened in TextEdit for Newman to copy when sharing with the admin-tool dev). `frontend/nynth-ecom/.env.local` (gitignored) holds live keys with test fallbacks. Server secrets on Supabase project: RESEND_API_KEY, EMAIL_FROM, ADMIN_NOTIFY_EMAIL, PAYSTACK_SECRET_KEY, SUPABASE_* keys.
-- **Orders model:** `is_test` stamped from Paystack `domain` at verify/webhook. Frontend derives test-mode from `VITE_PAYSTACK_PUBLIC_KEY` starting with `pk_test_`. Test traffic excluded from metrics. Order `customer` jsonb stores the ENTIRE checkout form via `{...form}` spread, so new form fields (specialInstructions, zip) persist with no schema change.
-- **Delivery / free delivery:** ALL non-ticket products `deliveryFeeEnabled=false`, `settings.free_delivery_enabled=true`, every order ships free. Page-top marquee + Shop strip removed 2026-09-27 (commit `79cf192`). Cart/Checkout/ProductDetail free-delivery lines stay.
-- **Discount codes:** table `discount_codes`; guest validation via SECURITY DEFINER RPC `public.validate_discount(p_code)` (anon+authenticated). Pattern to copy for any future shopper-facing check (do NOT loosen RLS to let anon read secret-ish tables). Code `MEMBER` (20%) expired 2026-10-04.
-- **Lock/drop model:** site-wide lock settings in `settings.data` (`lock_page_enabled`, `lock_epoch`, `lock_password`, `lock_timer_*`, `launch_date`); admin Settings edits them. `collections` table (id bigint identity BY DEFAULT, name, slug, launch_date timestamptz, status text, password text, created_at) written by the external admin tool; `status='live'` (exact lowercase) marks the active drop. Storefront `fetchLiveCollection()` reads it (newest id) and falls back to settings when none. RLS: `collections_public_read` (select using true, password included = parity with old settings.lock_password) + `collections_admin_write` (is_admin()). `lock_epoch` force-relock must stay intact. Lock unlock is client-side compare + localStorage (`nynth_site_unlocked`, `nynth_lock_epoch`). No FK between collections and subscribers. Table still EMPTY as of 2026-10-07.
-- **subscribers model:** `id text` (default `('sub-' || gen_random_uuid()::text)`; 171 pre-existing rows backfilled with id = email), `email text unique`, `source text` ('waitlist'|'newsletter'|'popup'|'footer'), `collection_id text` (stores collections.id as a string; send stringified), `notified boolean`, `created_at`. RLS: insert anyone, read/write admin only (keep it that way). Admin Subscribers page counts off `source`.
-- **Price display convention (since 2026-10-07):** whole naira only, plain `toLocaleString()`, NO decimals, NO foreign currency line. `src/utils/currency.js` (foreignPriceLabel, NGN_PER_USD/GBP) is now an unused leftover file; renders were removed from ProductCard + ProductDetail per Newman.
-- **Checkout structure (since 2026-10-07):** left column = numbered collapsible sections via local `CheckoutSection` component in `Checkout.jsx` (1 Contact Information, 2 Delivery Details, 3 Delivery Method), `openSections` state, force-open on submit. Form KEYS unchanged (`address`, `city`, `state`, `zip`, `specialInstructions`) even where labels changed (Street Address, Zip Code (Optional), Phone Number). Selects use relative-wrapper + ChevronDown (the4 appearance-none ones); house `.focus-ring` class on interactive controls.
-- **Key files:** `src/pages/Checkout.jsx` (CheckoutSection + sections), `src/api/supabaseFunctions.js`, `src/context/SettingsContext.jsx` (liveCollection), `src/pages/LockPage.jsx`, `src/components/home/Header.jsx` (navLinks incl. NEWSLETTER hash link), `src/components/home/Footer.jsx` (newsletter section id="newsletter", phone/address), `src/components/products/ProductCard.jsx`, `src/pages/ProductDetail.jsx`, `src/pages/Shop.jsx`, `src/pages/admin/Settings.jsx`, `src/App.jsx`, `src/context/CartContext.jsx`, `src/utils/shippingRates.js`, `supabase/schema.sql`, `scripts/verify-dist.mjs`.
+- **Newman triage rules (2026-10-07):** do only what he explicitly asked; do NOT ask him clarifying questions (owner's instruction); user (Dipo) does want an interpretation cross-check before pushing ambiguous batches, then says "push".
+- **Secrets (locations only, never values):** `frontend/nynth-ecom/.secrets/` (gitignored): `supabase.env` (SUPABASE_ACCESS_TOKEN), `paystack.env`, `google-oauth.env`, `resend.env`. `frontend/nynth-ecom/.env.local` (gitignored). Server secrets live on the Supabase project.
+- **Orders model:** `is_test` stamped from Paystack `domain`. Test traffic excluded from metrics. Order `customer` jsonb stores the ENTIRE checkout form via `{...form}` spread, so new form fields persist with no schema change.
+- **Product page copy (since 2026-10-17, PERMANENT):** the "7 DAYS RETURN POLICY" badge is gone from `ProductDetail.jsx` (both desktop and mobile). The SHIPPING & RETURNS accordion renders `resolveProductNote(product, settings)` from `src/utils/productCopy.js`. Precedence: `product.productNote` / `product.productNoteTitle` (per product, Admin > Products > Edit) > `settings.product_note_text` / `product_note_title` (Admin > Settings > Product page) > `DEFAULT_PRODUCT_NOTE`. `settings.product_note_enabled === false` hides the panel entirely. Rendered with `whitespace-pre-line`, so blank lines survive. Do not hardcode policy copy into ProductDetail again.
+- **Shipping page copy (since 2026-10-17):** `/shipping` RETURN POLICY body is `settings.returns_page_policy`, split on blank lines into paragraphs. Missing/null shows the default; explicitly emptied string hides the block. Distinct semantics from the product note (fallback vs hide) and that is deliberate.
+- **Revenue privacy (since 2026-10-17, PERMANENT):** `settings.revenue_display = { hide_by_default: boolean, override: number|null }` inside `settings.data` jsonb, no migration needed. Dashboard Net sales renders through `src/components/admin/RevenueValue.jsx`: masked to `****.***` on first paint when `hide_by_default`, eye button reveals (choice is component state, never persisted, so a reload masks again), `override` replaces the ledger figure and draws a red dot. Only the headline is dressed; orders, reports, and the ledger are untouched.
+- **Delivery / free delivery:** ALL non-ticket products `deliveryFeeEnabled=false`, `settings.free_delivery_enabled=true`, every order ships free.
+- **Discount codes:** table `discount_codes`; guest validation via SECURITY DEFINER RPC `public.validate_discount(p_code)`. Code `MEMBER` (20%) expired 2026-10-04.
+- **Lock/drop model:** site-wide lock settings in `settings.data`; `collections` table written by the external admin tool; `status='live'` marks the active drop. `lock_epoch` force-relock must stay intact. Lock unlock is client-side + localStorage. Table still EMPTY as of 2026-10-07.
+- **subscribers model:** `id text`, `email text unique`, `source text`, `collection_id text`, `notified boolean`, `created_at`. RLS: insert anyone, read/write admin only.
+- **Price display convention:** whole naira only, plain `toLocaleString()`, NO decimals, NO foreign currency line. `src/utils/currency.js` is unused leftover.
+- **Key files:** `src/pages/ProductDetail.jsx`, `src/utils/productCopy.js`, `src/utils/revenueDisplay.js`, `src/components/admin/RevenueValue.jsx`, `src/pages/admin/Settings.jsx`, `src/pages/admin/Products.jsx`, `src/pages/admin/AdminDashboard.jsx`, `src/pages/ShippingReturns.jsx`, `src/context/SettingsContext.jsx`, `src/api/supabaseFunctions.js`, `src/pages/Checkout.jsx`, `src/pages/LockPage.jsx`, `supabase/schema.sql`, `scripts/verify-dist.mjs`.
 
-## What was built (2026-10-07, both batches pushed and live)
+## What was built (2026-10-17, pushed to main)
 
-**Batch 1 (commit `96f39f3`, live-verified):**
-- Removed the "APPROX $x / £y" line from ProductCard + ProductDetail (both orientations) and removed `.00` price decimals (dropped `minimumFractionDigits: 2`, compare-at included).
-- Checkout: state defaults to `SELECT STATE` placeholder (was Abuja), `PLEASE SELECT YOUR STATE` validation, shipping fee 0 until state chosen, ChevronDown arrows on all 4 bare selects.
-- Affordances: discount code boxed with solid black APPLY; every underlined checkout input/select got `hover:border-black/40` + `.focus-ring` (8 via replaceAll).
-- Header `NEWSLETTER` nav item (`to: "#newsletter"`, `<a>` branch, desktop `hidden lg:block`, mobile closes menu); Footer newsletter section got `id="newsletter"` + `scroll-mt-24`; footer shows phone (tel: link) + location above copyright.
-
-**Batch 2 (commit `fcacd53`, live-verified):**
-- Checkout restructured into numbered collapsible sections per Newman's reference screenshots ("Simpler terms"): section 1 Contact Information (names/email/phone + NEW Special Instructions textarea 0/500 counter), section 2 Delivery Details (State*|City grid, Street Address rename, NEW Zip Code using pre-existing unrendered `form.zip`), section 3 Delivery Method (Lagos note / home+park radios / no-state hint, Preferred Delivery Date box, NEW View Shipping Policy Link to /shipping). Required labels got `*`; page h1 now sr-only; Order Summary shipping fallback says "Select state" before "Select area".
+- `src/utils/productCopy.js` (new): `DEFAULT_PRODUCT_NOTE`, `DEFAULT_PRODUCT_NOTE_TITLE`, `DEFAULT_RETURNS_PAGE_POLICY`, `resolveProductNote`, `isProductNoteEnabled`, `resolveReturnsPagePolicy`.
+- `src/utils/revenueDisplay.js` (new): `REVENUE_MASK = "****.***"`, `toAmount`, `normalizeRevenueDisplay`, `formatNaira`, `resolveRevenue`, `revenueText`.
+- `src/components/admin/RevenueValue.jsx` (new): masked figure, eye toggle, red dot for a manual figure, count-up animation.
+- `src/pages/ProductDetail.jsx`: removed both 7-day badges; both shipping/returns accordions now read the resolver; panel can be hidden.
+- `src/pages/admin/Products.jsx`: per-product "Product page note" block (panel title + text), wired into `initialFormState` and `handleEdit`.
+- `src/pages/admin/Settings.jsx`: new "Product page" section (show/hide, title, text with restore-default, shipping page return policy) and "Revenue" section (hide by default, manual figure with live preview); nav entries added; defaults and merge logic extended.
+- `src/pages/ShippingReturns.jsx`: return policy rendered from settings, block hidden when cleared.
+- `src/pages/admin/AdminDashboard.jsx`: Net sales uses `RevenueValue` with `settings.revenue_display`.
+- `src/context/SettingsContext.jsx`: seeds the new keys so first paint is correct before the fetch resolves.
+- Tests: `src/utils/productCopy.test.js` (14), `src/utils/revenueDisplay.test.js` (14), `src/pages/productPageCopy.test.jsx` (9 static wiring guards).
 
 ## Decisions made
 
-- Labels can change but form keys never do (orders/customer jsonb and downstream admin views depend on them; new fields ride the `{...form}` spread).
-- Newsletter ask satisfied with a header anchor button pointing at the pre-existing footer form (footer form already existed; the button was the missing entry point).
-- Competitor-style extras NOT added: no Country field, no name field on newsletter (would need a subscribers column = DB change, which Newman deferred), no prices on delivery-method radios (summary carries the fee; avoids free-delivery inconsistency).
-- `react-hooks/set-state-in-effect` rejects `Promise.allSettled` inside an effect-called loader; sequential try/catch shape passes (SettingsContext pattern).
+- Policy copy is data, not code: defaults live in utils, edits live in `settings.data`, so Newman changes wording without a deploy.
+- Product note precedence is per product > store > built-in. A whitespace-only value counts as "not set" so a stray space cannot blank the panel.
+- `/shipping` uses empty-string-means-hidden while the product panel uses empty-means-fallback. Different intents: removing policy versus leaving a field alone.
+- The manual revenue figure is a display setting, not a written ledger value. Real totals stay truthful for reports and emails; only the dashboard headline is dressed, and the red dot is the tell.
+- Reveal state stays local to the component on purpose. Persisting it would leave the figure exposed on the next load.
+- No jsdom in the repo, so new tests are pure-function tests plus static source-wiring guards (same style as `adminRoutes.test.jsx`).
 
 ## Problems solved
 
-- Deploy verification: "Contact Information" matched the OLD bundle (false positive); unique markers ("SELECT STATE", "Zip Code (Optional)" + "View Shipping Policy") confirmed the real deploys (`index-Bo3wKQsy.js`, `index-Bubmhr5R.js`).
-- ProductCard JSX splice left an extra `</div>` (lint parse error "Adjacent JSX elements") - fixed by keeping the ADD TO BAG button inside the info div.
-- Lint rule conflict in SettingsContext solved by sequential try/catch loader shape.
+- ProductDetail had the same hardcoded shipping/returns copy duplicated for desktop and mobile. Both now share one resolver, so a copy edit lands in both layouts.
+- `react-hooks/set-state-in-effect` rejected the first RevenueValue (effect syncing reveal state to settings). Fixed by deriving `revealChoice ?? !hideByDefault` instead of a state-syncing effect.
+- Repo standing rules caught two slips before commit: `&mdash;` in new admin copy and a `style={{}}` in RevenueValue. Replaced with " - " and Tailwind text sizes.
+- `npx impeccable` is no longer installed or cached locally, so that UI gate could not run offline this session (it tries to download `impeccable@4.6.0`).
 
 ## Current state
 
-- Working tree CLEAN; both batches pushed: `96f39f3` + `dfee50b` (fix batch) and `fcacd53` + `d577618` (checkout restructure). Both deploys live-verified. Gates green at push time (lint zero, 86 vitest, 19 edge, build + verify-dist, impeccable []).
-- Live site now serves: whole-naira prices with no currency line, SELECT STATE checkout with arrows and numbered collapsible sections, special instructions + zip fields, NEWSLETTER header button, footer phone/location.
+- Gates green: `npm run lint` exit 0, `npm test` 123 passed (86 baseline + 37 new), `npm run test:edge` 19 passed, `npm run build` OK, `node scripts/verify-dist.mjs` OK. `npx impeccable` unavailable.
+- Shipped and pushed to `main` (commit `5389706`, plus the memory commit that follows it). Working tree clean afterwards.
+- Live behaviour after Vercel rebuild: product pages show no 7-day return badge; the SHIPPING & RETURNS panel reads the store default; dashboard Net sales is masked until the eye is clicked.
 
 ## Next session starts with
 
 1. Run `/remember restore`.
-2. Get Newman/dev confirmation the new checkout works end to end on a real order (sections collapse, special instructions land in `orders.customer`).
-3. Still open: external dev's end-to-end test once he creates a `status='live'` collection row; `MEMBER` discount code expired 2026-10-04 (confirm and clean up); zone-disable delivery-fee button (deferred); server-side amount recompute in `initialize-payment` (hardening); `src/utils/currency.js` is dead code (delete only if Newman agrees).
-4. Deferred by Newman: any further checkout redesign beyond what shipped; AB test layout; abandoned-checkout follow-up reminder emails.
+2. Have Newman confirm the panel copy on a live product page and set the store default once in Admin > Settings > Product page (title + text).
+3. If he wants the dressed number now, set the manual figure in Admin > Settings > Revenue (the red dot will confirm it is active).
+4. Still open from earlier sessions: external dev's end-to-end test once a `status='live'` collection row exists; `MEMBER` discount code expired 2026-10-04; server-side amount recompute in `initialize-payment`; `src/utils/currency.js` dead code.
 
 ## Open questions
 
-- Whether the dev's tool reads collections via anon key (sees all rows incl. passwords) or direct SQL; what other `status` values he uses besides 'live'.
-- Currency viewer rates question is moot unless Newman asks for the $/£ line back (file kept but unused).
+- Whether Newman wants a per-product panel title or only the body text. Both are wired; the title field can be removed from the product form if it is noise.
+- Whether the RBAC brief (Vice Admin, Ticket Admin, Ticket Staff, per-event scoping) should be built next, and whether `users.role` should grow beyond `admin|customer` or a separate `staff_roles` table should hold scoped permissions.
+- Whether to add `impeccable` as a devDependency so the UI gate works offline.
