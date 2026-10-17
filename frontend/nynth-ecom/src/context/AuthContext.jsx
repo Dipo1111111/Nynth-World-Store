@@ -116,6 +116,16 @@ export function AuthProvider({ children }) {
   const canAccessEvents = (eventId) =>
     isAdmin || (Array.isArray(access?.event_ids) && access.event_ids.includes(eventId));
 
+  // Product edits are split by line of business: the clothing catalogue needs
+  // store.products.manage, a ticket organizer needs ticketing.events.edit on an
+  // event that is assigned to them. Mirrors products_admin_write in Postgres.
+  const canManageProduct = (product) => {
+    if (isAdmin) return true;
+    const isTicket = product?.category === "tickets";
+    if (isTicket) return can("ticketing.events.edit") && canAccessEvents(product.id);
+    return can("store.products.manage");
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -128,6 +138,7 @@ export function AuthProvider({ children }) {
         can,
         isStaff,
         canAccessEvents,
+        canManageProduct,
         refreshAccess: loadAccess,
         signup,
         login,

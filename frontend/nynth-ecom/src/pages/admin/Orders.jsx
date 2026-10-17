@@ -19,6 +19,7 @@ import { formatEventDate } from "../../utils/tickets";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import StatusDropdown from "../../components/admin/StatusDropdown";
+import { useAuth } from "../../context/AuthContext";
 import {
     Select,
     SelectContent,
@@ -100,6 +101,9 @@ const PaymentStatusDropdown = ({ status, onStatusChange }) => {
 const SECTION_LABEL = "text-[11px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/60 mb-4 flex items-center gap-2";
 
 const Orders = () => {
+    // Reading orders is one permission, changing them is another.
+    const { can: canAny } = useAuth();
+    const canManageOrders = canAny("store.orders.manage");
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -479,11 +483,15 @@ const Orders = () => {
                                             <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
                                                 <span className="font-bold text-sm leading-none mt-1 tabular-nums">₦{order.total?.toLocaleString()}</span>
                                                 <div className="[&_button]:h-8 [&_button]:min-w-0 [&_button]:px-3 [&_button]:text-[11px] flex justify-end">
-                                                    <StatusDropdown
+                                                    {canManageOrders ? (
+                                                        <StatusDropdown
                                                         orderId={order.id}
                                                         currentStatus={order.order_status || 'pending'}
                                                         onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
                                                     />
+                                                    ) : (
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.order_status}</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -566,10 +574,14 @@ const Orders = () => {
                                                             </h4>
                                                             <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 flex items-center justify-between">
                                                                 <PaymentStatusBadge status={order.payment_status || 'pending'} />
-                                                                <PaymentStatusDropdown
-                                                                    status={order.payment_status || 'pending'}
-                                                                    onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
-                                                                />
+                                                                {canManageOrders ? (
+                                                                  <PaymentStatusDropdown
+                                                                      status={order.payment_status || 'pending'}
+                                                                      onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
+                                                                  />
+                                                                ) : (
+                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.payment_status}</span>
+                                                                )}
                                                             </div>
                                                         </div>
 
@@ -645,11 +657,15 @@ const Orders = () => {
                                                         <p className="text-xs text-[#EDEAE2]/45">{order.customer?.email}</p>
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                                                        <StatusDropdown
-                                                            orderId={order.id}
-                                                            currentStatus={order.order_status || 'pending'}
-                                                            onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
-                                                        />
+                                                        {canManageOrders ? (
+                                                          <StatusDropdown
+                                                              orderId={order.id}
+                                                              currentStatus={order.order_status || 'pending'}
+                                                              onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                                                          />
+                                                        ) : (
+                                                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.order_status}</span>
+                                                        )}
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <PaymentStatusBadge status={order.payment_status || 'pending'} />
@@ -783,18 +799,26 @@ const Orders = () => {
                                                                         <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-3">
                                                                             <div className="flex justify-between items-center text-sm">
                                                                                 <span className="text-[#EDEAE2]/55">Fulfillment</span>
-                                                                                <StatusDropdown
-                                                                                    orderId={order.id}
-                                                                                    currentStatus={order.order_status || 'pending'}
-                                                                                    onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
-                                                                                />
+                                                                                {canManageOrders ? (
+                                                                                  <StatusDropdown
+                                                                                      orderId={order.id}
+                                                                                      currentStatus={order.order_status || 'pending'}
+                                                                                      onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                                                                                  />
+                                                                                ) : (
+                                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.order_status}</span>
+                                                                                )}
                                                                             </div>
                                                                             <div className="flex justify-between items-center text-sm pt-3 border-t border-white/[0.06]">
                                                                                 <span className="text-[#EDEAE2]/55">Payment</span>
-                                                                                <PaymentStatusDropdown
-                                                                                    status={order.payment_status || 'pending'}
-                                                                                    onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
-                                                                                />
+                                                                                {canManageOrders ? (
+                                                                                  <PaymentStatusDropdown
+                                                                                      status={order.payment_status || 'pending'}
+                                                                                      onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
+                                                                                  />
+                                                                                ) : (
+                                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.payment_status}</span>
+                                                                                )}
                                                                             </div>
                                                                             <div className="space-y-2 pt-3 border-t border-white/[0.06]">
                                                                                 <div className="flex justify-between text-xs text-[#EDEAE2]/55">

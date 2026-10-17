@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import { useAuth } from "../../context/AuthContext";
 import { fetchSubscribers, getAllOrders } from "../../api/firebaseFunctions";
 import {
  Users,
@@ -41,6 +42,9 @@ const StatIcon = ({ icon: Icon, className }) => (
 );
 
 const Subscribers = () => {
+ const { can: canAny } = useAuth();
+ // Reading the list is one permission, emailing it is another.
+ const canEmailSubscribers = canAny("store.subscribers.email");
  const [subscribers, setSubscribers] = useState([]);
  const [filteredSubscribers, setFilteredSubscribers] = useState([]);
  const [loading, setLoading] = useState(true);
@@ -288,7 +292,7 @@ const Subscribers = () => {
  </Button>
 
  {/* Send Email Button */}
- {selectedEmails.size > 0 && (
+ {canEmailSubscribers && selectedEmails.size > 0 && (
  <Button
  onClick={() => setShowEmailModal(true)}
  className="text-[10px] tracking-widest font-bold uppercase h-9 px-4 shrink-0 transition-all animate-fadeIn"

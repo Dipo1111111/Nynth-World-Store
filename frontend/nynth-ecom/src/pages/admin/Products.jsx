@@ -16,9 +16,10 @@ import { CSS } from "@dnd-kit/utilities";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
+import { useAuth } from "../../context/AuthContext";
 
 
-const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePublic }) => {
+const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePublic, canEdit = true }) => {
  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
@@ -56,23 +57,26 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  <GripVertical size={16} />
  </button>
  <button
+ disabled={!canEdit}
  onClick={() => handleTogglePublic(product)}
  className={`focus-ring flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25 hover:bg-emerald-500/25' : 'bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30 hover:bg-slate-500/35'}`}
  >
  {product.isPublic !== false ? <><Eye size={14}/> Visible</> : <><EyeOff size={14}/> Hidden</>}
  </button>
+ {canEdit && <>
  <button onClick={() => handleEdit(product)} className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[#EDEAE2]/65 rounded-lg border border-white/10 hover:bg-white/[0.12]">
  <Edit2 size={14} />
  </button>
  <button onClick={() => handleDelete(product.id)} className="focus-ring flex items-center justify-center p-2 bg-rose-500/[0.14] text-rose-300 rounded-lg border border-rose-500/25 hover:bg-rose-500/25">
  <Trash2 size={14} />
  </button>
+ </>}
  </div>
  </div>
  );
 };
 
-const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePublic }) => {
+const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePublic, canEdit = true }) => {
  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
@@ -110,6 +114,7 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <td className="p-4 text-right">
  <div className="flex justify-end items-center gap-2 transition-all">
  <button
+ disabled={!canEdit}
  onClick={() => handleTogglePublic(product)}
  className={`focus-ring p-1.5 rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25' : 'bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30'}`}
  title={product.isPublic !== false ? "Hide from Store" : "Show on Store"}
@@ -119,12 +124,14 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <button {...attributes} {...listeners} className="focus-ring p-2 text-[#EDEAE2]/42 hover:text-[#EDEAE2] cursor-grab active:cursor-grabbing touch-none">
  <GripVertical size={16} />
  </button>
+ {canEdit && <>
  <button onClick={() => handleEdit(product)} className="focus-ring p-2 text-[#EDEAE2]/65 hover:text-[#EDEAE2] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-white/10">
  <Edit2 size={16} />
  </button>
  <button onClick={() => handleDelete(product.id)} className="focus-ring p-2 text-rose-300 hover:bg-rose-500/[0.14] rounded-lg border border-transparent hover:border-rose-500/25">
  <Trash2 size={16} />
  </button>
+ </>}
  </div>
  </td>
  </tr>
@@ -137,6 +144,10 @@ export default function AdminProducts() {
  const [isModalOpen, setIsModalOpen] = useState(false);
  const [editingId, setEditingId] = useState(null);
  const [isSubmitting, setIsSubmitting] = useState(false);
+ // A Vice Admin can monitor the catalogue but must not change it. Postgres
+ // refuses the write either way; this keeps the buttons honest.
+ const { canManageProduct, can: canAny } = useAuth();
+ const canCreateProduct = canAny("store.products.manage");
 
  // Modal behavior: freeze the page behind the dialog and let Escape close it.
  // Backdrop clicks close through the overlay onClick below. Both the body and
@@ -508,6 +519,7 @@ export default function AdminProducts() {
  </p>
  <p className="text-sm text-[#EDEAE2]/55">Keep your catalog ordered and discoverable.</p>
  </div>
+ {canCreateProduct && (
  <button
  onClick={handleCreate}
  className="focus-ring btn-primary flex items-center gap-2 text-xs sm:text-sm py-2 px-4 sm:py-2.5 sm:px-5 shadow-card"
@@ -515,6 +527,7 @@ export default function AdminProducts() {
  <Plus size={18} />
  <span>Add Product</span>
  </button>
+ )}
  </div>
 
  <div className="bg-transparent sm:bg-[#0a0a0a] sm:rounded-xl sm:border sm:border-white/10 sm:shadow-card overflow-hidden">
@@ -530,7 +543,7 @@ export default function AdminProducts() {
  <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
  <div className="grid grid-cols-1 gap-4 sm:hidden pb-10">
  {products.map(product => (
- <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
+ <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} canEdit={canManageProduct(product)} />
  ))}
  {products.length === 0 && (
  <div className="text-center py-20 bg-[#0a0a0a] rounded-xl border border-dashed border-white/22">
@@ -560,7 +573,7 @@ export default function AdminProducts() {
  <SortableContext items={products.map(p => p.id)} strategy={verticalListSortingStrategy}>
  <tbody className="divide-y divide-white/10">
  {products.map(product => (
- <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} />
+ <SortableDesktopRow key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} canEdit={canManageProduct(product)} />
  ))}
  {products.length === 0 && (
  <tr>

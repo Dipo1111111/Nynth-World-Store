@@ -20,6 +20,7 @@ import {
  DollarSign,
 } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
+import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
 const initialFormState = {
@@ -31,6 +32,9 @@ const initialFormState = {
 };
 
 export default function DiscountCodes() {
+ // Viewing codes is one permission, creating and editing them is another.
+ const { can: canAny } = useAuth();
+ const canManageCodes = canAny("store.discounts.manage");
  const [codes, setCodes] = useState([]);
  const [loading, setLoading] = useState(true);
  const [isModalOpen, setIsModalOpen] = useState(false);
@@ -168,6 +172,7 @@ export default function DiscountCodes() {
  </p>
  <p className="text-sm text-[#EDEAE2]/55">Promo codes applied at checkout.</p>
  </div>
+ {canManageCodes && (
  <button
  onClick={() => openModal()}
  className="focus-ring flex items-center gap-2 px-5 py-2.5 bg-[#EDEAE2] text-[#0d0d0f] text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover active:scale-[0.98]"
@@ -175,6 +180,7 @@ export default function DiscountCodes() {
  <Plus size={16} />
  Add Code
  </button>
+ )}
  </div>
 
  {/* Table */}
@@ -190,6 +196,7 @@ export default function DiscountCodes() {
  </div>
  <p className="text-[#EDEAE2] font-medium mb-1">No discount codes yet</p>
  <p className="text-[#EDEAE2]/42 text-sm mb-6">Create your first promo code to run a campaign.</p>
+ {canManageCodes && (
  <button
  onClick={() => openModal()}
  className="focus-ring flex items-center gap-2 px-6 py-3 bg-[#EDEAE2] text-[#0d0d0f] text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all"
@@ -197,6 +204,7 @@ export default function DiscountCodes() {
  <Plus size={15} />
  Create your first code
  </button>
+ )}
  </CardContent>
  </Card>
  ) : (
@@ -249,7 +257,7 @@ export default function DiscountCodes() {
  )}
  </div>
  </div>
- <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
+ {canManageCodes && <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
  <button
  onClick={() => handleToggleActive(code)}
  className={`focus-ring flex items-center justify-center gap-1 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
@@ -277,7 +285,7 @@ export default function DiscountCodes() {
  >
  <Trash2 size={14} />
  </button>
- </div>
+ </div>}
  </div>
  ))}
  </div>
@@ -362,7 +370,7 @@ export default function DiscountCodes() {
  )}
  </td>
  <td className="px-6 py-4 text-right">
- <div className="flex justify-end items-center gap-2">
+ {canManageCodes ? <div className="flex justify-end items-center gap-2">
  <button
  onClick={() => handleToggleActive(code)}
  className={`focus-ring p-1.5 rounded-lg border transition-colors ${
@@ -390,7 +398,7 @@ export default function DiscountCodes() {
  >
  <Trash2 size={16} />
  </button>
- </div>
+ </div> : <span className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/35">View only</span>}
  </td>
  </tr>
  ))}

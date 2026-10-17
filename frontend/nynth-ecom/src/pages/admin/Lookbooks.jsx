@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchLookbooks, uploadImage, addLookbook, deleteLookbook, subscribeLookbooks } from "../../api/firebaseFunctions";
+import { useAuth } from "../../context/AuthContext";
 import { Loader2, Plus, Trash2, Upload, CheckCircle, X, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
 import { compressImage } from "../../utils/imageUtils";
 
 export default function AdminLookbooks() {
+ const { can: canAny } = useAuth();
+ const canManageLookbooks = canAny("store.lookbooks.manage");
  const [lookbooks, setLookbooks] = useState([]);
  const [loading, setLoading] = useState(true);
  const [isModalOpen, setIsModalOpen] = useState(false);
@@ -123,6 +126,7 @@ export default function AdminLookbooks() {
  >
  Refresh
  </button>
+ {canManageLookbooks && (
  <button
  onClick={() => setIsModalOpen(true)}
  className="focus-ring flex items-center gap-2 btn-primary px-6 py-2.5 shadow-card active:scale-[0.98]"
@@ -130,6 +134,7 @@ export default function AdminLookbooks() {
  <Plus size={18} />
  <span className="text-[11px] tracking-widest font-bold uppercase">Add New Look</span>
  </button>
+ )}
  </div>
  </div>
 
@@ -146,6 +151,7 @@ export default function AdminLookbooks() {
  </div>
  <h3 className="text-xl font-bold text-[#EDEAE2] mb-2">No Looks Found</h3>
  <p className="text-[#EDEAE2]/42 text-sm mb-8">Start by adding your first visual to the collection.</p>
+ {canManageLookbooks && (
  <button
  onClick={() => setIsModalOpen(true)}
  className="btn-primary focus-ring flex items-center gap-3 px-8 py-4 shadow-card"
@@ -153,6 +159,7 @@ export default function AdminLookbooks() {
  <Plus size={18} />
  <span className="text-xs tracking-widest font-bold uppercase">Add First Look</span>
  </button>
+ )}
  </div>
  ) : (
  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
@@ -161,6 +168,7 @@ export default function AdminLookbooks() {
  <img src={look.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
 
  {/* Persistent Delete Button for Mobile/Desktop Accessibility */}
+ {canManageLookbooks && (
  <button
  onClick={() => setDeleteConfirmId(look.id)}
  className="absolute bottom-3 right-3 bg-[#0a0a0a]/90 backdrop-blur-sm text-rose-300 p-2.5 rounded-lg shadow-card hover:bg-white/15 hover:scale-110 active:scale-90 transition-all duration-300 z-10"
@@ -168,6 +176,7 @@ export default function AdminLookbooks() {
  >
  <Trash2 size={16} />
  </button>
+ )}
  </div>
  ))}
  </div>
