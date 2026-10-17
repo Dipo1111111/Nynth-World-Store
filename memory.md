@@ -1,23 +1,25 @@
-# Memory - Nynth World Store (handoff: build the rest of the platform brief)
+# Memory - Nynth World Store (platform brief is built; next session is polish and hardening)
 
-Last updated: 2026-10-17 17:15 (Africa/Lagos)
+Last updated: 2026-10-17 17:50 (Africa/Lagos)
 
-## Read this first: handoff instructions
+## Recurring context
 
-Owner's full platform brief (13 pages, roles, ticketing, permissions, revenue separation):
-`/Users/igbojuwooladipupo/Downloads/NYNTH WORLD PLATFORM .pdf`
+- Founder and owner: Newman (09137207918). Owner alerts: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com. Newman sends fragmented WhatsApp and voicemail requirements; interpret them into concrete edits. Dipo (the user) approves before ambiguous batches go out.
+- Newman's design line: "Easy, clean, minimal, but exceptional."
+- Stack: React 18 + Vite + Tailwind v4 + react-router-dom v7, frontend in `frontend/nynth-ecom`, backend fully Supabase (`cybcooychgicsnjeummo`), Paystack, Resend, Cloudinary, Vercel.
+- `src/api/firebaseFunctions.js` is a one-line alias over `supabaseFunctions.js`. Imports still say firebaseFunctions; that is intentional, do not rename.
+- Live site: `https://www.nynthworld.com`. Verify a deploy by fetching the served entry bundle and grepping for a string unique to the change. Generic strings give false positives. Deploy takes 1 to 3 minutes.
+- Supabase MCP works, but `execute_sql` runs as a superuser and therefore **bypasses RLS**. To test a policy, wrap the query: `begin; select set_config('request.jwt.claims','{"sub":"<uuid>","email":"...","role":"authenticated"}',true); set local role authenticated; select ...; rollback;` The `sub` must be a real uuid, `auth.uid()` casts to uuid, a Firebase-style id throws 22P02.
+- Management API fallback if the MCP fails: `POST https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/database/query` with the token in `frontend/nynth-ecom/.secrets/supabase.env`. Never commit or echo that token.
+- Supabase had a ~20 minute 502 outage on 2026-10-17 evening affecting both the MCP and the management API. Retry, do not panic-migrate.
+- Stale tabs: after a push, old tabs keep old JS. Hard refresh before believing a bug report.
+- Orders model: `orders.customer` jsonb stores the whole checkout form. `is_test` comes from the Paystack domain and test traffic is excluded from metrics. Live paid revenue is currently ₦1,060 across 16 paid orders (35 store orders, 6 ticket orders out of 41).
+- Lock and drop model: `settings.data` holds `lock_page_enabled`, `lock_epoch`, `lock_password`, `launch_date`. `collections` (written by the external dev, currently empty) with `status='live'` marks the active drop. `lock_epoch` force-relock must stay intact.
+- Discount codes: `discount_codes`, guest check via `public.validate_discount(p_code)`. `MEMBER` expired 2026-10-04.
+- Founders in `users` are `nynthworld@gmail.com` and `primebusiness54@gmail.com`, both with duplicate rows (Firebase uid and Supabase uuid formats, one of each). Do not dedupe without asking.
+- Key files: `src/utils/permissions.js`, `src/context/AuthContext.jsx`, `src/components/ProtectedRoute.jsx`, `src/api/supabaseFunctions.js`, `src/pages/admin/StaffAccess.jsx`, `src/pages/admin/TicketPlatform.jsx`, `src/pages/admin/CheckIn.jsx`, `src/pages/admin/Events.jsx`, `src/pages/admin/Settings.jsx`, `src/pages/Landing.jsx`, `supabase/migrations/`, `supabase/functions/_shared/eventTickets.ts`.
 
-You are picking this up because the previous session shipped the copy and revenue asks and stopped short of the permissions build. Your job is to finish the brief.
-
-1. Read the PDF end to end and write your own requirement list. Do not trust the summary below as complete. The previous agent may have missed things, and the brief is the authority.
-2. Confirm the Supabase MCP is live before you start: enabled in `~/.config/opencode/opencode.json` and `~/.config/opencode/opencode.jsonc`, `project_ref=cybcooychgicsnjeummo` (project `nynth-world`, eu-west-1), `read_only=false`. Run `opencode mcp list`. If it says "needs authentication", run `opencode mcp auth supabase` and finish the browser login. It previously pointed at the wrong project (`llwlgzujsyxlseiqiwsp`, Atomic Xp); that is fixed, but verify the ref before you run any SQL.
-3. Inspect the live schema before writing migrations. `supabase/schema.sql` is a snapshot, and the external developer (pobbagency@gmail.com) has created tables by hand, so the file and the database can disagree.
-4. Build what is missing, frontend plus database, with the rules enforced in Postgres (RLS, security definer functions), not only in React.
-5. Run the full gate before pushing: `npm run lint`, `npm test`, `npm run test:edge`, `npm run build`, `node scripts/verify-dist.mjs`.
-6. Commit and push to `main` when green. Dipo has authorised the push for this batch. Vercel auto-deploys; verify the live bundle after the deploy.
-7. Update this memory.md when you are done.
-
-Hard rules (do not break):
+## Hard rules (do not break)
 
 - No em dashes anywhere, in copy, code, or commits.
 - No `style={{}}` in new code except dnd-kit in Products.jsx.
@@ -26,69 +28,60 @@ Hard rules (do not break):
 - Do not modify anything under `Documents/dipo-bench/`. That tree is a read-only benchmark fixture.
 - Never put secrets in this file.
 
-## What has already shipped (do not redo)
+## What shipped this session (commit 345beca, pushed and verified live)
 
-Pushed to `main`, latest `e0693aa` / `5389706`. Live and verified in the served bundles.
+The whole platform brief is now built. Do not redo any of it.
 
-- The "7 DAYS RETURN POLICY" badge is gone from both product page layouts.
-- The SHIPPING & RETURNS panel is editable: per product (`product.productNote`, `product.productNoteTitle`) then store default (`settings.product_note_text`, `product_note_title`) then `DEFAULT_PRODUCT_NOTE`. `settings.product_note_enabled === false` hides it. Logic in `src/utils/productCopy.js`, rendered at `ProductDetail.jsx:212`, `ProductDetail.jsx:483`, `ProductDetail.jsx:719`.
-- Admin surfaces: Settings > Product page (`Settings.jsx:535`), Products > Edit (`Products.jsx:663`).
-- `/shipping` return policy comes from `settings.returns_page_policy`; empty string hides the block (`ShippingReturns.jsx:10`).
-- Revenue privacy: `settings.revenue_display = { hide_by_default, override }`. Dashboard Net sales masks to `****.***`, eye reveals, manual figure shows a red dot. `src/components/admin/RevenueValue.jsx`, `AdminDashboard.jsx:295`, controls at `Settings.jsx:611`.
-- Tests: 123 vitest, 19 deno edge, build and verify-dist green.
+1. Roles and permissions. `public.staff_roles` (id, user_id, email, full_name, department, role, permissions jsonb, event_ids text[], status, notes, invited_by, last_seen_at). Roles: `vice_admin`, `ticket_organizer`, `ticket_admin`, `ticket_staff`. `users.role` is untouched and is still founder-or-customer.
+2. Per-event scoping. `event_ids` on the staff row, enforced by `can_access_event()` and `order_touches_my_events()` inside RLS. Swapping an event id in a URL gets nothing.
+3. Staff management UI. `/admin/staff`, founder only. Add by email, department, role, per-permission toggles, event assignment, revoke and delete. Also appoints the director of each ticket section.
+4. Atomic ticket verification. `public.verify_ticket_entry(code)` does the check and the mark in one statement. Proved it: two calls on one code give `verified` then `already_used` with the original timestamp and staff email. Replaced both client-side race holes, in `CheckIn.jsx` and in the public `TicketPass.jsx`.
+5. Ticket state separation. `public.event_tickets` with `payment_status` (pending/paid/failed/refunded), `ticket_status` (valid/cancelled/revoked), `entry_status` (unused/used) on separate axes. Backfilled from `orders.tickets` jsonb; the one already-used legacy ticket kept its history.
+6. Landing split. `/` is now `Landing.jsx`, two boxes, store and ticket, each image uploadable from Settings > Landing. `/tickets` lists events.
+7. Revenue separation. `orders.sales_channel` plus organizer, commission, fee, refund, and net columns. `event_finance` view (security_invoker) aggregates per event. `/admin/ticket-platform` shows collected, fees, refunds, NYNTH commission, and owed to organizer, with clothing revenue alongside for contrast.
 
-## What is still missing (previous audit, verify it yourself)
+Also: admin nav, routes, and the dashboard finance block all key off permissions now. `paystack-webhook` and `paystack-verify` both call `syncEventTickets()` so new sales appear at the door without a backfill.
 
-1. Roles and permissions. `users.role` only allows `admin|customer` (`supabase/schema.sql:21`). No Vice Admin, Ticket Admin, Ticket Staff. No per-user permission toggles. `ProtectedRoute` only checks `requireAdmin` (`src/components/ProtectedRoute.jsx:5`), and there is no enforcement below the UI.
-2. Per-event scoping. Events and ticket orders have no organizer id, so a Ticket Admin cannot be confined to one event.
-3. Staff management UI. No Add User by email, no role assignment, no way to appoint a director for an external ticket section.
-4. Atomic ticket verification. `markTicketUsed` (`src/api/supabaseFunctions.js:86`) reads, checks, then writes from the client. Two staff at once can both pass. Replace with one `security definer` Postgres function that checks and marks in a single statement, and call it from `CheckIn.jsx`.
-5. Ticket state separation. Payment is only `pending|paid|failed` (`supabase/schema.sql:76`). No refunded, no ticket status (valid, cancelled, revoked), no separate entry status. The `used` flag lives inside the `orders.tickets` jsonb.
-6. Landing split: Store box and Ticket box, each image uploadable from admin. Not built; `/` still redirects to `/shop`.
-7. Organizer revenue separation, NYNTH commission, fees, refunds owed. Everything lands in one orders ledger.
-
-Suggested order: 4 and 5 first (small, security critical), then 1 to 3 as one connected build, then 6 and 7.
-
-Recommended shape for 1: a `staff_roles` table (user id, role, scoped event ids, created_at) rather than widening `users.role`. It is the only shape that supports per-event scoping. Pair it with helper functions used by RLS policies, and keep `is_admin()` for the founder.
-
-## Recurring context
-
-- Founder and owner: Newman (09137207918). Owner alerts: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com. Newman sends fragmented WhatsApp and voicemail requirements; interpret them into concrete edits. Dipo (the user) approves before ambiguous batches go out.
-- Newman's design line: "Easy, clean, minimal, but exceptional."
-- Stack: React 18 + Vite + Tailwind v4 + react-router-dom v7, frontend in `frontend/nynth-ecom`, backend fully Supabase (`cybcooychgicsnjeummo`), Paystack, Resend, Cloudinary, Vercel.
-- `src/api/firebaseFunctions.js` is a one-line alias over `supabaseFunctions.js`.
-- Live site: `https://www.nynthworld.com`. Verify a deploy by fetching the served entry bundle and grepping for a string unique to the change. Generic strings give false positives. Deploy takes 1 to 3 minutes.
-- Supabase MCP used to point at the wrong project. Use the connection only after checking the project ref in the URL.
-- Management API fallback if the MCP fails: `POST https://api.supabase.com/v1/projects/cybcooychgicsnjeummo/database/query` with the token in `frontend/nynth-ecom/.secrets/supabase.env`. Never commit or echo that token.
-- Stale tabs: after a push, old tabs keep old JS. Hard refresh before believing a bug report.
-- Orders model: `orders.customer` jsonb stores the whole checkout form. `is_test` comes from the Paystack domain and test traffic is excluded from metrics.
-- Lock and drop model: `settings.data` holds `lock_page_enabled`, `lock_epoch`, `lock_password`, `launch_date`. `collections` (written by the external dev) with `status='live'` marks the active drop. `lock_epoch` force-relock must stay intact.
-- Discount codes: `discount_codes`, guest check via `public.validate_discount(p_code)`. `MEMBER` expired 2026-10-04.
-- Key files: `src/pages/admin/Settings.jsx`, `src/pages/admin/Products.jsx`, `src/pages/admin/AdminDashboard.jsx`, `src/pages/ProductDetail.jsx`, `src/pages/CheckIn.jsx`, `src/pages/admin/Events.jsx`, `src/api/supabaseFunctions.js`, `src/context/AuthContext.jsx`, `src/components/ProtectedRoute.jsx`, `supabase/schema.sql`, `supabase/functions/`.
+Gate at 345beca: lint clean, 152 vitest, 27 deno edge, build green, verify-dist green.
 
 ## Decisions made
 
-- Policy copy is data, not code: defaults in utils, edits in `settings.data`, so Newman changes wording without a deploy.
-- Product note: per product beats store default beats built-in. Whitespace-only counts as unset. Empty `/shipping` policy hides the block (different intent from the product panel, intentional).
-- A manual revenue figure is a display setting only. The ledger stays truthful for orders, reports, and emails. The red dot is the tell.
-- Reveal state is not persisted, so every load starts masked.
-- Tests: no jsdom in the repo, so new tests are pure-function tests plus static source-wiring guards.
+- `staff_roles` keyed by email rather than a widened `users.role`. Only that shape supports per-event scoping and email-first invitations.
+- Permissions are role defaults plus a per-person override map, `defaults || overrides`, both in `staff_role_defaults()` and in `effectivePermissions()`. A later change to a role's defaults is not frozen by an old override. `permissions.test.js` parses the migration file and fails if the JS and SQL disagree.
+- `staff.manage` and `store.finance.view` are in no role's defaults. Only the founder ever holds them, because the brief says nobody should exceed the Main Admin and the Vice Admin is explicitly shut out of finances.
+- The founder is never a `staff_roles` row. `is_admin()` short circuits every check, and `can()` returns true for everything.
+- `event_tickets` is a new normalized table, not a reshape of the jsonb. The jsonb stays the source of truth for the buyer's email; the table is the ledger the door reads.
+- Verification goes through a Postgres function only. `event_tickets` has a select policy and deliberately no insert/update/delete policy, so a staff member cannot flip a payment status from the browser console.
+- Money columns on `orders` are column-level revoked from anon and authenticated. `assign_event_organizer()` is founder-only, matching "only the admin can add people to the ticket section".
+- The landing page ships enabled. Set `settings.data.landing.enabled = false` to send `/` straight to the shop as before.
 
 ## Problems solved
 
-- ProductDetail had the shipping and returns copy duplicated for desktop and mobile; both now share one resolver.
-- `react-hooks/set-state-in-effect` rejected an effect that synced reveal state. Fixed by deriving `revealChoice ?? !hideByDefault`.
-- Standing rules caught em dashes in admin copy and a `style={{}}` in RevenueValue before commit.
-- `npx impeccable detect --json` returns `[]`, but the CLI is not a project dependency and downloads on demand.
+- Supabase 502 outage mid-session. Fell back to the management API, then resumed when it recovered.
+- The SQL backfill failed first time round: `jsonb_array_elements` yields `jsonb`, so `t.code` does not exist. Needs `t ->> 'code'`.
+- `auth.uid()` casts to uuid, so simulating a session with a Firebase-format id throws 22P02 inside `is_admin()`. Use a real uuid in the test claims.
+- RLS test results looked wrong at first because the SQL tool bypasses RLS. Fixed with `set local role authenticated` inside the transaction. Every scoping assertion below was confirmed under that role: organizer sees 0 subscribers and 0 foreign tickets, vice admin sees 0 tickets and cannot edit products or verify, neither can write settings.
+- `roleDefaults()` originally returned an array-shaped object and the tests wanted keys. Split into `roleDefaults()` (map) and `rolePermissionKeys()` (list).
 
 ## Current state
 
-- Working tree has `memory.md` modified (this handoff) and nothing else. All code is committed and pushed.
-- Live: no 7-day badge, editable panel, masked revenue with manual figure option.
-- Not live: everything in the missing list above.
+- Working tree clean, everything committed and pushed to `main` at 345beca. Live bundle verified to contain the new code and both new lazy chunks serve.
+- `staff_roles` is intentionally empty. No staff have been added yet; the founder does that from `/admin/staff`.
+- All 4 existing event tickets are Paystack test traffic (`is_test = true`), so `event_finance` legitimately shows zero rows and Ticket Platform renders its empty state.
+- `settings.data.landing` is `{enabled: true}` with no images yet, so the landing page currently shows two clean blocks with no artwork.
+- `presence_read_any` was left in place even though it is loose, because the external dev's tool may read that table.
+
+## Next session starts with
+
+- Nothing is blocked. The brief is done. Ask Dipo what to pick up next, or start on:
+  - The external dev's `collections` / drop tool, which has never been reconciled with these permissions and may still write as an admin.
+  - Adding real staff accounts so the role system can be exercised with more than one person.
+  - Uploading the two landing images from Settings so the split page is not artless.
+  - Paystack is still in TEST mode and the production webhook is not wired in the Paystack dashboard. That is the single biggest gap between this build and real money.
 
 ## Open questions
 
-- Whether to widen `users.role` or add `staff_roles`. Recommendation is `staff_roles`.
-- Whether Newman wants a per-product panel title or only the body text. Both are wired now; drop the title field from the product form if it is noise.
 - Whether the external dev's tool reads `collections` with the anon key (sees passwords) or direct SQL.
+- Whether Newman wants per-product panel titles or only the body text. Both are wired; drop the title field from the product form if it is noise.
+- Whether commission should be a flat percent or a per-event flat fee. Percent is what is built.
+- Whether an organizer should ever see the clothing store. The brief says no, and that is what is enforced.
