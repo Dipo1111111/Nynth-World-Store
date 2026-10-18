@@ -1,10 +1,10 @@
 // pages/Shop.jsx
+// Tickets are no longer part of the store. They live only on /tickets.
 import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import ProductCard from "../components/products/ProductCard";
-import TicketCard from "../components/products/TicketCard";
 import { fetchProducts } from "../api/firebaseFunctions";
 import { Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
@@ -14,34 +14,8 @@ import { getOptimizedImageUrl } from "../api/cloudinary";
 import Marquee from "../components/common/Marquee";
 import {
   normalizeCategoryOrder,
-  normalizeBandPosition,
-  normalizeBandScope,
-  normalizeBandLimit,
   categoryLabel,
 } from "../utils/shopConfig";
-
-const TicketsBand = ({ products, onTicketsView, limit }) => (
-  <section className="w-full">
-    <div className="flex flex-col gap-2 px-4 py-3.5 bg-black sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:px-10">
-      <span className="text-[8px] md:text-[9px] leading-relaxed tracking-[0.2em] font-bold uppercase text-white">
-        INSTANT E-TICKETS · NO DELIVERY · NO FEES
-      </span>
-      <Link
-        to={onTicketsView ? "/shop" : "/shop?category=tickets"}
-        className="shrink-0 whitespace-nowrap self-end sm:self-auto sm:ml-auto text-[8px] md:text-[9px] tracking-[0.2em] font-bold uppercase text-white/60 hover:text-white transition-colors py-2 sm:py-1 pl-4"
-      >
-        {onTicketsView ? "SHOW ALL PRODUCTS" : "VIEW ALL TICKETS"} →
-      </Link>
-    </div>
-    <div className="w-full bg-white px-4 md:px-10 py-8">
-      <div className="grid grid-cols-1 gap-5 w-full">
-        {products.slice(0, limit).map((p) => (
-          <TicketCard key={p.id} product={p} wide />
-        ))}
-      </div>
-    </div>
-  </section>
-);
 
 export default function Shop() {
   const [searchParams] = useSearchParams();
@@ -58,10 +32,10 @@ export default function Shop() {
   const [displayMode, setDisplayMode] = useState("view");
   const { settings } = useSettings();
 
-  const categoryOrder = normalizeCategoryOrder(settings.shop_category_order);
-  const bandPosition = normalizeBandPosition(settings.tickets_band_position);
-  const bandScope = normalizeBandScope(settings.tickets_band_scope);
-  const bandLimit = normalizeBandLimit(settings.tickets_band_limit);
+  // Clothing categories only. Tickets never appear in the store.
+  const categoryOrder = normalizeCategoryOrder(settings.shop_category_order).filter(
+    (cat) => cat !== "tickets"
+  );
 
   // Dynamically preload LCP hero banner - works in both dev and production
   useEffect(() => {
@@ -101,6 +75,8 @@ export default function Shop() {
   useEffect(() => {
     if (!products.length) return;
     let result = [...products];
+    // Tickets are excluded from the store entirely.
+    result = result.filter((p) => p.category !== "tickets");
     if (searchQuery) {
       const query = searchQuery.toLowerCase().trim();
       result = result.filter(p => p.title?.toLowerCase().includes(query) || p.category?.toLowerCase().includes(query));
@@ -117,13 +93,6 @@ export default function Shop() {
     });
     setFilteredProducts(result);
   }, [products, selectedCategory, searchQuery, sortBy]);
-
-  const ticketProducts = filteredProducts.filter((p) => p.category === "tickets");
-  const onTicketsView = selectedCategory?.toLowerCase() === "tickets";
-  const bandVisible =
-    ticketProducts.length > 0 &&
-    bandPosition !== "hidden" &&
-    (bandScope === "all" || onTicketsView);
 
   return (
     <div className="min-h-screen bg-white text-black font-inter flex flex-col">
@@ -210,11 +179,6 @@ export default function Shop() {
           ))}
         </div>
 
-        {/* Tickets Band - Edge to Edge, Long Glossy Wide Cards */}
-        {bandPosition === "top" && bandVisible && (
-          <TicketsBand products={ticketProducts} onTicketsView={onTicketsView} limit={bandLimit} />
-        )}
-
         {/* Grid Layer - 100% Full Width, 0 Padding, 1px Gaps */}
         <div id="product-grid" className="w-full bg-white min-h-[60vh] scroll-mt-[130px]">
           {loading ? (
@@ -232,13 +196,9 @@ export default function Shop() {
           ) : (
             <section className="w-full px-0">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12 bg-white px-4 md:px-10 py-10">
-                {filteredProducts.map((product) =>
-                  product.category === "tickets" ? (
-                    <TicketCard key={product.id} product={product} />
-                  ) : (
-                    <ProductCard key={product.id} product={product} displayMode={displayMode} />
-                  )
-                )}
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} displayMode={displayMode} />
+                ))}
 
                 {/* Fill all empty slots in the last row to maintain 1px grid lines (only in model mode) */}
                 {displayMode !== 'view' && filteredProducts.length > 0 && Array.from({
@@ -250,11 +210,6 @@ export default function Shop() {
             </section>
           )}
         </div>
-
-        {/* Tickets Band - bottom placement, below the full product grid */}
-        {bandPosition === "bottom" && bandVisible && (
-          <TicketsBand products={ticketProducts} onTicketsView={onTicketsView} limit={bandLimit} />
-        )}
       </main>
 
       <Footer />

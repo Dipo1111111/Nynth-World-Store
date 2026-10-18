@@ -12,6 +12,9 @@ export default function WhatsAppButton() {
   const { pathname } = useLocation();
   const { settings } = useSettings();
   if (pathname.startsWith("/admin")) return null;
+  // The chat button stays off the landing page. It appears once somebody
+  // enters any page of the store (shop, product, tickets, ...).
+  if (pathname === "/" || pathname === "/home") return null;
   const raw = typeof settings?.support_whatsapp === "string" ? settings.support_whatsapp : "";
   const number = raw.replace(/[^0-9]/g, "");
 

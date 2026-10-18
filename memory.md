@@ -5,6 +5,8 @@ Last updated: 2026-10-17 17:50 (Africa/Lagos)
 ## Recurring context
 
 - Founder and owner: Newman (09137207918). Owner alerts: newmanyange14@gmail.com, nynthworld@gmail.com, primebusiness54@gmail.com. Newman sends fragmented WhatsApp and voicemail requirements; interpret them into concrete edits. Dipo (the user) approves before ambiguous batches go out.
+- Newman reads in light mode and finds the dark admin hard to read. Admin defaults to light now, remembered per browser in `nynth_admin_theme`.
+- Newman's landing vision (mockup, 17 Oct 2026): white page, NYNTH wordmark and STAY ABOVE centred top, two rounded cards on white with red NYNTH WORLD STORE and TICKET STORE labels beneath, then company line, EST. 2022, and FOUNDED BY NEWMAN YANGE / By Winners, For Winners. He references bolapsd.xyz as the vision for the ticketing poster grid. He says "you can add some special features" but the vision is the vision.
 - Newman's design line: "Easy, clean, minimal, but exceptional."
 - Stack: React 18 + Vite + Tailwind v4 + react-router-dom v7, frontend in `frontend/nynth-ecom`, backend fully Supabase (`cybcooychgicsnjeummo`), Paystack, Resend, Cloudinary, Vercel.
 - `src/api/firebaseFunctions.js` is a one-line alias over `supabaseFunctions.js`. Imports still say firebaseFunctions; that is intentional, do not rename.
@@ -21,6 +23,7 @@ Last updated: 2026-10-17 17:50 (Africa/Lagos)
 
 ## Hard rules (do not break)
 
+- **THE LANDING PAGE IS MOSTLY WHITE AND IS NEVER DARK.** Newman's words, 17 Oct 2026: "NEVER EVER, UNLESS EXPLICITLY MENTIONED, CHANGE THE LANDING PAGE TO DARK MODE. THE PAGE IS MOSTLY WHITE. NEVER USE THAT." This is standing and unconditional until Newman says otherwise in so many words. There is no dark landing and no dark-mode toggle on it. `src/pages/Landing.test.js` fails the build if a dark surface, a photo scrim or a theme switch comes back. Checked non-vacuous: run against the old dark design it fails five tests. An earlier full-bleed dark split panel was exactly what he rejected, so do not reintroduce that pattern.
 - No em dashes anywhere, in copy, code, or commits.
 - No `style={{}}` in new code except dnd-kit in Products.jsx.
 - No new npm dependencies without asking.
@@ -61,6 +64,11 @@ the dropped test-ticket gate (a3dff90) and the ungated CRUD buttons (7edc426). T
 
 ## Problems solved
 
+- **Landing page was dark, which is exactly what the founder rejected.** The first build was a full-bleed dark split panel with a black overlay. Rebuilt to his mockup and locked the rule with `Landing.test.js`.
+- **A theme switch alone would have done nothing for the admin.** 835 hardcoded ink hexes across 17 admin files ignored any token change. Converted all of them to `--admin-*` semantic tokens so `.admin-app[data-theme=light]` actually moves the whole back office.
+- Caught a bug in my own first `useAdminTheme`: the floating AdminLayout switch and the Settings Appearance switch are separate components, so independent state meant whichever re-rendered last silently reverted the other. Fixed with one module-level owner plus a subscriber list, guarded by a test.
+- Verified empirically that Tailwind v4 emits `color-mix` for opacity modifiers on CSS-var arbitrary values (`text-[var(--x)]/55`) before relying on it for 835 conversions. It does.
+- Two self-inflicted regex bugs: an alpha lookahead that did not consume, producing `/70/70` classes; and a `bg-black` match that flagged the permitted 2% hairline tint. Both fixed by making the assertions precise rather than loosening them.
 - Supabase 502 outage mid-session. Fell back to the management API, then resumed when it recovered.
 - **The Check-In rewrite silently dropped the test-ticket gate.** Replacing the client-side `isTest` check with `verify_ticket_entry()` did not carry the rule into the function, so a Paystack test ticket became admissible. Every ticket in the DB is test traffic, so this was wide open. Fixed in the function (migration `20261017190000_verify_ticket_blocks_test.sql`, is_test checked before the paid check) and the test panel was restored in CheckIn.jsx. `permissions.wiring.test.js` guards it. Lesson: when a rewrite moves a rule from the client into a function, enumerate the rules the client used to enforce and move each one.
 - Broadening admin routes from founder-only to permission-based exposed Add/Edit/Delete/status/send-email buttons to Vice Admins. Postgres always blocked them, but the brief's "monitor, not edit" means the buttons should be hidden. Gated on `can()` in Products, Orders, DiscountCodes, Subscribers, Lookbooks, plus a `canManageProduct` helper in AuthContext.
@@ -89,11 +97,12 @@ the dropped test-ticket gate (a3dff90) and the ungated CRUD buttons (7edc426). T
 
 ## Next session starts with
 
-- Nothing is blocked. The brief is done. Ask Dipo what to pick up next, or start on:
-  - The external dev's `collections` / drop tool, which has never been reconciled with these permissions and may still write as an admin.
+- Nothing is blocked. Ask Dipo what to pick up next. Likely candidates:
+  - **The ticketing poster grid.** Newman sent bolapsd.xyz as the vision for the ticketing page: big red TICKETS title, two-column grid of portrait event posters, red SOLD OUT badge top-right. `/tickets` exists and already has poster cards with SOLD OUT / EVENT ENDED badges, so it is partly there, but it has not been restyled to that reference. Not confirmed as wanted yet, so check before doing it.
+  - **A real lifestyle photo for the landing store card.** The database has no model or lifestyle shot, only flat product photography on white, so the store card currently shows the red WINNERS tee. Newman should upload the real streetwear photo via Settings > Landing.
+  - Reconciling the external dev's `collections` tool with the new permissions, which may still write as an admin.
   - Adding real staff accounts so the role system can be exercised with more than one person.
-  - Uploading the two landing images from Settings so the split page is not artless.
-  - Paystack is still in TEST mode and the production webhook is not wired in the Paystack dashboard. That is the single biggest gap between this build and real money.
+  - Paystack is still in TEST mode and the production webhook is not wired in the Paystack dashboard. That is still the single biggest gap between this build and real money.
 
 ## Open questions
 
