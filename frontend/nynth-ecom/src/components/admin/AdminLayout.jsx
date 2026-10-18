@@ -19,8 +19,10 @@ import {
     Landmark,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useAdminTheme } from "../../hooks/useAdminTheme";
 import { PAGE_PERMISSIONS } from "../../utils/permissions";
 import Logo from "../common/Logo";
+import { Sun, Moon } from "lucide-react";
 
 // Each item names the permission that opens its page. The founder holds
 // everything, so can() is true for them without a special case here.
@@ -66,6 +68,7 @@ const allowedFor = (item, can) => {
 export default function AdminLayout({ children, title }) {
     const location = useLocation();
     const { logout, can, isAdmin, access } = useAuth();
+    const { theme, toggle } = useAdminTheme();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const roleLabel = isAdmin
@@ -96,11 +99,33 @@ export default function AdminLayout({ children, title }) {
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
-        <div className="min-h-screen admin-app admin-paper flex">
+        // data-theme drives the whole admin token layer. Only the tokens move,
+        // so no page knows or cares which theme is on.
+        <div className="min-h-screen admin-app admin-paper flex" data-theme={theme}>
+            {/* Theme switch. On every admin screen, because reading comfort is
+                not a per-page decision. */}
+            <button
+                type="button"
+                onClick={toggle}
+                aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+                aria-pressed={theme === "light"}
+                title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+                className="fixed top-4 right-4 z-50 inline-flex items-center gap-2 px-3.5 py-2.5 rounded-lg border border-[var(--admin-line)] bg-[var(--admin-surface)] text-[var(--admin-ink)] shadow-card hover:bg-[var(--admin-ink)]/[0.06] transition-all focus-ring"
+            >
+                {theme === "light" ? (
+                    <Sun size={14} className="shrink-0" />
+                ) : (
+                    <Moon size={14} className="shrink-0" />
+                )}
+                <span className="hidden sm:inline text-[9px] font-bold uppercase tracking-[0.2em]">
+                    {theme === "light" ? "Light" : "Dark"}
+                </span>
+            </button>
+
             {/* Sidebar - ink rail */}
             <aside
                 className={`
-                    w-64 bg-[#0b0b0c] text-white fixed inset-y-0 left-0 z-40 flex flex-col
+                    w-64 bg-[var(--admin-page)] text-[var(--admin-ink)] fixed inset-y-0 left-0 z-40 flex flex-col
                     border-r border-white/[0.07]
                     transition-transform duration-300 ease-out md:translate-x-0
                     ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
@@ -109,14 +134,14 @@ export default function AdminLayout({ children, title }) {
                 {/* Brand lockup */}
                 <div className="px-6 pt-7 pb-6 flex items-center justify-between">
                     <Link to="/admin" className="flex items-center gap-3 group">
-                        <Logo size="sm" className="invert" />
-                        <span className="text-[9px] font-bold tracking-[0.4em] text-white/70 group-hover:text-white transition-colors">
+                        <Logo size="sm" className="admin-logo-invert" />
+                        <span className="text-[9px] font-bold tracking-[0.4em] text-[var(--admin-ink)]/70 group-hover:text-[var(--admin-ink)] transition-colors">
                             ADMIN
                         </span>
                     </Link>
                     <button
                         onClick={toggleMobileMenu}
-                        className="md:hidden p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                        className="md:hidden p-2 text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-ink)]/10 rounded-lg transition-all"
                         aria-label="Close menu"
                     >
                         <X size={18} />
@@ -127,7 +152,7 @@ export default function AdminLayout({ children, title }) {
                 <nav className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto scrollbar-hide">
                     {groups.map((group) => (
                         <div key={group.label}>
-                            <p className="px-3 mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-white/30">
+                            <p className="px-3 mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/30">
                                 {group.label}
                             </p>
                             <div className="space-y-0.5">
@@ -140,8 +165,8 @@ export default function AdminLayout({ children, title }) {
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ease-out ${
                                                 active
-                                                    ? "bg-[#0a0a0a] text-[#EDEAE2] shadow-card"
-                                                    : "text-white/55 hover:text-white hover:bg-white/[0.14] hover:translate-x-0.5"
+                                                    ? "bg-[var(--admin-surface)] text-[var(--admin-ink)] shadow-card"
+                                                    : "text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.14] hover:translate-x-0.5"
                                             }`}
                                         >
                                             <item.icon
@@ -159,28 +184,28 @@ export default function AdminLayout({ children, title }) {
                 </nav>
 
                 {/* Footer */}
-                <div className="px-4 pb-5 pt-3 border-t border-white/10">
+                <div className="px-4 pb-5 pt-3 border-t border-[var(--admin-ink)]/10">
                     <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-lg bg-white/[0.06]">
-                        <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-[11px] font-bold tracking-wider shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-[var(--admin-ink)]/15 flex items-center justify-center text-[11px] font-bold tracking-wider shrink-0">
                             {initials}
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="text-[12px] font-semibold truncate">{access?.full_name || "Administrator"}</p>
-                            <p className="text-[10px] text-white/45 flex items-center gap-1 truncate">
+                            <p className="text-[10px] text-[var(--admin-ink)]/45 flex items-center gap-1 truncate">
                                 <ShieldCheck size={11} className="shrink-0" /> {roleLabel}
                             </p>
                         </div>
                     </div>
                     <Link
                         to="/"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-white/55 hover:text-white hover:bg-white/[0.14] transition-all duration-150"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.14] transition-all duration-150"
                     >
                         <Home size={16} strokeWidth={1.8} />
                         View Store
                     </Link>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-white/55 hover:text-white hover:bg-white/[0.14] transition-all duration-150"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.14] transition-all duration-150"
                     >
                         <LogOut size={16} strokeWidth={1.8} />
                         Sign Out
@@ -199,14 +224,16 @@ export default function AdminLayout({ children, title }) {
             {/* Content layer */}
             <div className="flex-1 md:ml-64 flex flex-col min-h-screen min-w-0">
                 {/* Mobile header */}
-                <header className="sticky top-0 z-30 md:hidden flex items-center justify-between px-4 py-3 bg-[#0c0c0c] text-white shadow-card">
+                {/* pr-16 keeps the fixed theme button from sitting on the
+                    hamburger on small screens. */}
+                <header className="sticky top-0 z-30 md:hidden flex items-center justify-between px-4 py-3 pr-16 bg-[var(--admin-page)] text-[var(--admin-ink)] shadow-card">
                     <Link to="/admin" className="flex items-center gap-2">
-                        <Logo size="sm" className="invert h-5" />
-                        <span className="text-[8px] font-bold tracking-[0.3em] text-white/70">ADMIN</span>
+                        <Logo size="sm" className="admin-logo-invert h-5" />
+                        <span className="text-[8px] font-bold tracking-[0.3em] text-[var(--admin-ink)]/70">ADMIN</span>
                     </Link>
                     <button
                         onClick={toggleMobileMenu}
-                        className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                        className="p-2 text-[var(--admin-ink)]/70 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-ink)]/10 rounded-lg transition-all"
                         aria-label="Toggle menu"
                     >
                         <Menu size={20} />

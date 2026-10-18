@@ -69,7 +69,7 @@ const TestBadge = () => (
 );
 
 const ETicketBadge = () => (
-    <span className="bg-white/10 text-[#EDEAE2]/75 border border-white/10 text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+    <span className="bg-[var(--admin-ink)]/10 text-[var(--admin-ink)]/75 border border-[var(--admin-ink)]/10 text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
 );
 
 const PaymentStatusDropdown = ({ status, onStatusChange }) => {
@@ -98,7 +98,7 @@ const PaymentStatusDropdown = ({ status, onStatusChange }) => {
     );
 };
 
-const SECTION_LABEL = "text-[11px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/60 mb-4 flex items-center gap-2";
+const SECTION_LABEL = "text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60 mb-4 flex items-center gap-2";
 
 const Orders = () => {
     // Reading orders is one permission, changing them is another.
@@ -300,13 +300,13 @@ const Orders = () => {
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                     <div className="min-w-0">
                         <div className="flex items-baseline gap-2">
-                            <span className="text-2xl md:text-3xl text-[#EDEAE2]/55 font-semibold leading-none">₦</span>
+                            <span className="text-2xl md:text-3xl text-[var(--admin-ink)]/55 font-semibold leading-none">₦</span>
                             <span
                                 ref={revenueRef}
-                                className="text-[40px] md:text-[56px] leading-none font-extrabold tracking-[-0.03em] tabular-nums text-[#EDEAE2]"
+                                className="text-[40px] md:text-[56px] leading-none font-extrabold tracking-[-0.03em] tabular-nums text-[var(--admin-ink)]"
                             >0</span>
                         </div>
-                        <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#EDEAE2]/42">
+                        <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[var(--admin-ink)]/42">
                             Net revenue · paid · live orders
                         </p>
                     </div>
@@ -314,12 +314,12 @@ const Orders = () => {
                     <div className="flex items-stretch overflow-x-auto pb-1 lg:pb-0 -mb-1 lg:mb-0">
                         {secondaryMetrics.map((m, i) => (
                             <React.Fragment key={m.label}>
-                                {i > 0 && <div className="mx-6 md:mx-9 w-px shrink-0 self-stretch bg-white/10" />}
+                                {i > 0 && <div className="mx-6 md:mx-9 w-px shrink-0 self-stretch bg-[var(--admin-ink)]/10" />}
                                 <div className="shrink-0">
-                                    <p className="text-3xl md:text-4xl font-extrabold leading-none tracking-[-0.02em] tabular-nums text-[#EDEAE2]">
+                                    <p className="text-3xl md:text-4xl font-extrabold leading-none tracking-[-0.02em] tabular-nums text-[var(--admin-ink)]">
                                         <span ref={m.ref}>0</span>
                                     </p>
-                                    <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[#EDEAE2]/42">
+                                    <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--admin-ink)]/42">
                                         {m.label}
                                     </p>
                                 </div>
@@ -346,11 +346,11 @@ const Orders = () => {
                     </div>
 
                     <div className="flex-1 min-w-[200px] relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EDEAE2]/42" size={17} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-ink)]/42" size={17} />
                         <input
                             type="text"
                             placeholder="Search by order ID or customer..."
-                            className="w-full pl-10 pr-4 py-2 bg-[#0a0a0a] border border-white/14 rounded-lg text-sm focus-ring placeholder:text-[#EDEAE2]/42"
+                            className="w-full pl-10 pr-4 py-2 bg-[var(--admin-surface)] border border-[var(--admin-ink)]/14 rounded-lg text-sm focus-ring placeholder:text-[var(--admin-ink)]/42"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -398,12 +398,12 @@ const Orders = () => {
                                 aria-pressed={active}
                                 className={`shrink-0 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors focus-ring ${
                                     active
-                                        ? "text-[#EDEAE2] border-b-2 border-[#EDEAE2]"
-                                        : "text-[#EDEAE2]/42 hover:text-[#EDEAE2]/75 border-b-2 border-transparent"
+                                        ? "text-[var(--admin-ink)] border-b-2 border-[var(--admin-accent)]"
+                                        : "text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)]/75 border-b-2 border-transparent"
                                 }`}
                             >
                                 {s.label}
-                                <span className={`ml-1.5 tabular-nums font-medium ${active ? "text-[#EDEAE2]/65" : "text-[#EDEAE2]/40"}`}>
+                                <span className={`ml-1.5 tabular-nums font-medium ${active ? "text-[var(--admin-ink)]/65" : "text-[var(--admin-ink)]/40"}`}>
                                     {statusCounts[s.value] || 0}
                                 </span>
                             </button>
@@ -415,36 +415,36 @@ const Orders = () => {
             {loading ? (
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-2 border-white/18 border-t-white/18 mx-auto mb-4"></div>
-                        <p className="text-[#EDEAE2]/55">Loading orders...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--admin-ink)]/18 border-t-white/18 mx-auto mb-4"></div>
+                        <p className="text-[var(--admin-ink)]/55">Loading orders...</p>
                     </div>
                 </div>
             ) : filteredOrders.length === 0 ? (
-                <Card className="border-white/10">
+                <Card className="border-[var(--admin-ink)]/10">
                     <CardContent className="flex flex-col items-center justify-center py-16">
                         <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
-                            <Package className="h-8 w-8 text-[#EDEAE2]/35" />
+                            <Package className="h-8 w-8 text-[var(--admin-ink)]/35" />
                         </div>
                         <h3 className="text-lg font-medium mb-2">No orders found</h3>
-                        <p className="text-[#EDEAE2]/55 text-sm">Try adjusting your search or filters.</p>
+                        <p className="text-[var(--admin-ink)]/55 text-sm">Try adjusting your search or filters.</p>
                         {testFilter === "live" && orders.some((o) => o.isTest) && (
-                            <p className="text-xs text-[#EDEAE2]/42 mt-3 max-w-sm text-center">
+                            <p className="text-xs text-[var(--admin-ink)]/42 mt-3 max-w-sm text-center">
                                 {orders.filter((o) => o.isTest).length} TEST order{orders.filter((o) => o.isTest).length === 1 ? "" : "s"} are hidden - switch the filter to
-                                <span className="text-[#EDEAE2]/65 font-medium"> Test orders </span>or<span className="text-[#EDEAE2]/65 font-medium"> All orders </span>to see them.
+                                <span className="text-[var(--admin-ink)]/65 font-medium"> Test orders </span>or<span className="text-[var(--admin-ink)]/65 font-medium"> All orders </span>to see them.
                             </p>
                         )}
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="border-white/10">
+                <Card className="border-[var(--admin-ink)]/10">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div className="flex items-baseline gap-3">
                             <CardTitle className="text-sm md:text-base uppercase tracking-[0.16em]">Orders</CardTitle>
-                            <span className="text-xs tabular-nums font-bold text-[#EDEAE2]/42">
+                            <span className="text-xs tabular-nums font-bold text-[var(--admin-ink)]/42">
                                 {filteredOrders.length}
                             </span>
                         </div>
-                        <p className="text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest hidden sm:block">
+                        <p className="text-[10px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest hidden sm:block">
                             Realtime · live feed
                         </p>
                     </CardHeader>
@@ -455,12 +455,12 @@ const Orders = () => {
                                     const isExpanded = expandedOrders.has(order.id);
                                     const needsAction = (order.payment_status === 'paid' || order.payment_status === 'success') && !['packaging', 'shipped', 'delivered', 'cancelled'].includes(order.order_status || 'pending');
                                     return (
-                                        <div key={order.id} className="p-4 bg-[#0a0a0a] flex flex-col gap-3">
+                                        <div key={order.id} className="p-4 bg-[var(--admin-surface)] flex flex-col gap-3">
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="flex items-center gap-2 min-w-0 flex-1">
                                                 <button
                                                     onClick={() => toggleOrderExpansion(order.id)}
-                                                    className="w-11 h-11 rounded-lg bg-white/[0.09] flex items-center justify-center text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors shrink-0"
+                                                    className="w-11 h-11 rounded-lg bg-white/[0.09] flex items-center justify-center text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors shrink-0"
                                                     aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                 >
                                                     {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -474,7 +474,7 @@ const Orders = () => {
                                                     </div>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <PaymentStatusBadge status={order.payment_status || 'pending'} />
-                                                        <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest truncate">
+                                                        <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest truncate">
                                                             {order.created_at?.seconds ? new Date(order.created_at.seconds * 1000).toLocaleDateString() : 'N/A'}
                                                         </p>
                                                     </div>
@@ -490,7 +490,7 @@ const Orders = () => {
                                                         onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
                                                     />
                                                     ) : (
-                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.order_status}</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.order_status}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -508,13 +508,13 @@ const Orders = () => {
                                                         </h4>
                                                         <div className="space-y-2">
                                                             {order.items?.map((item, idx) => (
-                                                                <div key={idx} className="flex gap-3 p-3 bg-white/[0.05] rounded-lg border border-white/10">
-                                                                    <div className="w-14 h-16 bg-[#0a0a0a] rounded overflow-hidden flex-shrink-0 border border-white/10">
+                                                                <div key={idx} className="flex gap-3 p-3 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
+                                                                    <div className="w-14 h-16 bg-[var(--admin-surface)] rounded overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
                                                                         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                     </div>
                                                                     <div className="flex-1 min-w-0">
-                                                                        <p className="font-medium text-xs text-[#EDEAE2]/90 truncate">{item.name || item.title}</p>
-                                                                        <p className="text-[10px] text-[#EDEAE2]/55 mt-1">
+                                                                        <p className="font-medium text-xs text-[var(--admin-ink)]/90 truncate">{item.name || item.title}</p>
+                                                                        <p className="text-[10px] text-[var(--admin-ink)]/55 mt-1">
                                                                             {item.category === "tickets" ? (
                                                                                 <span className="inline-flex items-center gap-1">
                                                                                     <Ticket size={10} className="shrink-0" />
@@ -524,7 +524,7 @@ const Orders = () => {
                                                                                 `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
                                                                             )}
                                                                         </p>
-                                                                        <p className="text-[10px] text-[#EDEAE2]/55 font-medium mt-1">Qty: {item.quantity}</p>
+                                                                        <p className="text-[10px] text-[var(--admin-ink)]/55 font-medium mt-1">Qty: {item.quantity}</p>
                                                                     </div>
                                                                     <div className="text-right pt-1 flex flex-col justify-between">
                                                                         <p className="font-medium text-sm tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
@@ -534,16 +534,16 @@ const Orders = () => {
                                                         </div>
 
                                                         {order.tickets?.length > 0 && (
-                                                            <div className="mt-3 pt-3 border-t border-white/10">
+                                                            <div className="mt-3 pt-3 border-t border-[var(--admin-ink)]/10">
                                                                 <h4 className={SECTION_LABEL}>
                                                                     <Ticket size={14} />
                                                                     E-Ticket Codes
                                                                 </h4>
                                                                 <div className="space-y-1.5">
                                                                     {order.tickets.map((t, i) => (
-                                                                        <div key={i} className="flex items-center justify-between gap-2 bg-[#0a0a0a] rounded-lg border border-white/10 px-3 py-2">
+                                                                        <div key={i} className="flex items-center justify-between gap-2 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 px-3 py-2">
                                                                             <span className="font-mono text-[11px] font-bold tracking-wider">{t.code}</span>
-                                                                            <span className="text-[9px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest truncate ml-2">{t.title}</span>
+                                                                            <span className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest truncate ml-2">{t.title}</span>
                                                                         </div>
                                                                     ))}
                                                                 </div>
@@ -557,12 +557,12 @@ const Orders = () => {
                                                             <h4 className={SECTION_LABEL}>
                                                                 <MapPin size={14} /> Shipping
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-2">
+                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-2">
                                                                 <p className="font-bold text-xs truncate uppercase">{order.customer?.firstName} {order.customer?.lastName}</p>
-                                                                <p className="text-[11px] text-[#EDEAE2]/65 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
-                                                                <p className="text-[11px] text-[#EDEAE2]/65 uppercase">{order.customer?.city}, {order.customer?.state}</p>
-                                                                <div className="flex items-center gap-2 text-[11px] text-[#EDEAE2]/65 pt-1 border-t border-white/14 mt-2">
-                                                                    <Phone size={12} className="text-[#EDEAE2]/42" />
+                                                                <p className="text-[11px] text-[var(--admin-ink)]/65 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
+                                                                <p className="text-[11px] text-[var(--admin-ink)]/65 uppercase">{order.customer?.city}, {order.customer?.state}</p>
+                                                                <div className="flex items-center gap-2 text-[11px] text-[var(--admin-ink)]/65 pt-1 border-t border-[var(--admin-ink)]/14 mt-2">
+                                                                    <Phone size={12} className="text-[var(--admin-ink)]/42" />
                                                                     <span>{order.customer?.phone}</span>
                                                                 </div>
                                                             </div>
@@ -572,7 +572,7 @@ const Orders = () => {
                                                             <h4 className={SECTION_LABEL}>
                                                                 <CreditCard size={14} /> Payment
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 flex items-center justify-between">
+                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 flex items-center justify-between">
                                                                 <PaymentStatusBadge status={order.payment_status || 'pending'} />
                                                                 {canManageOrders ? (
                                                                   <PaymentStatusDropdown
@@ -580,7 +580,7 @@ const Orders = () => {
                                                                       onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
                                                                   />
                                                                 ) : (
-                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.payment_status}</span>
+                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.payment_status}</span>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -590,16 +590,16 @@ const Orders = () => {
                                                             <h4 className={SECTION_LABEL}>
                                                                 <TrendingUp size={14} /> Summary
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-white/10 space-y-3">
-                                                                <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
+                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
+                                                                <div className="flex justify-between text-[11px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">
                                                                     <span>Subtotal</span>
                                                                     <span className="text-right tabular-nums font-medium">₦{order.subtotal?.toLocaleString()}</span>
                                                                 </div>
-                                                                <div className="flex justify-between text-[11px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">
+                                                                <div className="flex justify-between text-[11px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">
                                                                     <span>Shipping</span>
                                                                     <span className="text-right tabular-nums font-medium">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
                                                                 </div>
-                                                                <div className="flex justify-between items-baseline font-bold pt-3 border-t border-white/14">
+                                                                <div className="flex justify-between items-baseline font-bold pt-3 border-t border-[var(--admin-ink)]/14">
                                                                     <span className="text-[11px] uppercase tracking-widest">Total</span>
                                                                     <span className="text-right text-lg font-extrabold tabular-nums tracking-tight">₦{order.total?.toLocaleString()}</span>
                                                                 </div>
@@ -618,17 +618,17 @@ const Orders = () => {
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full admin-table">
                                 <thead>
-                                    <tr className="border-b border-white/10">
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 w-12"></th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Order</th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hidden xl:table-cell">Customer</th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Status</th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Payment</th>
-                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hidden sm:table-cell">Date</th>
-                                        <th className="px-4 md:px-6 py-3 text-right text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Total</th>
+                                    <tr className="border-b border-[var(--admin-ink)]/10">
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 w-12"></th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Order</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hidden xl:table-cell">Customer</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Status</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Payment</th>
+                                        <th className="px-4 md:px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hidden sm:table-cell">Date</th>
+                                        <th className="px-4 md:px-6 py-3 text-right text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-[#0a0a0a]">
+                                <tbody className="bg-[var(--admin-surface)]">
                                     {filteredOrders.map((order) => {
                                         const isExpanded = expandedOrders.has(order.id);
                                         const needsAction = (order.payment_status === 'paid' || order.payment_status === 'success') && !['packaging', 'shipped', 'delivered', 'cancelled'].includes(order.order_status || 'pending');
@@ -638,7 +638,7 @@ const Orders = () => {
                                                     <td className="px-4 md:px-6 py-4">
                                                         <button
                                                             onClick={() => toggleOrderExpansion(order.id)}
-                                                            className="text-[#EDEAE2]/42 hover:text-[#EDEAE2]/65 transition-colors p-2 -m-2"
+                                                            className="text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)]/65 transition-colors p-2 -m-2"
                                                             aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                         >
                                                             {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
@@ -653,8 +653,8 @@ const Orders = () => {
                                                         </div>
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap hidden xl:table-cell">
-                                                        <p className="font-medium text-sm text-[#EDEAE2]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
-                                                        <p className="text-xs text-[#EDEAE2]/45">{order.customer?.email}</p>
+                                                        <p className="font-medium text-sm text-[var(--admin-ink)]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                                        <p className="text-xs text-[var(--admin-ink)]/45">{order.customer?.email}</p>
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         {canManageOrders ? (
@@ -664,13 +664,13 @@ const Orders = () => {
                                                               onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
                                                           />
                                                         ) : (
-                                                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.order_status}</span>
+                                                          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.order_status}</span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <PaymentStatusBadge status={order.payment_status || 'pending'} />
                                                     </td>
-                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-[#EDEAE2]/55 tabular-nums hidden sm:table-cell">
+                                                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-[var(--admin-ink)]/55 tabular-nums hidden sm:table-cell">
                                                         {order.created_at?.seconds
                                                             ? new Date(order.created_at.seconds * 1000).toLocaleDateString('en-US', {
                                                                 year: 'numeric',
@@ -697,13 +697,13 @@ const Orders = () => {
                                                                     </h4>
                                                                     <div className="space-y-3">
                                                                         {order.items?.map((item, idx) => (
-                                                                            <div key={idx} className="flex gap-4 p-3 bg-[#0a0a0a] rounded-lg border border-white/10">
-                                                                                <div className="w-16 h-20 bg-[#0a0a0a] rounded overflow-hidden flex-shrink-0 border border-white/10">
+                                                                            <div key={idx} className="flex gap-4 p-3 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10">
+                                                                                <div className="w-16 h-20 bg-[var(--admin-surface)] rounded overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
                                                                                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                                 </div>
                                                                                 <div className="flex-1 min-w-0">
-                                                                                    <p className="font-medium text-sm text-[#EDEAE2]/90 truncate">{item.name || item.title}</p>
-                                                                                    <p className="text-xs text-[#EDEAE2]/55 mt-1">
+                                                                                    <p className="font-medium text-sm text-[var(--admin-ink)]/90 truncate">{item.name || item.title}</p>
+                                                                                    <p className="text-xs text-[var(--admin-ink)]/55 mt-1">
                                                                                         {item.category === "tickets" ? (
                                                                                             <span className="inline-flex items-center gap-1">
                                                                                                 <Ticket size={10} className="shrink-0" />
@@ -713,7 +713,7 @@ const Orders = () => {
                                                                                             `${item.size || item.selectedSize} / ${item.color || item.selectedColor}`
                                                                                         )}
                                                                                     </p>
-                                                                                    <p className="text-xs text-[#EDEAE2]/55">Qty: {item.quantity}</p>
+                                                                                    <p className="text-xs text-[var(--admin-ink)]/55">Qty: {item.quantity}</p>
                                                                                 </div>
                                                                                 <div className="text-right">
                                                                                     <p className="font-medium text-sm tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
@@ -723,16 +723,16 @@ const Orders = () => {
                                                                     </div>
 
                                                                     {order.tickets?.length > 0 && (
-                                                                        <div className="mt-6 pt-5 border-t border-white/10">
+                                                                        <div className="mt-6 pt-5 border-t border-[var(--admin-ink)]/10">
                                                                             <h4 className={`${SECTION_LABEL}`}>
                                                                                 <Ticket size={15} />
                                                                                 E-Ticket Codes
                                                                             </h4>
                                                                             <div className="space-y-2">
                                                                                 {order.tickets.map((t, i) => (
-                                                                                    <div key={i} className="flex items-center justify-between gap-3 bg-[#0a0a0a] rounded-lg border border-white/10 px-3 py-2.5">
+                                                                                    <div key={i} className="flex items-center justify-between gap-3 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 px-3 py-2.5">
                                                                                         <span className="font-mono text-xs font-bold tracking-wider">{t.code}</span>
-                                                                                        <span className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest truncate">{t.title}</span>
+                                                                                        <span className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest truncate">{t.title}</span>
                                                                                     </div>
                                                                                 ))}
                                                                             </div>
@@ -747,11 +747,11 @@ const Orders = () => {
                                                                             <MapPin size={15} />
                                                                             Shipping
                                                                         </h4>
-                                                                        <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-2">
-                                                                            <p className="font-medium text-sm text-[#EDEAE2]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
-                                                                            <p className="text-sm text-[#EDEAE2]/65">{order.customer?.address}</p>
-                                                                            <p className="text-sm text-[#EDEAE2]/65">{order.customer?.city}, {order.customer?.state}</p>
-                                                                            <p className="text-sm text-[#EDEAE2]/65">{order.customer?.country}</p>
+                                                                        <div className="p-4 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 space-y-2">
+                                                                            <p className="font-medium text-sm text-[var(--admin-ink)]/90">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                                                            <p className="text-sm text-[var(--admin-ink)]/65">{order.customer?.address}</p>
+                                                                            <p className="text-sm text-[var(--admin-ink)]/65">{order.customer?.city}, {order.customer?.state}</p>
+                                                                            <p className="text-sm text-[var(--admin-ink)]/65">{order.customer?.country}</p>
                                                                             {order.customer?.deliveryDate && (
                                                                                 <p className="text-sm text-emerald-400/90 pt-1">
                                                                                     Preferred: {new Date(`${order.customer.deliveryDate}T00:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
@@ -766,10 +766,10 @@ const Orders = () => {
                                                                             <User size={15} />
                                                                             Contact
                                                                         </h4>
-                                                                        <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-3">
+                                                                        <div className="p-4 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
                                                                             <div className="flex items-center justify-between gap-3">
                                                                                 <div className="flex items-center gap-2 text-sm min-w-0">
-                                                                                    <Mail size={14} className="text-[#EDEAE2]/42 shrink-0" />
+                                                                                    <Mail size={14} className="text-[var(--admin-ink)]/42 shrink-0" />
                                                                                     <span className="truncate">{order.customer?.email}</span>
                                                                                 </div>
                                                                                 {order.customer?.email && (
@@ -778,14 +778,14 @@ const Orders = () => {
                                                                                             e.stopPropagation();
                                                                                             window.location.href = `mailto:${order.customer?.email}?subject=Your Nynth World Order #${order.id.slice(0, 8)}&body=Dear ${order.customer?.firstName},%0D%0A%0D%0ACongratulations on your order!`
                                                                                         }}
-                                                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.11] hover:bg-white/[0.15] text-[#EDEAE2] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
+                                                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.11] hover:bg-white/[0.15] text-[var(--admin-ink)] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
                                                                                     >
                                                                                         <Mail size={12} /> Email Buyer
                                                                                     </button>
                                                                                 )}
                                                                             </div>
                                                                             <div className="flex items-center gap-2 text-sm">
-                                                                                <Phone size={14} className="text-[#EDEAE2]/42" />
+                                                                                <Phone size={14} className="text-[var(--admin-ink)]/42" />
                                                                                 <span>{order.customer?.phone}</span>
                                                                             </div>
                                                                         </div>
@@ -796,9 +796,9 @@ const Orders = () => {
                                                                             <CreditCard size={15} />
                                                                             Status & Money
                                                                         </h4>
-                                                                        <div className="p-4 bg-[#0a0a0a] rounded-lg border border-white/10 space-y-3">
+                                                                        <div className="p-4 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
                                                                             <div className="flex justify-between items-center text-sm">
-                                                                                <span className="text-[#EDEAE2]/55">Fulfillment</span>
+                                                                                <span className="text-[var(--admin-ink)]/55">Fulfillment</span>
                                                                                 {canManageOrders ? (
                                                                                   <StatusDropdown
                                                                                       orderId={order.id}
@@ -806,32 +806,32 @@ const Orders = () => {
                                                                                       onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
                                                                                   />
                                                                                 ) : (
-                                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.order_status}</span>
+                                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.order_status}</span>
                                                                                 )}
                                                                             </div>
                                                                             <div className="flex justify-between items-center text-sm pt-3 border-t border-white/[0.06]">
-                                                                                <span className="text-[#EDEAE2]/55">Payment</span>
+                                                                                <span className="text-[var(--admin-ink)]/55">Payment</span>
                                                                                 {canManageOrders ? (
                                                                                   <PaymentStatusDropdown
                                                                                       status={order.payment_status || 'pending'}
                                                                                       onStatusChange={(next) => handlePaymentStatusChange(order.id, next)}
                                                                                   />
                                                                                 ) : (
-                                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/45">{order.payment_status}</span>
+                                                                                  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.payment_status}</span>
                                                                                 )}
                                                                             </div>
                                                                             <div className="space-y-2 pt-3 border-t border-white/[0.06]">
-                                                                                <div className="flex justify-between text-xs text-[#EDEAE2]/55">
+                                                                                <div className="flex justify-between text-xs text-[var(--admin-ink)]/55">
                                                                                     <span>Subtotal</span>
                                                                                     <span className="tabular-nums">₦{order.subtotal?.toLocaleString()}</span>
                                                                                 </div>
-                                                                                <div className="flex justify-between text-xs text-[#EDEAE2]/55">
+                                                                                <div className="flex justify-between text-xs text-[var(--admin-ink)]/55">
                                                                                     <span>Shipping</span>
                                                                                     <span className="tabular-nums">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
                                                                                 </div>
-                                                                                <div className="flex justify-between items-baseline pt-3 border-t border-white/14">
-                                                                                    <span className="text-[11px] font-bold uppercase tracking-widest text-[#EDEAE2]/80">Total</span>
-                                                                                    <span className="text-right text-xl font-extrabold tabular-nums tracking-tight text-[#EDEAE2]">₦{order.total?.toLocaleString()}</span>
+                                                                                <div className="flex justify-between items-baseline pt-3 border-t border-[var(--admin-ink)]/14">
+                                                                                    <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/80">Total</span>
+                                                                                    <span className="text-right text-xl font-extrabold tabular-nums tracking-tight text-[var(--admin-ink)]">₦{order.total?.toLocaleString()}</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

@@ -115,14 +115,14 @@ export default function AdminLookbooks() {
  {/* Action Bar */}
  <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">Editorial Archive</p>
- <h2 className="text-2xl font-bold text-[#EDEAE2]">Gallery</h2>
- <p className="text-[#EDEAE2]/42 text-sm mt-1">Manage your editorial imagery.</p>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">Editorial Archive</p>
+ <h2 className="text-2xl font-bold text-[var(--admin-ink)]">Gallery</h2>
+ <p className="text-[var(--admin-ink)]/42 text-sm mt-1">Manage your editorial imagery.</p>
  </div>
  <div className="flex gap-3">
  <button
  onClick={() => loadLookbooks(true)}
- className="focus-ring px-5 py-2.5 border border-white/14 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.05] transition-all active:scale-[0.98]"
+ className="focus-ring px-5 py-2.5 border border-[var(--admin-ink)]/14 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.05] transition-all active:scale-[0.98]"
  >
  Refresh
  </button>
@@ -145,12 +145,12 @@ export default function AdminLookbooks() {
  ))}
  </div>
  ) : lookbooks.length === 0 ? (
- <div className="bg-[#0a0a0a] border border-dashed border-white/22 rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-card">
+ <div className="bg-[var(--admin-surface)] border border-dashed border-[var(--admin-ink)]/22 rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-card">
  <div className="w-16 h-16 bg-white/[0.09] rounded-2xl flex items-center justify-center mb-6">
- <Upload className="w-8 h-8 text-[#EDEAE2]/35" />
+ <Upload className="w-8 h-8 text-[var(--admin-ink)]/35" />
  </div>
- <h3 className="text-xl font-bold text-[#EDEAE2] mb-2">No Looks Found</h3>
- <p className="text-[#EDEAE2]/42 text-sm mb-8">Start by adding your first visual to the collection.</p>
+ <h3 className="text-xl font-bold text-[var(--admin-ink)] mb-2">No Looks Found</h3>
+ <p className="text-[var(--admin-ink)]/42 text-sm mb-8">Start by adding your first visual to the collection.</p>
  {canManageLookbooks && (
  <button
  onClick={() => setIsModalOpen(true)}
@@ -164,14 +164,14 @@ export default function AdminLookbooks() {
  ) : (
  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
  {lookbooks.map((look) => (
- <div key={look.id} className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover relative group aspect-[3/4]">
+ <div key={look.id} className="bg-[var(--admin-surface)] border border-[var(--admin-ink)]/10 rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover relative group aspect-[3/4]">
  <img src={look.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
 
  {/* Persistent Delete Button for Mobile/Desktop Accessibility */}
  {canManageLookbooks && (
  <button
  onClick={() => setDeleteConfirmId(look.id)}
- className="absolute bottom-3 right-3 bg-[#0a0a0a]/90 backdrop-blur-sm text-rose-300 p-2.5 rounded-lg shadow-card hover:bg-white/15 hover:scale-110 active:scale-90 transition-all duration-300 z-10"
+ className="absolute bottom-3 right-3 bg-[var(--admin-surface)]/90 backdrop-blur-sm text-rose-300 p-2.5 rounded-lg shadow-card hover:bg-[var(--admin-ink)]/15 hover:scale-110 active:scale-90 transition-all duration-300 z-10"
  aria-label="Delete Look"
  >
  <Trash2 size={16} />
@@ -193,11 +193,11 @@ export default function AdminLookbooks() {
  }
  }}
  >
- <div className="bg-[#0a0a0a] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-white/10 my-auto">
+ <div className="bg-[var(--admin-surface)] rounded-2xl w-full max-w-lg p-8 shadow-raised animate-in zoom-in-95 duration-300 border border-[var(--admin-ink)]/10 my-auto">
  <div className="flex justify-between items-center mb-8">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">New Editorial Image</p>
- <h2 className="text-2xl font-bold text-[#EDEAE2]">Upload Visual</h2>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">New Editorial Image</p>
+ <h2 className="text-2xl font-bold text-[var(--admin-ink)]">Upload Visual</h2>
  </div>
  <button onClick={() => setIsModalOpen(false)} className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg transition-colors">
  <X size={20} />
@@ -205,7 +205,7 @@ export default function AdminLookbooks() {
  </div>
 
  <form onSubmit={handleSubmit} className="space-y-8">
- <div className="border-2 border-dashed border-white/22 rounded-2xl p-16 text-center cursor-pointer hover:border-white/45 hover:bg-white/[0.05] transition-all relative group">
+ <div className="border-2 border-dashed border-[var(--admin-ink)]/22 rounded-2xl p-16 text-center cursor-pointer hover:border-[var(--admin-ink)]/45 hover:bg-white/[0.05] transition-all relative group">
  <input
  type="file"
  onChange={handleImageChange}
@@ -220,7 +220,7 @@ export default function AdminLookbooks() {
  <span className="text-sm font-bold uppercase tracking-widest">{formData.image.name}</span>
  </div>
  ) : (
- <div className="flex flex-col items-center text-[#EDEAE2]/35 group-hover:text-[#EDEAE2]/42 transition-colors">
+ <div className="flex flex-col items-center text-[var(--admin-ink)]/35 group-hover:text-[var(--admin-ink)]/42 transition-colors">
  <div className="w-16 h-16 bg-white/[0.09] rounded-2xl flex items-center justify-center mb-6">
  <Plus size={32} />
  </div>
@@ -236,14 +236,14 @@ export default function AdminLookbooks() {
  setIsModalOpen(false);
  resetForm();
  }}
- className="focus-ring flex-1 py-4 border border-white/14 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.05] transition-all"
+ className="focus-ring flex-1 py-4 border border-[var(--admin-ink)]/14 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.05] transition-all"
  >
  Cancel
  </button>
  <button
  type="submit"
  disabled={isSubmitting || !formData.image}
- className="focus-ring flex-[1.5] py-4 bg-[#EDEAE2] text-[#0d0d0f] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black/90 disabled:opacity-20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+ className="focus-ring flex-[1.5] py-4 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black/90 disabled:opacity-20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
  >
  {isSubmitting ? (
  <>
@@ -252,7 +252,7 @@ export default function AdminLookbooks() {
  </>
  ) : (
  <>
- <div className="w-1.5 h-1.5 bg-[#0a0a0a] rounded-lg animate-pulse"></div>
+ <div className="w-1.5 h-1.5 bg-[var(--admin-surface)] rounded-lg animate-pulse"></div>
  <span>Create Look</span>
  </>
  )}
@@ -266,12 +266,12 @@ export default function AdminLookbooks() {
  {/* DELETE CONFIRMATION MODAL */}
  {deleteConfirmId && (
 <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto">
-<div className="bg-[#0a0a0a] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-white/10 my-auto">
+<div className="bg-[var(--admin-surface)] rounded-2xl w-full max-w-sm p-10 text-center shadow-raised animate-in zoom-in-95 duration-200 border border-[var(--admin-ink)]/10 my-auto">
  <div className="w-20 h-20 bg-rose-500/[0.14] rounded-2xl flex items-center justify-center mx-auto mb-8">
  <AlertTriangle className="text-rose-300" size={32} strokeWidth={1.5} />
  </div>
- <h3 className="text-2xl font-bold mb-4 text-[#EDEAE2]">Are you sure?</h3>
- <p className="text-[#EDEAE2]/42 text-sm mb-10 leading-relaxed uppercase tracking-widest font-bold text-[9px]">
+ <h3 className="text-2xl font-bold mb-4 text-[var(--admin-ink)]">Are you sure?</h3>
+ <p className="text-[var(--admin-ink)]/42 text-sm mb-10 leading-relaxed uppercase tracking-widest font-bold text-[9px]">
  This will permanently remove this look from the website.
  </p>
 
@@ -286,7 +286,7 @@ export default function AdminLookbooks() {
  <button
  onClick={() => setDeleteConfirmId(null)}
  disabled={isDeleting}
- className="focus-ring w-full py-4 bg-white/[0.07] text-[#EDEAE2] border border-white/10 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.11] transition-all active:scale-[0.98]"
+ className="focus-ring w-full py-4 bg-white/[0.07] text-[var(--admin-ink)] border border-[var(--admin-ink)]/10 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.11] transition-all active:scale-[0.98]"
  >
  Wait, Go Back
  </button>

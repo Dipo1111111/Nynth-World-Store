@@ -7,13 +7,13 @@ import toast from "react-hot-toast";
 const naira = (v) => `\u20A6${Number(v ?? 0).toLocaleString()}`;
 
 const Stat = ({ label, value, note, icon: Icon }) => (
-  <div className="border border-white/10 rounded-2xl bg-white/[0.03] px-5 py-4">
+  <div className="border border-[var(--admin-ink)]/10 rounded-2xl bg-white/[0.03] px-5 py-4">
     <div className="flex items-center gap-1.5 mb-1.5">
-      {Icon && <Icon size={11} className="text-[#EDEAE2]/35" />}
-      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42">{label}</p>
+      {Icon && <Icon size={11} className="text-[var(--admin-ink)]/35" />}
+      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42">{label}</p>
     </div>
     <p className="text-xl font-extrabold tracking-tight tabular-nums">{value}</p>
-    {note && <p className="text-[10px] text-[#EDEAE2]/40 mt-1">{note}</p>}
+    {note && <p className="text-[10px] text-[var(--admin-ink)]/40 mt-1">{note}</p>}
   </div>
 );
 
@@ -63,7 +63,7 @@ export default function TicketPlatform() {
   return (
     <AdminLayout title="Ticket Platform">
       <div className="max-w-6xl">
-        <p className="text-sm text-[#EDEAE2]/55 mb-8 max-w-2xl">
+        <p className="text-sm text-[var(--admin-ink)]/55 mb-8 max-w-2xl">
           Ticket money is tracked separately from the clothing business. What an organizer sells is
           not NYNTH income: only the commission is. Everything below is live traffic, Paystack test
           orders excluded.
@@ -89,30 +89,30 @@ export default function TicketPlatform() {
             </div>
 
             {finance.length === 0 ? (
-              <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center">
-                <Wallet size={28} className="mx-auto mb-3 text-[#EDEAE2]/25" />
-                <p className="text-sm text-[#EDEAE2]/65">
+              <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-2xl p-12 text-center">
+                <Wallet size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
+                <p className="text-sm text-[var(--admin-ink)]/65">
                   No live ticket sales yet. Figures appear the moment a real ticket is paid for.
                 </p>
               </div>
             ) : (
               <>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42 mb-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-4">
                   By event
                 </p>
                 {/* Desktop */}
-                <div className="hidden md:block bg-[#0a0a0a] rounded-xl border border-white/10 shadow-card overflow-x-auto">
+                <div className="hidden md:block bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card overflow-x-auto">
                   <table className="w-full admin-table">
                     <thead>
-                      <tr className="border-b border-white/10 bg-white/[0.05]">
+                      <tr className="border-b border-[var(--admin-ink)]/10 bg-white/[0.05]">
                         {["Event", "Sold", "In", "Collected", "Fees", "Refunded", "NYNTH cut", "Owed to organizer"].map((h) => (
-                          <th key={h} className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-5 py-3 whitespace-nowrap">
+                          <th key={h} className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-5 py-3 whitespace-nowrap">
                             {h}
                           </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10">
+                    <tbody className="divide-y divide-[var(--admin-ink)]/10">
                       {finance.map((f) => {
                         const owed =
                           Number(f.gross_collected ?? 0) -
@@ -122,10 +122,10 @@ export default function TicketPlatform() {
                           <tr key={f.event_id} className="hover:bg-white/[0.04] transition-colors">
                             <td className="px-5 py-4 text-sm font-bold uppercase">{f.event_title || f.event_id}</td>
                             <td className="px-5 py-4 text-sm tabular-nums">{f.tickets_sold}</td>
-                            <td className="px-5 py-4 text-sm tabular-nums text-[#EDEAE2]/60">{f.tickets_used}</td>
+                            <td className="px-5 py-4 text-sm tabular-nums text-[var(--admin-ink)]/60">{f.tickets_used}</td>
                             <td className="px-5 py-4 text-sm tabular-nums">{naira(f.gross_collected)}</td>
-                            <td className="px-5 py-4 text-sm tabular-nums text-[#EDEAE2]/60">{naira(f.payment_fees)}</td>
-                            <td className="px-5 py-4 text-sm tabular-nums text-[#EDEAE2]/60">{naira(f.refunded)}</td>
+                            <td className="px-5 py-4 text-sm tabular-nums text-[var(--admin-ink)]/60">{naira(f.payment_fees)}</td>
+                            <td className="px-5 py-4 text-sm tabular-nums text-[var(--admin-ink)]/60">{naira(f.refunded)}</td>
                             <td className="px-5 py-4 text-sm tabular-nums text-emerald-300">{naira(f.nynth_commission)}</td>
                             <td className="px-5 py-4 text-sm tabular-nums">{naira(owed)}</td>
                           </tr>
@@ -138,7 +138,7 @@ export default function TicketPlatform() {
                 {/* Mobile */}
                 <div className="md:hidden space-y-3">
                   {finance.map((f) => (
-                    <div key={f.event_id} className="bg-[#0a0a0a] rounded-xl border border-white/10 p-5">
+                    <div key={f.event_id} className="bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 p-5">
                       <p className="text-sm font-bold uppercase mb-3">{f.event_title || f.event_id}</p>
                       <div className="grid grid-cols-2 gap-3">
                         {[
@@ -148,7 +148,7 @@ export default function TicketPlatform() {
                           ["NYNTH cut", naira(f.nynth_commission)],
                         ].map(([l, v]) => (
                           <div key={l}>
-                            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42 mb-1">{l}</p>
+                            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1">{l}</p>
                             <p className="text-sm font-extrabold tabular-nums">{v}</p>
                           </div>
                         ))}

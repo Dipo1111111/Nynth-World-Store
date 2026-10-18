@@ -167,15 +167,15 @@ export default function DiscountCodes() {
  {/* Header */}
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">
- <span className="text-[#EDEAE2]">{activeCount}</span> active · {codes.length} total
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">
+ <span className="text-[var(--admin-ink)]">{activeCount}</span> active · {codes.length} total
  </p>
- <p className="text-sm text-[#EDEAE2]/55">Promo codes applied at checkout.</p>
+ <p className="text-sm text-[var(--admin-ink)]/55">Promo codes applied at checkout.</p>
  </div>
  {canManageCodes && (
  <button
  onClick={() => openModal()}
- className="focus-ring flex items-center gap-2 px-5 py-2.5 bg-[#EDEAE2] text-[#0d0d0f] text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover active:scale-[0.98]"
+ className="focus-ring flex items-center gap-2 px-5 py-2.5 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover active:scale-[0.98]"
  >
  <Plus size={16} />
  Add Code
@@ -189,17 +189,17 @@ export default function DiscountCodes() {
  <Loader2 className="animate-spin text-white/25" size={28} />
  </div>
  ) : codes.length === 0 ? (
- <Card className="border-white/10">
+ <Card className="border-[var(--admin-ink)]/10">
  <CardContent className="flex flex-col items-center justify-center py-20 text-center">
  <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
- <Tag className="text-[#EDEAE2]/35" size={30} />
+ <Tag className="text-[var(--admin-ink)]/35" size={30} />
  </div>
- <p className="text-[#EDEAE2] font-medium mb-1">No discount codes yet</p>
- <p className="text-[#EDEAE2]/42 text-sm mb-6">Create your first promo code to run a campaign.</p>
+ <p className="text-[var(--admin-ink)] font-medium mb-1">No discount codes yet</p>
+ <p className="text-[var(--admin-ink)]/42 text-sm mb-6">Create your first promo code to run a campaign.</p>
  {canManageCodes && (
  <button
  onClick={() => openModal()}
- className="focus-ring flex items-center gap-2 px-6 py-3 bg-[#EDEAE2] text-[#0d0d0f] text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all"
+ className="focus-ring flex items-center gap-2 px-6 py-3 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all"
  >
  <Plus size={15} />
  Create your first code
@@ -214,13 +214,13 @@ export default function DiscountCodes() {
  {codes.map((code) => (
  <div
  key={code.id}
- className={`bg-[#0a0a0a] p-4 rounded-xl border ${
- isExpired(code) ? "border-rose-500/25 opacity-60" : "border-white/10"
+ className={`bg-[var(--admin-surface)] p-4 rounded-xl border ${
+ isExpired(code) ? "border-rose-500/25 opacity-60" : "border-[var(--admin-ink)]/10"
  } shadow-card`}
  >
  <div className="flex items-start justify-between mb-3">
  <div>
- <span className="font-mono font-bold text-sm tracking-wider bg-[#EDEAE2] text-[#0d0d0f] px-2.5 py-1 rounded-lg">
+ <span className="font-mono font-bold text-sm tracking-wider bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-2.5 py-1 rounded-lg">
  {code.code}
  </span>
  <div className="flex items-center gap-2 mt-2 flex-wrap">
@@ -243,13 +243,13 @@ export default function DiscountCodes() {
  Active
  </span>
  ) : (
- <span className="text-[9px] font-bold uppercase tracking-wider text-[#EDEAE2]/55 bg-slate-500/[0.18] px-2 py-0.5 rounded-lg border border-slate-500/30">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 bg-slate-500/[0.18] px-2 py-0.5 rounded-lg border border-slate-500/30">
  Inactive
  </span>
  )}
  </div>
  {code.expiresAt && (
- <p className="text-[10px] text-[#EDEAE2]/42 flex items-center gap-1 mb-3 mt-2">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 flex items-center gap-1 mb-3 mt-2">
  <Calendar size={10} />
  Expires{" "}
   {new Date(code.expiresAt).toLocaleDateString()}
@@ -263,7 +263,7 @@ export default function DiscountCodes() {
  className={`focus-ring flex items-center justify-center gap-1 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  code.isActive
  ? "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
- : "bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30"
+ : "bg-slate-500/[0.18] text-[var(--admin-ink)]/55 border-slate-500/30"
  }`}
  >
  {code.isActive ? (
@@ -275,7 +275,7 @@ export default function DiscountCodes() {
  </button>
  <button
  onClick={() => openModal(code)}
- className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[#EDEAE2]/65 rounded-lg border border-white/10 hover:bg-white/[0.12]"
+ className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[var(--admin-ink)]/65 rounded-lg border border-[var(--admin-ink)]/10 hover:bg-white/[0.12]"
  >
  <Edit2 size={14} />
  </button>
@@ -291,31 +291,31 @@ export default function DiscountCodes() {
  </div>
 
  {/* Desktop Table */}
- <div className="hidden md:block bg-[#0a0a0a] rounded-xl border border-white/10 shadow-card overflow-hidden">
+ <div className="hidden md:block bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card overflow-hidden">
  <table className="w-full admin-table">
  <thead>
- <tr className="border-b border-white/10 bg-white/[0.05]">
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
+ <tr className="border-b border-[var(--admin-ink)]/10 bg-white/[0.05]">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Code
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Type
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Value
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Expires
  </th>
- <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
+ <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Status
  </th>
- <th className="text-right text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 px-6 py-3">
+ <th className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Actions
  </th>
  </tr>
  </thead>
- <tbody className="divide-y divide-white/10">
+ <tbody className="divide-y divide-[var(--admin-ink)]/10">
  {codes.map((code) => (
  <tr
  key={code.id}
@@ -324,7 +324,7 @@ export default function DiscountCodes() {
  }`}
  >
  <td className="px-6 py-4">
- <span className="font-mono font-bold text-sm tracking-wider bg-[#EDEAE2] text-[#0d0d0f] px-2.5 py-1 rounded-lg">
+ <span className="font-mono font-bold text-sm tracking-wider bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-2.5 py-1 rounded-lg">
  {code.code}
  </span>
  </td>
@@ -349,7 +349,7 @@ export default function DiscountCodes() {
  ? `${code.value}%`
  : `₦${Number(code.value).toLocaleString()}`}
  </td>
- <td className="px-6 py-4 text-sm text-[#EDEAE2]/55">
+ <td className="px-6 py-4 text-sm text-[var(--admin-ink)]/55">
   {code.expiresAt
   ? new Date(code.expiresAt).toLocaleDateString()
   : "-"}
@@ -376,7 +376,7 @@ export default function DiscountCodes() {
  className={`focus-ring p-1.5 rounded-lg border transition-colors ${
  code.isActive
  ? "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
- : "bg-slate-500/[0.18] text-[#EDEAE2]/55 border-slate-500/30"
+ : "bg-slate-500/[0.18] text-[var(--admin-ink)]/55 border-slate-500/30"
  }`}
  title={code.isActive ? "Deactivate" : "Activate"}
  >
@@ -388,7 +388,7 @@ export default function DiscountCodes() {
  </button>
  <button
  onClick={() => openModal(code)}
- className="focus-ring p-2 text-[#EDEAE2]/65 hover:text-[#EDEAE2] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-white/10"
+ className="focus-ring p-2 text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-[var(--admin-ink)]/10"
  >
  <Edit2 size={16} />
  </button>
@@ -398,7 +398,7 @@ export default function DiscountCodes() {
  >
  <Trash2 size={16} />
  </button>
- </div> : <span className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/35">View only</span>}
+ </div> : <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35">View only</span>}
  </td>
  </tr>
  ))}
@@ -411,13 +411,13 @@ export default function DiscountCodes() {
  {/* Add / Edit Modal */}
  {isModalOpen && (
 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-<div className="bg-[#0a0a0a] rounded-2xl w-full max-w-md shadow-raised border border-white/10 my-auto">
- <div className="flex items-center justify-between p-6 border-b border-white/10">
+<div className="bg-[var(--admin-surface)] rounded-2xl w-full max-w-md shadow-raised border border-[var(--admin-ink)]/10 my-auto">
+ <div className="flex items-center justify-between p-6 border-b border-[var(--admin-ink)]/10">
  <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-1">
+ <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">
  {editingId ? "Update promo" : "New promo code"}
  </p>
- <h2 className="font-bold text-lg text-[#EDEAE2]">
+ <h2 className="font-bold text-lg text-[var(--admin-ink)]">
  {editingId ? "Edit Code" : "New Code"}
  </h2>
  </div>
@@ -432,7 +432,7 @@ export default function DiscountCodes() {
  <form onSubmit={handleSubmit} className="p-6 space-y-5">
  {/* Code */}
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">
  Discount Code
  </label>
  <input
@@ -442,7 +442,7 @@ export default function DiscountCodes() {
  setForm({ ...form, code: e.target.value.toUpperCase() })
  }
  placeholder="e.g. NYNTH20"
- className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm font-mono font-bold tracking-wider uppercase focus-ring transition-colors"
+ className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg text-sm font-mono font-bold tracking-wider uppercase focus-ring transition-colors"
  required
  />
  </div>
@@ -450,7 +450,7 @@ export default function DiscountCodes() {
  {/* Type + Value */}
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">
  Type
  </label>
  <select
@@ -458,14 +458,14 @@ export default function DiscountCodes() {
  onChange={(e) =>
  setForm({ ...form, type: e.target.value })
  }
- className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors bg-[#0a0a0a] cursor-pointer"
+ className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg text-sm focus-ring transition-colors bg-[var(--admin-surface)] cursor-pointer"
  >
  <option value="percentage">Percentage (%)</option>
  <option value="fixed">Fixed Amount (₦)</option>
  </select>
  </div>
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">
  {form.type === "percentage"
  ? "Percentage Off"
  : "Amount Off (₦)"}
@@ -479,7 +479,7 @@ export default function DiscountCodes() {
  setForm({ ...form, value: e.target.value })
  }
  placeholder={form.type === "percentage" ? "20" : "2000"}
- className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors"
+ className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg text-sm focus-ring transition-colors"
  required
  />
  </div>
@@ -487,7 +487,7 @@ export default function DiscountCodes() {
 
  {/* Expiry */}
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">
  Expiry Date (Optional)
  </label>
  <input
@@ -496,15 +496,15 @@ export default function DiscountCodes() {
  onChange={(e) =>
  setForm({ ...form, expiresAt: e.target.value })
  }
- className="w-full px-4 py-3 border border-white/14 rounded-lg text-sm focus-ring transition-colors"
+ className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg text-sm focus-ring transition-colors"
  />
  </div>
 
  {/* Active Toggle */}
- <div className="flex items-center justify-between py-3 px-4 bg-white/[0.05] rounded-xl border border-white/10">
+ <div className="flex items-center justify-between py-3 px-4 bg-white/[0.05] rounded-xl border border-[var(--admin-ink)]/10">
  <div>
- <span className="text-sm font-medium text-[#EDEAE2] block">Active</span>
- <span className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Code available at checkout</span>
+ <span className="text-sm font-medium text-[var(--admin-ink)] block">Active</span>
+ <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Code available at checkout</span>
  </div>
  <button
  type="button"
@@ -513,11 +513,11 @@ export default function DiscountCodes() {
  }
  aria-label="Toggle active"
  className={`focus-ring p-0.5 rounded-lg transition-colors ${
- form.isActive ? "bg-[#EDEAE2]" : "bg-white/[0.18]"
+ form.isActive ? "bg-[var(--admin-accent)]" : "bg-white/[0.18]"
  }`}
  >
  <div
- className={`w-5 h-5 rounded-lg bg-[#0a0a0a] shadow transition-transform ${
+ className={`w-5 h-5 rounded-lg bg-[var(--admin-surface)] shadow transition-transform ${
  form.isActive ? "translate-x-5" : "translate-x-0"
  }`}
  />
@@ -529,14 +529,14 @@ export default function DiscountCodes() {
  <button
  type="button"
  onClick={closeModal}
- className="focus-ring flex-1 py-3 text-sm font-bold border border-white/18 rounded-lg hover:bg-white/[0.05] transition-colors"
+ className="focus-ring flex-1 py-3 text-sm font-bold border border-[var(--admin-ink)]/18 rounded-lg hover:bg-white/[0.05] transition-colors"
  >
  Cancel
  </button>
  <button
  type="submit"
  disabled={isSubmitting}
- className="focus-ring flex-1 py-3 text-sm font-bold bg-[#EDEAE2] text-[#0d0d0f] rounded-lg hover:bg-[#DBD8CE] shadow-card transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+ className="focus-ring flex-1 py-3 text-sm font-bold bg-[var(--admin-accent)] text-[var(--admin-on-ink)] rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all disabled:opacity-50 flex items-center justify-center gap-2"
  >
  {isSubmitting && <Loader2 size={14} className="animate-spin" />}
  {editingId ? "Save Changes" : "Create Code"}

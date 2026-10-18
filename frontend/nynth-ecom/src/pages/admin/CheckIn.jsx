@@ -20,7 +20,7 @@ const TICKET_CHIP = {
 
 const ENTRY_CHIP = {
   unused: "bg-sky-500/[0.14] text-sky-300 border-sky-500/25",
-  used: "bg-white/[0.07] text-[#EDEAE2]/60 border-white/15",
+  used: "bg-white/[0.07] text-[var(--admin-ink)]/60 border-[var(--admin-ink)]/15",
 };
 
 const Chip = ({ map, value, children }) => (
@@ -115,7 +115,7 @@ const CheckIn = () => {
                     <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300 mb-2">
                         Verification is off for your account
                     </p>
-                    <p className="text-sm text-[#EDEAE2]/60">
+                    <p className="text-sm text-[var(--admin-ink)]/60">
                         Only the founder, an organizer, a ticketing admin or ticketing staff can admit
                         somebody through a door.
                     </p>
@@ -127,16 +127,16 @@ const CheckIn = () => {
     const t = result?.ticket;
     const statuses = t && (
         <div className="grid grid-cols-3 gap-2 mb-5">
-            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/10">
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42 mb-1.5">Payment</p>
+            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-[var(--admin-ink)]/10">
+                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Payment</p>
                 <Chip map={PAYMENT_CHIP} value={t.payment_status ?? "pending"} />
             </div>
-            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/10">
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42 mb-1.5">Ticket</p>
+            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-[var(--admin-ink)]/10">
+                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Ticket</p>
                 <Chip map={TICKET_CHIP} value={t.ticket_status ?? "valid"} />
             </div>
-            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/10">
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42 mb-1.5">Entry</p>
+            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-[var(--admin-ink)]/10">
+                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Entry</p>
                 <Chip map={ENTRY_CHIP} value={t.entry_status ?? "unused"}>
                     {t.entry_status === "used" ? "USED" : "NOT YET USED"}
                 </Chip>
@@ -147,11 +147,11 @@ const CheckIn = () => {
     return (
         <AdminLayout title="Door Check-In">
             <div className="max-w-xl">
-                <p className="text-sm text-[#EDEAE2]/55 mb-2">
+                <p className="text-sm text-[var(--admin-ink)]/55 mb-2">
                     Type the ticket code from the buyer's email. The check and the mark happen together
                     in the database, so no code walks in twice, even on a screenshot.
                 </p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/35 mb-6">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 mb-6">
                     Verifying as {currentUser?.email}
                 </p>
 
@@ -163,12 +163,12 @@ const CheckIn = () => {
                         placeholder="NWT-XXXXXXXX"
                         autoComplete="off"
                         spellCheck={false}
-                        className="flex-1 min-w-0 px-4 py-3 bg-[#0a0a0a] border border-white/14 rounded-lg font-mono text-sm tracking-wider focus-ring placeholder:text-[#EDEAE2]/35 placeholder:font-sans placeholder:tracking-normal"
+                        className="flex-1 min-w-0 px-4 py-3 bg-[var(--admin-surface)] border border-[var(--admin-ink)]/14 rounded-lg font-mono text-sm tracking-wider focus-ring placeholder:text-[var(--admin-ink)]/35 placeholder:font-sans placeholder:tracking-normal"
                     />
                     <button
                         type="submit"
                         disabled={checking || !code.trim()}
-                        className="shrink-0 inline-flex items-center gap-2 bg-[#EDEAE2] text-[#0d0d0f] px-6 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-40 transition-all focus-ring"
+                        className="shrink-0 inline-flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-6 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-40 transition-all focus-ring"
                     >
                         <Search size={14} />
                         {checking ? "Checking" : "Verify"}
@@ -176,9 +176,9 @@ const CheckIn = () => {
                 </form>
 
                 {!result && (
-                    <div className="border border-dashed border-white/15 rounded-2xl p-10 text-center">
-                        <Ticket size={28} className="mx-auto mb-3 text-[#EDEAE2]/25" />
-                        <p className="text-sm text-[#EDEAE2]/45">No code checked yet. Results land here.</p>
+                    <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-2xl p-10 text-center">
+                        <Ticket size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
+                        <p className="text-sm text-[var(--admin-ink)]/45">No code checked yet. Results land here.</p>
                     </div>
                 )}
 
@@ -189,29 +189,29 @@ const CheckIn = () => {
                             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">Valid ticket - admit one</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
-                        <p className="text-sm text-[#EDEAE2]/75 mb-1">{t?.event_title}</p>
+                        <p className="text-sm text-[var(--admin-ink)]/75 mb-1">{t?.event_title}</p>
                         {(t?.event_date_time) && (
-                            <p className="text-xs text-[#EDEAE2]/55 mb-1">{formatEventDate(t.event_date_time)}</p>
+                            <p className="text-xs text-[var(--admin-ink)]/55 mb-1">{formatEventDate(t.event_date_time)}</p>
                         )}
                         {t?.ticket_type && (
-                            <p className="text-xs text-[#EDEAE2]/55 mb-1">Type: {t.ticket_type}</p>
+                            <p className="text-xs text-[var(--admin-ink)]/55 mb-1">Type: {t.ticket_type}</p>
                         )}
                         {t?.holder_name && (
-                            <p className="text-xs text-[#EDEAE2]/55 mb-4">{t.holder_name}</p>
+                            <p className="text-xs text-[var(--admin-ink)]/55 mb-4">{t.holder_name}</p>
                         )}
                         {statuses}
                         <div className="flex flex-wrap gap-3">
                             <button
                                 onClick={confirmEntry}
                                 disabled={marking}
-                                className="inline-flex items-center gap-2 bg-emerald-400 text-[#0d0d0f] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all focus-ring"
+                                className="inline-flex items-center gap-2 bg-emerald-400 text-[var(--admin-on-ink)] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all focus-ring"
                             >
                                 <Check size={14} />
                                 {marking ? "Admitting" : "Verify entry"}
                             </button>
                             <button
                                 onClick={reset}
-                                className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                                className="px-6 py-3 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] transition-colors focus-ring"
                             >
                                 Next code
                             </button>
@@ -226,15 +226,15 @@ const CheckIn = () => {
                             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">Entry verified - admit</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
-                        <p className="text-sm text-[#EDEAE2]/75 mb-4">{t?.event_title}</p>
+                        <p className="text-sm text-[var(--admin-ink)]/75 mb-4">{t?.event_title}</p>
                         {statuses}
-                        <p className="text-xs text-[#EDEAE2]/55 mb-1">
+                        <p className="text-xs text-[var(--admin-ink)]/55 mb-1">
                             Verified at {t?.verified_at ? new Date(t.verified_at).toLocaleString() : "just now"}
                         </p>
-                        <p className="text-xs text-[#EDEAE2]/55 mb-5">Verified by {t?.verified_by || currentUser?.email}</p>
+                        <p className="text-xs text-[var(--admin-ink)]/55 mb-5">Verified by {t?.verified_by || currentUser?.email}</p>
                         <button
                             onClick={reset}
-                            className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                            className="px-6 py-3 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] transition-colors focus-ring"
                         >
                             Next code
                         </button>
@@ -248,19 +248,19 @@ const CheckIn = () => {
                             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-300">Already used - do not admit</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
-                        {t?.event_title && <p className="text-sm text-[#EDEAE2]/75 mb-4">{t.event_title}</p>}
+                        {t?.event_title && <p className="text-sm text-[var(--admin-ink)]/75 mb-4">{t.event_title}</p>}
                         {statuses}
                         {t?.verified_at && (
-                            <p className="text-xs text-[#EDEAE2]/55 mb-1">
+                            <p className="text-xs text-[var(--admin-ink)]/55 mb-1">
                                 First admitted {new Date(t.verified_at).toLocaleString()}
                             </p>
                         )}
                         {t?.verified_by && (
-                            <p className="text-xs text-[#EDEAE2]/55 mb-5">Verified by {t.verified_by}</p>
+                            <p className="text-xs text-[var(--admin-ink)]/55 mb-5">Verified by {t.verified_by}</p>
                         )}
                         <button
                             onClick={reset}
-                            className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                            className="px-6 py-3 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] transition-colors focus-ring"
                         >
                             Next code
                         </button>
@@ -274,14 +274,14 @@ const CheckIn = () => {
                             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-300">Test code - not a live ticket</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
-                        {t?.event_title && <p className="text-sm text-[#EDEAE2]/75 mb-1">{t.event_title}</p>}
-                        {t?.holder_name && <p className="text-xs text-[#EDEAE2]/55 mb-4">{t.holder_name}</p>}
-                        <p className="text-sm text-[#EDEAE2]/65 mb-5">
+                        {t?.event_title && <p className="text-sm text-[var(--admin-ink)]/75 mb-1">{t.event_title}</p>}
+                        {t?.holder_name && <p className="text-xs text-[var(--admin-ink)]/55 mb-4">{t.holder_name}</p>}
+                        <p className="text-sm text-[var(--admin-ink)]/65 mb-5">
                             Paid under a Paystack test key. It is not a real sale, so nobody is admitted on it.
                         </p>
                         <button
                             onClick={reset}
-                            className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                            className="px-6 py-3 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] transition-colors focus-ring"
                         >
                             Next code
                         </button>
@@ -295,11 +295,11 @@ const CheckIn = () => {
                             Do not admit
                         </p>
                         <p className="font-mono text-lg font-bold tracking-wider mb-3">{result.code}</p>
-                        {t?.event_title && <p className="text-sm text-[#EDEAE2]/75 mb-2">{t.event_title}</p>}
-                        <p className="text-sm text-[#EDEAE2]/65 mb-5">{REASON_COPY[result.reason] ?? REASON_COPY.error}</p>
+                        {t?.event_title && <p className="text-sm text-[var(--admin-ink)]/75 mb-2">{t.event_title}</p>}
+                        <p className="text-sm text-[var(--admin-ink)]/65 mb-5">{REASON_COPY[result.reason] ?? REASON_COPY.error}</p>
                         <button
                             onClick={reset}
-                            className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                            className="px-6 py-3 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] transition-colors focus-ring"
                         >
                             Next code
                         </button>
@@ -312,10 +312,10 @@ const CheckIn = () => {
                         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-300 mb-2">
                             {result.reason === "forbidden_event" ? "Not your event" : "Code not found"}
                         </p>
-                        <p className="text-sm text-[#EDEAE2]/65 mb-5">{REASON_COPY[result.reason] ?? REASON_COPY.not_found}</p>
+                        <p className="text-sm text-[var(--admin-ink)]/65 mb-5">{REASON_COPY[result.reason] ?? REASON_COPY.not_found}</p>
                         <button
                             onClick={reset}
-                            className="px-6 py-3 rounded-lg border border-white/15 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/65 hover:text-[#EDEAE2] transition-colors focus-ring"
+                            className="px-6 py-3 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] transition-colors focus-ring"
                         >
                             Try another code
                         </button>

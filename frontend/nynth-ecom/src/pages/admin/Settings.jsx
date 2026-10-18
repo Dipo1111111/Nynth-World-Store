@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp, ArrowDown, LayoutList, FileText, EyeOff } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp, ArrowDown, LayoutList, FileText, EyeOff, Sun, Moon } from "lucide-react";
 import { compressImage } from "../../utils/imageUtils";
 import { useSettings } from "../../context/SettingsContext";
+import { useAdminTheme } from "../../hooks/useAdminTheme";
 import { DEFAULT_CATEGORY_ORDER, categoryLabel } from "../../utils/shopConfig";
 import { DEFAULT_PRODUCT_NOTE, DEFAULT_PRODUCT_NOTE_TITLE, DEFAULT_RETURNS_PAGE_POLICY } from "../../utils/productCopy";
 import { DEFAULT_REVENUE_DISPLAY, formatNaira, normalizeRevenueDisplay } from "../../utils/revenueDisplay";
@@ -127,6 +128,7 @@ export default function AdminSettings() {
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
  const { refreshSettings } = useSettings();
+ const { theme, toggle: toggleTheme } = useAdminTheme();
  const [isUploading, setIsUploading] = useState(false);
  const [isMerging, setIsMerging] = useState(false);
  // Snapshot of the last persisted state. Any difference from `settings` is
@@ -322,15 +324,15 @@ export default function AdminSettings() {
  return (
  <AdminLayout title="Settings">
  <div className="flex items-center justify-center h-64">
- <Loader2 className="animate-spin text-[#EDEAE2]/42" size={32} />
+ <Loader2 className="animate-spin text-[var(--admin-ink)]/42" size={32} />
  </div>
  </AdminLayout>
  );
  }
 
  const SectionTitle = ({ icon: Icon, title }) => (
- <div className="flex items-center gap-2 mb-6 pb-2 border-b border-white/10">
- <Icon size={18} className="text-[#EDEAE2]/42" />
+ <div className="flex items-center gap-2 mb-6 pb-2 border-b border-[var(--admin-ink)]/10">
+ <Icon size={18} className="text-[var(--admin-ink)]/42" />
  <h3 className="font-bold text-lg">{title}</h3>
  </div>
  );
@@ -338,8 +340,31 @@ export default function AdminSettings() {
  return (
  <AdminLayout title="Settings">
   <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
+  {/* APPEARANCE - first thing on the page, because reading comfort is the
+  first thing anyone notices. Newman asked for this at the very top. */}
+  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+  <SectionTitle icon={theme === "light" ? Sun : Moon} title="Appearance" />
+  <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.04] rounded-lg border border-[var(--admin-ink)]/10">
+  <div className="min-w-0">
+  <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Light Mode</h4>
+  <p className="text-[10px] text-[var(--admin-ink)]/45 uppercase tracking-wider mt-1 leading-relaxed">
+  Easier on the eyes. The admin was dark by default, which was hard to read. Your choice is remembered on this device.
+  </p>
+  </div>
+  <button
+  type="button"
+  onClick={toggleTheme}
+  aria-label="Toggle light mode"
+  aria-pressed={theme === "light"}
+  className={`w-12 h-6 rounded-lg transition-colors relative shrink-0 focus-ring ${theme === "light" ? 'bg-[var(--admin-accent)]' : 'bg-[var(--admin-ink)]/15'}`}
+  >
+  <div className={`absolute top-1 w-4 h-4 rounded-lg transition-all ${theme === "light" ? 'left-7 bg-[var(--admin-on-ink)]' : 'left-1 bg-[var(--admin-surface)]'}`} />
+  </button>
+  </div>
+  </div>
+
   <header className="flex flex-wrap items-center justify-between gap-3">
-  <p className="text-sm text-[#EDEAE2]/55">Storefront configuration. Changes stay staged until you save.</p>
+  <p className="text-sm text-[var(--admin-ink)]/55">Storefront configuration. Changes stay staged until you save.</p>
   {isDirty && (
   <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-200">
   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
@@ -348,35 +373,35 @@ export default function AdminSettings() {
   )}
   </header>
 
-  <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur px-2 py-2">
+  <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur px-2 py-2">
   {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Product page", "#set-product"], ["Landing", "#set-landing"], ["Revenue", "#set-revenue"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
-  <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#EDEAE2]/55 hover:text-[#EDEAE2] hover:bg-white/[0.06] transition-colors focus-ring">
+  <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.06] transition-colors focus-ring">
   {label}
   </a>
   ))}
   </nav>
 
   {/* General Settings */}
-  <div id="set-store" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-store" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Site Name</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Site Name</label>
  <input
  name="site_name"
  value={settings.site_name}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="NYNTH"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Currency Symbol</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Currency Symbol</label>
  <input
  name="currency_symbol"
  value={settings.currency_symbol}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="₦"
  />
  </div>
@@ -384,29 +409,29 @@ export default function AdminSettings() {
  </div>
 
  {/* Shop Page Layout */}
- <div id="set-shop" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+ <div id="set-shop" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={LayoutList} title="Shop Page Layout" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the category tabs and the bold tickets band on the shop page. Changes stay staged until you save.
  </p>
 
  <div className="mb-8">
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Category Tab Order</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Category Tab Order</h4>
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, shop_category_order: [...DEFAULT_CATEGORY_ORDER] }))}
- className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+ className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
  >
  <RotateCcw size={11} /> Restore Default
  </button>
  </div>
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-3">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
- <div className="border border-white/10 rounded-lg divide-y divide-white/10">
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-3">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
+ <div className="border border-[var(--admin-ink)]/10 rounded-lg divide-y divide-[var(--admin-ink)]/10">
  {(settings.shop_category_order || []).map((cat, idx) => (
  <div key={`${cat}-${idx}`} className="flex items-center justify-between gap-3 px-3 py-2.5">
- <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#EDEAE2]">
- <span className="text-[#EDEAE2]/42 tabular-nums">{String(idx + 1).padStart(2, "0")}</span>
+ <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[var(--admin-ink)]">
+ <span className="text-[var(--admin-ink)]/42 tabular-nums">{String(idx + 1).padStart(2, "0")}</span>
  {categoryLabel(cat)}
  </span>
  <span className="flex items-center gap-1">
@@ -414,7 +439,7 @@ export default function AdminSettings() {
  type="button"
  disabled={idx === 0}
  onClick={() => moveCategory(idx, -1)}
- className="p-1.5 rounded hover:bg-white/[0.08] text-[#EDEAE2]/60 hover:text-[#EDEAE2] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ className="p-1.5 rounded hover:bg-white/[0.08] text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
  title="Move up"
  aria-label={`Move ${categoryLabel(cat)} up`}
  >
@@ -424,7 +449,7 @@ export default function AdminSettings() {
  type="button"
  disabled={idx === (settings.shop_category_order || []).length - 1}
  onClick={() => moveCategory(idx, 1)}
- className="p-1.5 rounded hover:bg-white/[0.08] text-[#EDEAE2]/60 hover:text-[#EDEAE2] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ className="p-1.5 rounded hover:bg-white/[0.08] text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
  title="Move down"
  aria-label={`Move ${categoryLabel(cat)} down`}
  >
@@ -434,7 +459,7 @@ export default function AdminSettings() {
  type="button"
  disabled={idx === 0}
  onClick={() => removeCategory(idx)}
- className="p-1.5 rounded hover:bg-rose-500/10 text-[#EDEAE2]/60 hover:text-rose-300 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ className="p-1.5 rounded hover:bg-rose-500/10 text-[var(--admin-ink)]/60 hover:text-rose-300 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
  title="Hide tab"
  aria-label={`Hide ${categoryLabel(cat)} tab`}
  >
@@ -449,7 +474,7 @@ export default function AdminSettings() {
  <select
  value=""
  onChange={(e) => { if (e.target.value) addCategory(e.target.value); }}
- className="flex-1 px-3 py-2 border border-white/14 rounded-lg bg-[#0a0a0a] text-[#EDEAE2] focus-ring text-xs"
+ className="flex-1 px-3 py-2 border border-[var(--admin-ink)]/14 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-ink)] focus-ring text-xs"
  aria-label="Add a hidden category back"
  >
  <option value="">Add hidden tab...</option>
@@ -463,7 +488,7 @@ export default function AdminSettings() {
 
  <div className="space-y-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Bold Tickets Band Position</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Bold Tickets Band Position</label>
  <div className="flex flex-wrap gap-2">
  {[["top", "TOP (BELOW TABS)"], ["bottom", "BOTTOM (BELOW PRODUCTS)"], ["hidden", "HIDDEN"]].map(([val, label]) => (
  <button
@@ -472,19 +497,19 @@ export default function AdminSettings() {
  onClick={() => setSettings(prev => ({ ...prev, tickets_band_position: val }))}
  className={`flex items-center gap-2 px-4 py-3 border transition-all text-[10px] font-bold uppercase tracking-widest ${
  settings.tickets_band_position === val
- ? 'border-white/25 bg-[#EDEAE2] text-[#0d0d0f]'
- : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
+ ? 'border-[var(--admin-ink)]/25 bg-[var(--admin-accent)] text-[var(--admin-on-ink)]'
+ : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
  }`}
  >
  {label}
  </button>
  ))}
  </div>
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Bold Tickets Band Shows On</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Bold Tickets Band Shows On</label>
  <div className="flex flex-wrap gap-2">
  {[["all", "ALL SECTIONS"], ["tickets_only", "TICKETS TAB ONLY"]].map(([val, label]) => (
  <button
@@ -493,19 +518,19 @@ export default function AdminSettings() {
  onClick={() => setSettings(prev => ({ ...prev, tickets_band_scope: val }))}
  className={`flex items-center gap-2 px-4 py-3 border transition-all text-[10px] font-bold uppercase tracking-widest ${
  settings.tickets_band_scope === val
- ? 'border-white/25 bg-[#EDEAE2] text-[#0d0d0f]'
- : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
+ ? 'border-[var(--admin-ink)]/25 bg-[var(--admin-accent)] text-[var(--admin-on-ink)]'
+ : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
  }`}
  >
  {label}
  </button>
  ))}
  </div>
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">When set to tickets tab only, the bold band is skipped on All and other views.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">When set to tickets tab only, the bold band is skipped on All and other views.</p>
  </div>
 
  <div className="max-w-xs space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Max Tickets in Bold Band</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Max Tickets in Bold Band</label>
  <input
  name="tickets_band_limit"
  type="number"
@@ -513,39 +538,39 @@ export default function AdminSettings() {
  max="6"
  value={settings.tickets_band_limit}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
  </div>
  </div>
  </div>
 
  {/* PRODUCT VARIANT OPTIONS */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={PackageIcon} title="Product Variant Options" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Manage the preset options available when creating or editing products. Separate items with commas.
  </p>
  <div className="space-y-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Available Colors</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Available Colors</label>
  <textarea
  name="available_colors"
  value={settings.available_colors}
  onChange={handleChange}
  rows={3}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring font-mono text-xs"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono text-xs"
  placeholder="Black, White, Red..."
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Available Sizes</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Available Sizes</label>
  <textarea
  name="available_sizes"
  value={settings.available_sizes}
  onChange={handleChange}
  rows={2}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring font-mono text-xs"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono text-xs"
  placeholder="XS, S, M, L, XL..."
  />
  </div>
@@ -553,43 +578,43 @@ export default function AdminSettings() {
  </div>
 
   {/* PRODUCT PAGE COPY */}
-  <div id="set-product" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-product" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
     <SectionTitle icon={FileText} title="Product Page Copy" />
-    <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+    <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
       The SHIPPING &amp; RETURNS panel shown on every product page. Any single product can override this in Products &gt; Edit &gt; Product page note. The 7-day return badge has been removed from product pages.
     </p>
 
-    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10">
+    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
       <div>
-        <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Show The Panel</h4>
-        <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Off hides the accordion on every product page</p>
+        <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Show The Panel</h4>
+        <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Off hides the accordion on every product page</p>
       </div>
       <button
         type="button"
         aria-label="Show the product page note panel"
         aria-pressed={settings.product_note_enabled !== false}
         onClick={() => setSettings(prev => ({ ...prev, product_note_enabled: prev.product_note_enabled === false }))}
-        className={`w-12 h-6 rounded-lg transition-colors relative ${settings.product_note_enabled !== false ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+        className={`w-12 h-6 rounded-lg transition-colors relative ${settings.product_note_enabled !== false ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
       >
-        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${settings.product_note_enabled !== false ? 'left-7' : 'left-1'}`} />
+        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${settings.product_note_enabled !== false ? 'left-7' : 'left-1'}`} />
       </button>
     </div>
 
     <div className="space-y-2 mb-5">
-      <label htmlFor="product_note_title" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Panel Title</label>
+      <label htmlFor="product_note_title" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Panel Title</label>
       <input
         id="product_note_title"
         name="product_note_title"
         value={settings.product_note_title || ""}
         onChange={handleChange}
-        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring"
+        className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
         placeholder={DEFAULT_PRODUCT_NOTE_TITLE}
       />
     </div>
 
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor="product_note_text" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Panel Text</label>
+        <label htmlFor="product_note_text" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Panel Text</label>
         <button
           type="button"
           onClick={() => setSettings(prev => ({
@@ -597,7 +622,7 @@ export default function AdminSettings() {
             product_note_title: DEFAULT_PRODUCT_NOTE_TITLE,
             product_note_text: DEFAULT_PRODUCT_NOTE,
           }))}
-          className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+          className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
         >
           <RotateCcw size={11} /> Restore Default
         </button>
@@ -608,47 +633,47 @@ export default function AdminSettings() {
         value={settings.product_note_text ?? ""}
         onChange={handleChange}
         rows={9}
-        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
+        className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
         placeholder={DEFAULT_PRODUCT_NOTE}
       />
-      <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
+      <p className="text-[10px] text-[var(--admin-ink)]/42 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
     </div>
 
-    <div className="space-y-2 mt-8 pt-6 border-t border-white/10">
-      <label htmlFor="returns_page_policy" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Shipping Page - Return Policy</label>
+    <div className="space-y-2 mt-8 pt-6 border-t border-[var(--admin-ink)]/10">
+      <label htmlFor="returns_page_policy" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Shipping Page - Return Policy</label>
       <textarea
         id="returns_page_policy"
         name="returns_page_policy"
         value={settings.returns_page_policy ?? ""}
         onChange={handleChange}
         rows={5}
-        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
+        className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
         placeholder={DEFAULT_RETURNS_PAGE_POLICY}
       />
-      <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
+      <p className="text-[10px] text-[var(--admin-ink)]/42 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
     </div>
   </div>
 
   {/* LANDING SPLIT */}
-  <div id="set-landing" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-landing" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={ImageIcon} title="Landing Page Split" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  The front page is two boxes. One for the store, one for tickets. Drop an image on either and it goes live the moment you save.
  </p>
 
- <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10 mb-6">
+ <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 mb-6">
  <div>
- <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Two-box Landing Page</h4>
- <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Off sends visitors straight to the shop, as before</p>
+ <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Two-box Landing Page</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Off sends visitors straight to the shop, as before</p>
  </div>
  <button
  type="button"
  aria-label="Toggle the two-box landing page"
  aria-pressed={(settings.landing || {}).enabled !== false}
  onClick={() => setLandingField("enabled", (settings.landing || {}).enabled === false)}
- className={`w-12 h-6 rounded-lg transition-colors relative ${(settings.landing || {}).enabled !== false ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+ className={`w-12 h-6 rounded-lg transition-colors relative ${(settings.landing || {}).enabled !== false ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
  >
- <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${(settings.landing || {}).enabled !== false ? 'left-7' : 'left-1'}`} />
+ <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${(settings.landing || {}).enabled !== false ? 'left-7' : 'left-1'}`} />
  </button>
  </div>
 
@@ -669,26 +694,26 @@ export default function AdminSettings() {
  </button>
  </>
  ) : (
- <div className="w-full h-full flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/35 bg-white/[0.03]">
+ <div className="w-full h-full flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 bg-white/[0.03]">
  No image
  </div>
  )}
  </div>
- <div className="relative border-2 border-dashed border-white/26 rounded-lg p-6 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
+ <div className="relative border-2 border-dashed border-[var(--admin-ink)]/26 rounded-lg p-6 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
  <input type="file" accept="image/*" onChange={handleLandingImageUpload(imageKey)} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer" />
- <Upload size={20} className="text-[#EDEAE2]/42 mb-2 group-hover:text-[#EDEAE2] transition-colors" />
- <span className="text-[10px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest group-hover:text-[#EDEAE2]">
+ <Upload size={20} className="text-[var(--admin-ink)]/42 mb-2 group-hover:text-[var(--admin-ink)] transition-colors" />
+ <span className="text-[10px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
  {isUploading ? "Uploading..." : imageLabel}
  </span>
- <p className="text-[10px] text-[#EDEAE2]/42 mt-2">Recommended: 1200 x 1500 px (portrait)</p>
+ <p className="text-[10px] text-[var(--admin-ink)]/42 mt-2">Recommended: 1200 x 1500 px (portrait)</p>
  </div>
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 mb-2">{titleLabel}</label>
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">{titleLabel}</label>
  <input
  value={(settings.landing || {})[titleKey] ?? ""}
  onChange={(e) => setLandingField(titleKey, e.target.value)}
  placeholder={imageKey === "storeImage" ? "NYNTH WORLD STORE" : "TICKET"}
- className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] uppercase tracking-widest"
+ className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] uppercase tracking-widest"
  />
  </div>
  </div>
@@ -697,30 +722,30 @@ export default function AdminSettings() {
   </div>
 
   {/* REVENUE PRIVACY */}
-  <div id="set-revenue" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-revenue" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
     <SectionTitle icon={EyeOff} title="Revenue Privacy" />
-    <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+    <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
       Controls the Net sales figure at the top of the admin dashboard. Hidden figures show as ****.*** until you click the eye.
     </p>
 
-    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10">
+    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
       <div>
-        <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Hide By Default</h4>
-        <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Masked every time the dashboard loads</p>
+        <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Hide By Default</h4>
+        <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Masked every time the dashboard loads</p>
       </div>
       <button
         type="button"
         aria-label="Hide revenue by default"
         aria-pressed={normalizeRevenueDisplay(settings.revenue_display).hide_by_default}
         onClick={() => setRevenueDisplay({ hide_by_default: !normalizeRevenueDisplay(settings.revenue_display).hide_by_default })}
-        className={`w-12 h-6 rounded-lg transition-colors relative ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+        className={`w-12 h-6 rounded-lg transition-colors relative ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
       >
-        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'left-7' : 'left-1'}`} />
+        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'left-7' : 'left-1'}`} />
       </button>
     </div>
 
     <div className="space-y-2">
-      <label htmlFor="revenue_override" className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Manual Display Figure ({settings.currency_symbol || "\u20A6"})</label>
+      <label htmlFor="revenue_override" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Manual Display Figure ({settings.currency_symbol || "\u20A6"})</label>
       <input
         id="revenue_override"
         type="number"
@@ -728,10 +753,10 @@ export default function AdminSettings() {
         step="1"
         value={normalizeRevenueDisplay(settings.revenue_display).override ?? ""}
         onChange={(e) => setRevenueDisplay({ override: e.target.value === "" ? null : Number(e.target.value) })}
-        className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring tabular-nums"
+        className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring tabular-nums"
         placeholder="Leave empty to show the real paid total"
       />
-      <p className="text-[10px] text-[#EDEAE2]/42 leading-relaxed">
+      <p className="text-[10px] text-[var(--admin-ink)]/42 leading-relaxed">
         When set, the dashboard shows this number instead of the ledger total and marks it with a red dot. Only the red dot tells you it is not the real figure. Leave empty to show the real paid total.
       </p>
       {normalizeRevenueDisplay(settings.revenue_display).override !== null && (
@@ -744,16 +769,16 @@ export default function AdminSettings() {
   </div>
 
   {/* LOCK PAGE CONFIGURATION */}
-  <div id="set-lock" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-lock" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
  </p>
  
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Lock Page</h4>
- <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Lock Page</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -763,15 +788,15 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
  </label>
  </div>
 
  {/* Timer Toggle */}
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Countdown Timer</h4>
- <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Countdown Timer</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -781,24 +806,24 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
  </label>
  </div>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Launch Countdown Date</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Launch Countdown Date</label>
  <input
  type="datetime-local"
  name="launch_date"
  value={settings.launch_date ? settings.launch_date.substring(0, 16) : ""}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring font-mono"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Countdown Duration (minutes)</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Countdown Duration (minutes)</label>
  <input
  type="number"
  name="lock_timer_duration_minutes"
@@ -806,57 +831,57 @@ export default function AdminSettings() {
  onChange={handleChange}
  min="1"
  max="999"
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring font-mono"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Lock Password</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Lock Password</label>
  <input
  name="lock_password"
  value={settings.lock_password}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring font-mono"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  placeholder="WINNERSONLY"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Title Line 1</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 1</label>
  <input
  name="lock_title1"
  value={settings.lock_title1}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="BY WINNERS FOR WINNERS"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Title Line 2 (Faded)</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 2 (Faded)</label>
  <input
  name="lock_title2"
  value={settings.lock_title2}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="STAY ABOVE"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Waitlist Section Title</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Title</label>
  <input
  name="lock_waitlist_title"
  value={settings.lock_waitlist_title}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="JOIN THE WAITLIST"
  />
  </div>
  <div className="space-y-2 md:col-span-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Waitlist Section Subtitle</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Subtitle</label>
  <input
  name="lock_waitlist_subtitle"
  value={settings.lock_waitlist_subtitle}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="BE NOTIFIED WHEN WE GO LIVE"
  />
  </div>
@@ -864,58 +889,58 @@ export default function AdminSettings() {
  </div>
 
  {/* Contact Information */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Mail} title="Contact Information" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Support Email</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Support Email</label>
  <div className="relative">
- <Mail size={16} className="absolute left-3 top-3 text-[#EDEAE2]/42" />
+ <Mail size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input
  name="support_email"
  type="email"
  value={settings.support_email}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full pl-10 pr-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="support@nynth.com"
  />
  </div>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Support Phone</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Support Phone</label>
  <div className="relative">
- <Phone size={16} className="absolute left-3 top-3 text-[#EDEAE2]/42" />
+ <Phone size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input
  name="support_phone"
  value={settings.support_phone}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full pl-10 pr-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="+234..."
  />
  </div>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Support WhatsApp</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Support WhatsApp</label>
  <div className="relative">
- <Share2 size={16} className="absolute left-3 top-3 text-[#EDEAE2]/42" />
+ <Share2 size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input
  name="support_whatsapp"
  value={settings.support_whatsapp}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full pl-10 pr-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="+234..."
  />
  </div>
  </div>
  <div className="space-y-2 md:col-span-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Office Address</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Office Address</label>
  <div className="relative">
- <MapPin size={16} className="absolute left-3 top-3 text-[#EDEAE2]/42" />
+ <MapPin size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input
  name="office_address"
  value={settings.office_address}
  onChange={handleChange}
- className="w-full pl-10 pr-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full pl-10 pr-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="123 Street, Lagos"
  />
  </div>
@@ -924,46 +949,46 @@ export default function AdminSettings() {
  </div>
 
  {/* Social Media */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Share2} title="Social Media Links" />
  <div className="grid grid-cols-1 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Instagram URL</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Instagram URL</label>
  <input
  name="instagram_url"
  value={settings.instagram_url}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="https://instagram.com/..."
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">X (Twitter) URL</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">X (Twitter) URL</label>
  <input
  name="twitter_url"
  value={settings.twitter_url}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="https://x.com/..."
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Facebook URL</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Facebook URL</label>
  <input
  name="facebook_url"
  value={settings.facebook_url}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="https://facebook.com/..."
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">TikTok URL</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">TikTok URL</label>
  <input
  name="tiktok_url"
  value={settings.tiktok_url || ""}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="https://tiktok.com/..."
  />
  </div>
@@ -971,19 +996,19 @@ export default function AdminSettings() {
  </div>
 
  {/* Google Analytics Settings */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
  <div className="space-y-4">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">GA4 Property ID</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">GA4 Property ID</label>
  <input
  name="ga_property_id"
  value={settings.ga_property_id || ""}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring font-mono text-sm"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono text-sm"
  placeholder="e.g. 123456789"
  />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest leading-relaxed">
  Required for the Admin Dashboard to pull real-time metrics. <br/>
  Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
  </p>
@@ -992,13 +1017,13 @@ export default function AdminSettings() {
  </div>
 
  {/* Brand Assets Section */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
  <div className="space-y-4">
- <div className="flex justify-between items-center bg-white/[0.05] p-3 rounded-lg border border-white/10">
- <span className="text-[10px] font-bold text-[#EDEAE2] uppercase tracking-widest leading-none">Currently Active Banner</span>
+ <div className="flex justify-between items-center bg-white/[0.05] p-3 rounded-lg border border-[var(--admin-ink)]/10">
+ <span className="text-[10px] font-bold text-[var(--admin-ink)] uppercase tracking-widest leading-none">Currently Active Banner</span>
  {!settings.hero_banner && (
- <span className="text-[9px] font-bold text-[#EDEAE2]/42 uppercase tracking-widest bg-[#0a0a0a] px-2 py-1 rounded border border-white/[0.06]">Default System Asset</span>
+ <span className="text-[9px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest bg-[var(--admin-surface)] px-2 py-1 rounded border border-white/[0.06]">Default System Asset</span>
  )}
  </div>
  <div className="flex flex-col gap-4">
@@ -1019,7 +1044,7 @@ export default function AdminSettings() {
  </button>
  )}
  </div>
- <div className="relative border-2 border-dashed border-white/26 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
+ <div className="relative border-2 border-dashed border-[var(--admin-ink)]/26 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
  <input
  type="file"
  accept="image/*"
@@ -1027,22 +1052,22 @@ export default function AdminSettings() {
  disabled={isUploading}
  className="absolute inset-0 opacity-0 cursor-pointer"
  />
- <Upload size={24} className="text-[#EDEAE2]/42 mb-2 group-hover:text-[#EDEAE2] transition-colors" />
- <span className="text-xs font-bold text-[#EDEAE2]/42 uppercase tracking-widest group-hover:text-[#EDEAE2]">
+ <Upload size={24} className="text-[var(--admin-ink)]/42 mb-2 group-hover:text-[var(--admin-ink)] transition-colors" />
+ <span className="text-xs font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
  {isUploading ? "Uploading..." : "Replace Header Image"}
  </span>
- <p className="text-[10px] text-[#EDEAE2]/42 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
+ <p className="text-[10px] text-[var(--admin-ink)]/42 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
  </div>
  </div>
  </div>
  </div>
 
  {/* Banner Hover Color */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Banner Hover Style" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-4 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-4 leading-relaxed">
  Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
- press <span className="text-[#EDEAE2]">Save All Settings</span> to publish.
+ press <span className="text-[var(--admin-ink)]">Save All Settings</span> to publish.
  </p>
  <div className="flex gap-3">
  <button
@@ -1051,7 +1076,7 @@ export default function AdminSettings() {
  className={`flex items-center gap-3 px-5 py-3 border transition-all ${
  settings.banner_hover_color === 'red'
 ? 'border-rose-500/60 bg-rose-500/[0.14] text-rose-300'
-  : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
+  : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
  }`}
  >
  <div className="w-4 h-4 rounded-lg bg-red-600"></div>
@@ -1062,42 +1087,42 @@ export default function AdminSettings() {
  onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
  className={`flex items-center gap-3 px-5 py-3 border transition-all ${
  settings.banner_hover_color === 'black'
-? 'border-white/25 bg-[#EDEAE2] text-[#0d0d0f]'
-  : 'border-white/14 bg-[#0a0a0a] text-[#EDEAE2]/42 hover:border-white/32'
+? 'border-[var(--admin-ink)]/25 bg-[var(--admin-accent)] text-[var(--admin-on-ink)]'
+  : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
  }`}
  >
- <div className="w-4 h-4 rounded-lg bg-[#EDEAE2]"></div>
+ <div className="w-4 h-4 rounded-lg bg-[var(--admin-accent)]"></div>
  <span className="text-[10px] font-bold uppercase tracking-widest">BLACK</span>
  </button>
  </div>
  </div>
 
   {/* Shipping Settings */}
-  <div id="set-shipping" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-shipping" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Default Shipping Fee ({settings.currency_symbol})</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Default Shipping Fee ({settings.currency_symbol})</label>
  <input
  name="shipping_fee"
  type="number"
  value={settings.shipping_fee}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  />
  </div>
  </div>
 
  {/* Free Delivery Discount */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Percent} title="Free Delivery Discount" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
  </p>
 
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Free Delivery Discount</h4>
- <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Free Delivery Discount</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -1107,23 +1132,23 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
  </label>
  </div>
 
  {settings.free_delivery_enabled && (
  <div className="max-w-xs space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Minimum Order Amount ({settings.currency_symbol})</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Minimum Order Amount ({settings.currency_symbol})</label>
  <input
  name="free_delivery_threshold"
  type="number"
  value={settings.free_delivery_threshold}
  onChange={handleChange}
  min="0"
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="50000"
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
  </div>
  )}
  </div>
@@ -1148,16 +1173,16 @@ export default function AdminSettings() {
  />
 
  {/* Shipping Location Toggles */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Truck} title="Shipping Locations" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Toggle delivery locations on or off. Disabled locations will not appear in checkout.
  </p>
 
  {/* Lagos Areas */}
  <div className="mb-8">
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Lagos Areas</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Lagos Areas</h4>
  <button
  type="button"
  onClick={() => {
@@ -1169,7 +1194,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, lagos: allDisabled ? [] : allLagos }
  }));
  }}
- className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+ className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1193,8 +1218,8 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-white/10 text-[#EDEAE2]/42 bg-white/[0.05] line-through"
- : "border-white/18 text-[#EDEAE2] bg-[#0a0a0a] hover:border-white/32"
+ ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-white/[0.05] line-through"
+ : "border-[var(--admin-ink)]/18 text-[var(--admin-ink)] bg-[var(--admin-surface)] hover:border-[var(--admin-ink)]/32"
  }`}
  >
  {area}
@@ -1207,7 +1232,7 @@ export default function AdminSettings() {
  {/* Abuja Areas */}
  <div className="mb-8">
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Abuja Areas</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Abuja Areas</h4>
  <button
  type="button"
  onClick={() => {
@@ -1219,7 +1244,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, abuja: allDisabled ? [] : allAbuja }
  }));
  }}
- className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+ className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1243,8 +1268,8 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-white/10 text-[#EDEAE2]/42 bg-white/[0.05] line-through"
- : "border-white/18 text-[#EDEAE2] bg-[#0a0a0a] hover:border-white/32"
+ ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-white/[0.05] line-through"
+ : "border-[var(--admin-ink)]/18 text-[var(--admin-ink)] bg-[var(--admin-surface)] hover:border-[var(--admin-ink)]/32"
  }`}
  >
  {area}
@@ -1257,7 +1282,7 @@ export default function AdminSettings() {
  {/* Interstate States */}
  <div>
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Interstate States</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Interstate States</h4>
  <button
  type="button"
  onClick={() => {
@@ -1269,7 +1294,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, interstate: allDisabled ? [] : allStates }
  }));
  }}
- className="text-[9px] font-bold uppercase tracking-widest text-[#EDEAE2]/42 hover:text-[#EDEAE2] transition-colors"
+ className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1293,8 +1318,8 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-white/10 text-[#EDEAE2]/42 bg-white/[0.05] line-through"
- : "border-white/18 text-[#EDEAE2] bg-[#0a0a0a] hover:border-white/32"
+ ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-white/[0.05] line-through"
+ : "border-[var(--admin-ink)]/18 text-[var(--admin-ink)] bg-[var(--admin-surface)] hover:border-[var(--admin-ink)]/32"
  }`}
  >
  {state}
@@ -1306,16 +1331,16 @@ export default function AdminSettings() {
  </div>
 
   {/* Announcement Bar */}
-  <div id="set-announce" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-announce" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
  </p>
 
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Announcement Bar</h4>
- <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Announcement Bar</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -1325,36 +1350,36 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
  </label>
  </div>
 
  {settings.announcement_bar_enabled && (
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Bar Text</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Bar Text</label>
  <input
  name="announcement_bar_text"
  value={settings.announcement_bar_text}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="NEXT DROP IN:"
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
  </div>
  )}
  </div>
 
  {/* Promotional Marquee */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Promotional Marquee" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A scrolling banner that appears above the hero image on Shop and Home pages.
  </p>
 
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-white/10">
+  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Enable Marquee</h4>
- <p className="text-[10px] text-[#EDEAE2]/55 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Marquee</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -1364,33 +1389,33 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[#0a0a0a] after:border-white/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EDEAE2]"></div>
+ <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
  </label>
  </div>
 
  {settings.marquee_enabled && (
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Marquee Text</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Marquee Text</label>
  <input
  name="marquee_text"
  value={settings.marquee_text}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
  </div>
  )}
  </div>
 
   {/* Email Section Settings */}
-  <div id="set-cleanup" className="bg-[#0a0a0a] p-6 rounded-xl border border-rose-500/25 shadow-card scroll-mt-28">
+  <div id="set-cleanup" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-rose-500/25 shadow-card scroll-mt-28">
  <SectionTitle icon={Mail} title="Email Section Settings" />
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[#EDEAE2] uppercase tracking-tight">Database Cleanup</h4>
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest leading-relaxed">
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Database Cleanup</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest leading-relaxed">
  Merge duplicate subscriber entries to maintain a clean mailing list.
  </p>
  </div>
@@ -1407,64 +1432,64 @@ export default function AdminSettings() {
  </div>
 
   {/* Size Chart Settings */}
-  <div id="set-content" className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card scroll-mt-28">
+  <div id="set-content" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-6">
-  <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-white/10">
+  <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
  <div>
- <h4 className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Enable Size Chart</h4>
- <p className="text-[10px] text-[#EDEAE2]/42 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
+ <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Enable Size Chart</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
  </div>
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
- className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-[#EDEAE2]' : 'bg-white/[0.18]'}`}
+ className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
  >
- <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[#0a0a0a] transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
+ <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
  </button>
  </div>
 
  {settings.show_size_chart && (
  <>
  <div className="space-y-2">
- <label className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Model & Sizing Info</label>
+ <label className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Model & Sizing Info</label>
  <textarea
  name="size_chart_model_info"
  value={settings.size_chart_model_info}
  onChange={handleChange}
  rows={3}
- className="w-full px-4 py-3 border border-white/14 rounded-lg focus-ring text-[11px] leading-relaxed"
+ className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed"
  placeholder="Our model is 185cm tall and wears a size M..."
  />
  </div>
 
  <div className="space-y-4">
  <div className="flex justify-between items-center">
- <label className="text-sm font-bold uppercase tracking-widest text-[#EDEAE2]">Measurement Table</label>
+ <label className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Measurement Table</label>
  <button
  type="button"
  onClick={() => setSettings(prev => ({
  ...prev,
  size_chart_data: [...(prev.size_chart_data || []), { size: "", chest: "", waist: "", length: "" }]
  }))}
- className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#EDEAE2] text-[#0d0d0f] px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
+ className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
  >
  <Plus size={12} /> Add Row
  </button>
  </div>
 
-<div className="overflow-x-auto border border-white/10 rounded-lg">
+<div className="overflow-x-auto border border-[var(--admin-ink)]/10 rounded-lg">
   <table className="w-full text-left">
-  <thead className="bg-white/[0.05] border-b border-white/10">
+  <thead className="bg-white/[0.05] border-b border-[var(--admin-ink)]/10">
  <tr>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Size</th>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Chest (cm)</th>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Waist (cm)</th>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[#EDEAE2]/42">Length (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Size</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Chest (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Waist (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Length (cm)</th>
  <th className="p-3 w-10"></th>
  </tr>
  </thead>
- <tbody className="divide-y divide-white/10">
+ <tbody className="divide-y divide-[var(--admin-ink)]/10">
  {(settings.size_chart_data || []).map((row, idx) => (
  <tr key={idx}>
  <td className="p-2">
@@ -1522,7 +1547,7 @@ export default function AdminSettings() {
  const newData = settings.size_chart_data.filter((_, i) => i !== idx);
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="p-2 text-[#EDEAE2]/35 hover:text-rose-300 transition-colors"
+ className="p-2 text-[var(--admin-ink)]/35 hover:text-rose-300 transition-colors"
  >
  <Trash2 size={14} />
  </button>
@@ -1533,7 +1558,7 @@ export default function AdminSettings() {
  </table>
  {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
  <div className="p-8 text-center bg-white/[0.05]">
- <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#EDEAE2]/42">No measurement rows added</p>
+ <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42">No measurement rows added</p>
  </div>
  )}
  </div>
@@ -1545,11 +1570,11 @@ export default function AdminSettings() {
 
 
  {/* Our Story Editor */}
- <div className="bg-[#0a0a0a] p-6 rounded-xl border border-white/10 shadow-card">
+ <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={BookOpen} title="Our Story" />
- <p className="text-[10px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
- change what you need, then press <span className="text-[#EDEAE2]">Save All Settings</span> to publish.
+ change what you need, then press <span className="text-[var(--admin-ink)]">Save All Settings</span> to publish.
  </p>
 
  {/* Helper: uses functional setState to avoid stale closure bugs */}
@@ -1565,31 +1590,31 @@ export default function AdminSettings() {
  return (
  <div className="space-y-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Company Name</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Company Name</label>
  <input
  value={story("company")}
  onChange={(e) => updateStory("company", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="NYNTH WORLD LTD"
  />
  </div>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Founded Date</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Founded Date</label>
  <input
  value={story("founded")}
  onChange={(e) => updateStory("founded", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="Founded October 20, 2022"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">CAC Registration</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">CAC Registration</label>
  <input
  value={story("cac")}
  onChange={(e) => updateStory("cac", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="Registered with the Corporate Affairs Commission (CAC), October 2, 2025"
  />
  </div>
@@ -1597,118 +1622,118 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Founder Label</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Label</label>
  <input
  value={story("founder_label")}
  onChange={(e) => updateStory("founder_label", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="Founder & Chief Executive Officer"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Founder Name</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Name</label>
  <input
  value={story("founder_name")}
  onChange={(e) => updateStory("founder_name", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="Yange Newman Terseer"
  />
  </div>
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Belief Statement (Italic)</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Statement (Italic)</label>
  <textarea
  value={story("belief")}
  onChange={(e) => updateStory("belief", e.target.value)}
  rows={3}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring text-sm italic"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm italic"
  placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
  />
- <p className="text-[9px] text-[#EDEAE2]/42 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Belief Description</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Description</label>
  <textarea
  value={story("belief_desc")}
  onChange={(e) => updateStory("belief_desc", e.target.value)}
  rows={2}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring text-sm"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm"
  placeholder="It is a brand based on mindset.&#10;A standard for people who choose to rise in every situation."
  />
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Origin Story</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Story</label>
  <textarea
  value={story("origin")}
  onChange={(e) => updateStory("origin", e.target.value)}
  rows={4}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring text-sm"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm"
  placeholder="NYNTH started from a real moment.&#10;The Founder was ranked 9th across 9 subjects and told he would not succeed.&#10;That moment did not create doubt. It created a shift in mindset."
  />
  </div>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Origin Quote Line 1</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 1</label>
  <input
  value={story("quote1")}
  onChange={(e) => updateStory("quote1", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring italic font-bold"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring italic font-bold"
  placeholder="Position is temporary."
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Origin Quote Line 2</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 2</label>
  <input
  value={story("quote2")}
  onChange={(e) => updateStory("quote2", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring italic font-bold"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring italic font-bold"
  placeholder="Mindset is Permanent."
  />
  </div>
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Meaning Section</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Meaning Section</label>
  <textarea
  value={story("meaning")}
  onChange={(e) => updateStory("meaning", e.target.value)}
  rows={4}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring text-sm"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm"
  placeholder="NYNTH is not just a number. It stands for elevation.&#10;It represents people who push past limits,&#10;stay disciplined,&#10;and keep the mindset of staying above."
  />
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Philosophy Section</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Philosophy Section</label>
  <textarea
  value={story("philosophy")}
  onChange={(e) => updateStory("philosophy", e.target.value)}
  rows={4}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring text-sm"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm"
  placeholder="Every NYNTH piece is made with intention.&#10;Not just as clothing, but as identity.&#10;When you see NYNTH, you see a person who keeps going."
  />
  </div>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Footer Tagline</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Tagline</label>
  <input
  value={story("tagline")}
  onChange={(e) => updateStory("tagline", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="BY WINNERS, FOR WINNERS, stay above"
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[#EDEAE2]/78">Footer Company Name</label>
+ <label className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Company Name</label>
  <input
  value={story("footer_name")}
  onChange={(e) => updateStory("footer_name", e.target.value)}
- className="w-full px-4 py-2 border border-white/14 rounded-lg focus-ring"
+ className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="NYNTH WORLD LTD"
  />
  </div>
@@ -1723,7 +1748,7 @@ export default function AdminSettings() {
  <button
  type="submit"
  disabled={saving || !isDirty}
- className="flex items-center gap-2 bg-[#EDEAE2] text-[#0d0d0f] px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-card focus-ring"
+ className="flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-card focus-ring"
  >
  {saving ? (
  <Loader2 className="animate-spin" size={20} />
@@ -1741,7 +1766,7 @@ export default function AdminSettings() {
   type="button"
   onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
   aria-label="Back to top"
-  className={`fixed right-4 md:right-6 z-40 w-11 h-11 rounded-full bg-[#EDEAE2] text-[#0d0d0f] flex items-center justify-center shadow-card hover:opacity-90 transition-all focus-ring ${isDirty ? "bottom-20" : "bottom-6"}`}
+  className={`fixed right-4 md:right-6 z-40 w-11 h-11 rounded-full bg-[var(--admin-accent)] text-[var(--admin-on-ink)] flex items-center justify-center shadow-card hover:opacity-90 transition-all focus-ring ${isDirty ? "bottom-20" : "bottom-6"}`}
   >
   <ArrowUp size={18} />
   </button>
@@ -1749,7 +1774,7 @@ export default function AdminSettings() {
 
   {/* Sticky save bar - appears whenever there are unsaved changes */}
  {isDirty && (
-  <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur">
+  <div className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur">
  <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-2.5 min-w-0">
  <span className="w-2 h-2 rounded-lg bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
@@ -1770,7 +1795,7 @@ export default function AdminSettings() {
  type="button"
  onClick={handleSubmit}
  disabled={saving}
- className="flex items-center gap-2 bg-[#EDEAE2] text-[#0d0d0f] px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-card focus-ring"
+ className="flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-card focus-ring"
  >
  {saving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
  {saving ? "Saving..." : "Save All Settings"}

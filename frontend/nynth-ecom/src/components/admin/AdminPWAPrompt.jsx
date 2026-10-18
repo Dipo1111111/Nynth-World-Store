@@ -59,10 +59,10 @@ const AdminPWAPrompt = () => {
 
     return (
         <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-10 md:w-96 z-[9999] animate-admin-fade-up">
-            <div className="bg-[#0c0c0c] text-white p-6 rounded-xl border border-white/10 shadow-raised relative overflow-hidden">
+            <div className="bg-[var(--admin-page)] text-white p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-raised relative overflow-hidden">
                 <button
                     onClick={dismiss}
-                    className="absolute top-4 right-4 p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                    className="absolute top-4 right-4 p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-[var(--admin-ink)]/10 transition-colors"
                     aria-label="Dismiss"
                 >
                     <X size={18} />
@@ -82,7 +82,7 @@ const AdminPWAPrompt = () => {
                     {('Notification' in window) && Notification.permission !== 'granted' && (
                         <button
                             onClick={() => Notification.requestPermission()}
-                            className="w-full bg-[#0a0a0a] text-[#EDEAE2] py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
+                            className="w-full bg-[var(--admin-surface)] text-[var(--admin-ink)] py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
                         >
                             <BellRing size={15} />
                             Enable Sales Alerts
@@ -92,24 +92,24 @@ const AdminPWAPrompt = () => {
                     {platform === 'android' ? (
                         <button
                             onClick={handleInstall}
-                            className="w-full bg-[#0a0a0a] text-[#EDEAE2] py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
+                            className="w-full bg-[var(--admin-surface)] text-[var(--admin-ink)] py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/85 transition-all"
                         >
                             Install App
                         </button>
                     ) : (
-                        <div className="space-y-4 bg-white/[0.06] p-4 rounded-lg border border-white/10">
+                        <div className="space-y-4 bg-white/[0.06] p-4 rounded-lg border border-[var(--admin-ink)]/10">
                             <p className="text-sm font-medium flex items-center gap-2">
                                 To install on iPhone:
                             </p>
                             <div className="space-y-3 text-xs text-white/50">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 bg-white/10 flex items-center justify-center rounded">
+                                    <div className="w-6 h-6 bg-[var(--admin-ink)]/10 flex items-center justify-center rounded">
                                         <Share size={12} />
                                     </div>
                                     <span>Tap the 'Share' icon</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 bg-white/10 flex items-center justify-center rounded">
+                                    <div className="w-6 h-6 bg-[var(--admin-ink)]/10 flex items-center justify-center rounded">
                                         <Plus size={12} />
                                     </div>
                                     <span>Select 'Add to Home Screen'</span>

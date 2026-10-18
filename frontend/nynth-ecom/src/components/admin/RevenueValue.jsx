@@ -25,15 +25,15 @@ export default function RevenueValue({ amount, display, symbol = "\u20A6", class
         <span className={`inline-flex items-end gap-3 ${className}`}>
             {revealed ? (
                 <span
-                    className="text-[42px] md:text-[56px] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[#EDEAE2]"
+                    className="text-[42px] md:text-[56px] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[var(--admin-ink)]"
                 >
-                    <span className="text-xl text-[#EDEAE2]/55 font-semibold">{symbol}</span>
+                    <span className="text-xl text-[var(--admin-ink)]/55 font-semibold">{symbol}</span>
                     <span ref={countRef}>0</span>
                 </span>
             ) : (
                 <span
                     aria-label="Revenue hidden"
-                    className="text-[42px] md:text-[56px] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[#EDEAE2]"
+                    className="text-[42px] md:text-[56px] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[var(--admin-ink)]"
                 >
                     {REVENUE_MASK}
                 </span>
@@ -53,7 +53,7 @@ export default function RevenueValue({ amount, display, symbol = "\u20A6", class
                 onClick={() => setRevealChoice(!revealed)}
                 aria-label={revealed ? "Hide revenue figure" : "Reveal revenue figure"}
                 aria-pressed={revealed}
-                className="focus-ring mb-2 inline-flex items-center justify-center rounded-lg p-1.5 text-[#EDEAE2]/45 transition-colors hover:bg-white/[0.08] hover:text-[#EDEAE2]"
+                className="focus-ring mb-2 inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--admin-ink)]/45 transition-colors hover:bg-white/[0.08] hover:text-[var(--admin-ink)]"
             >
                 {revealed ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>

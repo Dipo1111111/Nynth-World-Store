@@ -158,6 +158,11 @@
 }
 
 :root {
+  /* Brand red. Newman's landing vision: the two box labels and the founder
+     line. Storefront only, never the admin. */
+  --brand-red: #d8232a;
+  --brand-red-ink: #a81b21;
+
   /* Brand "money" accent - revenue, paid, live */
   --money: oklch(0.6 0.15 155);
   --money-soft: oklch(0.96 0.04 155);
@@ -199,8 +204,23 @@
    ADMIN SCOPE - The Black Atelier
    Apply .admin-app on the admin layout root. Flips every
    shadcn semantic token + shared admin token to the ink world.
+
+   THEME: data-theme="light" on .admin-app switches the whole
+   back office to paper. Founder asked for it 17 Oct 2026: "I'm more of a
+   light mode person, I usually have struggles with reading this dark mode."
+   The toggle lives at the very top of Admin Settings and persists per browser.
    ============================================================ */
 .admin-app {
+  /* --- Admin surface tokens (the ones the pages actually reference) --- */
+  --admin-page: oklch(0.155 0.002 85); /* page background, the ink rail */
+  --admin-surface: #0a0a0a; /* cards, panels, table bodies */
+  --admin-ink: #edeae2; /* primary type on admin surfaces */
+  --admin-on-ink: #0d0d0f; /* type sitting on the bone/accent button */
+  --admin-accent: #edeae2; /* the bone button fill */
+  --admin-accent-hover: #dbd8ce;
+  --admin-line: rgb(255 255 255 / 0.1);
+  --admin-line-2: rgb(255 255 255 / 0.14);
+
   --background: oklch(0.155 0.002 85);
   --foreground: oklch(0.93 0.005 90);
   --card: oklch(0.12 0 0);
@@ -261,7 +281,88 @@
   --tint-slate-fg: oklch(0.66 0.005 90);
   --tint-slate-line: oklch(0.93 0.005 90 / 0.16);
 
-  color: oklch(0.93 0.005 90);
+  color: var(--admin-ink);
+}
+
+/* ============================================================
+   ADMIN LIGHT THEME
+   Same layout, same hairline discipline, paper instead of ink.
+   Only the tokens move. No page knows which theme is on.
+   ============================================================ */
+.admin-app[data-theme='light'] {
+  --admin-page: oklch(0.975 0.002 95);
+  --admin-surface: #ffffff;
+  --admin-ink: #0c0c0c;
+  --admin-on-ink: #f7f7f5;
+  --admin-accent: #0c0c0c;
+  --admin-accent-hover: #262626;
+  --admin-line: rgb(0 0 0 / 0.1);
+  --admin-line-2: rgb(0 0 0 / 0.16);
+
+  --background: oklch(0.975 0.002 95);
+  --foreground: #0c0c0c;
+  --card: #ffffff;
+  --card-foreground: #0c0c0c;
+  --popover: #ffffff;
+  --popover-foreground: #0c0c0c;
+  --primary: #0c0c0c;
+  --primary-foreground: #f7f7f5;
+  --secondary: oklch(0.96 0.002 95);
+  --secondary-foreground: #0c0c0c;
+  --muted: oklch(0.96 0.002 95);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.96 0.002 95);
+  --accent-foreground: #0c0c0c;
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: #ffffff;
+  --border: rgb(0 0 0 / 0.1);
+  --input: rgb(0 0 0 / 0.14);
+  --ring: oklch(0.55 0 0);
+
+  --money: oklch(0.52 0.13 155);
+  --money-soft: oklch(0.94 0.04 155);
+  --money-ink: oklch(0.38 0.11 155);
+
+  --paper: oklch(0.975 0.002 95);
+  --paper-warm: #ffffff;
+
+  --admin-chart-ink: oklch(0.2 0 0);
+  --admin-chart-money: oklch(0.52 0.13 155);
+  --admin-chart-amber: oklch(0.6 0.14 75);
+  --admin-chart-violet: oklch(0.52 0.17 280);
+  --admin-chart-sky: oklch(0.55 0.15 240);
+  --admin-chart-grid: oklch(0.9 0 0);
+
+  --shadow-card: 0 1px 2px 0 oklch(0 0 0 / 0.05), 0 1px 3px 1px oklch(0 0 0 / 0.04);
+  --shadow-card-hover: 0 2px 4px -2px oklch(0 0 0 / 0.06), 0 16px 32px -12px oklch(0 0 0 / 0.16);
+  --shadow-raised: 0 0 0 1px oklch(0 0 0 / 0.06), 0 18px 40px -16px oklch(0 0 0 / 0.22);
+
+  --tint-emerald-bg: oklch(0.96 0.05 155);
+  --tint-emerald-fg: oklch(0.44 0.13 155);
+  --tint-emerald-line: oklch(0.89 0.07 155);
+  --tint-amber-bg: oklch(0.97 0.05 85);
+  --tint-amber-fg: oklch(0.46 0.11 60);
+  --tint-amber-line: oklch(0.91 0.07 85);
+  --tint-sky-bg: oklch(0.96 0.04 235);
+  --tint-sky-fg: oklch(0.43 0.12 250);
+  --tint-sky-line: oklch(0.89 0.07 235);
+  --tint-rose-bg: oklch(0.96 0.04 20);
+  --tint-rose-fg: oklch(0.44 0.16 15);
+  --tint-rose-line: oklch(0.89 0.07 20);
+  --tint-violet-bg: oklch(0.96 0.04 300);
+  --tint-violet-fg: oklch(0.45 0.16 285);
+  --tint-violet-line: oklch(0.89 0.07 285);
+  --tint-slate-bg: oklch(0.96 0.004 90);
+  --tint-slate-fg: oklch(0.45 0 0);
+  --tint-slate-line: oklch(0.9 0.004 90);
+
+  color: var(--admin-ink);
+}
+
+/* The wordmark ships as a black PNG and is inverted for the dark rail. On
+   paper the sidebar is light, so it must go back to black. */
+.admin-app[data-theme='light'] .admin-logo-invert {
+  filter: none;
 }
 
 /* Chart & sparkline wrappers */
