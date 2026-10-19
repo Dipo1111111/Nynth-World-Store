@@ -134,7 +134,7 @@ export default function AdminLayout({ children, title }) {
                 {/* Brand lockup */}
                 <div className="px-6 pt-7 pb-6 flex items-center justify-between">
                     <Link to="/admin" className="flex items-center gap-3 group">
-                        <Logo size="sm" className="admin-logo-invert" />
+                        <Logo size="sm" />
                         <span className="text-[9px] font-bold tracking-[0.4em] text-[var(--admin-ink)]/70 group-hover:text-[var(--admin-ink)] transition-colors">
                             ADMIN
                         </span>
@@ -228,7 +228,7 @@ export default function AdminLayout({ children, title }) {
                     hamburger on small screens. */}
                 <header className="sticky top-0 z-30 md:hidden flex items-center justify-between px-4 py-3 pr-16 bg-[var(--admin-page)] text-[var(--admin-ink)] shadow-card">
                     <Link to="/admin" className="flex items-center gap-2">
-                        <Logo size="sm" className="admin-logo-invert h-5" />
+                        <Logo size="sm" className="h-5" />
                         <span className="text-[8px] font-bold tracking-[0.3em] text-[var(--admin-ink)]/70">ADMIN</span>
                     </Link>
                     <button

@@ -360,10 +360,27 @@
   color: var(--admin-ink);
 }
 
-/* The wordmark ships as a black PNG and is inverted for the dark rail. On
-   paper the sidebar is light, so it must go back to black. */
-.admin-app[data-theme='light'] .admin-logo-invert {
+/* ============================================================
+   NYNTH WORDMARK
+
+   The wordmark PNG ships white on transparent, so the colour it
+   reads as is decided here and not in the component.
+
+   Paper (the whole storefront, and the admin in light mode): black.
+   The black admin rail in dark mode: white.
+   ============================================================ */
+.nynth-wordmark {
+  filter: brightness(0);
+}
+
+/* Dark admin rail. The wordmark ships white, so it is left alone. */
+.admin-app .nynth-wordmark {
   filter: none;
+}
+
+/* Paper admin rail. Back to black, same as the storefront. */
+.admin-app[data-theme='light'] .nynth-wordmark {
+  filter: brightness(0);
 }
 
 /* Chart & sparkline wrappers */

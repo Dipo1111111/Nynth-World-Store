@@ -15,6 +15,16 @@ import { resolve } from "node:path";
 const read = (p) => readFileSync(resolve(process.cwd(), p), "utf8");
 const css = read("src/index.css");
 
+// Pulls the body of one CSS rule, so an assertion is about that rule and not
+// about whatever text happens to sit next to it.
+const ruleBody = (selector) => {
+  const start = css.indexOf(`${selector} {`);
+  if (start === -1) return null;
+  const open = css.indexOf("{", start);
+  const close = css.indexOf("}", open);
+  return css.slice(open + 1, close);
+};
+
 const adminFiles = [
   ...readdirSync(resolve(process.cwd(), "src/pages/admin")).map((f) => `src/pages/admin/${f}`),
   ...readdirSync(resolve(process.cwd(), "src/components/admin")).map((f) => `src/components/admin/${f}`),
@@ -58,13 +68,23 @@ describe("admin token layer", () => {
     expect(dark).toContain("--admin-surface: #0a0a0a");
   });
 
-  it("un-inverts the wordmark on paper, since the rail becomes light", () => {
-    const light = css.slice(css.indexOf(".admin-app[data-theme='light']"));
-    expect(light).toContain("admin-logo-invert");
-    expect(light).toContain("filter: none");
+  it("reads the wordmark white on the black rail and black on paper", () => {
+    // The wordmark PNG ships white on transparent, so the filter decides what
+    // it reads as. Paper is black, the dark admin rail is white.
+    expect(ruleBody(".nynth-wordmark")).toContain("filter: brightness(0)");
+    expect(ruleBody(".admin-app .nynth-wordmark")).toContain("filter: none");
+    expect(ruleBody(".admin-app[data-theme='light'] .nynth-wordmark")).toContain(
+      "filter: brightness(0)"
+    );
+  });
+
+  it("leaves the wordmark colour to the CSS, not to the component", () => {
+    const logo = read("src/components/common/Logo.jsx");
+    expect(logo).toContain("nynth-wordmark");
+    // A hardcoded filter in the component would beat the theme rules.
+    expect(logo).not.toContain("brightness-0");
   });
 });
-
 describe("no admin page hardcodes the ink palette", () => {
   // A page with literal #0a0a0a / #EDEAE2 ignores the switch entirely and
   // stays dark in light mode. That was the whole problem before this refactor.
