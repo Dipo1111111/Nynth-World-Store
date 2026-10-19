@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { fetchUserOrders, subscribeOrders } from "../api/firebaseFunctions";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
-import { LogOut, Package, User, MapPin, ChevronRight, ShoppingBag, Ticket } from "lucide-react";
+import { LogOut, Package, User, MapPin, ChevronRight, ShoppingBag, Ticket, ShieldCheck } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { formatEventDate } from "../utils/tickets";
 import { Link } from "react-router-dom";
@@ -73,7 +73,10 @@ export default function Account() {
 
                                     {isAdmin && (
                                         <div className="mt-4">
-                                            <span className="text-[9px] tracking-[0.2em] font-bold uppercase bg-black text-white px-3 py-1">Admin Access</span>
+                                            <Link to="/admin" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-black text-[8px] tracking-[0.2em] font-bold uppercase bg-black text-white shadow-card hover:bg-white hover:text-black transition-all focus-ring">
+                                                <ShieldCheck size={12} />
+                                                Admin
+                                            </Link>
                                         </div>
                                     )}
                                 </div>
