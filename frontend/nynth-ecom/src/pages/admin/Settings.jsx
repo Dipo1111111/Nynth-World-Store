@@ -12,6 +12,7 @@ import { DEFAULT_REVENUE_DISPLAY, formatNaira, normalizeRevenueDisplay } from ".
 import headerBanner from "../../assets/header.JPEG";
 import { LAGOS_SHIPPING_DATA, ABUJA_SHIPPING_DATA, INTERSTATE_SHIPPING_DATA, EMPTY_SHIPPING_RATES } from "../../data/locationData";
 import ShippingRatesEditor from "../../components/admin/ShippingRatesEditor";
+import Toggle from "../../components/admin/Toggle";
 
 // Base settings defaults - merged with whatever is persisted in the DB.
 const SETTINGS_DEFAULTS = {
@@ -123,6 +124,23 @@ const STORY_DEFAULTS = {
  footer_name: "NYNTH WORLD LTD"
 };
 
+// The settings page is one tab per area. A tab shows only the sections that
+// belong to it, so the page stays a normal height instead of one endless
+// scroll with every section stacked under every other one.
+// The hash stays in the URL so a tab can be linked to directly.
+const SECTION_TABS = [
+  { id: "store", label: "Store", hash: "#set-store" },
+  { id: "shop", label: "Shop page", hash: "#set-shop" },
+  { id: "product", label: "Product page", hash: "#set-product" },
+  { id: "landing", label: "Landing", hash: "#set-landing" },
+  { id: "revenue", label: "Revenue", hash: "#set-revenue" },
+  { id: "lock", label: "Lock page", hash: "#set-lock" },
+  { id: "shipping", label: "Shipping", hash: "#set-shipping" },
+  { id: "announce", label: "Announcements", hash: "#set-announce" },
+  { id: "content", label: "Content", hash: "#set-content" },
+  { id: "cleanup", label: "Cleanup", hash: "#set-cleanup" },
+];
+
 export default function AdminSettings() {
  const [settings, setSettings] = useState(mergeSettingsDefaults());
  const [loading, setLoading] = useState(true);
@@ -136,6 +154,8 @@ export default function AdminSettings() {
   const [savedSnapshot, setSavedSnapshot] = useState(null);
   const isDirty = savedSnapshot !== null && JSON.stringify(settings) !== JSON.stringify(savedSnapshot);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  // Which settings tab is open. Only that tab's sections are mounted.
+  const [activeTab, setActiveTab] = useState("store");
 
   // Back-to-top pill for the long settings page.
   useEffect(() => {
@@ -155,6 +175,24 @@ export default function AdminSettings() {
  window.addEventListener("beforeunload", handler);
  return () => window.removeEventListener("beforeunload", handler);
  }, [isDirty]);
+
+  // Deep links. /admin/settings#set-shop opens the Shop page tab.
+  useEffect(() => {
+  const syncFromHash = () => {
+  const match = SECTION_TABS.find((tab) => tab.hash === window.location.hash);
+  if (match) setActiveTab(match.id);
+  };
+  syncFromHash();
+  window.addEventListener("hashchange", syncFromHash);
+  return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
+
+  const selectTab = (tab) => {
+  setActiveTab(tab.id);
+  if (window.location.hash !== tab.hash) {
+  window.history.replaceState(null, "", tab.hash);
+  }
+  };
 
  const handleDiscard = () => {
  if (!savedSnapshot) return;
@@ -333,7 +371,7 @@ export default function AdminSettings() {
  const SectionTitle = ({ icon: Icon, title }) => (
  <div className="flex items-center gap-2 mb-6 pb-2 border-b border-[var(--admin-ink)]/10">
  <Icon size={18} className="text-[var(--admin-ink)]/42" />
- <h3 className="font-bold text-lg">{title}</h3>
+ <h2 className="font-bold text-lg">{title}</h2>
  </div>
  );
 
@@ -351,43 +389,64 @@ export default function AdminSettings() {
   Easier on the eyes. The admin was dark by default, which was hard to read. Your choice is remembered on this device.
   </p>
   </div>
-  <button
-  type="button"
-  onClick={toggleTheme}
-  aria-label="Toggle light mode"
-  aria-pressed={theme === "light"}
-  className={`w-12 h-6 rounded-lg transition-colors relative shrink-0 focus-ring ${theme === "light" ? 'bg-[var(--admin-accent)]' : 'bg-[var(--admin-ink)]/15'}`}
-  >
-  <div className={`absolute top-1 w-4 h-4 rounded-lg transition-all ${theme === "light" ? 'left-7 bg-[var(--admin-on-ink)]' : 'left-1 bg-[var(--admin-surface)]'}`} />
-  </button>
+  <Toggle
+  checked={theme === "light"}
+  onChange={toggleTheme}
+  label="Light mode"
+  />
   </div>
   </div>
 
   <header className="flex flex-wrap items-center justify-between gap-3">
   <p className="text-sm text-[var(--admin-ink)]/55">Storefront configuration. Changes stay staged until you save.</p>
   {isDirty && (
-  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-200">
-  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
+  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">
+  <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-amber-fg)] animate-pulse" aria-hidden="true" />
   Unsaved changes
   </span>
   )}
   </header>
 
-  <nav aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur px-2 py-2">
-  {[["Store", "#set-store"], ["Shop page", "#set-shop"], ["Product page", "#set-product"], ["Landing", "#set-landing"], ["Revenue", "#set-revenue"], ["Lock page", "#set-lock"], ["Shipping", "#set-shipping"], ["Announcements", "#set-announce"], ["Content", "#set-content"], ["Cleanup", "#set-cleanup"]].map(([label, href]) => (
-  <a key={href} href={href} className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.06] transition-colors focus-ring">
-  {label}
-  </a>
-  ))}
+  <nav role="tablist" aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur px-2 py-2">
+  {SECTION_TABS.map((tab) => {
+  const active = activeTab === tab.id;
+  return (
+  <button
+  key={tab.id}
+  id={`tab-${tab.id}`}
+  type="button"
+  role="tab"
+  aria-selected={active}
+  aria-controls="settings-tabpanel"
+  tabIndex={active ? 0 : -1}
+  onClick={() => selectTab(tab)}
+  className={`shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors focus-ring ${active
+  ? "bg-[var(--admin-accent)] text-[var(--admin-on-ink)]"
+  : "text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-ink)]/[0.06]"}`}
+  >
+  {tab.label}
+  </button>
+  );
+  })}
   </nav>
 
+  {/* One panel at a time. The tab decides what is mounted, so the page never
+  stacks every section under every other one. */}
+  <div
+  id="settings-tabpanel"
+  role="tabpanel"
+  aria-labelledby={`tab-${activeTab}`}
+  className="space-y-6"
+  >
+
   {/* General Settings */}
+  {activeTab === "store" && (
   <div id="set-store" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Site Name</label>
- <input
+ <label htmlFor="site_name" className="text-sm font-medium text-[var(--admin-ink)]/78">Site Name</label>
+ <input id="site_name"
  name="site_name"
  value={settings.site_name}
  onChange={handleChange}
@@ -396,8 +455,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Currency Symbol</label>
- <input
+ <label htmlFor="currency_symbol" className="text-sm font-medium text-[var(--admin-ink)]/78">Currency Symbol</label>
+ <input id="currency_symbol"
  name="currency_symbol"
  value={settings.currency_symbol}
  onChange={handleChange}
@@ -407,31 +466,33 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+  )}
 
  {/* Shop Page Layout */}
+  {activeTab === "shop" && (
  <div id="set-shop" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={LayoutList} title="Shop Page Layout" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the category tabs and the bold tickets band on the shop page. Changes stay staged until you save.
  </p>
 
  <div className="mb-8">
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Category Tab Order</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Category Tab Order</h4>
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, shop_category_order: [...DEFAULT_CATEGORY_ORDER] }))}
- className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  <RotateCcw size={11} /> Restore Default
  </button>
  </div>
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-3">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-3">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
  <div className="border border-[var(--admin-ink)]/10 rounded-lg divide-y divide-[var(--admin-ink)]/10">
  {(settings.shop_category_order || []).map((cat, idx) => (
  <div key={`${cat}-${idx}`} className="flex items-center justify-between gap-3 px-3 py-2.5">
  <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[var(--admin-ink)]">
- <span className="text-[var(--admin-ink)]/42 tabular-nums">{String(idx + 1).padStart(2, "0")}</span>
+ <span className="text-[var(--admin-ink)]/70 tabular-nums">{String(idx + 1).padStart(2, "0")}</span>
  {categoryLabel(cat)}
  </span>
  <span className="flex items-center gap-1">
@@ -439,7 +500,7 @@ export default function AdminSettings() {
  type="button"
  disabled={idx === 0}
  onClick={() => moveCategory(idx, -1)}
- className="p-1.5 rounded hover:bg-white/[0.08] text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ className="p-1.5 rounded-lg focus-ring hover:bg-[var(--admin-ink)]/[0.08] text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
  title="Move up"
  aria-label={`Move ${categoryLabel(cat)} up`}
  >
@@ -449,7 +510,7 @@ export default function AdminSettings() {
  type="button"
  disabled={idx === (settings.shop_category_order || []).length - 1}
  onClick={() => moveCategory(idx, 1)}
- className="p-1.5 rounded hover:bg-white/[0.08] text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ className="p-1.5 rounded-lg focus-ring hover:bg-[var(--admin-ink)]/[0.08] text-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
  title="Move down"
  aria-label={`Move ${categoryLabel(cat)} down`}
  >
@@ -459,7 +520,7 @@ export default function AdminSettings() {
  type="button"
  disabled={idx === 0}
  onClick={() => removeCategory(idx)}
- className="p-1.5 rounded hover:bg-rose-500/10 text-[var(--admin-ink)]/60 hover:text-rose-300 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+ className="p-1.5 rounded-lg focus-ring hover:bg-[var(--tint-rose-fg)]/10 text-[var(--admin-ink)]/60 hover:text-[var(--tint-rose-fg)] transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
  title="Hide tab"
  aria-label={`Hide ${categoryLabel(cat)} tab`}
  >
@@ -488,50 +549,50 @@ export default function AdminSettings() {
 
  <div className="space-y-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Bold Tickets Band Position</label>
- <div className="flex flex-wrap gap-2">
+ <h4 id="tickets-band-position" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Bold Tickets Band Position</h4>
+ <div role="radiogroup" aria-labelledby="tickets-band-position" className="flex flex-wrap gap-2">
  {[["top", "TOP (BELOW TABS)"], ["bottom", "BOTTOM (BELOW PRODUCTS)"], ["hidden", "HIDDEN"]].map(([val, label]) => (
  <button
  key={val}
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, tickets_band_position: val }))}
- className={`flex items-center gap-2 px-4 py-3 border transition-all text-[10px] font-bold uppercase tracking-widest ${
+ className={`flex items-center gap-2 px-4 py-3 border rounded-lg focus-ring transition-all text-[10px] font-bold uppercase tracking-widest ${
  settings.tickets_band_position === val
  ? 'border-[var(--admin-ink)]/25 bg-[var(--admin-accent)] text-[var(--admin-on-ink)]'
- : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
+ : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/60 hover:border-[var(--admin-ink)]/32'
  }`}
  >
  {label}
  </button>
  ))}
  </div>
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Bold Tickets Band Shows On</label>
- <div className="flex flex-wrap gap-2">
+ <h4 id="tickets-band-scope" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Bold Tickets Band Shows On</h4>
+ <div role="radiogroup" aria-labelledby="tickets-band-scope" className="flex flex-wrap gap-2">
  {[["all", "ALL SECTIONS"], ["tickets_only", "TICKETS TAB ONLY"]].map(([val, label]) => (
  <button
  key={val}
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, tickets_band_scope: val }))}
- className={`flex items-center gap-2 px-4 py-3 border transition-all text-[10px] font-bold uppercase tracking-widest ${
+ className={`flex items-center gap-2 px-4 py-3 border rounded-lg focus-ring transition-all text-[10px] font-bold uppercase tracking-widest ${
  settings.tickets_band_scope === val
  ? 'border-[var(--admin-ink)]/25 bg-[var(--admin-accent)] text-[var(--admin-on-ink)]'
- : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
+ : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/60 hover:border-[var(--admin-ink)]/32'
  }`}
  >
  {label}
  </button>
  ))}
  </div>
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">When set to tickets tab only, the bold band is skipped on All and other views.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">When set to tickets tab only, the bold band is skipped on All and other views.</p>
  </div>
 
  <div className="max-w-xs space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Max Tickets in Bold Band</label>
- <input
+ <label htmlFor="tickets_band_limit" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Max Tickets in Bold Band</label>
+ <input id="tickets_band_limit"
  name="tickets_band_limit"
  type="number"
  min="1"
@@ -540,21 +601,23 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
  </div>
  </div>
  </div>
+  )}
 
  {/* PRODUCT VARIANT OPTIONS */}
+  {activeTab === "product" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={PackageIcon} title="Product Variant Options" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Manage the preset options available when creating or editing products. Separate items with commas.
  </p>
  <div className="space-y-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Available Colors</label>
- <textarea
+ <label htmlFor="available_colors" className="text-sm font-medium text-[var(--admin-ink)]/78">Available Colors</label>
+ <textarea id="available_colors"
  name="available_colors"
  value={settings.available_colors}
  onChange={handleChange}
@@ -564,8 +627,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Available Sizes</label>
- <textarea
+ <label htmlFor="available_sizes" className="text-sm font-medium text-[var(--admin-ink)]/78">Available Sizes</label>
+ <textarea id="available_sizes"
  name="available_sizes"
  value={settings.available_sizes}
  onChange={handleChange}
@@ -576,28 +639,26 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+  )}
 
   {/* PRODUCT PAGE COPY */}
+  {activeTab === "product" && (
   <div id="set-product" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
     <SectionTitle icon={FileText} title="Product Page Copy" />
-    <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+    <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
       The SHIPPING &amp; RETURNS panel shown on every product page. Any single product can override this in Products &gt; Edit &gt; Product page note. The 7-day return badge has been removed from product pages.
     </p>
 
-    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
+    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
       <div>
         <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Show The Panel</h4>
-        <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Off hides the accordion on every product page</p>
+        <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Off hides the accordion on every product page</p>
       </div>
-      <button
-        type="button"
-        aria-label="Show the product page note panel"
-        aria-pressed={settings.product_note_enabled !== false}
-        onClick={() => setSettings(prev => ({ ...prev, product_note_enabled: prev.product_note_enabled === false }))}
-        className={`w-12 h-6 rounded-lg transition-colors relative ${settings.product_note_enabled !== false ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
-      >
-        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${settings.product_note_enabled !== false ? 'left-7' : 'left-1'}`} />
-      </button>
+      <Toggle
+  checked={settings.product_note_enabled !== false}
+  onChange={(next) => setSettings(prev => ({ ...prev, product_note_enabled: next }))}
+  label="Show the shipping and returns panel on product pages"
+  />
     </div>
 
     <div className="space-y-2 mb-5">
@@ -622,7 +683,7 @@ export default function AdminSettings() {
             product_note_title: DEFAULT_PRODUCT_NOTE_TITLE,
             product_note_text: DEFAULT_PRODUCT_NOTE,
           }))}
-          className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+          className="focus-ring flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
         >
           <RotateCcw size={11} /> Restore Default
         </button>
@@ -636,7 +697,7 @@ export default function AdminSettings() {
         className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
         placeholder={DEFAULT_PRODUCT_NOTE}
       />
-      <p className="text-[10px] text-[var(--admin-ink)]/42 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
+      <p className="text-[10px] text-[var(--admin-ink)]/55 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
     </div>
 
     <div className="space-y-2 mt-8 pt-6 border-t border-[var(--admin-ink)]/10">
@@ -650,65 +711,63 @@ export default function AdminSettings() {
         className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
         placeholder={DEFAULT_RETURNS_PAGE_POLICY}
       />
-      <p className="text-[10px] text-[var(--admin-ink)]/42 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
+      <p className="text-[10px] text-[var(--admin-ink)]/55 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
     </div>
   </div>
+  )}
 
   {/* LANDING SPLIT */}
+  {activeTab === "landing" && (
   <div id="set-landing" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={ImageIcon} title="Landing Page Split" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  The front page is two boxes. One for the store, one for tickets. Drop an image on either and it goes live the moment you save.
  </p>
 
- <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 mb-6">
+ <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 mb-6">
  <div>
  <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Two-box Landing Page</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Off sends visitors straight to the shop, as before</p>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Off sends visitors straight to the shop, as before</p>
  </div>
- <button
- type="button"
- aria-label="Toggle the two-box landing page"
- aria-pressed={(settings.landing || {}).enabled !== false}
- onClick={() => setLandingField("enabled", (settings.landing || {}).enabled === false)}
- className={`w-12 h-6 rounded-lg transition-colors relative ${(settings.landing || {}).enabled !== false ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
- >
- <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${(settings.landing || {}).enabled !== false ? 'left-7' : 'left-1'}`} />
- </button>
+ <Toggle
+  checked={(settings.landing || {}).enabled !== false}
+  onChange={(next) => setLandingField("enabled", next)}
+  label="Two-box landing page"
+  />
  </div>
 
  <div className="grid md:grid-cols-2 gap-6">
  {[["storeImage", "Store box image", "storeTitle", "Store box title"], ["ticketImage", "Ticket box image", "ticketTitle", "Ticket box title"]].map(([imageKey, imageLabel, titleKey, titleLabel]) => (
  <div key={imageKey} className="space-y-3">
- <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden border border-white/[0.06]">
+ <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden border border-[var(--admin-ink)]/[0.06]">
  {(settings.landing || {})[imageKey] ? (
  <>
  <img src={settings.landing[imageKey]} alt="" className="w-full h-full object-cover" />
  <button
  type="button"
  onClick={() => setLandingField(imageKey, "")}
- className="absolute top-3 right-3 bg-black/60 text-white p-2 rounded-lg hover:bg-black/70 transition-colors shadow-card"
+ className="focus-ring absolute top-3 right-3 bg-black/60 text-white p-2 rounded-lg hover:bg-black/70 transition-colors shadow-card"
  title="Remove image"
  >
  <X size={16} />
  </button>
  </>
  ) : (
- <div className="w-full h-full flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 bg-white/[0.03]">
+ <div className="w-full h-full flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 bg-[var(--admin-ink)]/[0.03]">
  No image
  </div>
  )}
  </div>
- <div className="relative border-2 border-dashed border-[var(--admin-ink)]/26 rounded-lg p-6 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
+ <div className="relative border-2 border-dashed border-[var(--admin-ink)]/26 rounded-lg p-6 flex flex-col items-center justify-center hover:bg-[var(--admin-ink)]/[0.05] transition-all cursor-pointer group">
  <input type="file" accept="image/*" onChange={handleLandingImageUpload(imageKey)} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer" />
  <Upload size={20} className="text-[var(--admin-ink)]/42 mb-2 group-hover:text-[var(--admin-ink)] transition-colors" />
- <span className="text-[10px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
+ <span className="text-[10px] font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
  {isUploading ? "Uploading..." : imageLabel}
  </span>
- <p className="text-[10px] text-[var(--admin-ink)]/42 mt-2">Recommended: 1200 x 1500 px (portrait)</p>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 mt-2">Recommended: 1200 x 1500 px (portrait)</p>
  </div>
  <div>
- <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">{titleLabel}</label>
+ <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 mb-2">{titleLabel}</label>
  <input
  value={(settings.landing || {})[titleKey] ?? ""}
  onChange={(e) => setLandingField(titleKey, e.target.value)}
@@ -720,28 +779,26 @@ export default function AdminSettings() {
  ))}
  </div>
   </div>
+  )}
 
   {/* REVENUE PRIVACY */}
+  {activeTab === "revenue" && (
   <div id="set-revenue" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
     <SectionTitle icon={EyeOff} title="Revenue Privacy" />
-    <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+    <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
       Controls the Net sales figure at the top of the admin dashboard. Hidden figures show as ****.*** until you click the eye.
     </p>
 
-    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
+    <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
       <div>
         <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Hide By Default</h4>
-        <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Masked every time the dashboard loads</p>
+        <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Masked every time the dashboard loads</p>
       </div>
-      <button
-        type="button"
-        aria-label="Hide revenue by default"
-        aria-pressed={normalizeRevenueDisplay(settings.revenue_display).hide_by_default}
-        onClick={() => setRevenueDisplay({ hide_by_default: !normalizeRevenueDisplay(settings.revenue_display).hide_by_default })}
-        className={`w-12 h-6 rounded-lg transition-colors relative ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
-      >
-        <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${normalizeRevenueDisplay(settings.revenue_display).hide_by_default ? 'left-7' : 'left-1'}`} />
-      </button>
+      <Toggle
+  checked={normalizeRevenueDisplay(settings.revenue_display).hide_by_default}
+  onChange={(next) => setRevenueDisplay({ hide_by_default: next })}
+  label="Hide revenue by default"
+  />
     </div>
 
     <div className="space-y-2">
@@ -756,75 +813,67 @@ export default function AdminSettings() {
         className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring tabular-nums"
         placeholder="Leave empty to show the real paid total"
       />
-      <p className="text-[10px] text-[var(--admin-ink)]/42 leading-relaxed">
+      <p className="text-[10px] text-[var(--admin-ink)]/55 leading-relaxed">
         When set, the dashboard shows this number instead of the ledger total and marks it with a red dot. Only the red dot tells you it is not the real figure. Leave empty to show the real paid total.
       </p>
       {normalizeRevenueDisplay(settings.revenue_display).override !== null && (
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-rose-300 pt-1">
-          <span className="inline-block h-2 w-2 rounded-full bg-rose-500" aria-hidden="true" />
+        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-rose-fg)] pt-1">
+          <span className="inline-block h-2 w-2 rounded-full bg-[var(--tint-rose-fg)]" aria-hidden="true" />
           Manual figure active - dashboard will read {revenuePreview}
         </p>
       )}
     </div>
   </div>
+  )}
 
   {/* LOCK PAGE CONFIGURATION */}
+  {activeTab === "lock" && (
   <div id="set-lock" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
  </p>
  
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
+  <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Lock Page</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Lock Page</h4>
  <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
- <input
- type="checkbox"
- name="lock_page_enabled"
- checked={settings.lock_page_enabled}
- onChange={handleChange}
- className="sr-only peer"
- />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
- </label>
+ <Toggle
+  checked={settings.lock_page_enabled}
+  onChange={(next) => setSettings(prev => ({ ...prev, lock_page_enabled: next }))}
+  label="Enable the lock page"
+  />
  </div>
 
  {/* Timer Toggle */}
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
+  <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Countdown Timer</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Countdown Timer</h4>
  <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
- <input
- type="checkbox"
- name="lock_timer_enabled"
- checked={settings.lock_timer_enabled}
- onChange={handleChange}
- className="sr-only peer"
- />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
- </label>
+ <Toggle
+  checked={settings.lock_timer_enabled}
+  onChange={(next) => setSettings(prev => ({ ...prev, lock_timer_enabled: next }))}
+  label="Enable the countdown timer on the lock page"
+  />
  </div>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Launch Countdown Date</label>
- <input
+ <label htmlFor="launch_date" className="text-sm font-medium text-[var(--admin-ink)]/78">Launch Countdown Date</label>
+ <input id="launch_date"
  type="datetime-local"
  name="launch_date"
  value={settings.launch_date ? settings.launch_date.substring(0, 16) : ""}
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Countdown Duration (minutes)</label>
- <input
+ <label htmlFor="lock_timer_duration_minutes" className="text-sm font-medium text-[var(--admin-ink)]/78">Countdown Duration (minutes)</label>
+ <input id="lock_timer_duration_minutes"
  type="number"
  name="lock_timer_duration_minutes"
  value={settings.lock_timer_duration_minutes}
@@ -833,11 +882,11 @@ export default function AdminSettings() {
  max="999"
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Lock Password</label>
- <input
+ <label htmlFor="lock_password" className="text-sm font-medium text-[var(--admin-ink)]/78">Lock Password</label>
+ <input id="lock_password"
  name="lock_password"
  value={settings.lock_password}
  onChange={handleChange}
@@ -846,8 +895,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 1</label>
- <input
+ <label htmlFor="lock_title1" className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 1</label>
+ <input id="lock_title1"
  name="lock_title1"
  value={settings.lock_title1}
  onChange={handleChange}
@@ -856,8 +905,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 2 (Faded)</label>
- <input
+ <label htmlFor="lock_title2" className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 2 (Faded)</label>
+ <input id="lock_title2"
  name="lock_title2"
  value={settings.lock_title2}
  onChange={handleChange}
@@ -866,8 +915,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Title</label>
- <input
+ <label htmlFor="lock_waitlist_title" className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Title</label>
+ <input id="lock_waitlist_title"
  name="lock_waitlist_title"
  value={settings.lock_waitlist_title}
  onChange={handleChange}
@@ -876,8 +925,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2 md:col-span-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Subtitle</label>
- <input
+ <label htmlFor="lock_waitlist_subtitle" className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Subtitle</label>
+ <input id="lock_waitlist_subtitle"
  name="lock_waitlist_subtitle"
  value={settings.lock_waitlist_subtitle}
  onChange={handleChange}
@@ -887,16 +936,18 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+  )}
 
  {/* Contact Information */}
+  {activeTab === "store" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Mail} title="Contact Information" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Support Email</label>
+ <label htmlFor="support_email" className="text-sm font-medium text-[var(--admin-ink)]/78">Support Email</label>
  <div className="relative">
  <Mail size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
- <input
+ <input id="support_email"
  name="support_email"
  type="email"
  value={settings.support_email}
@@ -907,10 +958,10 @@ export default function AdminSettings() {
  </div>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Support Phone</label>
+ <label htmlFor="support_phone" className="text-sm font-medium text-[var(--admin-ink)]/78">Support Phone</label>
  <div className="relative">
  <Phone size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
- <input
+ <input id="support_phone"
  name="support_phone"
  value={settings.support_phone}
  onChange={handleChange}
@@ -920,10 +971,10 @@ export default function AdminSettings() {
  </div>
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Support WhatsApp</label>
+ <label htmlFor="support_whatsapp" className="text-sm font-medium text-[var(--admin-ink)]/78">Support WhatsApp</label>
  <div className="relative">
  <Share2 size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
- <input
+ <input id="support_whatsapp"
  name="support_whatsapp"
  value={settings.support_whatsapp}
  onChange={handleChange}
@@ -933,10 +984,10 @@ export default function AdminSettings() {
  </div>
  </div>
  <div className="space-y-2 md:col-span-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Office Address</label>
+ <label htmlFor="office_address" className="text-sm font-medium text-[var(--admin-ink)]/78">Office Address</label>
  <div className="relative">
  <MapPin size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
- <input
+ <input id="office_address"
  name="office_address"
  value={settings.office_address}
  onChange={handleChange}
@@ -947,14 +998,16 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+  )}
 
  {/* Social Media */}
+  {activeTab === "store" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Share2} title="Social Media Links" />
  <div className="grid grid-cols-1 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Instagram URL</label>
- <input
+ <label htmlFor="instagram_url" className="text-sm font-medium text-[var(--admin-ink)]/78">Instagram URL</label>
+ <input id="instagram_url"
  name="instagram_url"
  value={settings.instagram_url}
  onChange={handleChange}
@@ -963,8 +1016,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">X (Twitter) URL</label>
- <input
+ <label htmlFor="twitter_url" className="text-sm font-medium text-[var(--admin-ink)]/78">X (Twitter) URL</label>
+ <input id="twitter_url"
  name="twitter_url"
  value={settings.twitter_url}
  onChange={handleChange}
@@ -973,8 +1026,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Facebook URL</label>
- <input
+ <label htmlFor="facebook_url" className="text-sm font-medium text-[var(--admin-ink)]/78">Facebook URL</label>
+ <input id="facebook_url"
  name="facebook_url"
  value={settings.facebook_url}
  onChange={handleChange}
@@ -983,8 +1036,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">TikTok URL</label>
- <input
+ <label htmlFor="tiktok_url" className="text-sm font-medium text-[var(--admin-ink)]/78">TikTok URL</label>
+ <input id="tiktok_url"
  name="tiktok_url"
  value={settings.tiktok_url || ""}
  onChange={handleChange}
@@ -994,40 +1047,44 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+  )}
 
  {/* Google Analytics Settings */}
+  {activeTab === "store" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
  <div className="space-y-4">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">GA4 Property ID</label>
- <input
+ <label htmlFor="ga_property_id" className="text-sm font-medium text-[var(--admin-ink)]/78">GA4 Property ID</label>
+ <input id="ga_property_id"
  name="ga_property_id"
  value={settings.ga_property_id || ""}
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono text-sm"
  placeholder="e.g. 123456789"
  />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest leading-relaxed">
  Required for the Admin Dashboard to pull real-time metrics. <br/>
  Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
  </p>
  </div>
  </div>
  </div>
+  )}
 
  {/* Brand Assets Section */}
+  {activeTab === "store" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
  <div className="space-y-4">
- <div className="flex justify-between items-center bg-white/[0.05] p-3 rounded-lg border border-[var(--admin-ink)]/10">
+ <div className="flex justify-between items-center bg-[var(--admin-ink)]/[0.05] p-3 rounded-lg border border-[var(--admin-ink)]/10">
  <span className="text-[10px] font-bold text-[var(--admin-ink)] uppercase tracking-widest leading-none">Currently Active Banner</span>
  {!settings.hero_banner && (
- <span className="text-[9px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest bg-[var(--admin-surface)] px-2 py-1 rounded border border-white/[0.06]">Default System Asset</span>
+ <span className="text-[9px] font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest bg-[var(--admin-surface)] px-2 py-1 rounded border border-[var(--admin-ink)]/[0.06]">Default System Asset</span>
  )}
  </div>
  <div className="flex flex-col gap-4">
- <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-white/[0.06]">
+ <div className="relative w-full aspect-[21/9] md:aspect-[21/6] rounded-lg overflow-hidden border border-[var(--admin-ink)]/[0.06]">
  <img 
  src={settings.hero_banner || headerBanner} 
  className="w-full h-full object-cover transition-opacity duration-300" 
@@ -1037,14 +1094,14 @@ export default function AdminSettings() {
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, hero_banner: "" }))}
- className="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-lg hover:bg-black/70 transition-colors shadow-card"
+ className="focus-ring absolute top-4 right-4 bg-black/60 text-white p-2 rounded-lg hover:bg-black/70 transition-colors shadow-card"
  title="Reset to Default"
  >
  <X size={18} />
  </button>
  )}
  </div>
- <div className="relative border-2 border-dashed border-[var(--admin-ink)]/26 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-white/[0.05] transition-all cursor-pointer group">
+ <div className="relative border-2 border-dashed border-[var(--admin-ink)]/26 rounded-lg p-10 flex flex-col items-center justify-center hover:bg-[var(--admin-ink)]/[0.05] transition-all cursor-pointer group">
  <input
  type="file"
  accept="image/*"
@@ -1053,56 +1110,64 @@ export default function AdminSettings() {
  className="absolute inset-0 opacity-0 cursor-pointer"
  />
  <Upload size={24} className="text-[var(--admin-ink)]/42 mb-2 group-hover:text-[var(--admin-ink)] transition-colors" />
- <span className="text-xs font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
+ <span className="text-xs font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
  {isUploading ? "Uploading..." : "Replace Header Image"}
  </span>
- <p className="text-[10px] text-[var(--admin-ink)]/42 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
  </div>
  </div>
  </div>
  </div>
+  )}
 
  {/* Banner Hover Color */}
+  {activeTab === "store" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Banner Hover Style" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-4 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-4 leading-relaxed">
  Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
  press <span className="text-[var(--admin-ink)]">Save All Settings</span> to publish.
  </p>
- <div className="flex gap-3">
- <button
- type="button"
- onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "red" }))}
- className={`flex items-center gap-3 px-5 py-3 border transition-all ${
+ <div role="radiogroup" aria-label="Banner hover style" className="flex gap-3">
+  <button
+  type="button"
+  role="radio"
+  aria-checked={settings.banner_hover_color === 'red'}
+  onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "red" }))}
+ className={`flex items-center gap-3 px-5 py-3 border rounded-lg focus-ring transition-all ${
  settings.banner_hover_color === 'red'
-? 'border-rose-500/60 bg-rose-500/[0.14] text-rose-300'
-  : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
+? 'border-[var(--tint-rose-line)] bg-[var(--tint-rose-fg)]/[0.14] text-[var(--tint-rose-fg)]'
+  : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/60 hover:border-[var(--admin-ink)]/32'
  }`}
  >
- <div className="w-4 h-4 rounded-lg bg-red-600"></div>
+ <div className="w-4 h-4 bg-red-600 border border-[var(--admin-ink)]/20"></div>
  <span className="text-[10px] font-bold uppercase tracking-widest">RED</span>
  </button>
  <button
- type="button"
- onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
- className={`flex items-center gap-3 px-5 py-3 border transition-all ${
+  type="button"
+  role="radio"
+  aria-checked={settings.banner_hover_color === 'black'}
+  onClick={() => setSettings(prev => ({ ...prev, banner_hover_color: "black" }))}
+ className={`flex items-center gap-3 px-5 py-3 border rounded-lg focus-ring transition-all ${
  settings.banner_hover_color === 'black'
 ? 'border-[var(--admin-ink)]/25 bg-[var(--admin-accent)] text-[var(--admin-on-ink)]'
-  : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/42 hover:border-[var(--admin-ink)]/32'
+  : 'border-[var(--admin-ink)]/14 bg-[var(--admin-surface)] text-[var(--admin-ink)]/60 hover:border-[var(--admin-ink)]/32'
  }`}
  >
- <div className="w-4 h-4 rounded-lg bg-[var(--admin-accent)]"></div>
+ <div className="w-4 h-4 bg-[var(--admin-accent)] border border-[var(--admin-ink)]/20"></div>
  <span className="text-[10px] font-bold uppercase tracking-widest">BLACK</span>
  </button>
  </div>
  </div>
+  )}
 
   {/* Shipping Settings */}
+  {activeTab === "shipping" && (
   <div id="set-shipping" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Default Shipping Fee ({settings.currency_symbol})</label>
- <input
+ <label htmlFor="shipping_fee" className="text-sm font-medium text-[var(--admin-ink)]/78">Default Shipping Fee ({settings.currency_symbol})</label>
+ <input id="shipping_fee"
  name="shipping_fee"
  type="number"
  value={settings.shipping_fee}
@@ -1111,35 +1176,32 @@ export default function AdminSettings() {
  />
  </div>
  </div>
+  )}
 
  {/* Free Delivery Discount */}
+  {activeTab === "shipping" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Percent} title="Free Delivery Discount" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
  </p>
 
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
+  <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Free Delivery Discount</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Free Delivery Discount</h4>
  <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
- <input
- type="checkbox"
- name="free_delivery_enabled"
- checked={settings.free_delivery_enabled}
- onChange={handleChange}
- className="sr-only peer"
- />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
- </label>
+ <Toggle
+  checked={settings.free_delivery_enabled}
+  onChange={(next) => setSettings(prev => ({ ...prev, free_delivery_enabled: next }))}
+  label="Offer free delivery above a minimum order value"
+  />
  </div>
 
  {settings.free_delivery_enabled && (
  <div className="max-w-xs space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Minimum Order Amount ({settings.currency_symbol})</label>
- <input
+ <label htmlFor="free_delivery_threshold" className="text-sm font-medium text-[var(--admin-ink)]/78">Minimum Order Amount ({settings.currency_symbol})</label>
+ <input id="free_delivery_threshold"
  name="free_delivery_threshold"
  type="number"
  value={settings.free_delivery_threshold}
@@ -1148,12 +1210,14 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="50000"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
  </div>
  )}
  </div>
+  )}
 
  {/* Shipping Rates Editor */}
+  {activeTab === "shipping" && (
  <ShippingRatesEditor
  settings={settings}
  setSettings={setSettings}
@@ -1171,18 +1235,20 @@ export default function AdminSettings() {
  }
  }}
  />
+  )}
 
  {/* Shipping Location Toggles */}
+  {activeTab === "shipping" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Truck} title="Shipping Locations" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Toggle delivery locations on or off. Disabled locations will not appear in checkout.
  </p>
 
  {/* Lagos Areas */}
  <div className="mb-8">
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Lagos Areas</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Lagos Areas</h4>
  <button
  type="button"
  onClick={() => {
@@ -1194,7 +1260,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, lagos: allDisabled ? [] : allLagos }
  }));
  }}
- className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1218,7 +1284,7 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-white/[0.05] line-through"
+ ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] line-through"
  : "border-[var(--admin-ink)]/18 text-[var(--admin-ink)] bg-[var(--admin-surface)] hover:border-[var(--admin-ink)]/32"
  }`}
  >
@@ -1232,7 +1298,7 @@ export default function AdminSettings() {
  {/* Abuja Areas */}
  <div className="mb-8">
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Abuja Areas</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Abuja Areas</h4>
  <button
  type="button"
  onClick={() => {
@@ -1244,7 +1310,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, abuja: allDisabled ? [] : allAbuja }
  }));
  }}
- className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1268,7 +1334,7 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-white/[0.05] line-through"
+ ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] line-through"
  : "border-[var(--admin-ink)]/18 text-[var(--admin-ink)] bg-[var(--admin-surface)] hover:border-[var(--admin-ink)]/32"
  }`}
  >
@@ -1282,7 +1348,7 @@ export default function AdminSettings() {
  {/* Interstate States */}
  <div>
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Interstate States</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Interstate States</h4>
  <button
  type="button"
  onClick={() => {
@@ -1294,7 +1360,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, interstate: allDisabled ? [] : allStates }
  }));
  }}
- className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1318,7 +1384,7 @@ export default function AdminSettings() {
  }}
  className={`text-left px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  isDisabled
- ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-white/[0.05] line-through"
+ ? "border-[var(--admin-ink)]/10 text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] line-through"
  : "border-[var(--admin-ink)]/18 text-[var(--admin-ink)] bg-[var(--admin-surface)] hover:border-[var(--admin-ink)]/32"
  }`}
  >
@@ -1329,93 +1395,89 @@ export default function AdminSettings() {
  </div>
  </div>
  </div>
+  )}
 
   {/* Announcement Bar */}
+  {activeTab === "announce" && (
   <div id="set-announce" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
  </p>
 
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
+  <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Announcement Bar</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Announcement Bar</h4>
  <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
- <input
- type="checkbox"
- name="announcement_bar_enabled"
- checked={settings.announcement_bar_enabled}
- onChange={handleChange}
- className="sr-only peer"
- />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
- </label>
+ <Toggle
+  checked={settings.announcement_bar_enabled}
+  onChange={(next) => setSettings(prev => ({ ...prev, announcement_bar_enabled: next }))}
+  label="Show the announcement bar above the navigation"
+  />
  </div>
 
  {settings.announcement_bar_enabled && (
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Bar Text</label>
- <input
+ <label htmlFor="announcement_bar_text" className="text-sm font-medium text-[var(--admin-ink)]/78">Bar Text</label>
+ <input id="announcement_bar_text"
  name="announcement_bar_text"
  value={settings.announcement_bar_text}
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="NEXT DROP IN:"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
  </div>
  )}
  </div>
+  )}
 
  {/* Promotional Marquee */}
+  {activeTab === "announce" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Promotional Marquee" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  A scrolling banner that appears above the hero image on Shop and Home pages.
  </p>
 
-  <div className="mb-6 p-4 bg-white/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
+  <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Enable Marquee</h4>
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Marquee</h4>
  <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
- <input
- type="checkbox"
- name="marquee_enabled"
- checked={settings.marquee_enabled}
- onChange={handleChange}
- className="sr-only peer"
- />
- <div className="w-11 h-6 bg-white/[0.18] peer-focus:outline-none rounded-lg peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--admin-surface)] after:border-[var(--admin-ink)]/18 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
- </label>
+ <Toggle
+  checked={settings.marquee_enabled}
+  onChange={(next) => setSettings(prev => ({ ...prev, marquee_enabled: next }))}
+  label="Show the promotional marquee above the hero image"
+  />
  </div>
 
  {settings.marquee_enabled && (
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Marquee Text</label>
- <input
+ <label htmlFor="marquee_text" className="text-sm font-medium text-[var(--admin-ink)]/78">Marquee Text</label>
+ <input id="marquee_text"
  name="marquee_text"
  value={settings.marquee_text}
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
  </div>
  )}
  </div>
+  )}
 
   {/* Email Section Settings */}
-  <div id="set-cleanup" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-rose-500/25 shadow-card scroll-mt-28">
+  {activeTab === "cleanup" && (
+  <div id="set-cleanup" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--tint-rose-line)] shadow-card scroll-mt-28">
  <SectionTitle icon={Mail} title="Email Section Settings" />
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div className="space-y-1">
- <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight">Database Cleanup</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest leading-relaxed">
+ <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Database Cleanup</h4>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest leading-relaxed">
  Merge duplicate subscriber entries to maintain a clean mailing list.
  </p>
  </div>
@@ -1423,30 +1485,30 @@ export default function AdminSettings() {
  type="button"
  onClick={handleMerge}
  disabled={isMerging}
- className="px-6 py-2 bg-rose-500/[0.14] text-rose-300 border border-rose-500/30 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
+ className="focus-ring px-6 py-2 bg-[var(--tint-rose-fg)]/[0.14] text-[var(--tint-rose-fg)] border border-[var(--tint-rose-line)] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
  >
  {isMerging ? "Cleaning..." : "Clean Duplicates"}
  </button>
  </div>
  </div>
  </div>
+  )}
 
   {/* Size Chart Settings */}
+  {activeTab === "content" && (
   <div id="set-content" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-6">
-  <div className="flex items-center justify-between gap-4 p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
+  <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
  <div>
  <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Enable Size Chart</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/42 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
+ <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
  </div>
- <button
- type="button"
- onClick={() => setSettings(prev => ({ ...prev, show_size_chart: !prev.show_size_chart }))}
- className={`w-12 h-6 rounded-lg transition-colors relative ${settings.show_size_chart ? 'bg-[var(--admin-accent)]' : 'bg-white/[0.18]'}`}
- >
- <div className={`absolute top-1 w-4 h-4 rounded-lg bg-[var(--admin-surface)] transition-all ${settings.show_size_chart ? 'left-7' : 'left-1'}`} />
- </button>
+ <Toggle
+  checked={settings.show_size_chart}
+  onChange={(next) => setSettings(prev => ({ ...prev, show_size_chart: next }))}
+  label="Show the size chart on product pages"
+  />
  </div>
 
  {settings.show_size_chart && (
@@ -1472,7 +1534,7 @@ export default function AdminSettings() {
  ...prev,
  size_chart_data: [...(prev.size_chart_data || []), { size: "", chest: "", waist: "", length: "" }]
  }))}
- className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded hover:opacity-80 transition-opacity"
+ className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity"
  >
  <Plus size={12} /> Add Row
  </button>
@@ -1480,12 +1542,12 @@ export default function AdminSettings() {
 
 <div className="overflow-x-auto border border-[var(--admin-ink)]/10 rounded-lg">
   <table className="w-full text-left">
-  <thead className="bg-white/[0.05] border-b border-[var(--admin-ink)]/10">
+  <thead className="bg-[var(--admin-ink)]/[0.05] border-b border-[var(--admin-ink)]/10">
  <tr>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Size</th>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Chest (cm)</th>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Waist (cm)</th>
- <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Length (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55">Size</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55">Chest (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55">Waist (cm)</th>
+ <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55">Length (cm)</th>
  <th className="p-3 w-10"></th>
  </tr>
  </thead>
@@ -1500,7 +1562,7 @@ export default function AdminSettings() {
  newData[idx].size = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] font-bold uppercase text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded-lg text-[11px] font-bold uppercase text-center"
  placeholder="M"
  />
  </td>
@@ -1512,7 +1574,7 @@ export default function AdminSettings() {
  newData[idx].chest = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded-lg text-[11px] text-center"
  placeholder="91-97"
  />
  </td>
@@ -1524,7 +1586,7 @@ export default function AdminSettings() {
  newData[idx].waist = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded-lg text-[11px] text-center"
  placeholder="76-81"
  />
  </td>
@@ -1536,7 +1598,7 @@ export default function AdminSettings() {
  newData[idx].length = e.target.value;
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="w-full px-2 py-1.5 border border-transparent focus-ring rounded text-[11px] text-center"
+ className="w-full px-2 py-1.5 border border-transparent focus-ring rounded-lg text-[11px] text-center"
  placeholder="72"
  />
  </td>
@@ -1547,7 +1609,7 @@ export default function AdminSettings() {
  const newData = settings.size_chart_data.filter((_, i) => i !== idx);
  setSettings({ ...settings, size_chart_data: newData });
  }}
- className="p-2 text-[var(--admin-ink)]/35 hover:text-rose-300 transition-colors"
+ className="focus-ring p-2 text-[var(--admin-ink)]/35 hover:text-[var(--tint-rose-fg)] transition-colors"
  >
  <Trash2 size={14} />
  </button>
@@ -1557,8 +1619,8 @@ export default function AdminSettings() {
  </tbody>
  </table>
  {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
- <div className="p-8 text-center bg-white/[0.05]">
- <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42">No measurement rows added</p>
+ <div className="p-8 text-center bg-[var(--admin-ink)]/[0.05]">
+ <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/55">No measurement rows added</p>
  </div>
  )}
  </div>
@@ -1567,12 +1629,14 @@ export default function AdminSettings() {
  )}
  </div>
  </div>
+  )}
 
 
  {/* Our Story Editor */}
+  {activeTab === "content" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={BookOpen} title="Our Story" />
- <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
  Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
  change what you need, then press <span className="text-[var(--admin-ink)]">Save All Settings</span> to publish.
  </p>
@@ -1590,8 +1654,8 @@ export default function AdminSettings() {
  return (
  <div className="space-y-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Company Name</label>
- <input
+ <label htmlFor="company-name" className="text-sm font-medium text-[var(--admin-ink)]/78">Company Name</label>
+ <input id="company-name"
  value={story("company")}
  onChange={(e) => updateStory("company", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1601,8 +1665,8 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Founded Date</label>
- <input
+ <label htmlFor="founded-date" className="text-sm font-medium text-[var(--admin-ink)]/78">Founded Date</label>
+ <input id="founded-date"
  value={story("founded")}
  onChange={(e) => updateStory("founded", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1610,8 +1674,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">CAC Registration</label>
- <input
+ <label htmlFor="cac-registration" className="text-sm font-medium text-[var(--admin-ink)]/78">CAC Registration</label>
+ <input id="cac-registration"
  value={story("cac")}
  onChange={(e) => updateStory("cac", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1622,8 +1686,8 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Label</label>
- <input
+ <label htmlFor="founder-label" className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Label</label>
+ <input id="founder-label"
  value={story("founder_label")}
  onChange={(e) => updateStory("founder_label", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1631,8 +1695,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Name</label>
- <input
+ <label htmlFor="founder-name" className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Name</label>
+ <input id="founder-name"
  value={story("founder_name")}
  onChange={(e) => updateStory("founder_name", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1642,20 +1706,20 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Statement (Italic)</label>
- <textarea
+ <label htmlFor="belief-statement-italic" className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Statement (Italic)</label>
+ <textarea id="belief-statement-italic"
  value={story("belief")}
  onChange={(e) => updateStory("belief", e.target.value)}
  rows={3}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm italic"
  placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
  />
- <p className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
+ <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Description</label>
- <textarea
+ <label htmlFor="belief-description" className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Description</label>
+ <textarea id="belief-description"
  value={story("belief_desc")}
  onChange={(e) => updateStory("belief_desc", e.target.value)}
  rows={2}
@@ -1665,8 +1729,8 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Story</label>
- <textarea
+ <label htmlFor="origin-story" className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Story</label>
+ <textarea id="origin-story"
  value={story("origin")}
  onChange={(e) => updateStory("origin", e.target.value)}
  rows={4}
@@ -1677,8 +1741,8 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 1</label>
- <input
+ <label htmlFor="origin-quote-line-1" className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 1</label>
+ <input id="origin-quote-line-1"
  value={story("quote1")}
  onChange={(e) => updateStory("quote1", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring italic font-bold"
@@ -1686,8 +1750,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 2</label>
- <input
+ <label htmlFor="origin-quote-line-2" className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 2</label>
+ <input id="origin-quote-line-2"
  value={story("quote2")}
  onChange={(e) => updateStory("quote2", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring italic font-bold"
@@ -1697,8 +1761,8 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Meaning Section</label>
- <textarea
+ <label htmlFor="meaning-section" className="text-sm font-medium text-[var(--admin-ink)]/78">Meaning Section</label>
+ <textarea id="meaning-section"
  value={story("meaning")}
  onChange={(e) => updateStory("meaning", e.target.value)}
  rows={4}
@@ -1708,8 +1772,8 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Philosophy Section</label>
- <textarea
+ <label htmlFor="philosophy-section" className="text-sm font-medium text-[var(--admin-ink)]/78">Philosophy Section</label>
+ <textarea id="philosophy-section"
  value={story("philosophy")}
  onChange={(e) => updateStory("philosophy", e.target.value)}
  rows={4}
@@ -1720,8 +1784,8 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Tagline</label>
- <input
+ <label htmlFor="footer-tagline" className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Tagline</label>
+ <input id="footer-tagline"
  value={story("tagline")}
  onChange={(e) => updateStory("tagline", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1729,8 +1793,8 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Company Name</label>
- <input
+ <label htmlFor="footer-company-name" className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Company Name</label>
+ <input id="footer-company-name"
  value={story("footer_name")}
  onChange={(e) => updateStory("footer_name", e.target.value)}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
@@ -1742,7 +1806,9 @@ export default function AdminSettings() {
  );
  })()}
  </div>
+  )}
 
+  </div>
  {/* Submit */}
  <div className={`flex justify-end pt-4 ${isDirty ? "pb-24" : ""}`}>
  <button
@@ -1777,16 +1843,16 @@ export default function AdminSettings() {
   <div className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur">
  <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-2.5 min-w-0">
- <span className="w-2 h-2 rounded-lg bg-amber-500 shrink-0 animate-pulse" aria-hidden="true" />
- <p className="text-xs font-bold uppercase tracking-widest text-amber-200">Unsaved changes</p>
+ <span className="w-2 h-2 rounded-full bg-[var(--tint-amber-fg)] shrink-0 animate-pulse" aria-hidden="true" />
+ <p className="text-xs font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">Unsaved changes</p>
  </div>
- <p className="hidden sm:block text-xs text-amber-200">Edits go live after you save.</p>
+ <p className="hidden sm:block text-xs text-[var(--tint-amber-fg)]">Edits go live after you save.</p>
  <div className="flex items-center gap-2 shrink-0">
  <button
  type="button"
  onClick={handleDiscard}
  disabled={saving}
- className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-200 px-3 py-2 rounded-lg hover:bg-amber-500/25 transition-colors disabled:opacity-50"
+ className="focus-ring flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)] px-3 py-2 rounded-lg hover:bg-[var(--tint-amber-fg)]/25 transition-colors disabled:opacity-50"
  >
  <RotateCcw size={13} />
  Discard

@@ -115,7 +115,9 @@ describe("the theme switch is reachable", () => {
     // Before any other settings section.
     expect(appearance).toBeLessThan(settings.indexOf('id="set-store"'));
     expect(settings).toContain("toggleTheme");
-    expect(settings).toContain('aria-pressed={theme === "light"}');
+    // The switch is the shared one now, so it reads checked={theme === "light"}.
+    expect(settings).toContain('checked={theme === "light"}');
+    expect(settings).toContain("onChange={toggleTheme}");
   });
 
   it("is also on every admin screen, since comfort is not a per-page choice", () => {

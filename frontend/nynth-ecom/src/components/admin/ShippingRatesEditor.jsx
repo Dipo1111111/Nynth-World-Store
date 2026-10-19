@@ -41,7 +41,7 @@ function PriceChip({ editingKey, value, isOverridden, onEdit, onCommit, onReset 
                     if (e.key === "Enter") e.currentTarget.blur();
                     if (e.key === "Escape") onEdit(null);
                 }}
-                className="w-20 px-2 py-1 text-right focus-ring border border-[var(--admin-ink)]/25 rounded text-[11px] font-bold tabular-nums"
+                className="w-20 px-2 py-1 text-right focus-ring border border-[var(--admin-ink)]/25 rounded-lg text-[11px] font-bold tabular-nums"
             />
         );
     }
@@ -56,7 +56,7 @@ function PriceChip({ editingKey, value, isOverridden, onEdit, onCommit, onReset 
                     type="button"
                     title="Reset to base price"
                     onClick={onReset}
-                    className="text-[var(--admin-ink)]/35 hover:text-rose-300 transition-colors"
+                    className="focus-ring text-[var(--admin-ink)]/35 hover:text-[var(--tint-rose-fg)] transition-colors"
                 >
                     <RotateCcw size={11} />
                 </button>
@@ -65,7 +65,7 @@ function PriceChip({ editingKey, value, isOverridden, onEdit, onCommit, onReset 
                 type="button"
                 title="Edit price"
                 onClick={onEdit}
-                className="text-[var(--admin-ink)]/35 hover:text-[var(--admin-ink)] transition-colors"
+                className="focus-ring text-[var(--admin-ink)]/35 hover:text-[var(--admin-ink)] transition-colors"
             >
                 <Pencil size={12} />
             </button>
@@ -266,8 +266,8 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                     <Truck size={18} className="text-[var(--admin-ink)]/42" />
                     <h3 className="font-bold text-lg">Shipping Rates</h3>
                     {dirty && (
-                        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-amber-300 bg-amber-500/[0.14] px-2 py-0.5 rounded">
-                            <span className="w-1.5 h-1.5 rounded-lg bg-amber-500" /> Unsaved
+                        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)] bg-[var(--tint-amber-fg)]/[0.14] px-2 py-0.5 rounded">
+                            <span className="w-1.5 h-1.5 rounded-lg bg-[var(--tint-amber-fg)]" /> Unsaved
                         </span>
                     )}
                 </div>
@@ -275,7 +275,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                     type="button"
                     onClick={handleSave}
                     disabled={saving || !dirty}
-                    className="flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="focus-ring flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                     {saving ? <Save size={14} className="animate-pulse" /> : <Save size={14} />}
                     {saving ? "Saving..." : "Save Rates"}
@@ -288,7 +288,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
             {/* LAGOS + ABUJA */}
             {singleGroups.map(({ region, title, groups, rates: r }) => (
                 <div key={region} className="mb-8">
-                    <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight mb-4">{title}</h4>
+                    <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest mb-4">{title}</h4>
                     <div className="space-y-5">
                         {groups.map((group) => {
                             const bulkKey = `${region}:${group.id}`;
@@ -299,12 +299,12 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                         <div className="flex items-center gap-2">
                                             <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">{group.name}</span>
                                             {group.price != null && (
-                                                <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-white/[0.05] px-2 py-0.5 rounded">
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] px-2 py-0.5 rounded">
                                                     base {currencySymbol}{group.price.toLocaleString()}
                                                 </span>
                                             )}
                                             {editedCount > 0 && (
-                                                <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)] bg-[#1f1f22] px-2 py-0.5 rounded text-white">
+                                                <span className="text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-ink)] text-[var(--admin-surface)] px-2 py-0.5 rounded">
                                                     {editedCount} edited
                                                 </span>
                                             )}
@@ -317,7 +317,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                         type="button"
                                                         onClick={() => setZoneDisabled(region, group.areas, !allOff)}
                                                         title={allOff ? "Enable this whole zone at checkout" : "Disable this whole zone at checkout (prices kept)"}
-                                                        className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded transition-opacity hover:opacity-80 ${allOff ? "bg-green-600 text-white" : "bg-white/[0.12] text-[var(--admin-ink)]/78"}`}
+                                                        className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring transition-opacity hover:opacity-80 ${allOff ? "bg-[var(--tint-emerald-fg)] text-white" : "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/78"}`}
                                                     >
                                                         <Power size={12} /> {allOff ? "Enable zone" : "Disable zone"}
                                                     </button>
@@ -327,7 +327,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 type="button"
                                                 onClick={() => { setAdding(adding === `${region}:${group.id}` ? null : `${region}:${group.id}`); setNewLoc({ name: "", price: "", speed: "" }); }}
                                                 title="Add a new location to this zone"
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
+                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
                                             >
                                                 <Plus size={12} /> Add location
                                             </button>
@@ -339,14 +339,14 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 value={bulk[bulkKey] || ""}
                                                 onChange={(e) => setBulk((prev) => ({ ...prev, [bulkKey]: e.target.value }))}
                                                 placeholder="₦"
-                                                className="w-24 px-2 py-1 border border-[var(--admin-ink)]/14 rounded text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
+                                                className="w-24 px-2 py-1 border border-[var(--admin-ink)]/14 rounded-lg text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => applyBulk(region, group, bulk[bulkKey])}
                                                 disabled={(bulk[bulkKey] ?? "").toString().trim() === ""}
                                                 title="Fill every area in this zone with one price"
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                                             >
                                                 <Check size={12} /> Set all
                                             </button>
@@ -364,7 +364,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 <div
                                                     key={area}
                                                     className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                                        off ? "border-[var(--admin-ink)]/10 bg-white/[0.05] opacity-60" : overridden ? "border-[var(--admin-ink)]/32 bg-white/[0.05]" : "border-[var(--admin-ink)]/18 bg-[var(--admin-surface)]"
+                                                        off ? "border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05] opacity-60" : overridden ? "border-[var(--admin-ink)]/32 bg-[var(--admin-ink)]/[0.05]" : "border-[var(--admin-ink)]/18 bg-[var(--admin-surface)]"
                                                     }`}
                                                 >
                                                     <span className="flex items-center gap-1.5 min-w-0 mr-2">
@@ -372,7 +372,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                             type="button"
                                                             onClick={() => toggleArea(region, area)}
                                                             title={off ? `Enable ${area} at checkout` : `Disable ${area} at checkout (price kept)`}
-                                                            className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-white/[0.12] text-[var(--admin-ink)]/42 hover:bg-white/[0.05] hover:text-emerald-300" : "bg-white/[0.05] text-emerald-300 hover:bg-white/[0.12] hover:text-[var(--admin-ink)]/55"}`}
+                                                            className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/42 hover:bg-[var(--admin-ink)]/[0.05] hover:text-[var(--tint-emerald-fg)]" : "bg-[var(--admin-ink)]/[0.05] text-[var(--tint-emerald-fg)] hover:bg-[var(--admin-ink)]/[0.12] hover:text-[var(--admin-ink)]/55"}`}
                                                         >
                                                             <Power size={11} />
                                                         </button>
@@ -396,7 +396,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                                 type="button"
                                                                 title={`Delete custom location ${area}`}
                                                                 onClick={() => deleteCustomLocation(region, area)}
-                                                                className="text-[var(--admin-ink)]/35 hover:text-rose-300 transition-colors"
+                                                                className="focus-ring text-[var(--admin-ink)]/35 hover:text-[var(--tint-rose-fg)] transition-colors"
                                                             >
                                                                 <Trash2 size={12} />
                                                             </button>
@@ -415,7 +415,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     value={newLoc.name}
                                                     onChange={(e) => setNewLoc((p) => ({ ...p, name: e.target.value }))}
                                                     placeholder="e.g. Sangotedo Phase 2"
-                                                    className="w-44 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded text-[11px] font-bold focus:border-[var(--admin-ink)]/60 transition-colors"
+                                                    className="w-44 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded-lg text-[11px] font-bold focus:border-[var(--admin-ink)]/60 transition-colors"
                                                 />
                                             </label>
                                             <label className="flex flex-col gap-1">
@@ -426,20 +426,20 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     value={newLoc.price}
                                                     onChange={(e) => setNewLoc((p) => ({ ...p, price: e.target.value }))}
                                                     placeholder="4500"
-                                                    className="w-24 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
+                                                    className="w-24 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded-lg text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
                                                 />
                                             </label>
                                             <button
                                                 type="button"
                                                 onClick={() => addCustomLocation(region, [...group.areas, ...Object.keys(settings.custom_shipping_locations?.[region] || {})])}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded hover:opacity-80 transition-opacity"
+                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded-lg focus-ring hover:opacity-80 transition-opacity"
                                             >
                                                 <Check size={12} /> Add
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(null)}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
+                                                className="focus-ring flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
                                             >
                                                 <X size={12} /> Cancel
                                             </button>
@@ -454,7 +454,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
 
             {/* INTERSTATE */}
             <div>
-                <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-tight mb-4">Interstate (Out of Lagos)</h4>
+                <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest mb-4">Interstate (Out of Lagos)</h4>
                 <div className="space-y-5">
                     {INTERSTATE_REGIONS.map((group) => {
                         const bulkKey = `interstate:${group.id}`;
@@ -464,11 +464,11 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">{group.name}</span>
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-white/[0.05] px-2 py-0.5 rounded">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] px-2 py-0.5 rounded">
                                             base {currencySymbol}{group.price.toLocaleString()}
                                         </span>
                                         {editedCount > 0 && (
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)] bg-[#1f1f22] px-2 py-0.5 rounded text-white">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-ink)] text-[var(--admin-surface)] px-2 py-0.5 rounded">
                                                 {editedCount} edited
                                             </span>
                                         )}
@@ -481,7 +481,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     type="button"
                                                     onClick={() => setZoneDisabled("interstate", group.states, !allOff)}
                                                     title={allOff ? "Enable this whole region at checkout" : "Disable this whole region at checkout (prices kept)"}
-                                                    className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded transition-opacity hover:opacity-80 ${allOff ? "bg-green-600 text-white" : "bg-white/[0.12] text-[var(--admin-ink)]/78"}`}
+                                                    className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring transition-opacity hover:opacity-80 ${allOff ? "bg-[var(--tint-emerald-fg)] text-white" : "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/78"}`}
                                                 >
                                                     <Power size={12} /> {allOff ? "Enable region" : "Disable region"}
                                                 </button>
@@ -491,7 +491,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             type="button"
                                             onClick={() => { setAdding(adding === `interstate:${group.id}` ? null : `interstate:${group.id}`); setNewLoc({ name: "", price: "", speed: "" }); }}
                                             title="Add a new state to this region"
-                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
+                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
                                         >
                                             <Plus size={12} /> Add location
                                         </button>
@@ -503,14 +503,14 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             value={bulk[bulkKey] || ""}
                                             onChange={(e) => setBulk((prev) => ({ ...prev, [bulkKey]: e.target.value }))}
                                             placeholder="₦"
-                                            className="w-24 px-2 py-1 border border-[var(--admin-ink)]/14 rounded text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
+                                            className="w-24 px-2 py-1 border border-[var(--admin-ink)]/14 rounded-lg text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => applyBulkInterstate(null, group, bulk[bulkKey])}
                                             disabled={(bulk[bulkKey] ?? "").toString().trim() === ""}
                                             title="Fill every state in this region with one price"
-                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                                         >
                                             <Check size={12} /> Set all
                                         </button>
@@ -528,7 +528,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             <div
                                                 key={state}
                                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                                    off ? "border-[var(--admin-ink)]/10 bg-white/[0.05] opacity-60" : overridden ? "border-[var(--admin-ink)]/32 bg-white/[0.05]" : "border-[var(--admin-ink)]/18 bg-[var(--admin-surface)]"
+                                                    off ? "border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05] opacity-60" : overridden ? "border-[var(--admin-ink)]/32 bg-[var(--admin-ink)]/[0.05]" : "border-[var(--admin-ink)]/18 bg-[var(--admin-surface)]"
                                                 }`}
                                             >
                                                 <span className="flex items-center gap-1.5 min-w-0 mr-2">
@@ -536,7 +536,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                         type="button"
                                                         onClick={() => toggleArea("interstate", state)}
                                                         title={off ? `Enable ${state} at checkout` : `Disable ${state} at checkout (price kept)`}
-                                                        className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-white/[0.12] text-[var(--admin-ink)]/42 hover:bg-white/[0.05] hover:text-emerald-300" : "bg-white/[0.05] text-emerald-300 hover:bg-white/[0.12] hover:text-[var(--admin-ink)]/55"}`}
+                                                        className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/42 hover:bg-[var(--admin-ink)]/[0.05] hover:text-[var(--tint-emerald-fg)]" : "bg-[var(--admin-ink)]/[0.05] text-[var(--tint-emerald-fg)] hover:bg-[var(--admin-ink)]/[0.12] hover:text-[var(--admin-ink)]/55"}`}
                                                     >
                                                         <Power size={11} />
                                                     </button>
@@ -548,7 +548,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                                 type="button"
                                                                 title={`Delete custom location ${state}`}
                                                                 onClick={() => deleteCustomLocation("interstate", state)}
-                                                                className="shrink-0 text-[var(--admin-ink)]/35 hover:text-rose-300 transition-colors"
+                                                                className="focus-ring shrink-0 text-[var(--admin-ink)]/35 hover:text-[var(--tint-rose-fg)] transition-colors"
                                                             >
                                                                 <Trash2 size={12} />
                                                             </button>
@@ -592,7 +592,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     value={newLoc.name}
                                                     onChange={(e) => setNewLoc((p) => ({ ...p, name: e.target.value }))}
                                                     placeholder="e.g. Bayelsa"
-                                                    className="w-44 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded text-[11px] font-bold focus:border-[var(--admin-ink)]/60 transition-colors"
+                                                    className="w-44 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded-lg text-[11px] font-bold focus:border-[var(--admin-ink)]/60 transition-colors"
                                                 />
                                             </label>
                                             <label className="flex flex-col gap-1">
@@ -603,20 +603,20 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     value={newLoc.price}
                                                     onChange={(e) => setNewLoc((p) => ({ ...p, price: e.target.value }))}
                                                     placeholder="8500"
-                                                    className="w-24 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
+                                                    className="w-24 px-2 py-1.5 border border-[var(--admin-ink)]/14 rounded-lg text-[11px] font-bold tabular-nums focus:border-[var(--admin-ink)]/60 transition-colors"
                                                 />
                                             </label>
                                             <button
                                                 type="button"
                                                 onClick={() => addCustomLocation("interstate", [...group.states, ...customInterstate], true)}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded hover:opacity-80 transition-opacity"
+                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded-lg focus-ring hover:opacity-80 transition-opacity"
                                             >
                                                 <Check size={12} /> Add
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(null)}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
+                                                className="focus-ring flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
                                             >
                                                 <X size={12} /> Cancel
                                             </button>
@@ -634,14 +634,14 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                     if (!eff) return null;
                                     const off = isAreaDisabled("interstate", state);
                                     return (
-                                        <div key={state} className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${off ? "border-[var(--admin-ink)]/10 bg-white/[0.05] opacity-60" : "border-[var(--admin-ink)]/18 bg-[var(--admin-surface)]"}`}>
+                                        <div key={state} className={`flex items-center justify-between px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${off ? "border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05] opacity-60" : "border-[var(--admin-ink)]/18 bg-[var(--admin-surface)]"}`}>
                                             <span className="flex items-center gap-1.5 min-w-0 mr-2">
-                                                <button type="button" onClick={() => toggleArea("interstate", state)} className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-white/[0.12] text-[var(--admin-ink)]/42" : "bg-white/[0.05] text-emerald-300"}`}>
+                                                <button type="button" onClick={() => toggleArea("interstate", state)} className={`shrink-0 rounded-lg p-1 transition-colors ${off ? "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/42" : "bg-[var(--admin-ink)]/[0.05] text-[var(--tint-emerald-fg)]"}`}>
                                                     <Power size={11} />
                                                 </button>
                                                 <span className={`truncate ${off ? "text-[var(--admin-ink)]/35 line-through" : "text-[var(--admin-ink)]/78"}`}>{state}</span>
                                                 <span className="shrink-0 text-[8px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
-                                                <button type="button" title={`Delete ${state}`} onClick={() => deleteCustomLocation("interstate", state)} className="shrink-0 text-[var(--admin-ink)]/35 hover:text-rose-300 transition-colors">
+                                                <button type="button" title={`Delete ${state}`} onClick={() => deleteCustomLocation("interstate", state)} className="focus-ring shrink-0 text-[var(--admin-ink)]/35 hover:text-[var(--tint-rose-fg)] transition-colors">
                                                     <Trash2 size={12} />
                                                 </button>
                                             </span>

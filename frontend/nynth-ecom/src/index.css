@@ -164,6 +164,11 @@
   --brand-red: #d8232a;
   --brand-red-ink: #a81b21;
 
+  /* Custom scrollbar. Paper storefront: a soft ink thumb on white. */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(0.145 0 0 / 0.26);
+  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.44);
+
   /* Brand "money" accent - revenue, paid, live */
   --money: oklch(0.6 0.15 155);
   --money-soft: oklch(0.96 0.04 155);
@@ -221,6 +226,18 @@
   --admin-accent-hover: #dbd8ce;
   --admin-line: rgb(255 255 255 / 0.1);
   --admin-line-2: rgb(255 255 255 / 0.14);
+
+  /* Native widget rendering. The ink admin wants dark form controls, the
+     paper admin wants light ones. */
+  --admin-color-scheme: dark;
+  /* Placeholder text. On ink it is bone at 35%. On paper it has to be dark,
+     white on white is invisible. */
+  --admin-placeholder: oklch(0.93 0.005 90 / 0.35);
+
+  /* Custom scrollbar on the ink admin: a bone thumb on black. */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(0.93 0.005 90 / 0.22);
+  --scrollbar-thumb-hover: oklch(0.93 0.005 90 / 0.36);
 
   --background: oklch(0.155 0.002 85);
   --foreground: oklch(0.93 0.005 90);
@@ -299,6 +316,17 @@
   --admin-accent-hover: #262626;
   --admin-line: rgb(0 0 0 / 0.1);
   --admin-line-2: rgb(0 0 0 / 0.16);
+
+  /* Light widgets on paper. */
+  --admin-color-scheme: light;
+  /* Dark placeholder. The ink value was white on white in this theme, which
+     is how the fields looked empty even with text in them. */
+  --admin-placeholder: oklch(0.145 0 0 / 0.45);
+
+  /* Custom scrollbar on the paper admin: an ink thumb on white. */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(0.145 0 0 / 0.26);
+  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.44);
 
   --background: oklch(0.975 0.002 95);
   --foreground: #0c0c0c;
@@ -508,7 +536,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .admin-control::placeholder {
-  color: oklch(0.93 0.005 90 / 0.35);
+  color: var(--admin-placeholder);
 }
 .admin-control:focus {
   outline: none;
@@ -537,30 +565,66 @@
   background-color: oklch(0.93 0.005 90);
   color: oklch(0.145 0 0);
 }
-.admin-app ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+.admin-app input,
+.admin-app select,
+.admin-app textarea {
+  caret-color: var(--admin-ink);
+  color: var(--admin-ink);
+  color-scheme: var(--admin-color-scheme);
 }
-.admin-app ::-webkit-scrollbar-track {
-  background-color: transparent;
+.admin-app input::placeholder,
+.admin-app select::placeholder,
+.admin-app textarea::placeholder {
+  color: var(--admin-placeholder);
 }
-.admin-app ::-webkit-scrollbar-thumb {
-  background-color: oklch(1 0 0 / 0.16);
+
+/* ============================================================
+   CUSTOM SCROLLBAR - the site wide scrollbar
+
+   One thin bar for the whole site, storefront and admin both.
+   The thumb colour comes from a token, so it follows the theme:
+   ink on paper, bone on the ink admin.
+
+   The admin window scrollbar belongs to the document, not to
+   .admin-app, so AdminLayout also stamps the theme on <html>.
+   ============================================================ */
+html[data-admin-theme='dark'] {
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(0.93 0.005 90 / 0.22);
+  --scrollbar-thumb-hover: oklch(0.93 0.005 90 / 0.36);
+}
+html[data-admin-theme='light'] {
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(0.145 0 0 / 0.26);
+  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.44);
+}
+
+html {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+* {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+*::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-track);
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
-.admin-app ::-webkit-scrollbar-thumb:hover {
-  background-color: oklch(1 0 0 / 0.26);
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
 }
-.admin-app input,
-.admin-app select,
-.admin-app textarea {
-  caret-color: oklch(0.93 0.005 90);
-  color: oklch(0.93 0.005 90);
-  color-scheme: dark;
-}
-.admin-app input::placeholder,
-.admin-app textarea::placeholder {
-  color: oklch(0.93 0.005 90 / 0.35);
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
     LayoutDashboard,
@@ -97,6 +97,15 @@ export default function AdminLayout({ children, title }) {
     };
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+    // The page scrollbar belongs to the document, not to .admin-app, so the
+    // theme has to reach <html> as well or the window bar would keep the
+    // storefront colours while the whole back office is in ink. The attribute
+    // is removed on unmount, so the storefront is never affected.
+    useEffect(() => {
+        document.documentElement.setAttribute("data-admin-theme", theme);
+        return () => document.documentElement.removeAttribute("data-admin-theme");
+    }, [theme]);
 
     return (
         // data-theme drives the whole admin token layer. Only the tokens move,
