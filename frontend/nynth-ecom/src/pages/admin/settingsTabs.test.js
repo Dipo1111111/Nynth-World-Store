@@ -99,9 +99,9 @@ describe("the scrollbar is ours, site wide", () => {
 
   it("gives the admin a bone thumb on ink and an ink thumb on paper", () => {
     const dark = css.slice(css.indexOf(".admin-app {"), css.indexOf(".admin-app[data-theme='light']"));
-    expect(dark).toContain("--scrollbar-thumb: oklch(0.93 0.005 90 / 0.22)");
+    expect(dark).toContain("--scrollbar-thumb: oklch(0.93 0.005 90 / 0.28)");
     const light = css.slice(css.indexOf(".admin-app[data-theme='light']"));
-    expect(light).toContain("--scrollbar-thumb: oklch(0.145 0 0 / 0.26)");
+    expect(light).toContain("--scrollbar-thumb: oklch(0.145 0 0 / 0.28)");
   });
 
   it("carries the admin theme onto the document, where the window bar lives", () => {

@@ -696,7 +696,7 @@ const Checkout = () => {
         <div className="bg-[#F9F9F9] p-6 md:p-10 lg:p-16 h-full border-l border-gray-100">
           <h2 className="text-[12px] tracking-[0.3em] font-bold uppercase mb-12 text-gray-400">Order Summary</h2>
 
-          <div className="space-y-8 mb-12 max-h-[500px] overflow-y-auto pr-4 no-scrollbar">
+          <div className="space-y-8 mb-12 max-h-[500px] overflow-y-auto pr-4">
             {cartItems.map((item) => (
               <div key={`${item.id}-${item.size}-${item.color}`} className="flex gap-6">
                 <div className="w-20 h-28 bg-white overflow-hidden border border-gray-100 relative flex-shrink-0">

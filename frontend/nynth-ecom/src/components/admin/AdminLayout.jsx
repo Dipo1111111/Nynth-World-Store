@@ -157,8 +157,9 @@ export default function AdminLayout({ children, title }) {
                     </button>
                 </div>
 
-                {/* Navigation */}
-                <nav className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto scrollbar-hide">
+                {/* Navigation. The vertical scrollbar stays visible here, a
+                    long menu that scrolls with no bar looks cut off. */}
+                <nav className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto">
                     {groups.map((group) => (
                         <div key={group.label}>
                             <p className="px-3 mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/30">

@@ -166,8 +166,8 @@
 
   /* Custom scrollbar. Paper storefront: a soft ink thumb on white. */
   --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(0.145 0 0 / 0.26);
-  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.44);
+  --scrollbar-thumb: oklch(0.145 0 0 / 0.28);
+  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.46);
 
   /* Brand "money" accent - revenue, paid, live */
   --money: oklch(0.6 0.15 155);
@@ -236,8 +236,8 @@
 
   /* Custom scrollbar on the ink admin: a bone thumb on black. */
   --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(0.93 0.005 90 / 0.22);
-  --scrollbar-thumb-hover: oklch(0.93 0.005 90 / 0.36);
+  --scrollbar-thumb: oklch(0.93 0.005 90 / 0.28);
+  --scrollbar-thumb-hover: oklch(0.93 0.005 90 / 0.46);
 
   --background: oklch(0.155 0.002 85);
   --foreground: oklch(0.93 0.005 90);
@@ -325,8 +325,8 @@
 
   /* Custom scrollbar on the paper admin: an ink thumb on white. */
   --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(0.145 0 0 / 0.26);
-  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.44);
+  --scrollbar-thumb: oklch(0.145 0 0 / 0.28);
+  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.46);
 
   --background: oklch(0.975 0.002 95);
   --foreground: #0c0c0c;
@@ -585,46 +585,75 @@
    The thumb colour comes from a token, so it follows the theme:
    ink on paper, bone on the ink admin.
 
+   Chrome and Safari ignore the webkit pseudo elements the moment
+   scrollbar-width is set on the same element, and the last version
+   of this set it on everything, which killed the custom bar in
+   exactly the browsers that were looking at it. So the standard
+   properties now live in a Firefox only block and never touch the
+   same elements as the webkit rules.
+
    The admin window scrollbar belongs to the document, not to
    .admin-app, so AdminLayout also stamps the theme on <html>.
    ============================================================ */
 html[data-admin-theme='dark'] {
   --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(0.93 0.005 90 / 0.22);
-  --scrollbar-thumb-hover: oklch(0.93 0.005 90 / 0.36);
+  --scrollbar-thumb: oklch(0.93 0.005 90 / 0.28);
+  --scrollbar-thumb-hover: oklch(0.93 0.005 90 / 0.46);
+  background-color: oklch(0.155 0.002 85);
 }
 html[data-admin-theme='light'] {
   --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(0.145 0 0 / 0.26);
-  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.44);
+  --scrollbar-thumb: oklch(0.145 0 0 / 0.28);
+  --scrollbar-thumb-hover: oklch(0.145 0 0 / 0.46);
+  background-color: oklch(0.975 0.002 95);
 }
 
-html {
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  scrollbar-width: thin;
+/* The scrollbar sits outside the admin shell, so without this the gutter
+   beside it stays the canvas white and the ink admin grows a white stripe
+   down its right edge. The html background is what paints that gutter, the
+   body one stops at the content edge. */
+html[data-admin-theme='dark'] body {
+  background-color: oklch(0.155 0.002 85);
+}
+html[data-admin-theme='light'] body {
+  background-color: oklch(0.975 0.002 95);
 }
 
-* {
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  scrollbar-width: thin;
+html::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
 }
-
-*::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+html *::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
 }
-*::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track,
+html *::-webkit-scrollbar-track {
   background-color: var(--scrollbar-track);
 }
-*::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+html *::-webkit-scrollbar-thumb {
   background-color: var(--scrollbar-thumb);
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
-*::-webkit-scrollbar-thumb:hover {
+html::-webkit-scrollbar-thumb:hover,
+html *::-webkit-scrollbar-thumb:hover {
   background-color: var(--scrollbar-thumb-hover);
 }
-*::-webkit-scrollbar-corner {
+html::-webkit-scrollbar-corner,
+html *::-webkit-scrollbar-corner {
   background-color: transparent;
+}
+
+/* Firefox has no webkit pseudo elements, so it gets the standard
+   properties instead. Chrome and Safari skip this block, which is
+   what keeps their custom bar alive. */
+@supports not selector(::-webkit-scrollbar) {
+  html,
+  html * {
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+  }
 }
