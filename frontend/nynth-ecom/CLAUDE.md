@@ -54,6 +54,5 @@ API layer changes, and `supabase/functions/*/index_test.ts` when an edge functio
 - Pushed to a git remote from this repo; CI gates lint + tests. Live deploy: Vercel.
 - Supabase project reference: `cybcooychgicsnjeummo`.
 - Secrets live in `.secrets/supabase.env` (`SUPABASE_ACCESS_TOKEN`) — never commit it.
-- Paystack is still in TEST mode; the production webhook is not yet wired in the Paystack dashboard.
 - Resend domain verification is in progress; `EMAIL_FROM` in `_shared/email.ts` must be a verified
   address (current value is malformed — `NYNTHWORLD<onboarding@resend.dev>` needs a space).

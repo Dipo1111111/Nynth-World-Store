@@ -20,6 +20,8 @@ Last updated: 2026-10-17 17:50 (Africa/Lagos)
 - Discount codes: `discount_codes`, guest check via `public.validate_discount(p_code)`. `MEMBER` expired 2026-10-04.
 - Founders in `users` are `nynthworld@gmail.com` and `primebusiness54@gmail.com`, both with duplicate rows (Firebase uid and Supabase uuid formats, one of each). Do not dedupe without asking.
 - Key files: `src/utils/permissions.js`, `src/context/AuthContext.jsx`, `src/components/ProtectedRoute.jsx`, `src/api/supabaseFunctions.js`, `src/pages/admin/StaffAccess.jsx`, `src/pages/admin/TicketPlatform.jsx`, `src/pages/admin/CheckIn.jsx`, `src/pages/admin/Events.jsx`, `src/pages/admin/Settings.jsx`, `src/pages/Landing.jsx`, `supabase/migrations/`, `supabase/functions/_shared/eventTickets.ts`.
+- Admin design system, locked in by the settings audit on 19 Oct 2026 and guarded by `src/pages/admin/settingsDesign.test.js`. One radius language: `rounded-xl` 12px for cards and the tab rail, `rounded-lg` 8px for every control and every container inside a card, `rounded` 4px for a small text chip, `rounded-full` for a switch, a dot or an avatar. Nothing sharp and nothing at 2, 6, 16 or 24px. One switch, the shared `src/components/admin/Toggle.jsx`, a 44 by 24 pill. Never hardcode white or black fills in the admin: use `bg-[var(--admin-ink)]/[0.0X]`, because a hardcoded white is white on white on the paper theme and the panel silently vanishes. Status colours come from the tint tokens (`--tint-amber-fg`, `--tint-rose-fg`, `--tint-emerald-fg`), never from `text-amber-200` and friends. The rest of the admin pages have not been through this yet, they still carry the old drift.
+- The admin settings page is one tab per area, and only the open tab is mounted, so the page is as tall as the section being edited. The tab id is also the URL hash, so `/admin/settings#set-shop` opens that tab.
 
 ## Hard rules (do not break)
 
@@ -102,7 +104,6 @@ the dropped test-ticket gate (a3dff90) and the ungated CRUD buttons (7edc426). T
   - **A real lifestyle photo for the landing store card.** The database has no model or lifestyle shot, only flat product photography on white, so the store card currently shows the red WINNERS tee. Newman should upload the real streetwear photo via Settings > Landing.
   - Reconciling the external dev's `collections` tool with the new permissions, which may still write as an admin.
   - Adding real staff accounts so the role system can be exercised with more than one person.
-  - Paystack is still in TEST mode and the production webhook is not wired in the Paystack dashboard. That is still the single biggest gap between this build and real money.
 
 ## Open questions
 
