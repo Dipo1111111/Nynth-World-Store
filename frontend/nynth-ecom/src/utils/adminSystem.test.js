@@ -28,9 +28,18 @@ const componentDir = resolve(process.cwd(), "src/components/admin");
 
 // The pages that have been through the system.
 const MIGRATED = [
-  "src/pages/admin/Settings.jsx",
-  "src/pages/admin/Subscribers.jsx",
+  "src/pages/admin/AbandonedCheckouts.jsx",
+  "src/pages/admin/AdminDashboard.jsx",
+  "src/pages/admin/CheckIn.jsx",
+  "src/pages/admin/DiscountCodes.jsx",
+  "src/pages/admin/Events.jsx",
   "src/pages/admin/Lookbooks.jsx",
+  "src/pages/admin/Orders.jsx",
+  "src/pages/admin/Products.jsx",
+  "src/pages/admin/Settings.jsx",
+  "src/pages/admin/StaffAccess.jsx",
+  "src/pages/admin/Subscribers.jsx",
+  "src/pages/admin/TicketPlatform.jsx",
   "src/components/admin/ShippingRatesEditor.jsx",
   "src/components/admin/Toggle.jsx",
   "src/components/admin/AdminButton.jsx",
@@ -42,18 +51,9 @@ const MIGRATED = [
   "src/components/admin/StatCard.jsx",
 ];
 
-// The pages still to go. This list is the work queue.
-const PENDING = [
-  "src/pages/admin/AbandonedCheckouts.jsx",
-  "src/pages/admin/AdminDashboard.jsx",
-  "src/pages/admin/CheckIn.jsx",
-  "src/pages/admin/DiscountCodes.jsx",
-  "src/pages/admin/Events.jsx",
-  "src/pages/admin/Orders.jsx",
-  "src/pages/admin/Products.jsx",
-  "src/pages/admin/StaffAccess.jsx",
-  "src/pages/admin/TicketPlatform.jsx",
-];
+// The pages still to go. This list is the work queue. It is empty now, and
+// the point of the ratchet is that it cannot grow again.
+const PENDING = [];
 
 // A hardcoded white or black is the mistake. On the paper theme a white
 // panel is white on white and the panel silently does not exist. A raw

@@ -18,9 +18,9 @@ export default function PageHeader({ eyebrow, title, description, actions, class
             {eyebrow}
           </p>
         )}
-        <h2 className="text-2xl font-bold text-[var(--admin-ink)]">{title}</h2>
+        {title && <h2 className="text-2xl font-bold text-[var(--admin-ink)]">{title}</h2>}
         {description && (
-          <p className="text-sm text-[var(--admin-ink)]/55 mt-1 leading-relaxed max-w-[60ch]">
+          <p className="text-sm text-[var(--admin-ink)]/55 mt-1 leading-relaxed max-w-[68ch]">
             {description}
           </p>
         )}

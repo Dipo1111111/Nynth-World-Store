@@ -31,10 +31,10 @@ import toast from "react-hot-toast";
 import { useCountUp } from "../../lib/motion";
 
 const PAYMENT_STATUS_CONFIG = {
-    paid: { label: "Paid", className: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25" },
-    pending: { label: "Pending", className: "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" },
-    failed: { label: "Failed", className: "bg-rose-500/[0.14] text-rose-300 border-rose-500/25" },
-    refunded: { label: "Refunded", className: "bg-slate-500/[0.18] text-slate-400 border-slate-500/30" },
+    paid: { label: "Paid", className: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]" },
+    pending: { label: "Pending", className: "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]" },
+    failed: { label: "Failed", className: "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]" },
+    refunded: { label: "Refunded", className: "bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border-[var(--tint-slate-line)]" },
 };
 
 const PAYMENT_STATUSES = Object.keys(PAYMENT_STATUS_CONFIG);
@@ -65,7 +65,7 @@ const PaymentStatusBadge = ({ status }) => {
 };
 
 const TestBadge = () => (
-    <span className="bg-amber-500/25 text-amber-200 text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">TEST</span>
+    <span className="bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">TEST</span>
 );
 
 const ETicketBadge = () => (
@@ -388,7 +388,7 @@ const Orders = () => {
                 </div>
 
                 {/* Fulfillment status tabs with live counts */}
-                <div className="mt-4 border-t border-white/[0.08] pt-3 flex items-center gap-5 md:gap-6 overflow-x-auto">
+                <div className="mt-4 border-t border-[var(--admin-ink)]/[0.08] pt-3 flex items-center gap-5 md:gap-6 overflow-x-auto">
                     {FULFILLMENT_STATUSES.map((s) => {
                         const active = statusFilter === s.value;
                         return (
@@ -422,7 +422,7 @@ const Orders = () => {
             ) : filteredOrders.length === 0 ? (
                 <Card className="border-[var(--admin-ink)]/10">
                     <CardContent className="flex flex-col items-center justify-center py-16">
-                        <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+                        <div className="w-16 h-16 rounded-xl bg-[var(--admin-ink)]/[0.09] flex items-center justify-center mb-4">
                             <Package className="h-8 w-8 text-[var(--admin-ink)]/35" />
                         </div>
                         <h3 className="text-lg font-medium mb-2">No orders found</h3>
@@ -450,7 +450,7 @@ const Orders = () => {
                     </CardHeader>
                     <CardContent className="p-0">
                         {/* Mobile Card View */}
-                        <div className="md:hidden divide-y divide-white/[0.08]">
+                        <div className="md:hidden divide-y divide-[var(--admin-ink)]/[0.08]">
                                 {filteredOrders.map((order) => {
                                     const isExpanded = expandedOrders.has(order.id);
                                     const needsAction = (order.payment_status === 'paid' || order.payment_status === 'success') && !['packaging', 'shipped', 'delivered', 'cancelled'].includes(order.order_status || 'pending');
@@ -460,14 +460,14 @@ const Orders = () => {
                                             <div className="flex items-center gap-2 min-w-0 flex-1">
                                                 <button
                                                     onClick={() => toggleOrderExpansion(order.id)}
-                                                    className="w-11 h-11 rounded-lg bg-white/[0.09] flex items-center justify-center text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors shrink-0"
+                                                    className="focus-ring w-11 h-11 rounded-lg bg-[var(--admin-ink)]/[0.09] flex items-center justify-center text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors shrink-0"
                                                     aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                 >
                                                     {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                                 </button>
                                                 <div className="min-w-0 flex-1">
                                                         <div className="flex items-center gap-2">
-                                                            {needsAction && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" title="Paid - needs fulfillment" />}
+                                                            {needsAction && <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-emerald-fg)] animate-pulse shrink-0" title="Paid - needs fulfillment" />}
                                                             <span className="font-mono text-xs font-medium tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
                                                         {order.isTest && <TestBadge />}
                                                         {order.items?.some(i => i.category === "tickets") && <ETicketBadge />}
@@ -498,7 +498,7 @@ const Orders = () => {
 
                                         {/* Expanded Row Content for Mobile */}
                                         {isExpanded && (
-                                            <div className="mt-2 pt-3 border-t border-white/[0.06]">
+                                            <div className="mt-2 pt-3 border-t border-[var(--admin-ink)]/[0.06]">
                                                 <div className="grid grid-cols-1 gap-6">
                                                     {/* Order Items */}
                                                     <div>
@@ -508,7 +508,7 @@ const Orders = () => {
                                                         </h4>
                                                         <div className="space-y-2">
                                                             {order.items?.map((item, idx) => (
-                                                                <div key={idx} className="flex gap-3 p-3 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
+                                                                <div key={idx} className="flex gap-3 p-3 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
                                                                     <div className="w-14 h-16 bg-[var(--admin-surface)] rounded overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
                                                                         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                                                     </div>
@@ -557,7 +557,7 @@ const Orders = () => {
                                                             <h4 className={SECTION_LABEL}>
                                                                 <MapPin size={14} /> Shipping
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-2">
+                                                            <div className="p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-2">
                                                                 <p className="font-bold text-xs truncate uppercase">{order.customer?.firstName} {order.customer?.lastName}</p>
                                                                 <p className="text-[11px] text-[var(--admin-ink)]/65 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
                                                                 <p className="text-[11px] text-[var(--admin-ink)]/65 uppercase">{order.customer?.city}, {order.customer?.state}</p>
@@ -572,7 +572,7 @@ const Orders = () => {
                                                             <h4 className={SECTION_LABEL}>
                                                                 <CreditCard size={14} /> Payment
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 flex items-center justify-between">
+                                                            <div className="p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 flex items-center justify-between">
                                                                 <PaymentStatusBadge status={order.payment_status || 'pending'} />
                                                                 {canManageOrders ? (
                                                                   <PaymentStatusDropdown
@@ -590,7 +590,7 @@ const Orders = () => {
                                                             <h4 className={SECTION_LABEL}>
                                                                 <TrendingUp size={14} /> Summary
                                                             </h4>
-                                                            <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
+                                                            <div className="p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
                                                                 <div className="flex justify-between text-[11px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">
                                                                     <span>Subtotal</span>
                                                                     <span className="text-right tabular-nums font-medium">₦{order.subtotal?.toLocaleString()}</span>
@@ -634,11 +634,11 @@ const Orders = () => {
                                         const needsAction = (order.payment_status === 'paid' || order.payment_status === 'success') && !['packaging', 'shipped', 'delivered', 'cancelled'].includes(order.order_status || 'pending');
                                         return (
                                             <React.Fragment key={order.id}>
-                                                <tr className="border-b border-white/[0.06] hover:bg-white/[0.05] transition-colors">
+                                                <tr className="border-b border-[var(--admin-ink)]/[0.06] hover:bg-[var(--admin-ink)]/[0.05] transition-colors">
                                                     <td className="px-4 md:px-6 py-4">
                                                         <button
                                                             onClick={() => toggleOrderExpansion(order.id)}
-                                                            className="text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)]/65 transition-colors p-2 -m-2"
+                                                            className="focus-ring text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)]/65 transition-colors p-2 -m-2"
                                                             aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
                                                         >
                                                             {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
@@ -646,7 +646,7 @@ const Orders = () => {
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2">
-                                                            {needsAction && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" title="Paid - needs fulfillment" />}
+                                                            {needsAction && <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-emerald-fg)] animate-pulse shrink-0" title="Paid - needs fulfillment" />}
                                                             <span className="font-mono text-xs md:text-sm font-medium tracking-tight">#{order.id.slice(0, 8)}</span>
                                                             {order.isTest && <TestBadge />}
                                                             {order.items?.some(i => i.category === "tickets") && <ETicketBadge />}
@@ -687,7 +687,7 @@ const Orders = () => {
                                                 {/* Expanded Detail Sheet */}
                                                 {isExpanded && (
                                                     <tr>
-                                                        <td colSpan="7" className="px-4 md:px-6 py-6 bg-white/[0.02]">
+                                                        <td colSpan="7" className="px-4 md:px-6 py-6 bg-[var(--admin-ink)]/[0.02]">
                                                             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
                                                                 {/* Order Items */}
                                                                 <div className="lg:col-span-3">
@@ -753,7 +753,7 @@ const Orders = () => {
                                                                             <p className="text-sm text-[var(--admin-ink)]/65">{order.customer?.city}, {order.customer?.state}</p>
                                                                             <p className="text-sm text-[var(--admin-ink)]/65">{order.customer?.country}</p>
                                                                             {order.customer?.deliveryDate && (
-                                                                                <p className="text-sm text-emerald-400/90 pt-1">
+                                                                                <p className="text-sm text-[var(--tint-emerald-fg)]/90 pt-1">
                                                                                     Preferred: {new Date(`${order.customer.deliveryDate}T00:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
                                                                                     {order.customer?.deliveryTimeWindow ? ` · ${order.customer.deliveryTimeWindow.toUpperCase()}` : ""}
                                                                                 </p>
@@ -778,7 +778,7 @@ const Orders = () => {
                                                                                             e.stopPropagation();
                                                                                             window.location.href = `mailto:${order.customer?.email}?subject=Your Nynth World Order #${order.id.slice(0, 8)}&body=Dear ${order.customer?.firstName},%0D%0A%0D%0ACongratulations on your order!`
                                                                                         }}
-                                                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.11] hover:bg-white/[0.15] text-[var(--admin-ink)] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
+                                                                                        className="focus-ring flex items-center gap-1.5 px-3 py-1.5 bg-[var(--admin-ink)]/[0.11] hover:bg-[var(--admin-hover)] text-[var(--admin-ink)] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
                                                                                     >
                                                                                         <Mail size={12} /> Email Buyer
                                                                                     </button>
@@ -809,7 +809,7 @@ const Orders = () => {
                                                                                   <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.order_status}</span>
                                                                                 )}
                                                                             </div>
-                                                                            <div className="flex justify-between items-center text-sm pt-3 border-t border-white/[0.06]">
+                                                                            <div className="flex justify-between items-center text-sm pt-3 border-t border-[var(--admin-ink)]/[0.06]">
                                                                                 <span className="text-[var(--admin-ink)]/55">Payment</span>
                                                                                 {canManageOrders ? (
                                                                                   <PaymentStatusDropdown
@@ -820,7 +820,7 @@ const Orders = () => {
                                                                                   <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/45">{order.payment_status}</span>
                                                                                 )}
                                                                             </div>
-                                                                            <div className="space-y-2 pt-3 border-t border-white/[0.06]">
+                                                                            <div className="space-y-2 pt-3 border-t border-[var(--admin-ink)]/[0.06]">
                                                                                 <div className="flex justify-between text-xs text-[var(--admin-ink)]/55">
                                                                                     <span>Subtotal</span>
                                                                                     <span className="tabular-nums">₦{order.subtotal?.toLocaleString()}</span>

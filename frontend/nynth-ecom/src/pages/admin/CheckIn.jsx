@@ -1,26 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import PageHeader from "../../components/admin/PageHeader";
+import AdminButton from "../../components/admin/AdminButton";
 import { useAuth } from "../../context/AuthContext";
 import { verifyTicketEntry, lookupTicketStatus } from "../../api/firebaseFunctions";
 import { formatEventDate } from "../../utils/tickets";
 import { Ticket, Search, Check, XCircle, AlertTriangle, ShieldCheck, Lock } from "lucide-react";
 
 const PAYMENT_CHIP = {
-  paid: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25",
-  pending: "bg-amber-500/[0.14] text-amber-300 border-amber-500/25",
-  failed: "bg-rose-500/[0.14] text-rose-300 border-rose-500/25",
-  refunded: "bg-slate-500/[0.18] text-slate-300 border-slate-500/30",
+  paid: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]",
+  pending: "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]",
+  failed: "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]",
+  refunded: "bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border-[var(--tint-slate-line)]",
 };
 
 const TICKET_CHIP = {
-  valid: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25",
-  cancelled: "bg-slate-500/[0.18] text-slate-300 border-slate-500/30",
-  revoked: "bg-rose-500/[0.14] text-rose-300 border-rose-500/25",
+  valid: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]",
+  cancelled: "bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border-[var(--tint-slate-line)]",
+  revoked: "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]",
 };
 
 const ENTRY_CHIP = {
-  unused: "bg-sky-500/[0.14] text-sky-300 border-sky-500/25",
-  used: "bg-white/[0.07] text-[var(--admin-ink)]/60 border-[var(--admin-ink)]/15",
+  unused: "bg-[var(--tint-sky-bg)] text-[var(--tint-sky-fg)] border-[var(--tint-sky-line)]",
+  used: "bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/60 border-[var(--admin-ink)]/15",
 };
 
 const Chip = ({ map, value, children }) => (
@@ -110,9 +112,9 @@ const CheckIn = () => {
     if (!can("ticketing.verify")) {
         return (
             <AdminLayout title="Door Check-In">
-                <div className="max-w-xl border border-amber-500/25 bg-amber-500/[0.08] rounded-2xl p-8 text-center">
-                    <Lock size={26} className="mx-auto mb-3 text-amber-300" />
-                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300 mb-2">
+                <div className="max-w-xl border border-[var(--tint-amber-line)] bg-[var(--tint-amber-fg)]/[0.08] rounded-xl p-8 text-center">
+                    <Lock size={26} className="mx-auto mb-3 text-[var(--tint-amber-fg)]" />
+                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-amber-fg)] mb-2">
                         Verification is off for your account
                     </p>
                     <p className="text-sm text-[var(--admin-ink)]/60">
@@ -127,15 +129,15 @@ const CheckIn = () => {
     const t = result?.ticket;
     const statuses = t && (
         <div className="grid grid-cols-3 gap-2 mb-5">
-            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-[var(--admin-ink)]/10">
+            <div className="px-3 py-2.5 rounded-lg bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10">
                 <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Payment</p>
                 <Chip map={PAYMENT_CHIP} value={t.payment_status ?? "pending"} />
             </div>
-            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-[var(--admin-ink)]/10">
+            <div className="px-3 py-2.5 rounded-lg bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10">
                 <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Ticket</p>
                 <Chip map={TICKET_CHIP} value={t.ticket_status ?? "valid"} />
             </div>
-            <div className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-[var(--admin-ink)]/10">
+            <div className="px-3 py-2.5 rounded-lg bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10">
                 <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Entry</p>
                 <Chip map={ENTRY_CHIP} value={t.entry_status ?? "unused"}>
                     {t.entry_status === "used" ? "USED" : "NOT YET USED"}
@@ -147,10 +149,10 @@ const CheckIn = () => {
     return (
         <AdminLayout title="Door Check-In">
             <div className="max-w-xl">
-                <p className="text-sm text-[var(--admin-ink)]/55 mb-2">
-                    Type the ticket code from the buyer's email. The check and the mark happen together
-                    in the database, so no code walks in twice, even on a screenshot.
-                </p>
+            <PageHeader
+            description="Type the ticket code from the buyer's email. The check and the mark happen together in the database, so no code walks in twice, even on a screenshot."
+            className="mb-4"
+            />
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 mb-6">
                     Verifying as {currentUser?.email}
                 </p>
@@ -165,28 +167,30 @@ const CheckIn = () => {
                         spellCheck={false}
                         className="flex-1 min-w-0 px-4 py-3 bg-[var(--admin-surface)] border border-[var(--admin-ink)]/14 rounded-lg font-mono text-sm tracking-wider focus-ring placeholder:text-[var(--admin-ink)]/35 placeholder:font-sans placeholder:tracking-normal"
                     />
-                    <button
-                        type="submit"
-                        disabled={checking || !code.trim()}
-                        className="shrink-0 inline-flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-6 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-40 transition-all focus-ring"
+                    <AdminButton
+                    type="submit"
+                    icon={Search}
+                    loading={checking}
+                    disabled={!code.trim()}
+                    size="md"
+                    className="shrink-0"
                     >
-                        <Search size={14} />
-                        {checking ? "Checking" : "Verify"}
-                    </button>
+                    Verify
+                    </AdminButton>
                 </form>
 
                 {!result && (
-                    <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-2xl p-10 text-center">
+                    <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-10 text-center">
                         <Ticket size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
                         <p className="text-sm text-[var(--admin-ink)]/45">No code checked yet. Results land here.</p>
                     </div>
                 )}
 
                 {result?.state === "valid" && (
-                    <div className="border border-emerald-500/30 bg-emerald-500/[0.08] rounded-2xl p-6">
+                    <div className="border border-[var(--tint-emerald-line)] bg-[var(--tint-emerald-fg)]/[0.08] rounded-xl p-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">Valid ticket - admit one</p>
+                            <span className="w-2 h-2 rounded-full bg-[var(--tint-emerald-fg)] animate-pulse" />
+                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-emerald-fg)]">Valid ticket - admit one</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
                         <p className="text-sm text-[var(--admin-ink)]/75 mb-1">{t?.event_title}</p>
@@ -204,7 +208,7 @@ const CheckIn = () => {
                             <button
                                 onClick={confirmEntry}
                                 disabled={marking}
-                                className="inline-flex items-center gap-2 bg-emerald-400 text-[var(--admin-on-ink)] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all focus-ring"
+                                className="inline-flex items-center gap-2 bg-[var(--tint-emerald-fg)] text-[var(--admin-on-ink)] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all focus-ring"
                             >
                                 <Check size={14} />
                                 {marking ? "Admitting" : "Verify entry"}
@@ -220,10 +224,10 @@ const CheckIn = () => {
                 )}
 
                 {result?.state === "admitted" && (
-                    <div className="border border-emerald-500/30 bg-emerald-500/[0.08] rounded-2xl p-6">
+                    <div className="border border-[var(--tint-emerald-line)] bg-[var(--tint-emerald-fg)]/[0.08] rounded-xl p-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <ShieldCheck size={15} className="text-emerald-300" />
-                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">Entry verified - admit</p>
+                            <ShieldCheck size={15} className="text-[var(--tint-emerald-fg)]" />
+                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-emerald-fg)]">Entry verified - admit</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
                         <p className="text-sm text-[var(--admin-ink)]/75 mb-4">{t?.event_title}</p>
@@ -242,10 +246,10 @@ const CheckIn = () => {
                 )}
 
                 {result?.state === "used" && (
-                    <div className="border border-rose-500/30 bg-rose-500/[0.08] rounded-2xl p-6">
+                    <div className="border border-[var(--tint-rose-line)] bg-[var(--tint-rose-fg)]/[0.08] rounded-xl p-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <AlertTriangle size={15} className="text-rose-300" />
-                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-300">Already used - do not admit</p>
+                            <AlertTriangle size={15} className="text-[var(--tint-rose-fg)]" />
+                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-rose-fg)]">Already used - do not admit</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
                         {t?.event_title && <p className="text-sm text-[var(--admin-ink)]/75 mb-4">{t.event_title}</p>}
@@ -268,10 +272,10 @@ const CheckIn = () => {
                 )}
 
                 {result?.state === "test" && (
-                    <div className="border border-sky-500/30 bg-sky-500/[0.08] rounded-2xl p-6">
+                    <div className="border border-[var(--tint-sky-line)] bg-[var(--tint-sky-bg)] rounded-xl p-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <AlertTriangle size={15} className="text-sky-300" />
-                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-300">Test code - not a live ticket</p>
+                            <AlertTriangle size={15} className="text-[var(--tint-sky-fg)]" />
+                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-sky-fg)]">Test code - not a live ticket</p>
                         </div>
                         <p className="font-mono text-lg font-bold tracking-wider mb-1">{result.code}</p>
                         {t?.event_title && <p className="text-sm text-[var(--admin-ink)]/75 mb-1">{t.event_title}</p>}
@@ -289,9 +293,9 @@ const CheckIn = () => {
                 )}
 
                 {result?.state === "blocked" && (
-                    <div className="border border-rose-500/30 bg-rose-500/[0.08] rounded-2xl p-6 text-center">
-                        <XCircle size={28} className="mx-auto mb-3 text-rose-300" />
-                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-300 mb-2">
+                    <div className="border border-[var(--tint-rose-line)] bg-[var(--tint-rose-fg)]/[0.08] rounded-xl p-6 text-center">
+                        <XCircle size={28} className="mx-auto mb-3 text-[var(--tint-rose-fg)]" />
+                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-rose-fg)] mb-2">
                             Do not admit
                         </p>
                         <p className="font-mono text-lg font-bold tracking-wider mb-3">{result.code}</p>
@@ -307,9 +311,9 @@ const CheckIn = () => {
                 )}
 
                 {result?.state === "invalid" && (
-                    <div className="border border-rose-500/30 bg-rose-500/[0.08] rounded-2xl p-6 text-center">
-                        <XCircle size={28} className="mx-auto mb-3 text-rose-300" />
-                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-300 mb-2">
+                    <div className="border border-[var(--tint-rose-line)] bg-[var(--tint-rose-fg)]/[0.08] rounded-xl p-6 text-center">
+                        <XCircle size={28} className="mx-auto mb-3 text-[var(--tint-rose-fg)]" />
+                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--tint-rose-fg)] mb-2">
                             {result.reason === "forbidden_event" ? "Not your event" : "Code not found"}
                         </p>
                         <p className="text-sm text-[var(--admin-ink)]/65 mb-5">{REASON_COPY[result.reason] ?? REASON_COPY.not_found}</p>

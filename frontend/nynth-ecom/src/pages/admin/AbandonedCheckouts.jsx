@@ -167,7 +167,7 @@ const AbandonedCheckouts = () => {
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Total Abandoned</span>
- <StatIcon icon={Package} className="bg-amber-500/[0.14] text-amber-300" />
+ <StatIcon icon={Package} className="bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)]" />
  </div>
  <h3 className="text-xl font-bold text-[var(--admin-ink)]"><span ref={abandonedRef}>0</span></h3>
  </CardContent>
@@ -176,7 +176,7 @@ const AbandonedCheckouts = () => {
  <CardContent className="p-4">
  <div className="flex items-center justify-between mb-2">
  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Potential Revenue Lost</span>
- <StatIcon icon={TrendingUp} className="bg-rose-500/[0.14] text-rose-300" />
+ <StatIcon icon={TrendingUp} className="bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)]" />
  </div>
  <h3 className="text-xl font-bold text-[var(--admin-ink)]">
  <span className="text-sm text-[var(--admin-ink)]/55 font-semibold">₦</span>
@@ -235,7 +235,7 @@ const AbandonedCheckouts = () => {
  ) : filteredOrders.length === 0 ? (
  <Card className="border-[var(--admin-ink)]/10">
  <CardContent className="flex flex-col items-center justify-center py-16">
- <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+ <div className="w-16 h-16 rounded-xl bg-[var(--admin-ink)]/[0.09] flex items-center justify-center mb-4">
  <Package className="h-8 w-8 text-[var(--admin-ink)]/35" />
  </div>
  <h3 className="text-lg font-medium mb-2">No orders found</h3>
@@ -250,7 +250,7 @@ const AbandonedCheckouts = () => {
  </CardHeader>
  <CardContent className="p-0">
  {/* Mobile Card View */}
- <div className="md:hidden divide-y divide-white/[0.08]">
+ <div className="md:hidden divide-y divide-[var(--admin-ink)]/[0.08]">
  {filteredOrders.map((order) => {
  const isExpanded = expandedOrders.has(order.id);
  const hasTickets = order.items?.some(i => i.category === "tickets");
@@ -260,7 +260,7 @@ const AbandonedCheckouts = () => {
  <div className="flex items-center gap-2 min-w-0 flex-1">
  <button
  onClick={() => toggleOrderExpansion(order.id)}
- className="focus-ring w-8 h-8 rounded-lg bg-white/[0.09] flex items-center justify-center text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors shrink-0"
+ className="focus-ring w-8 h-8 rounded-lg bg-[var(--admin-ink)]/[0.09] flex items-center justify-center text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors shrink-0"
  >
  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
  </button>
@@ -283,13 +283,13 @@ const AbandonedCheckouts = () => {
  </div>
  <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
  <span className="font-bold text-sm leading-none mt-1">₦{order.total?.toLocaleString()}</span>
- <span className="text-xs text-rose-300 font-bold uppercase tracking-widest">ABANDONED</span>
+ <span className="text-xs text-[var(--tint-rose-fg)] font-bold uppercase tracking-widest">ABANDONED</span>
  </div>
  </div>
 
  {/* Expanded Row Content for Mobile */}
  {isExpanded && (
- <div className="mt-2 pt-3 border-t border-white/[0.08]">
+ <div className="mt-2 pt-3 border-t border-[var(--admin-ink)]/[0.08]">
  <div className="grid grid-cols-1 gap-6">
  {/* Order Items */}
  <div>
@@ -299,7 +299,7 @@ const AbandonedCheckouts = () => {
  </h4>
  <div className="space-y-2">
  {order.items?.map((item, idx) => (
- <div key={idx} className="flex gap-3 p-3 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
+ <div key={idx} className="flex gap-3 p-3 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
  <div className="w-14 h-16 bg-[var(--admin-surface)] rounded overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
  </div>
@@ -331,7 +331,7 @@ const AbandonedCheckouts = () => {
  <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
  <MapPin size={14} /> Shipping
  </h4>
- <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-2">
+ <div className="p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-2">
  <p className="font-bold text-xs truncate uppercase">{order.customer?.firstName} {order.customer?.lastName}</p>
  <p className="text-[11px] text-[var(--admin-ink)]/65 line-clamp-2 uppercase leading-relaxed">{order.customer?.address}</p>
  <p className="text-[11px] text-[var(--admin-ink)]/65 uppercase">{order.customer?.city}, {order.customer?.state}</p>
@@ -347,7 +347,7 @@ const AbandonedCheckouts = () => {
  <h4 className="font-semibold mb-3 text-sm flex items-center gap-2 uppercase tracking-wider">
  <LayoutDashboard size={14}/> Summary
  </h4>
- <div className="p-4 bg-white/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-3 font-inter">
+ <div className="p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-3 font-inter">
  <div className="flex justify-between text-[11px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">
  <span>Subtotal</span>
  <span className="text-right">₦{order.subtotal?.toLocaleString()}</span>
@@ -375,7 +375,7 @@ const AbandonedCheckouts = () => {
  <div className="hidden md:block overflow-x-auto">
  <table className="w-full admin-table">
  <thead>
- <tr className="bg-white/[0.05] border-b border-[var(--admin-ink)]/10">
+ <tr className="bg-[var(--admin-ink)]/[0.05] border-b border-[var(--admin-ink)]/10">
  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[var(--admin-ink)]/55 uppercase tracking-wider w-12"></th>
  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[var(--admin-ink)]/55 uppercase tracking-wider">Order ID</th>
  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-[var(--admin-ink)]/55 uppercase tracking-wider hidden md:table-cell">Customer</th>
@@ -390,7 +390,7 @@ const AbandonedCheckouts = () => {
  const hasTickets = order.items?.some(i => i.category === "tickets");
  return (
  <React.Fragment key={order.id}>
- <tr className="transition-colors hover:bg-white/[0.05]">
+ <tr className="transition-colors hover:bg-[var(--admin-ink)]/[0.05]">
  <td className="px-4 md:px-6 py-4">
  <button
  onClick={() => toggleOrderExpansion(order.id)}
@@ -414,7 +414,7 @@ const AbandonedCheckouts = () => {
  </div>
  </td>
  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
- <span className="text-xs text-rose-300 font-bold uppercase tracking-widest bg-rose-500/[0.14] px-2.5 py-1 rounded-lg border border-rose-500/25">ABANDONED</span>
+ <span className="text-xs text-[var(--tint-rose-fg)] font-bold uppercase tracking-widest bg-[var(--tint-rose-bg)] px-2.5 py-1 rounded-lg border border-[var(--tint-rose-line)]">ABANDONED</span>
  </td>
  <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-[var(--admin-ink)]/55 hidden sm:table-cell">
  {order.created_at?.seconds
@@ -433,7 +433,7 @@ const AbandonedCheckouts = () => {
  {/* Expanded Row */}
  {isExpanded && (
  <tr>
- <td colSpan="6" className="px-4 md:px-6 py-6 bg-white/[0.02]">
+ <td colSpan="6" className="px-4 md:px-6 py-6 bg-[var(--admin-ink)]/[0.02]">
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  {/* Order Items */}
  <div>
@@ -444,7 +444,7 @@ const AbandonedCheckouts = () => {
  <div className="space-y-3">
  {order.items?.map((item, idx) => (
  <div key={idx} className="flex gap-4 p-3 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10">
- <div className="w-16 h-20 bg-white/[0.07] rounded overflow-hidden flex-shrink-0">
+ <div className="w-16 h-20 bg-[var(--admin-ink)]/[0.07] rounded overflow-hidden flex-shrink-0">
  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
  </div>
  <div className="flex-1 min-w-0">
@@ -503,7 +503,7 @@ const AbandonedCheckouts = () => {
  e.stopPropagation();
  window.location.href = `mailto:${order.customer?.email}?subject=Did you forget something? (Order #${order.id.slice(0,8)})&body=Hi ${order.customer?.firstName},%0D%0A%0D%0AWe noticed you left some items in your cart...`
  }}
- className="focus-ring flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.11] hover:bg-white/[0.15] text-[var(--admin-ink)] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
+ className="focus-ring flex items-center gap-1.5 px-3 py-1.5 bg-[var(--admin-ink)]/[0.11] hover:bg-[var(--admin-hover)] text-[var(--admin-ink)] text-[10px] font-bold uppercase tracking-wider rounded transition-colors shrink-0"
  >
  <Mail size={12} /> Email Buyer
  </button>
@@ -522,7 +522,7 @@ const AbandonedCheckouts = () => {
  <div className="p-4 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
  <div className="flex justify-between items-center text-sm">
  <span className="text-[var(--admin-ink)]/55">Payment Status</span>
- <span className="text-xs text-rose-300 font-bold uppercase tracking-widest">ABANDONED</span>
+ <span className="text-xs text-[var(--tint-rose-fg)] font-bold uppercase tracking-widest">ABANDONED</span>
  </div>
  <div className="space-y-2 pt-3 border-t border-[var(--admin-ink)]/10 font-inter">
  <div className="flex justify-between text-xs text-[var(--admin-ink)]/55">

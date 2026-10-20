@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import AdminModal from "../../components/admin/AdminModal";
 import { useAuth } from "../../context/AuthContext";
 import { fetchSubscribers, getAllOrders } from "../../api/firebaseFunctions";
 import {
@@ -401,21 +402,13 @@ const Subscribers = () => {
 
  {/* Email Modal */}
  {showEmailModal && (
-<div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-<div className="bg-[var(--admin-surface)] rounded-xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-[var(--admin-ink)]/10 my-auto">
- <div className="flex items-center justify-between p-6 border-b border-[var(--admin-ink)]/10">
- <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">BCC Campaign</p>
- <h3 className="text-lg font-bold text-[var(--admin-ink)]">Send Email</h3>
- </div>
- <button
- onClick={() => setShowEmailModal(false)}
- className="focus-ring p-2 hover:bg-[var(--admin-hover)] rounded-lg text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+ <AdminModal
+ onClose={() => setShowEmailModal(false)}
+ eyebrow="BCC Campaign"
+ title="Send Email"
+ size="md"
  >
- <X size={20} />
- </button>
- </div>
- <div className="p-6 space-y-4">
+ <div className="space-y-4">
  <div className="flex items-center gap-3 bg-[var(--tint-emerald-bg)] border border-[var(--tint-emerald-line)] rounded-lg px-4 py-3">
  <Mail size={16} className="text-[var(--tint-emerald-fg)] shrink-0" />
  <div className="text-sm text-[var(--tint-emerald-fg)]">
@@ -444,8 +437,7 @@ const Subscribers = () => {
  </AdminButton>
  </div>
  </div>
- </div>
- </div>
+ </AdminModal>
  )}
  </AdminLayout>
  );

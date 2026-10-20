@@ -62,7 +62,7 @@ const isPaid = (o) => o.payment_status === 'paid' || o.payment_status === 'succe
 
 const GrowthBadge = ({ value }) => {
     const isUp = value >= 0;
-    const colorClass = isUp ? "text-emerald-300" : "text-rose-300";
+    const colorClass = isUp ? "text-[var(--tint-emerald-fg)]" : "text-[var(--tint-rose-fg)]";
     const Icon = isUp ? ArrowUpRight : ArrowDownRight;
     return (
         <span className={`flex items-center text-xs font-extrabold tracking-tight tabular-nums ${colorClass}`}>
@@ -89,7 +89,7 @@ const SegmentedFilter = ({ options, value, onChange }) => (
 
 const DashboardSkeleton = () => (
     <div className="space-y-5 md:space-y-6">
-        <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-6 md:p-8">
+        <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-6 md:p-8">
             <div className="skeleton h-4 w-32 mb-4" />
             <div className="skeleton h-14 w-48 mb-4" />
             <div className="flex gap-8">
@@ -97,16 +97,16 @@ const DashboardSkeleton = () => (
             </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
-            <div className="lg:col-span-7 border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-5">
+            <div className="lg:col-span-7 border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
                 <div className="skeleton h-5 w-36 mb-4" />
                 {[0, 1, 2, 3].map(i => <div key={i} className="skeleton h-10 w-full mb-3" />)}
             </div>
             <div className="lg:col-span-5 flex flex-col gap-4 md:gap-5">
-                <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-5">
+                <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
                     <div className="skeleton h-5 w-32 mb-4" />
                     <div className="skeleton h-48 w-full" />
                 </div>
-                <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-5">
+                <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
                     <div className="skeleton h-5 w-32 mb-4" />
                     {[0, 1, 2].map(i => <div key={i} className="skeleton h-8 w-full mb-3" />)}
                 </div>
@@ -247,7 +247,7 @@ const AdminDashboard = () => {
     };
     const donutOpts = { ...doughnutOptions, cutout: '72%' };
 
-    const PAYMENT_PILLS = { pending: "bg-amber-500/[0.14] text-amber-300", paid: "bg-emerald-500/[0.14] text-emerald-300", success: "bg-emerald-500/[0.14] text-emerald-300", failed: "bg-rose-500/[0.14] text-rose-300", cancelled: "bg-slate-500/[0.18] text-slate-400", refunded: "bg-slate-500/[0.18] text-slate-400" };
+    const PAYMENT_PILLS = { pending: "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)]", paid: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)]", success: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)]", failed: "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)]", cancelled: "bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)]", refunded: "bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)]" };
     const PaymentPill = ({ status }) => {
         const normalized = isPaid({ payment_status: status }) ? 'paid' : (status || 'pending');
         return <span className={`text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded border inline-block ${PAYMENT_PILLS[normalized] || PAYMENT_PILLS.pending}`}>{normalized === 'paid' ? 'Paid' : (status || 'pending')}</span>;
@@ -255,9 +255,9 @@ const AdminDashboard = () => {
 
     const filterOptions = [
         { id: 'all', label: 'All', dot: 'bg-[var(--admin-accent)]' },
-        { id: 'pending', label: 'Pending', dot: 'bg-amber-500' },
-        { id: 'paid', label: 'Paid', dot: 'bg-emerald-500' },
-        { id: 'delivered', label: 'Delivered', dot: 'bg-violet-500' },
+        { id: 'pending', label: 'Pending', dot: 'bg-[var(--tint-amber-fg)]' },
+        { id: 'paid', label: 'Paid', dot: 'bg-[var(--tint-emerald-fg)]' },
+        { id: 'delivered', label: 'Delivered', dot: 'bg-[var(--tint-violet-fg)]' },
     ];
     const periodLabel = globalFilter === 'today' ? 'Today' : globalFilter === 'yesterday' ? 'Yesterday' : globalFilter === '7d' ? 'Last 7 days' : globalFilter === '30d' ? 'Last 30 days' : 'All time';
 
@@ -281,7 +281,7 @@ const AdminDashboard = () => {
             <div className="mb-5 flex flex-wrap items-center gap-3">
                 <SegmentedFilter options={filterOptions} value={paymentFilter} onChange={setPaymentFilter} />
                 <span className="inline-flex items-center gap-1.5 text-[10px] text-[var(--admin-ink)]/45 ml-auto">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />{liveVisitors} live
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-emerald-fg)] animate-pulse" />{liveVisitors} live
                 </span>
             </div>
 
@@ -290,7 +290,7 @@ const AdminDashboard = () => {
                     {/* Lead metric - editorial block. Hidden without store.finance.view:
                         a Vice Admin oversees operations but never sees company money. */}
                     {canSeeFinance && (
-                    <section className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-6 md:p-8">
+                    <section className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/45 mb-1">Net sales</p>
@@ -314,8 +314,8 @@ const AdminDashboard = () => {
                                     <p className="text-3xl font-extrabold tabular-nums text-[var(--admin-ink)]">{dashboardData.deliveredCount}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/45 mb-1">Awaiting</p>
-                                    <p className="text-3xl font-extrabold tabular-nums text-amber-300">{dashboardData.pendingCount}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--tint-amber-fg)]/45 mb-1">Awaiting</p>
+                                    <p className="text-3xl font-extrabold tabular-nums text-[var(--tint-amber-fg)]">{dashboardData.pendingCount}</p>
                                 </div>
                             </div>
                         </div>
@@ -323,7 +323,7 @@ const AdminDashboard = () => {
                     )}
 
                     {!canSeeFinance && (
-                        <section className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-6 md:p-8">
+                        <section className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-6 md:p-8">
                             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/45 mb-2">
                                 Company financials
                             </p>
@@ -336,15 +336,15 @@ const AdminDashboard = () => {
                     {/* Dense editorial row */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
                         {/* Recent orders - 7 cols */}
-                        <div className="lg:col-span-7 border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl overflow-hidden">
-                            <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+                        <div className="lg:col-span-7 border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl overflow-hidden">
+                            <div className="px-5 py-4 border-b border-[var(--admin-ink)]/[0.06] flex items-center justify-between">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60">Recent orders</h2>
                                 <Link to="/admin/orders" className="text-[10px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)]">View all</Link>
                             </div>
                             <div className="divide-y divide-white/[0.06]">
                                 {dashboardData.recentList.length === 0 && <div className="px-5 py-10 text-center text-sm text-[var(--admin-ink)]/55">No recent orders.</div>}
                                 {dashboardData.recentList.map((order) => (
-                                    <div key={order.id} className="flex items-center justify-between px-5 py-3 hover:bg-white/[0.03] transition-colors">
+                                    <div key={order.id} className="flex items-center justify-between px-5 py-3 hover:bg-[var(--admin-ink)]/[0.03] transition-colors">
                                         <div className="min-w-0">
                                             <p className="text-sm font-bold text-[var(--admin-ink)]">#{order.id.slice(0, 8).toUpperCase()}</p>
                                             <p className="text-xs text-[var(--admin-ink)]/55 truncate mt-0.5">{order.customer?.firstName} {order.customer?.lastName}</p>
@@ -360,7 +360,7 @@ const AdminDashboard = () => {
 
                         {/* Right column */}
                         <div className="lg:col-span-5 flex flex-col gap-4 md:gap-5">
-                            <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-5">
+                            <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60 mb-3">Fulfillment</h2>
                                 {Object.values(dashboardData.statusBreakdown).reduce((a, b) => a + b, 0) === 0 ? (
                                     <div className="text-center text-sm text-[var(--admin-ink)]/55 py-8">No data for this period.</div>
@@ -374,7 +374,7 @@ const AdminDashboard = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-2xl p-5">
+                            <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60 mb-3">Top products</h2>
                                 {dashboardData.topProducts.length === 0 ? (
                                     <div className="text-center text-sm text-[var(--admin-ink)]/55 py-8">No product sales in this period.</div>

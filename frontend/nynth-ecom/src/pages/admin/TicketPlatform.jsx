@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 const naira = (v) => `\u20A6${Number(v ?? 0).toLocaleString()}`;
 
 const Stat = ({ label, value, note, icon: Icon }) => (
-  <div className="border border-[var(--admin-ink)]/10 rounded-2xl bg-white/[0.03] px-5 py-4">
+  <div className="border border-[var(--admin-ink)]/10 rounded-xl bg-[var(--admin-ink)]/[0.03] px-5 py-4">
     <div className="flex items-center gap-1.5 mb-1.5">
       {Icon && <Icon size={11} className="text-[var(--admin-ink)]/35" />}
       <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42">{label}</p>
@@ -89,7 +89,7 @@ export default function TicketPlatform() {
             </div>
 
             {finance.length === 0 ? (
-              <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-2xl p-12 text-center">
+              <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-12 text-center">
                 <Wallet size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
                 <p className="text-sm text-[var(--admin-ink)]/65">
                   No live ticket sales yet. Figures appear the moment a real ticket is paid for.
@@ -104,7 +104,7 @@ export default function TicketPlatform() {
                 <div className="hidden md:block bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card overflow-x-auto">
                   <table className="w-full admin-table">
                     <thead>
-                      <tr className="border-b border-[var(--admin-ink)]/10 bg-white/[0.05]">
+                      <tr className="border-b border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05]">
                         {["Event", "Sold", "In", "Collected", "Fees", "Refunded", "NYNTH cut", "Owed to organizer"].map((h) => (
                           <th key={h} className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-5 py-3 whitespace-nowrap">
                             {h}
@@ -119,14 +119,14 @@ export default function TicketPlatform() {
                           Number(f.payment_fees ?? 0) -
                           Number(f.nynth_commission ?? 0);
                         return (
-                          <tr key={f.event_id} className="hover:bg-white/[0.04] transition-colors">
+                          <tr key={f.event_id} className="hover:bg-[var(--admin-ink)]/[0.04] transition-colors">
                             <td className="px-5 py-4 text-sm font-bold uppercase">{f.event_title || f.event_id}</td>
                             <td className="px-5 py-4 text-sm tabular-nums">{f.tickets_sold}</td>
                             <td className="px-5 py-4 text-sm tabular-nums text-[var(--admin-ink)]/60">{f.tickets_used}</td>
                             <td className="px-5 py-4 text-sm tabular-nums">{naira(f.gross_collected)}</td>
                             <td className="px-5 py-4 text-sm tabular-nums text-[var(--admin-ink)]/60">{naira(f.payment_fees)}</td>
                             <td className="px-5 py-4 text-sm tabular-nums text-[var(--admin-ink)]/60">{naira(f.refunded)}</td>
-                            <td className="px-5 py-4 text-sm tabular-nums text-emerald-300">{naira(f.nynth_commission)}</td>
+                            <td className="px-5 py-4 text-sm tabular-nums text-[var(--tint-emerald-fg)]">{naira(f.nynth_commission)}</td>
                             <td className="px-5 py-4 text-sm tabular-nums">{naira(owed)}</td>
                           </tr>
                         );

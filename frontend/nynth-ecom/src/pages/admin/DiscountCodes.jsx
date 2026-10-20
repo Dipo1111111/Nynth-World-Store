@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import PageHeader from "../../components/admin/PageHeader";
+import AdminModal from "../../components/admin/AdminModal";
+import AdminButton from "../../components/admin/AdminButton";
 import {
  fetchDiscountCodes,
  addDiscountCode,
@@ -164,24 +167,19 @@ export default function DiscountCodes() {
 
  return (
  <AdminLayout title="Discount Codes">
- {/* Header */}
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
- <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">
- <span className="text-[var(--admin-ink)]">{activeCount}</span> active · {codes.length} total
- </p>
- <p className="text-sm text-[var(--admin-ink)]/55">Promo codes applied at checkout.</p>
- </div>
+ <PageHeader
+ eyebrow={(`${activeCount}` + " active · " + `${codes.length}` + " total")}
+ description="Promo codes applied at checkout."
+ actions={(
+ <>
  {canManageCodes && (
- <button
- onClick={() => openModal()}
- className="focus-ring flex items-center gap-2 px-5 py-2.5 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover active:scale-[0.98]"
- >
- <Plus size={16} />
+ <AdminButton icon={Plus} onClick={() => openModal()} size="md">
  Add Code
- </button>
+ </AdminButton>
  )}
- </div>
+ </>
+ )}
+ />
 
  {/* Table */}
  {loading ? (
@@ -191,19 +189,19 @@ export default function DiscountCodes() {
  ) : codes.length === 0 ? (
  <Card className="border-[var(--admin-ink)]/10">
  <CardContent className="flex flex-col items-center justify-center py-20 text-center">
- <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+ <div className="w-16 h-16 rounded-xl bg-[var(--admin-ink)]/[0.09] flex items-center justify-center mb-4">
  <Tag className="text-[var(--admin-ink)]/35" size={30} />
  </div>
  <p className="text-[var(--admin-ink)] font-medium mb-1">No discount codes yet</p>
  <p className="text-[var(--admin-ink)]/42 text-sm mb-6">Create your first promo code to run a campaign.</p>
  {canManageCodes && (
- <button
+ <AdminButton
+ icon={Plus}
  onClick={() => openModal()}
- className="focus-ring flex items-center gap-2 px-6 py-3 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all"
+ size="block"
  >
- <Plus size={15} />
  Create your first code
- </button>
+ </AdminButton>
  )}
  </CardContent>
  </Card>
@@ -215,7 +213,7 @@ export default function DiscountCodes() {
  <div
  key={code.id}
  className={`bg-[var(--admin-surface)] p-4 rounded-xl border ${
- isExpired(code) ? "border-rose-500/25 opacity-60" : "border-[var(--admin-ink)]/10"
+ isExpired(code) ? "border-[var(--tint-rose-line)] opacity-60" : "border-[var(--admin-ink)]/10"
  } shadow-card`}
  >
  <div className="flex items-start justify-between mb-3">
@@ -225,25 +223,25 @@ export default function DiscountCodes() {
  </span>
  <div className="flex items-center gap-2 mt-2 flex-wrap">
  {code.type === "percentage" ? (
- <span className="flex items-center gap-1 text-xs font-bold text-violet-300 bg-violet-500/[0.14] px-2 py-0.5 rounded-lg border border-violet-500/25">
+ <span className="flex items-center gap-1 text-xs font-bold text-[var(--tint-violet-fg)] bg-[var(--tint-violet-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-violet-line)]">
  <Percent size={10} /> {code.value}%
  </span>
  ) : (
- <span className="flex items-center gap-1 text-xs font-bold text-emerald-300 bg-emerald-500/[0.14] px-2 py-0.5 rounded-lg border border-emerald-500/25">
+ <span className="flex items-center gap-1 text-xs font-bold text-[var(--tint-emerald-fg)] bg-[var(--tint-emerald-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-emerald-line)]">
  <DollarSign size={10} /> ₦
  {Number(code.value).toLocaleString()}
  </span>
  )}
  {isExpired(code) ? (
- <span className="text-[9px] font-bold uppercase tracking-wider text-rose-300 bg-rose-500/[0.14] px-2 py-0.5 rounded-lg border border-rose-500/25">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tint-rose-fg)] bg-[var(--tint-rose-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-rose-line)]">
  Expired
  </span>
  ) : code.isActive ? (
- <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/[0.14] px-2 py-0.5 rounded-lg border border-emerald-500/25">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tint-emerald-fg)] bg-[var(--tint-emerald-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-emerald-line)]">
  Active
  </span>
  ) : (
- <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 bg-slate-500/[0.18] px-2 py-0.5 rounded-lg border border-slate-500/30">
+ <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 bg-[var(--tint-slate-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-slate-line)]">
  Inactive
  </span>
  )}
@@ -257,13 +255,13 @@ export default function DiscountCodes() {
  )}
  </div>
  </div>
- {canManageCodes && <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
+ {canManageCodes && <div className="flex justify-end gap-2 pt-2 border-t border-[var(--admin-ink)]/[0.08]">
  <button
  onClick={() => handleToggleActive(code)}
  className={`focus-ring flex items-center justify-center gap-1 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${
  code.isActive
- ? "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
- : "bg-slate-500/[0.18] text-[var(--admin-ink)]/55 border-slate-500/30"
+ ? "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]"
+ : "bg-[var(--tint-slate-bg)] text-[var(--admin-ink)]/55 border-[var(--tint-slate-line)]"
  }`}
  >
  {code.isActive ? (
@@ -275,13 +273,13 @@ export default function DiscountCodes() {
  </button>
  <button
  onClick={() => openModal(code)}
- className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[var(--admin-ink)]/65 rounded-lg border border-[var(--admin-ink)]/10 hover:bg-white/[0.12]"
+ className="focus-ring flex items-center justify-center p-2 bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/65 rounded-lg border border-[var(--admin-ink)]/10 hover:bg-[var(--admin-ink)]/[0.12]"
  >
  <Edit2 size={14} />
  </button>
  <button
  onClick={() => handleDelete(code.id)}
- className="focus-ring flex items-center justify-center p-2 bg-rose-500/[0.14] text-rose-300 rounded-lg border border-rose-500/25 hover:bg-rose-500/25"
+ className="focus-ring flex items-center justify-center p-2 bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] rounded-lg border border-[var(--tint-rose-line)] hover:bg-[var(--tint-rose-fg)]/25"
  >
  <Trash2 size={14} />
  </button>
@@ -294,7 +292,7 @@ export default function DiscountCodes() {
  <div className="hidden md:block bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card overflow-hidden">
  <table className="w-full admin-table">
  <thead>
- <tr className="border-b border-[var(--admin-ink)]/10 bg-white/[0.05]">
+ <tr className="border-b border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05]">
  <th className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 px-6 py-3">
  Code
  </th>
@@ -319,7 +317,7 @@ export default function DiscountCodes() {
  {codes.map((code) => (
  <tr
  key={code.id}
- className={`hover:bg-white/[0.05] transition-colors ${
+ className={`hover:bg-[var(--admin-ink)]/[0.05] transition-colors ${
  isExpired(code) ? "opacity-50" : ""
  }`}
  >
@@ -332,8 +330,8 @@ export default function DiscountCodes() {
  <span
  className={`flex items-center gap-1 text-xs font-bold uppercase tracking-wider ${
  code.type === "percentage"
- ? "text-violet-300"
- : "text-emerald-300"
+ ? "text-[var(--tint-violet-fg)]"
+ : "text-[var(--tint-emerald-fg)]"
  }`}
  >
  {code.type === "percentage" ? (
@@ -356,15 +354,15 @@ export default function DiscountCodes() {
  </td>
  <td className="px-6 py-4">
  {isExpired(code) ? (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-rose-500/[0.14] text-rose-300 border border-rose-500/25">
+ <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border border-[var(--tint-rose-line)]">
  Expired
  </span>
  ) : code.isActive ? (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-emerald-500/[0.14] text-emerald-300 border border-emerald-500/25">
+ <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border border-[var(--tint-emerald-line)]">
  Active
  </span>
  ) : (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-slate-500/[0.18] text-slate-400 border border-slate-500/30">
+ <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border border-[var(--tint-slate-line)]">
  Inactive
  </span>
  )}
@@ -375,8 +373,8 @@ export default function DiscountCodes() {
  onClick={() => handleToggleActive(code)}
  className={`focus-ring p-1.5 rounded-lg border transition-colors ${
  code.isActive
- ? "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
- : "bg-slate-500/[0.18] text-[var(--admin-ink)]/55 border-slate-500/30"
+ ? "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]"
+ : "bg-[var(--tint-slate-bg)] text-[var(--admin-ink)]/55 border-[var(--tint-slate-line)]"
  }`}
  title={code.isActive ? "Deactivate" : "Activate"}
  >
@@ -388,13 +386,13 @@ export default function DiscountCodes() {
  </button>
  <button
  onClick={() => openModal(code)}
- className="focus-ring p-2 text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-[var(--admin-ink)]/10"
+ className="focus-ring p-2 text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-ink)]/[0.09] rounded-lg border border-transparent hover:border-[var(--admin-ink)]/10"
  >
  <Edit2 size={16} />
  </button>
  <button
  onClick={() => handleDelete(code.id)}
- className="focus-ring p-2 text-rose-300 hover:bg-rose-500/[0.14] rounded-lg border border-transparent hover:border-rose-500/25"
+ className="focus-ring p-2 text-[var(--tint-rose-fg)] hover:bg-[var(--tint-rose-bg)] rounded-lg border border-transparent hover:border-[var(--tint-rose-line)]"
  >
  <Trash2 size={16} />
  </button>
@@ -410,26 +408,13 @@ export default function DiscountCodes() {
 
  {/* Add / Edit Modal */}
  {isModalOpen && (
-<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-<div className="bg-[var(--admin-surface)] rounded-2xl w-full max-w-md shadow-raised border border-[var(--admin-ink)]/10 my-auto">
- <div className="flex items-center justify-between p-6 border-b border-[var(--admin-ink)]/10">
- <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">
- {editingId ? "Update promo" : "New promo code"}
- </p>
- <h2 className="font-bold text-lg text-[var(--admin-ink)]">
- {editingId ? "Edit Code" : "New Code"}
- </h2>
- </div>
- <button
- onClick={closeModal}
- className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg transition-colors"
+ <AdminModal
+ onClose={closeModal}
+ eyebrow={editingId ? "Update promo" : "New promo code"}
+ title={editingId ? "Edit Code" : "New Code"}
+ size="sm"
  >
- <X size={18} />
- </button>
- </div>
-
- <form onSubmit={handleSubmit} className="p-6 space-y-5">
+ <form onSubmit={handleSubmit} className="space-y-5">
  {/* Code */}
  <div>
  <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-2">
@@ -501,7 +486,7 @@ export default function DiscountCodes() {
  </div>
 
  {/* Active Toggle */}
- <div className="flex items-center justify-between py-3 px-4 bg-white/[0.05] rounded-xl border border-[var(--admin-ink)]/10">
+ <div className="flex items-center justify-between py-3 px-4 bg-[var(--admin-ink)]/[0.05] rounded-xl border border-[var(--admin-ink)]/10">
  <div>
  <span className="text-sm font-medium text-[var(--admin-ink)] block">Active</span>
  <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Code available at checkout</span>
@@ -513,7 +498,7 @@ export default function DiscountCodes() {
  }
  aria-label="Toggle active"
  className={`focus-ring p-0.5 rounded-lg transition-colors ${
- form.isActive ? "bg-[var(--admin-accent)]" : "bg-white/[0.18]"
+ form.isActive ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-ink)]/[0.18]"
  }`}
  >
  <div
@@ -529,7 +514,7 @@ export default function DiscountCodes() {
  <button
  type="button"
  onClick={closeModal}
- className="focus-ring flex-1 py-3 text-sm font-bold border border-[var(--admin-ink)]/18 rounded-lg hover:bg-white/[0.05] transition-colors"
+ className="focus-ring flex-1 py-3 text-sm font-bold border border-[var(--admin-ink)]/18 rounded-lg hover:bg-[var(--admin-ink)]/[0.05] transition-colors"
  >
  Cancel
  </button>
@@ -543,8 +528,7 @@ export default function DiscountCodes() {
  </button>
  </div>
  </form>
- </div>
- </div>
+ </AdminModal>
  )}
  </AdminLayout>
  );

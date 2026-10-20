@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
+import PageHeader from "../../components/admin/PageHeader";
+import AdminButton from "../../components/admin/AdminButton";
 import {
  fetchProducts,
  addProduct,
@@ -26,7 +28,7 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  return (
  <div ref={setNodeRef} style={style} className={`bg-[var(--admin-surface)] p-4 rounded-xl border ${isDragging ? "border-[var(--admin-ink)]/25 shadow-card opacity-80" : "border-[var(--admin-ink)]/10 shadow-card"} flex flex-col gap-3 group transition-all`}>
  <div className="flex gap-4">
- <div className="w-20 h-20 bg-white/[0.07] rounded-lg overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
+ <div className="w-20 h-20 bg-[var(--admin-ink)]/[0.07] rounded-lg overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
  {(product.images?.[0] || product.imageUrl) ? (
  <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
  ) : (
@@ -42,9 +44,9 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
  <div className="flex items-center gap-1">
  <span className={`px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider border ${
- product.stockQuantity <= 0 ? "bg-rose-500/[0.14] text-rose-300 border-rose-500/25" :
- product.stockQuantity <= 5 ? "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" :
- "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
+ product.stockQuantity <= 0 ? "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]" :
+ product.stockQuantity <= 5 ? "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]" :
+ "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]"
  }`}>
  {product.stockQuantity <= 0 ? "Out" : `${product.stockQuantity} Left`}
  </span>
@@ -52,22 +54,22 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  </div>
  </div>
  </div>
- <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
- <button {...attributes} {...listeners} className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] rounded-lg border border-transparent touch-none active:cursor-grabbing cursor-grab">
+ <div className="flex justify-end gap-2 pt-2 border-t border-[var(--admin-ink)]/[0.08]">
+ <button {...attributes} {...listeners} className="focus-ring flex items-center justify-center p-2 bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] rounded-lg border border-transparent touch-none active:cursor-grabbing cursor-grab">
  <GripVertical size={16} />
  </button>
  <button
  disabled={!canEdit}
  onClick={() => handleTogglePublic(product)}
- className={`focus-ring flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25 hover:bg-emerald-500/25' : 'bg-slate-500/[0.18] text-[var(--admin-ink)]/55 border-slate-500/30 hover:bg-slate-500/35'}`}
+ className={`focus-ring flex-1 flex items-center justify-center gap-1.5 p-2 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${product.isPublic !== false ? 'bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)] hover:bg-[var(--tint-emerald-fg)]/25' : 'bg-[var(--tint-slate-bg)] text-[var(--admin-ink)]/55 border-[var(--tint-slate-line)] hover:bg-[var(--admin-hover)]'}`}
  >
  {product.isPublic !== false ? <><Eye size={14}/> Visible</> : <><EyeOff size={14}/> Hidden</>}
  </button>
  {canEdit && <>
- <button onClick={() => handleEdit(product)} className="focus-ring flex items-center justify-center p-2 bg-white/[0.07] text-[var(--admin-ink)]/65 rounded-lg border border-[var(--admin-ink)]/10 hover:bg-white/[0.12]">
+ <button onClick={() => handleEdit(product)} className="focus-ring flex items-center justify-center p-2 bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/65 rounded-lg border border-[var(--admin-ink)]/10 hover:bg-[var(--admin-ink)]/[0.12]">
  <Edit2 size={14} />
  </button>
- <button onClick={() => handleDelete(product.id)} className="focus-ring flex items-center justify-center p-2 bg-rose-500/[0.14] text-rose-300 rounded-lg border border-rose-500/25 hover:bg-rose-500/25">
+ <button onClick={() => handleDelete(product.id)} className="focus-ring flex items-center justify-center p-2 bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] rounded-lg border border-[var(--tint-rose-line)] hover:bg-[var(--tint-rose-fg)]/25">
  <Trash2 size={14} />
  </button>
  </>}
@@ -81,10 +83,10 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <tr ref={setNodeRef} style={style} className={`transition-colors ${isDragging ? "bg-white/[0.05] shadow-card ring-1 ring-[var(--admin-ink)]/12 opacity-80" : "hover:bg-white/[0.05]"}`}>
+ <tr ref={setNodeRef} style={style} className={`transition-colors ${isDragging ? "bg-[var(--admin-ink)]/[0.05] shadow-card ring-1 ring-[var(--admin-ink)]/12 opacity-80" : "hover:bg-[var(--admin-ink)]/[0.05]"}`}>
  <td className="p-4">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-white/[0.07] rounded-lg overflow-hidden border border-[var(--admin-ink)]/10">
+ <div className="w-12 h-12 bg-[var(--admin-ink)]/[0.07] rounded-lg overflow-hidden border border-[var(--admin-ink)]/10">
  {(product.images?.[0] || product.imageUrl) ? (
  <img src={product.images?.[0] || product.imageUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
  ) : (
@@ -102,9 +104,9 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <td className="p-4">
  <div className="flex flex-col gap-1">
  <span className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider w-fit border ${
- product.stockQuantity <= 0 ? "bg-rose-500/[0.14] text-rose-300 border-rose-500/25" :
- product.stockQuantity <= 5 ? "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" :
- "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25"
+ product.stockQuantity <= 0 ? "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]" :
+ product.stockQuantity <= 5 ? "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]" :
+ "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]"
  }`}>
  {product.stockQuantity <= 0 ? "Out of Stock" : product.stockQuantity <= 5 ? "Low Stock" : "In Stock"}
  </span>
@@ -116,7 +118,7 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <button
  disabled={!canEdit}
  onClick={() => handleTogglePublic(product)}
- className={`focus-ring p-1.5 rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25' : 'bg-slate-500/[0.18] text-[var(--admin-ink)]/55 border-slate-500/30'}`}
+ className={`focus-ring p-1.5 rounded-lg border hover:opacity-80 transition-opacity ${product.isPublic !== false ? 'bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]' : 'bg-[var(--tint-slate-bg)] text-[var(--admin-ink)]/55 border-[var(--tint-slate-line)]'}`}
  title={product.isPublic !== false ? "Hide from Store" : "Show on Store"}
  >
  {product.isPublic !== false ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -125,10 +127,10 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <GripVertical size={16} />
  </button>
  {canEdit && <>
- <button onClick={() => handleEdit(product)} className="focus-ring p-2 text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] hover:bg-white/[0.09] rounded-lg border border-transparent hover:border-[var(--admin-ink)]/10">
+ <button onClick={() => handleEdit(product)} className="focus-ring p-2 text-[var(--admin-ink)]/65 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-ink)]/[0.09] rounded-lg border border-transparent hover:border-[var(--admin-ink)]/10">
  <Edit2 size={16} />
  </button>
- <button onClick={() => handleDelete(product.id)} className="focus-ring p-2 text-rose-300 hover:bg-rose-500/[0.14] rounded-lg border border-transparent hover:border-rose-500/25">
+ <button onClick={() => handleDelete(product.id)} className="focus-ring p-2 text-[var(--tint-rose-fg)] hover:bg-[var(--tint-rose-bg)] rounded-lg border border-transparent hover:border-[var(--tint-rose-line)]">
  <Trash2 size={16} />
  </button>
  </>}
@@ -512,23 +514,19 @@ export default function AdminProducts() {
 
  return (
  <AdminLayout title="Products">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
- <div>
- <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">
- {products.length} product{products.length !== 1 ? "s" : ""} · drag rows or long-press cards to reorder
- </p>
- <p className="text-sm text-[var(--admin-ink)]/55">Keep your catalog ordered and discoverable.</p>
- </div>
+ <PageHeader
+ eyebrow={`${products.length} product${products.length !== 1 ? "s" : ""} · drag rows or long-press cards to reorder`}
+ description="Keep your catalog ordered and discoverable."
+ actions={(
+ <>
  {canCreateProduct && (
- <button
- onClick={handleCreate}
- className="focus-ring btn-primary flex items-center gap-2 text-xs sm:text-sm py-2 px-4 sm:py-2.5 sm:px-5 shadow-card"
- >
- <Plus size={18} />
- <span>Add Product</span>
- </button>
+ <AdminButton icon={Plus} onClick={handleCreate} size="md" className="shrink-0">
+ Add Product
+ </AdminButton>
  )}
- </div>
+ </>
+ )}
+ />
 
  <div className="bg-transparent sm:bg-[var(--admin-surface)] sm:rounded-xl sm:border sm:border-[var(--admin-ink)]/10 sm:shadow-card overflow-hidden">
  {loading ? (
@@ -547,7 +545,7 @@ export default function AdminProducts() {
  ))}
  {products.length === 0 && (
  <div className="text-center py-20 bg-[var(--admin-surface)] rounded-xl border border-dashed border-[var(--admin-ink)]/22">
- <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.09] flex items-center justify-center mb-3">
+ <div className="w-12 h-12 mx-auto rounded-xl bg-[var(--admin-ink)]/[0.09] flex items-center justify-center mb-3">
  <Package className="h-6 w-6 text-[var(--admin-ink)]/35" />
  </div>
  <p className="text-[var(--admin-ink)]/55 text-xs font-bold uppercase tracking-widest">No products found</p>
@@ -561,7 +559,7 @@ export default function AdminProducts() {
  <div className="hidden sm:block overflow-x-auto">
  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
  <table className="w-full text-left admin-table">
- <thead className="bg-white/[0.05] border-b border-[var(--admin-ink)]/10">
+ <thead className="bg-[var(--admin-ink)]/[0.05] border-b border-[var(--admin-ink)]/10">
  <tr>
  <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[var(--admin-ink)]/42">Product</th>
  <th className="p-4 font-bold text-[10px] tracking-widest uppercase text-[var(--admin-ink)]/42 whitespace-nowrap">Category</th>
@@ -578,7 +576,7 @@ export default function AdminProducts() {
  {products.length === 0 && (
  <tr>
  <td colSpan="5" className="p-12 text-center">
- <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.09] flex items-center justify-center mb-3">
+ <div className="w-12 h-12 mx-auto rounded-xl bg-[var(--admin-ink)]/[0.09] flex items-center justify-center mb-3">
  <Package className="h-6 w-6 text-[var(--admin-ink)]/35" />
  </div>
  <p className="text-[var(--admin-ink)]/55 text-xs font-bold uppercase tracking-widest">No products found</p>
@@ -607,7 +605,7 @@ onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}
 role="dialog"
 aria-modal="true"
 aria-label={editingId ? "Edit product" : "New product"}
-className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto overscroll-contain p-6 md:p-8 shadow-raised border border-[var(--admin-ink)]/10 m-auto animate-in fade-in zoom-in-95 duration-200"
+className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto overscroll-contain p-6 md:p-8 shadow-raised border border-[var(--admin-ink)]/10 m-auto animate-in fade-in zoom-in-95 duration-200"
 >
  <div className="flex justify-between items-center mb-6">
  <div>
@@ -616,7 +614,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  </div>
  <button
  onClick={() => setIsModalOpen(false)}
- className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg transition-colors"
+ className="focus-ring p-2 hover:bg-[var(--admin-ink)]/[0.09] rounded-lg transition-colors"
  >
  <X size={20} />
  </button>
@@ -670,7 +668,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  </div>
 
  {formData.category !== "tickets" && (
- <div className="space-y-3 pt-4 border-t border-[var(--admin-ink)]/10 bg-white/[0.05] p-4 rounded-xl">
+ <div className="space-y-3 pt-4 border-t border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05] p-4 rounded-xl">
  <div className="flex items-center gap-2">
  <FileText size={16} className="text-[var(--admin-ink)]" />
  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">Product page note - shipping &amp; returns</span>
@@ -713,7 +711,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
 
  {/* Ticket / Event fields */}
  {formData.category === "tickets" && (
- <div className="space-y-4 pt-4 border-t border-[var(--admin-ink)]/10 bg-white/[0.05] p-4 rounded-xl">
+ <div className="space-y-4 pt-4 border-t border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05] p-4 rounded-xl">
  <div className="flex items-center gap-2">
  <Ticket size={16} className="text-[var(--admin-ink)]" />
  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">Event Setup - e-tickets auto-deliver</span>
@@ -820,7 +818,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
 
  {formData.category !== "headwear" && formData.category !== "tickets" ? (
  formData.sizes.length > 0 && (
- <div className="bg-white/[0.05] p-4 rounded-xl border border-[var(--admin-ink)]/10 space-y-4">
+ <div className="bg-[var(--admin-ink)]/[0.05] p-4 rounded-xl border border-[var(--admin-ink)]/10 space-y-4">
  <div className="flex justify-between items-center bg-[var(--admin-surface)] p-3 rounded-lg border border-[var(--admin-ink)]/10 shadow-card">
  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">Inventory per Size</label>
  <div className="flex items-center gap-3">
@@ -843,7 +841,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  toast.success("Applied to all sizes");
  }
  }}
- className="px-2 py-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[8px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
+ className="focus-ring px-2 py-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[8px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
  >
  Set All
  </button>
@@ -854,7 +852,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  onClick={() => {
  if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
  }}
- className="text-[9px] font-bold text-rose-300 hover:text-rose-300 uppercase tracking-tighter transition-colors"
+ className="focus-ring text-[9px] font-bold text-[var(--tint-rose-fg)] hover:text-[var(--tint-rose-fg)] uppercase tracking-tighter transition-colors"
  >
  Clear All
  </button>
@@ -904,12 +902,12 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  <div className="w-28 h-28 rounded-xl border border-[var(--admin-ink)]/14 overflow-hidden relative shadow-card">
  <img src={img} className="w-full h-full object-cover" />
  {idx === 0 && (
- <div className="absolute top-1 left-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
+ <div className="absolute top-1 left-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider z-10 pointer-events-none">
  Primary
  </div>
  )}
  {formData.modelImage === img && (
- <div className="absolute bottom-1 left-1 bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
+ <div className="absolute bottom-1 left-1 bg-[var(--tint-amber-fg)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider z-10 pointer-events-none">
  Model
  </div>
  )}
@@ -928,7 +926,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  setFormData({ ...formData, images: newImages });
  }}
  disabled={idx === 0}
- className="focus-ring p-1.5 rounded-md hover:bg-white/[0.09] text-[var(--admin-ink)]/65 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+ className="focus-ring p-1.5 rounded-lg hover:bg-[var(--admin-ink)]/[0.09] text-[var(--admin-ink)]/65 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
  title="Move Left"
  >
  <ChevronLeft size={16} strokeWidth={2.5} />
@@ -937,7 +935,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  <button
  type="button"
  onClick={() => setFormData({ ...formData, modelImage: formData.modelImage === img ? null : img })}
- className={`focus-ring p-1.5 rounded-md hover:bg-white/[0.09] transition-colors ${formData.modelImage === img ? 'text-amber-500 bg-amber-500/[0.14]' : 'text-[var(--admin-ink)]/65'}`}
+ className={`focus-ring p-1.5 rounded-lg hover:bg-[var(--admin-ink)]/[0.09] transition-colors ${formData.modelImage === img ? 'text-[var(--tint-amber-fg)] bg-[var(--tint-amber-bg)]' : 'text-[var(--admin-ink)]/65'}`}
  title="Toggle Model Image"
  >
  <Star size={14} fill={formData.modelImage === img ? "currentColor" : "none"} />
@@ -954,7 +952,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  modelImage: prev.modelImage === img ? null : prev.modelImage
  }));
  }}
- className="focus-ring p-1.5 rounded-md hover:bg-rose-500/[0.14] text-rose-300 transition-colors"
+ className="focus-ring p-1.5 rounded-lg hover:bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] transition-colors"
  title="Delete Image"
  >
  <Trash2 size={14} />
@@ -971,7 +969,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  setFormData({ ...formData, images: newImages });
  }}
  disabled={idx === formData.images.length - 1}
- className="focus-ring p-1.5 rounded-md hover:bg-white/[0.09] text-[var(--admin-ink)]/65 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+ className="focus-ring p-1.5 rounded-lg hover:bg-[var(--admin-ink)]/[0.09] text-[var(--admin-ink)]/65 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
  title="Move Right"
  >
  <ChevronRight size={16} strokeWidth={2.5} />
@@ -981,7 +979,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  ))}
  </div>
 
- <div className="border-2 border-dashed border-[var(--admin-ink)]/26 rounded-xl p-6 text-center cursor-pointer hover:border-[var(--admin-ink)]/45 hover:bg-white/[0.05] transition-all relative">
+ <div className="border-2 border-dashed border-[var(--admin-ink)]/26 rounded-xl p-6 text-center cursor-pointer hover:border-[var(--admin-ink)]/45 hover:bg-[var(--admin-ink)]/[0.05] transition-all relative">
  <input
  type="file"
  multiple
@@ -1011,7 +1009,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  type="number"
  min="0"
  readOnly
- className="w-full px-4 py-3 pl-10 border border-[var(--admin-ink)]/14 rounded-lg bg-white/[0.05] text-[var(--admin-ink)]/55 font-bold focus-ring"
+ className="w-full px-4 py-3 pl-10 border border-[var(--admin-ink)]/14 rounded-lg bg-[var(--admin-ink)]/[0.05] text-[var(--admin-ink)]/55 font-bold focus-ring"
  value={formData.stockQuantity}
  />
  <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-ink)]/42" size={18} />
@@ -1076,19 +1074,18 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-2xl w-full 
  <button
  type="button"
  onClick={() => setIsModalOpen(false)}
- className="focus-ring px-6 py-2.5 border border-[var(--admin-ink)]/18 rounded-lg hover:bg-white/[0.05]"
+ className="focus-ring px-6 py-2.5 border border-[var(--admin-ink)]/18 rounded-lg hover:bg-[var(--admin-ink)]/[0.05]"
  disabled={isSubmitting || isUploading}
  >
  Cancel
  </button>
- <button
+ <AdminButton
  type="submit"
- className="focus-ring px-6 py-2.5 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] rounded-lg hover:opacity-90 shadow-card flex items-center gap-2"
- disabled={isSubmitting || isUploading}
+ loading={isSubmitting || isUploading}
+ size="md"
  >
- {(isSubmitting || isUploading) && <Loader2 className="animate-spin" size={16} />}
  {editingId ? "Save Changes" : "Create Product"}
- </button>
+ </AdminButton>
  </div>
   </form>
   </div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import PageHeader from "../../components/admin/PageHeader";
+import AdminButton from "../../components/admin/AdminButton";
 import {
   fetchStaffRoles,
   addStaffRole,
@@ -28,9 +30,9 @@ const blankForm = () => ({
 });
 
 const STATUS_CHIP = {
-  invited: "bg-amber-500/[0.14] text-amber-300 border-amber-500/25",
-  active: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25",
-  suspended: "bg-slate-500/[0.18] text-slate-300 border-slate-500/30",
+  invited: "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]",
+  active: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]",
+  suspended: "bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border-[var(--tint-slate-line)]",
 };
 
 const STATUS_LABEL = { invited: "Invited", active: "Active", suspended: "Suspended" };
@@ -222,20 +224,19 @@ export default function StaffAccess() {
   return (
     <AdminLayout title="Staff & Access">
       <div className="max-w-5xl">
-        <p className="text-sm text-[var(--admin-ink)]/55 mb-8">
-          One platform, several levels of access. Add somebody by email, give them a role, then turn
-          individual permissions on or off. Everything below is enforced in the database, so a direct
-          URL or an API call gives them exactly what you see here and nothing more.
-        </p>
+      <PageHeader
+      description="One platform, several levels of access. Add somebody by email, give them a role, then turn individual permissions on or off. Everything below is enforced in the database, so a direct URL or an API call gives them exactly what you see here and nothing more."
+      className="mb-6"
+      />
 
         {/* ADD / EDIT */}
-        <form onSubmit={submit} className="bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-ink)]/10 shadow-card p-6 mb-8">
+        <form onSubmit={submit} className="bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card p-6 mb-8">
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">
               {editingId ? `Editing ${form.email || "person"}` : "Add new person"}
             </h2>
             {editingId && (
-              <button type="button" onClick={closeForm} className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg">
+              <button type="button" onClick={closeForm} className="focus-ring p-2 hover:bg-[var(--admin-ink)]/[0.09] rounded-lg">
                 <X size={16} />
               </button>
             )}
@@ -325,7 +326,7 @@ export default function StaffAccess() {
                         className={`focus-ring text-left px-4 py-3 rounded-lg border transition-colors ${
                           on
                             ? "bg-[var(--admin-accent)] text-[var(--admin-on-ink)] border-[var(--admin-accent)]"
-                            : "bg-white/[0.04] text-[var(--admin-ink)]/70 border-[var(--admin-ink)]/10 hover:bg-white/[0.07]"
+                            : "bg-[var(--admin-ink)]/[0.04] text-[var(--admin-ink)]/70 border-[var(--admin-ink)]/10 hover:bg-[var(--admin-ink)]/[0.07]"
                         }`}
                       >
                         <p className="text-[12px] font-bold uppercase tracking-wide truncate">
@@ -371,14 +372,14 @@ export default function StaffAccess() {
                           aria-pressed={on}
                           className={`focus-ring flex items-start gap-3 px-4 py-3 rounded-lg border text-left transition-colors ${
                             on
-                              ? "bg-emerald-500/[0.08] border-emerald-500/25"
-                              : "bg-white/[0.03] border-[var(--admin-ink)]/10 hover:bg-white/[0.06]"
+                              ? "bg-[var(--tint-emerald-fg)]/[0.08] border-[var(--tint-emerald-line)]"
+                              : "bg-[var(--admin-ink)]/[0.03] border-[var(--admin-ink)]/10 hover:bg-[var(--admin-ink)]/[0.06]"
                           }`}
                         >
                           <span
                             aria-hidden="true"
                             className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                              on ? "bg-emerald-400 border-emerald-400" : "border-[var(--admin-ink)]/25"
+                              on ? "bg-[var(--tint-emerald-fg)] border-[var(--tint-emerald-fg)]" : "border-[var(--admin-ink)]/25"
                             }`}
                           >
                             {on && <span className="w-1.5 h-1.5 rounded-full bg-[var(--admin-page)]" />}
@@ -388,7 +389,7 @@ export default function StaffAccess() {
                               {p.label}
                             </span>
                             {!isDefault && (
-                              <span className="block text-[9px] font-bold uppercase tracking-widest text-amber-300/80 mt-1">
+                              <span className="block text-[9px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]/80 mt-1">
                                 your change
                               </span>
                             )}
@@ -407,19 +408,19 @@ export default function StaffAccess() {
               <button
                 type="button"
                 onClick={closeForm}
-                className="focus-ring flex-1 py-3 text-sm font-bold border border-[var(--admin-ink)]/18 rounded-lg hover:bg-white/[0.05] transition-colors"
+                className="focus-ring flex-1 py-3 text-sm font-bold border border-[var(--admin-ink)]/18 rounded-lg hover:bg-[var(--admin-ink)]/[0.05] transition-colors"
               >
                 Cancel
               </button>
             )}
-            <button
-              type="submit"
-              disabled={saving}
-              className="focus-ring flex-1 py-3 text-sm font-bold bg-[var(--admin-accent)] text-[var(--admin-on-ink)] rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            <AdminButton
+            type="submit"
+            loading={saving}
+            size="block"
+            className="flex-1"
             >
-              {saving && <Loader2 size={14} className="animate-spin" />}
-              {editingId ? "Save access" : "Add person"}
-            </button>
+            {editingId ? "Save access" : "Add person"}
+            </AdminButton>
           </div>
         </form>
 
@@ -429,18 +430,19 @@ export default function StaffAccess() {
             <Loader2 className="animate-spin text-white/25" size={28} />
           </div>
         ) : staff.length === 0 ? (
-          <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-2xl p-12 text-center">
+          <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-12 text-center">
             <Users size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
             <p className="text-sm text-[var(--admin-ink)]/65 mb-6">
               Nobody yet. Add your first Vice Admin or Ticket Organizer above.
             </p>
-            <button
-              type="button"
-              onClick={openAdd}
-              className="focus-ring inline-flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--admin-accent-hover)] transition-all"
+            <AdminButton
+            icon={Plus}
+            type="button"
+            onClick={openAdd}
+            size="block"
             >
-              <Plus size={14} /> Add person
-            </button>
+            Add person
+            </AdminButton>
           </div>
         ) : (
           <div className="space-y-3 mb-12">
@@ -464,15 +466,15 @@ export default function StaffAccess() {
                       </div>
                       <p className="text-[11px] text-[var(--admin-ink)]/50 truncate">{person.email}</p>
                       <div className="flex items-center gap-2 flex-wrap mt-3">
-                        <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/[0.07] text-[var(--admin-ink)]/70 border border-[var(--admin-ink)]/10">
+                        <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/70 border border-[var(--admin-ink)]/10">
                           {roleMeta(person.role)?.label ?? person.role}
                         </span>
                         {person.department && (
-                          <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
+                          <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
                             {person.department}
                           </span>
                         )}
-                        <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
+                        <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
                           {granted} permission{granted === 1 ? "" : "s"}
                         </span>
                       </div>
@@ -485,7 +487,7 @@ export default function StaffAccess() {
                         </p>
                       )}
                       {person.eventIds?.length === 0 && canDirect(person.role) && (
-                        <p className="text-[10px] text-amber-300/70 mt-3">
+                        <p className="text-[10px] text-[var(--tint-amber-fg)]/70 mt-3">
                           No events assigned yet, so they can see no tickets.
                         </p>
                       )}
@@ -502,7 +504,7 @@ export default function StaffAccess() {
                         <button
                           type="button"
                           onClick={() => setStatus(person, "active", `${person.email} has access again`)}
-                          className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-emerald-500/25 bg-emerald-500/[0.08] text-emerald-300 text-[9px] font-bold uppercase tracking-widest hover:bg-emerald-500/[0.14] transition-colors"
+                          className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--tint-emerald-line)] bg-[var(--tint-emerald-fg)]/[0.08] text-[var(--tint-emerald-fg)] text-[9px] font-bold uppercase tracking-widest hover:bg-[var(--tint-emerald-bg)] transition-colors"
                         >
                           <UserCheck size={12} /> Restore
                         </button>
@@ -519,7 +521,7 @@ export default function StaffAccess() {
                         type="button"
                         onClick={() => remove(person)}
                         aria-label={`Remove ${person.email}`}
-                        className="focus-ring p-2.5 rounded-lg border border-rose-500/25 bg-rose-500/[0.08] text-rose-300 hover:bg-rose-500/[0.14] transition-colors"
+                        className="focus-ring p-2.5 rounded-lg border border-[var(--tint-rose-line)] bg-[var(--tint-rose-fg)]/[0.08] text-[var(--tint-rose-fg)] hover:bg-[var(--tint-rose-bg)] transition-colors"
                       >
                         <Trash2 size={12} />
                       </button>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
+import AdminButton from "../../components/admin/AdminButton";
 import { fetchProducts, getAllOrders, updateProduct, fetchEventTickets } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { summarizeEvents, summarizeTotals } from "../../utils/eventStats";
@@ -9,10 +10,10 @@ import { Calendar, MapPin, Eye, EyeOff, ArrowUpRight, Ticket, Plus, Lock, Ticket
 import toast from "react-hot-toast";
 
 const STATUS_CHIP = {
-  live: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25",
-  hidden: "bg-white/[0.07] text-[var(--admin-ink)]/60 border-[var(--admin-ink)]/15",
-  soldout: "bg-rose-500/[0.14] text-rose-300 border-rose-500/25",
-  ended: "bg-white/[0.07] text-[var(--admin-ink)]/40 border-[var(--admin-ink)]/15",
+  live: "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]",
+  hidden: "bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/60 border-[var(--admin-ink)]/15",
+  soldout: "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]",
+  ended: "bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/40 border-[var(--admin-ink)]/15",
 };
 
 const STATUS_LABEL = { live: "ON SALE", hidden: "HIDDEN", soldout: "SOLD OUT", ended: "ENDED" };
@@ -97,7 +98,7 @@ export default function Events() {
               canSeeRevenue ? ["REVENUE", `₦${totals.revenue.toLocaleString()}`] : ["CODES ISSUED", String(tickets.length)],
               ["CHECKED IN", `${totals.checkedIn}/${totals.codes}`],
             ].map(([label, value]) => (
-              <div key={label} className="border border-[var(--admin-ink)]/10 rounded-2xl bg-white/[0.03] px-5 py-4">
+              <div key={label} className="border border-[var(--admin-ink)]/10 rounded-xl bg-[var(--admin-ink)]/[0.03] px-5 py-4">
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">{label}</p>
                 <p className="text-xl font-extrabold tracking-tight tabular-nums">{value}</p>
               </div>
@@ -113,17 +114,17 @@ export default function Events() {
         {loading && <p className="text-sm text-[var(--admin-ink)]/50 tracking-widest uppercase font-bold">Loading events</p>}
 
         {!loading && summaries.length === 0 && (
-          <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-2xl p-10 text-center">
+          <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-10 text-center">
             <Ticket size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
             <p className="text-sm text-[var(--admin-ink)]/65 mb-2">
               {isAdmin ? "No events yet. Create one as a Tickets product and it lands here." : "No events are assigned to you yet."}
             </p>
             {isAdmin && (
               <Link
-                to="/admin/products"
-                className="inline-flex items-center gap-2 mt-4 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-6 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all focus-ring"
+              to="/admin/products"
+              className="inline-flex items-center gap-2 mt-4 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] h-11 px-4 rounded-lg text-[10px] font-bold uppercase tracking-[0.18em] hover:opacity-90 transition-all focus-ring"
               >
-                <Plus size={14} /> New event
+              <Plus size={14} /> New event
               </Link>
             )}
           </div>
@@ -134,7 +135,7 @@ export default function Events() {
             const filled = s.capacity ? Math.round((s.sold / s.capacity) * 10) : 0;
             const inScope = isAdmin || canAccessEvents(s.id);
             return (
-              <div key={s.id} className="border border-[var(--admin-ink)]/10 rounded-2xl bg-white/[0.03] p-6">
+              <div key={s.id} className="border border-[var(--admin-ink)]/10 rounded-xl bg-[var(--admin-ink)]/[0.03] p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="min-w-0">
                     <h2 className="text-base font-extrabold tracking-tight uppercase truncate">{s.title}</h2>
@@ -170,7 +171,7 @@ export default function Events() {
                 {s.capacity != null ? (
                   <div className="flex gap-1 mb-5" aria-label={`${s.sold} of ${s.capacity} sold`}>
                     {Array.from({ length: 10 }).map((_, i) => (
-                      <span key={i} className={`h-1.5 flex-1 rounded-full ${i < filled ? "bg-emerald-400" : "bg-[var(--admin-ink)]/10"}`} />
+                      <span key={i} className={`h-1.5 flex-1 rounded-full ${i < filled ? "bg-[var(--tint-emerald-fg)]" : "bg-[var(--admin-ink)]/10"}`} />
                     ))}
                   </div>
                 ) : (
