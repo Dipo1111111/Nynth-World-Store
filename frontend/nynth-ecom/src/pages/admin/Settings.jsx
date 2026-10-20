@@ -134,9 +134,9 @@ const SECTION_TABS = [
   { id: "product", label: "Product page", hash: "#set-product" },
   { id: "landing", label: "Landing", hash: "#set-landing" },
   { id: "revenue", label: "Revenue", hash: "#set-revenue" },
-  { id: "lock", label: "Lock page", hash: "#set-lock" },
+  { id: "lock", label: "Lock", hash: "#set-lock" },
   { id: "shipping", label: "Shipping", hash: "#set-shipping" },
-  { id: "announce", label: "Announcements", hash: "#set-announce" },
+  { id: "announce", label: "News", hash: "#set-announce" },
   { id: "content", label: "Content", hash: "#set-content" },
   { id: "cleanup", label: "Cleanup", hash: "#set-cleanup" },
 ];
@@ -369,7 +369,7 @@ export default function AdminSettings() {
  }
 
  const SectionTitle = ({ icon: Icon, title }) => (
- <div className="flex items-center gap-2 mb-6 pb-2 border-b border-[var(--admin-ink)]/10">
+ <div className="flex items-center gap-2 mb-5 pb-2 border-b border-[var(--admin-ink)]/10">
  <Icon size={18} className="text-[var(--admin-ink)]/42" />
  <h2 className="font-bold text-lg">{title}</h2>
  </div>
@@ -378,6 +378,16 @@ export default function AdminSettings() {
  return (
  <AdminLayout title="Settings">
   <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
+  <header className="flex flex-wrap items-center justify-between gap-3">
+  <p className="text-sm text-[var(--admin-ink)]/55">Storefront configuration. Changes stay staged until you save.</p>
+  {isDirty && (
+  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">
+  <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-amber-fg)] animate-pulse" aria-hidden="true" />
+  Unsaved changes
+  </span>
+  )}
+  </header>
+
   {/* APPEARANCE - first thing on the page, because reading comfort is the
   first thing anyone notices. Newman asked for this at the very top. */}
   <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
@@ -385,7 +395,7 @@ export default function AdminSettings() {
   <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.04] rounded-lg border border-[var(--admin-ink)]/10">
   <div className="min-w-0">
   <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Light Mode</h4>
-  <p className="text-[10px] text-[var(--admin-ink)]/45 uppercase tracking-wider mt-1 leading-relaxed">
+  <p className="text-xs text-[var(--admin-ink)]/55 mt-1.5 leading-relaxed">
   Easier on the eyes. The admin was dark by default, which was hard to read. Your choice is remembered on this device.
   </p>
   </div>
@@ -397,17 +407,7 @@ export default function AdminSettings() {
   </div>
   </div>
 
-  <header className="flex flex-wrap items-center justify-between gap-3">
-  <p className="text-sm text-[var(--admin-ink)]/55">Storefront configuration. Changes stay staged until you save.</p>
-  {isDirty && (
-  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">
-  <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-amber-fg)] animate-pulse" aria-hidden="true" />
-  Unsaved changes
-  </span>
-  )}
-  </header>
-
-  <nav role="tablist" aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur px-2 py-2">
+  <nav role="tablist" aria-label="Settings sections" className="sticky top-0 z-30 flex gap-1 overflow-x-auto min-w-0 rounded-xl border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur px-2 py-2">
   {SECTION_TABS.map((tab) => {
   const active = activeTab === tab.id;
   return (
@@ -420,7 +420,7 @@ export default function AdminSettings() {
   aria-controls="settings-tabpanel"
   tabIndex={active ? 0 : -1}
   onClick={() => selectTab(tab)}
-  className={`shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors focus-ring ${active
+  className={`shrink-0 rounded-lg px-2 py-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors focus-ring ${active
   ? "bg-[var(--admin-accent)] text-[var(--admin-on-ink)]"
   : "text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-ink)]/[0.06]"}`}
   >
@@ -436,7 +436,7 @@ export default function AdminSettings() {
   id="settings-tabpanel"
   role="tabpanel"
   aria-labelledby={`tab-${activeTab}`}
-  className="space-y-6"
+  className="space-y-8"
   >
 
   {/* General Settings */}
@@ -445,7 +445,7 @@ export default function AdminSettings() {
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="site_name" className="text-sm font-medium text-[var(--admin-ink)]/78">Site Name</label>
+ <label htmlFor="site_name" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Site Name</label>
  <input id="site_name"
  name="site_name"
  value={settings.site_name}
@@ -455,7 +455,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="currency_symbol" className="text-sm font-medium text-[var(--admin-ink)]/78">Currency Symbol</label>
+ <label htmlFor="currency_symbol" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Currency Symbol</label>
  <input id="currency_symbol"
  name="currency_symbol"
  value={settings.currency_symbol}
@@ -472,7 +472,7 @@ export default function AdminSettings() {
   {activeTab === "shop" && (
  <div id="set-shop" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={LayoutList} title="Shop Page Layout" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Control the category tabs and the bold tickets band on the shop page. Changes stay staged until you save.
  </p>
 
@@ -487,7 +487,7 @@ export default function AdminSettings() {
  <RotateCcw size={11} /> Restore Default
  </button>
  </div>
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-3">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mb-3 leading-relaxed">Move tabs up or down to set the order customers see. Hide a tab and its products still show under All. The All tab is locked in first position.</p>
  <div className="border border-[var(--admin-ink)]/10 rounded-lg divide-y divide-[var(--admin-ink)]/10">
  {(settings.shop_category_order || []).map((cat, idx) => (
  <div key={`${cat}-${idx}`} className="flex items-center justify-between gap-3 px-3 py-2.5">
@@ -547,8 +547,8 @@ export default function AdminSettings() {
  )}
  </div>
 
- <div className="space-y-6">
- <div className="space-y-2">
+ <div className="space-y-5">
+ <div className="space-y-3">
  <h4 id="tickets-band-position" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Bold Tickets Band Position</h4>
  <div role="radiogroup" aria-labelledby="tickets-band-position" className="flex flex-wrap gap-2">
  {[["top", "TOP (BELOW TABS)"], ["bottom", "BOTTOM (BELOW PRODUCTS)"], ["hidden", "HIDDEN"]].map(([val, label]) => (
@@ -566,10 +566,10 @@ export default function AdminSettings() {
  </button>
  ))}
  </div>
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Hidden removes the bold band; tickets fall back to the regular product grid.</p>
  </div>
 
- <div className="space-y-2">
+ <div className="space-y-3">
  <h4 id="tickets-band-scope" className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Bold Tickets Band Shows On</h4>
  <div role="radiogroup" aria-labelledby="tickets-band-scope" className="flex flex-wrap gap-2">
  {[["all", "ALL SECTIONS"], ["tickets_only", "TICKETS TAB ONLY"]].map(([val, label]) => (
@@ -587,7 +587,7 @@ export default function AdminSettings() {
  </button>
  ))}
  </div>
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">When set to tickets tab only, the bold band is skipped on All and other views.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">When set to tickets tab only, the bold band is skipped on All and other views.</p>
  </div>
 
  <div className="max-w-xs space-y-2">
@@ -601,7 +601,7 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">How many bold wide ticket cards show before the rest. Unused tickets still appear in the grid.</p>
  </div>
  </div>
  </div>
@@ -611,12 +611,12 @@ export default function AdminSettings() {
   {activeTab === "product" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={PackageIcon} title="Product Variant Options" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Manage the preset options available when creating or editing products. Separate items with commas.
  </p>
- <div className="space-y-6">
+ <div className="space-y-5">
  <div className="space-y-2">
- <label htmlFor="available_colors" className="text-sm font-medium text-[var(--admin-ink)]/78">Available Colors</label>
+ <label htmlFor="available_colors" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Available Colors</label>
  <textarea id="available_colors"
  name="available_colors"
  value={settings.available_colors}
@@ -627,7 +627,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="available_sizes" className="text-sm font-medium text-[var(--admin-ink)]/78">Available Sizes</label>
+ <label htmlFor="available_sizes" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Available Sizes</label>
  <textarea id="available_sizes"
  name="available_sizes"
  value={settings.available_sizes}
@@ -645,14 +645,14 @@ export default function AdminSettings() {
   {activeTab === "product" && (
   <div id="set-product" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
     <SectionTitle icon={FileText} title="Product Page Copy" />
-    <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+    <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
       The SHIPPING &amp; RETURNS panel shown on every product page. Any single product can override this in Products &gt; Edit &gt; Product page note. The 7-day return badge has been removed from product pages.
     </p>
 
     <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
       <div>
         <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Show The Panel</h4>
-        <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Off hides the accordion on every product page</p>
+        <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Off hides the accordion on every product page</p>
       </div>
       <Toggle
   checked={settings.product_note_enabled !== false}
@@ -697,7 +697,7 @@ export default function AdminSettings() {
         className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
         placeholder={DEFAULT_PRODUCT_NOTE}
       />
-      <p className="text-[10px] text-[var(--admin-ink)]/55 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
+      <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">Line breaks are preserved. Leave it empty to fall back to the built-in copy.</p>
     </div>
 
     <div className="space-y-2 mt-8 pt-6 border-t border-[var(--admin-ink)]/10">
@@ -711,7 +711,7 @@ export default function AdminSettings() {
         className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-[11px] leading-relaxed whitespace-pre-wrap"
         placeholder={DEFAULT_RETURNS_PAGE_POLICY}
       />
-      <p className="text-[10px] text-[var(--admin-ink)]/55 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
+      <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">Shown on /shipping. Clear it completely to remove the return policy block.</p>
     </div>
   </div>
   )}
@@ -720,14 +720,14 @@ export default function AdminSettings() {
   {activeTab === "landing" && (
   <div id="set-landing" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={ImageIcon} title="Landing Page Split" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  The front page is two boxes. One for the store, one for tickets. Drop an image on either and it goes live the moment you save.
  </p>
 
  <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 mb-6">
  <div>
  <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Two-box Landing Page</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Off sends visitors straight to the shop, as before</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Off sends visitors straight to the shop, as before</p>
  </div>
  <Toggle
   checked={(settings.landing || {}).enabled !== false}
@@ -764,7 +764,7 @@ export default function AdminSettings() {
  <span className="text-[10px] font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
  {isUploading ? "Uploading..." : imageLabel}
  </span>
- <p className="text-[10px] text-[var(--admin-ink)]/55 mt-2">Recommended: 1200 x 1500 px (portrait)</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1.5 leading-relaxed">Recommended: 1200 x 1500 px (portrait)</p>
  </div>
  <div>
  <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 mb-2">{titleLabel}</label>
@@ -785,14 +785,14 @@ export default function AdminSettings() {
   {activeTab === "revenue" && (
   <div id="set-revenue" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
     <SectionTitle icon={EyeOff} title="Revenue Privacy" />
-    <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+    <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
       Controls the Net sales figure at the top of the admin dashboard. Hidden figures show as ****.*** until you click the eye.
     </p>
 
     <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
       <div>
         <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Hide By Default</h4>
-        <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Masked every time the dashboard loads</p>
+        <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Masked every time the dashboard loads</p>
       </div>
       <Toggle
   checked={normalizeRevenueDisplay(settings.revenue_display).hide_by_default}
@@ -813,7 +813,7 @@ export default function AdminSettings() {
         className="w-full px-4 py-3 border border-[var(--admin-ink)]/14 rounded-lg focus-ring tabular-nums"
         placeholder="Leave empty to show the real paid total"
       />
-      <p className="text-[10px] text-[var(--admin-ink)]/55 leading-relaxed">
+      <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">
         When set, the dashboard shows this number instead of the ledger total and marks it with a red dot. Only the red dot tells you it is not the real figure. Leave empty to show the real paid total.
       </p>
       {normalizeRevenueDisplay(settings.revenue_display).override !== null && (
@@ -830,14 +830,14 @@ export default function AdminSettings() {
   {activeTab === "lock" && (
   <div id="set-lock" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
  </p>
  
   <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Lock Page</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">When enabled, all public store pages will be hidden behind the password wall.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">When enabled, all public store pages will be hidden behind the password wall.</p>
  </div>
  <Toggle
   checked={settings.lock_page_enabled}
@@ -850,7 +850,7 @@ export default function AdminSettings() {
   <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Countdown Timer</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">Show a countdown on the lock page. Password field will be hidden until timer ends.</p>
  </div>
  <Toggle
   checked={settings.lock_timer_enabled}
@@ -861,7 +861,7 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="launch_date" className="text-sm font-medium text-[var(--admin-ink)]/78">Launch Countdown Date</label>
+ <label htmlFor="launch_date" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Launch Countdown Date</label>
  <input id="launch_date"
  type="datetime-local"
  name="launch_date"
@@ -869,10 +869,10 @@ export default function AdminSettings() {
  onChange={handleChange}
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">This sets the timer for the Lock Page and Header Announcement.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">This sets the timer for the Lock Page and Header Announcement.</p>
  </div>
  <div className="space-y-2">
- <label htmlFor="lock_timer_duration_minutes" className="text-sm font-medium text-[var(--admin-ink)]/78">Countdown Duration (minutes)</label>
+ <label htmlFor="lock_timer_duration_minutes" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Countdown Duration (minutes)</label>
  <input id="lock_timer_duration_minutes"
  type="number"
  name="lock_timer_duration_minutes"
@@ -882,10 +882,10 @@ export default function AdminSettings() {
  max="999"
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">How long the access timer counts down before revealing the password field.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">How long the access timer counts down before revealing the password field.</p>
  </div>
  <div className="space-y-2">
- <label htmlFor="lock_password" className="text-sm font-medium text-[var(--admin-ink)]/78">Lock Password</label>
+ <label htmlFor="lock_password" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Lock Password</label>
  <input id="lock_password"
  name="lock_password"
  value={settings.lock_password}
@@ -895,7 +895,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="lock_title1" className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 1</label>
+ <label htmlFor="lock_title1" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Title Line 1</label>
  <input id="lock_title1"
  name="lock_title1"
  value={settings.lock_title1}
@@ -905,7 +905,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="lock_title2" className="text-sm font-medium text-[var(--admin-ink)]/78">Title Line 2 (Faded)</label>
+ <label htmlFor="lock_title2" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Title Line 2 (Faded)</label>
  <input id="lock_title2"
  name="lock_title2"
  value={settings.lock_title2}
@@ -915,7 +915,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="lock_waitlist_title" className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Title</label>
+ <label htmlFor="lock_waitlist_title" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Waitlist Section Title</label>
  <input id="lock_waitlist_title"
  name="lock_waitlist_title"
  value={settings.lock_waitlist_title}
@@ -925,7 +925,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2 md:col-span-2">
- <label htmlFor="lock_waitlist_subtitle" className="text-sm font-medium text-[var(--admin-ink)]/78">Waitlist Section Subtitle</label>
+ <label htmlFor="lock_waitlist_subtitle" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Waitlist Section Subtitle</label>
  <input id="lock_waitlist_subtitle"
  name="lock_waitlist_subtitle"
  value={settings.lock_waitlist_subtitle}
@@ -944,7 +944,7 @@ export default function AdminSettings() {
  <SectionTitle icon={Mail} title="Contact Information" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="support_email" className="text-sm font-medium text-[var(--admin-ink)]/78">Support Email</label>
+ <label htmlFor="support_email" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Support Email</label>
  <div className="relative">
  <Mail size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input id="support_email"
@@ -958,7 +958,7 @@ export default function AdminSettings() {
  </div>
  </div>
  <div className="space-y-2">
- <label htmlFor="support_phone" className="text-sm font-medium text-[var(--admin-ink)]/78">Support Phone</label>
+ <label htmlFor="support_phone" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Support Phone</label>
  <div className="relative">
  <Phone size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input id="support_phone"
@@ -971,7 +971,7 @@ export default function AdminSettings() {
  </div>
  </div>
  <div className="space-y-2">
- <label htmlFor="support_whatsapp" className="text-sm font-medium text-[var(--admin-ink)]/78">Support WhatsApp</label>
+ <label htmlFor="support_whatsapp" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Support WhatsApp</label>
  <div className="relative">
  <Share2 size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input id="support_whatsapp"
@@ -984,7 +984,7 @@ export default function AdminSettings() {
  </div>
  </div>
  <div className="space-y-2 md:col-span-2">
- <label htmlFor="office_address" className="text-sm font-medium text-[var(--admin-ink)]/78">Office Address</label>
+ <label htmlFor="office_address" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Office Address</label>
  <div className="relative">
  <MapPin size={16} className="absolute left-3 top-3 text-[var(--admin-ink)]/42" />
  <input id="office_address"
@@ -1006,7 +1006,7 @@ export default function AdminSettings() {
  <SectionTitle icon={Share2} title="Social Media Links" />
  <div className="grid grid-cols-1 gap-6">
  <div className="space-y-2">
- <label htmlFor="instagram_url" className="text-sm font-medium text-[var(--admin-ink)]/78">Instagram URL</label>
+ <label htmlFor="instagram_url" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Instagram URL</label>
  <input id="instagram_url"
  name="instagram_url"
  value={settings.instagram_url}
@@ -1016,7 +1016,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="twitter_url" className="text-sm font-medium text-[var(--admin-ink)]/78">X (Twitter) URL</label>
+ <label htmlFor="twitter_url" className="text-[13px] font-medium text-[var(--admin-ink)]/85">X (Twitter) URL</label>
  <input id="twitter_url"
  name="twitter_url"
  value={settings.twitter_url}
@@ -1026,7 +1026,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="facebook_url" className="text-sm font-medium text-[var(--admin-ink)]/78">Facebook URL</label>
+ <label htmlFor="facebook_url" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Facebook URL</label>
  <input id="facebook_url"
  name="facebook_url"
  value={settings.facebook_url}
@@ -1036,7 +1036,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="tiktok_url" className="text-sm font-medium text-[var(--admin-ink)]/78">TikTok URL</label>
+ <label htmlFor="tiktok_url" className="text-[13px] font-medium text-[var(--admin-ink)]/85">TikTok URL</label>
  <input id="tiktok_url"
  name="tiktok_url"
  value={settings.tiktok_url || ""}
@@ -1055,7 +1055,7 @@ export default function AdminSettings() {
  <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
  <div className="space-y-4">
  <div className="space-y-2">
- <label htmlFor="ga_property_id" className="text-sm font-medium text-[var(--admin-ink)]/78">GA4 Property ID</label>
+ <label htmlFor="ga_property_id" className="text-[13px] font-medium text-[var(--admin-ink)]/85">GA4 Property ID</label>
  <input id="ga_property_id"
  name="ga_property_id"
  value={settings.ga_property_id || ""}
@@ -1063,7 +1063,7 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring font-mono text-sm"
  placeholder="e.g. 123456789"
  />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest leading-relaxed">
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">
  Required for the Admin Dashboard to pull real-time metrics. <br/>
  Find this in: <b>GA4 Admin &gt; Property Settings &gt; Property ID</b>
  </p>
@@ -1113,7 +1113,7 @@ export default function AdminSettings() {
  <span className="text-xs font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest group-hover:text-[var(--admin-ink)]">
  {isUploading ? "Uploading..." : "Replace Header Image"}
  </span>
- <p className="text-[10px] text-[var(--admin-ink)]/55 mt-2">Recommended: 2000 x 600 px (Horizontal)</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1.5 leading-relaxed">Recommended: 2000 x 600 px (Horizontal)</p>
  </div>
  </div>
  </div>
@@ -1124,7 +1124,7 @@ export default function AdminSettings() {
   {activeTab === "store" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Banner Hover Style" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-4 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-4 leading-relaxed">
  Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
  press <span className="text-[var(--admin-ink)]">Save All Settings</span> to publish.
  </p>
@@ -1166,7 +1166,7 @@ export default function AdminSettings() {
   <div id="set-shipping" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
- <label htmlFor="shipping_fee" className="text-sm font-medium text-[var(--admin-ink)]/78">Default Shipping Fee ({settings.currency_symbol})</label>
+ <label htmlFor="shipping_fee" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Default Shipping Fee ({settings.currency_symbol})</label>
  <input id="shipping_fee"
  name="shipping_fee"
  type="number"
@@ -1182,14 +1182,14 @@ export default function AdminSettings() {
   {activeTab === "shipping" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Percent} title="Free Delivery Discount" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
  </p>
 
   <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Free Delivery Discount</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">When enabled, orders above the threshold get free delivery.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">When enabled, orders above the threshold get free delivery.</p>
  </div>
  <Toggle
   checked={settings.free_delivery_enabled}
@@ -1200,7 +1200,7 @@ export default function AdminSettings() {
 
  {settings.free_delivery_enabled && (
  <div className="max-w-xs space-y-2">
- <label htmlFor="free_delivery_threshold" className="text-sm font-medium text-[var(--admin-ink)]/78">Minimum Order Amount ({settings.currency_symbol})</label>
+ <label htmlFor="free_delivery_threshold" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Minimum Order Amount ({settings.currency_symbol})</label>
  <input id="free_delivery_threshold"
  name="free_delivery_threshold"
  type="number"
@@ -1210,7 +1210,7 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="50000"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">Orders at or above this amount get free delivery.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Orders at or above this amount get free delivery.</p>
  </div>
  )}
  </div>
@@ -1241,7 +1241,7 @@ export default function AdminSettings() {
   {activeTab === "shipping" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Truck} title="Shipping Locations" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Toggle delivery locations on or off. Disabled locations will not appear in checkout.
  </p>
 
@@ -1401,14 +1401,14 @@ export default function AdminSettings() {
   {activeTab === "announce" && (
   <div id="set-announce" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
  </p>
 
   <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Announcement Bar</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show the announcement bar above the navigation.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">Show the announcement bar above the navigation.</p>
  </div>
  <Toggle
   checked={settings.announcement_bar_enabled}
@@ -1419,7 +1419,7 @@ export default function AdminSettings() {
 
  {settings.announcement_bar_enabled && (
  <div className="space-y-2">
- <label htmlFor="announcement_bar_text" className="text-sm font-medium text-[var(--admin-ink)]/78">Bar Text</label>
+ <label htmlFor="announcement_bar_text" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Bar Text</label>
  <input id="announcement_bar_text"
  name="announcement_bar_text"
  value={settings.announcement_bar_text}
@@ -1427,7 +1427,7 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="NEXT DROP IN:"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">This text appears before the countdown. After launch, use something like "HAPPY LAUNCH DAY".</p>
  </div>
  )}
  </div>
@@ -1437,14 +1437,14 @@ export default function AdminSettings() {
   {activeTab === "announce" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={Megaphone} title="Promotional Marquee" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  A scrolling banner that appears above the hero image on Shop and Home pages.
  </p>
 
   <div className="mb-6 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg flex items-center justify-between gap-4 border border-[var(--admin-ink)]/10">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Enable Marquee</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">Show the scrolling promotional banner on store pages.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">Show the scrolling promotional banner on store pages.</p>
  </div>
  <Toggle
   checked={settings.marquee_enabled}
@@ -1455,7 +1455,7 @@ export default function AdminSettings() {
 
  {settings.marquee_enabled && (
  <div className="space-y-2">
- <label htmlFor="marquee_text" className="text-sm font-medium text-[var(--admin-ink)]/78">Marquee Text</label>
+ <label htmlFor="marquee_text" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Marquee Text</label>
  <input id="marquee_text"
  name="marquee_text"
  value={settings.marquee_text}
@@ -1463,7 +1463,7 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring"
  placeholder="FREE DELIVERY ON ORDERS OVER ₦50,000"
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">This text scrolls horizontally across the banner.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">This text scrolls horizontally across the banner.</p>
  </div>
  )}
  </div>
@@ -1477,7 +1477,7 @@ export default function AdminSettings() {
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-[var(--admin-ink)] uppercase tracking-widest">Database Cleanup</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest leading-relaxed">
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">
  Merge duplicate subscriber entries to maintain a clean mailing list.
  </p>
  </div>
@@ -1498,11 +1498,11 @@ export default function AdminSettings() {
   {activeTab === "content" && (
   <div id="set-content" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
- <div className="space-y-6">
+ <div className="space-y-5">
   <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
  <div>
  <h4 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">Enable Size Chart</h4>
- <p className="text-[10px] text-[var(--admin-ink)]/55 uppercase tracking-wider mt-1">Show or hide the size guide on product pages</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Show or hide the size guide on product pages</p>
  </div>
  <Toggle
   checked={settings.show_size_chart}
@@ -1620,7 +1620,7 @@ export default function AdminSettings() {
  </table>
  {(!settings.size_chart_data || settings.size_chart_data.length === 0) && (
  <div className="p-8 text-center bg-[var(--admin-ink)]/[0.05]">
- <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/55">No measurement rows added</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 leading-relaxed">No measurement rows added</p>
  </div>
  )}
  </div>
@@ -1636,7 +1636,7 @@ export default function AdminSettings() {
   {activeTab === "content" && (
  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
  <SectionTitle icon={BookOpen} title="Our Story" />
- <p className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+ <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
  change what you need, then press <span className="text-[var(--admin-ink)]">Save All Settings</span> to publish.
  </p>
@@ -1652,9 +1652,9 @@ export default function AdminSettings() {
  const story = (field) => settings.our_story_content?.[field] || STORY_DEFAULTS[field];
 
  return (
- <div className="space-y-6">
+ <div className="space-y-5">
  <div className="space-y-2">
- <label htmlFor="company-name" className="text-sm font-medium text-[var(--admin-ink)]/78">Company Name</label>
+ <label htmlFor="company-name" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Company Name</label>
  <input id="company-name"
  value={story("company")}
  onChange={(e) => updateStory("company", e.target.value)}
@@ -1665,7 +1665,7 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="founded-date" className="text-sm font-medium text-[var(--admin-ink)]/78">Founded Date</label>
+ <label htmlFor="founded-date" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Founded Date</label>
  <input id="founded-date"
  value={story("founded")}
  onChange={(e) => updateStory("founded", e.target.value)}
@@ -1674,7 +1674,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="cac-registration" className="text-sm font-medium text-[var(--admin-ink)]/78">CAC Registration</label>
+ <label htmlFor="cac-registration" className="text-[13px] font-medium text-[var(--admin-ink)]/85">CAC Registration</label>
  <input id="cac-registration"
  value={story("cac")}
  onChange={(e) => updateStory("cac", e.target.value)}
@@ -1686,7 +1686,7 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="founder-label" className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Label</label>
+ <label htmlFor="founder-label" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Founder Label</label>
  <input id="founder-label"
  value={story("founder_label")}
  onChange={(e) => updateStory("founder_label", e.target.value)}
@@ -1695,7 +1695,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="founder-name" className="text-sm font-medium text-[var(--admin-ink)]/78">Founder Name</label>
+ <label htmlFor="founder-name" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Founder Name</label>
  <input id="founder-name"
  value={story("founder_name")}
  onChange={(e) => updateStory("founder_name", e.target.value)}
@@ -1706,7 +1706,7 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label htmlFor="belief-statement-italic" className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Statement (Italic)</label>
+ <label htmlFor="belief-statement-italic" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Belief Statement (Italic)</label>
  <textarea id="belief-statement-italic"
  value={story("belief")}
  onChange={(e) => updateStory("belief", e.target.value)}
@@ -1714,11 +1714,11 @@ export default function AdminSettings() {
  className="w-full px-4 py-2 border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm italic"
  placeholder="NYNTH WORLD was built on one belief.&#10;Where you begin does not define where you finish."
  />
- <p className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest mt-1">Separate lines with Enter. Displayed in italic bold.</p>
+ <p className="text-[11px] text-[var(--admin-ink)]/55 mt-1 leading-relaxed">Separate lines with Enter. Displayed in italic bold.</p>
  </div>
 
  <div className="space-y-2">
- <label htmlFor="belief-description" className="text-sm font-medium text-[var(--admin-ink)]/78">Belief Description</label>
+ <label htmlFor="belief-description" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Belief Description</label>
  <textarea id="belief-description"
  value={story("belief_desc")}
  onChange={(e) => updateStory("belief_desc", e.target.value)}
@@ -1729,7 +1729,7 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label htmlFor="origin-story" className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Story</label>
+ <label htmlFor="origin-story" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Origin Story</label>
  <textarea id="origin-story"
  value={story("origin")}
  onChange={(e) => updateStory("origin", e.target.value)}
@@ -1741,7 +1741,7 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="origin-quote-line-1" className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 1</label>
+ <label htmlFor="origin-quote-line-1" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Origin Quote Line 1</label>
  <input id="origin-quote-line-1"
  value={story("quote1")}
  onChange={(e) => updateStory("quote1", e.target.value)}
@@ -1750,7 +1750,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="origin-quote-line-2" className="text-sm font-medium text-[var(--admin-ink)]/78">Origin Quote Line 2</label>
+ <label htmlFor="origin-quote-line-2" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Origin Quote Line 2</label>
  <input id="origin-quote-line-2"
  value={story("quote2")}
  onChange={(e) => updateStory("quote2", e.target.value)}
@@ -1761,7 +1761,7 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label htmlFor="meaning-section" className="text-sm font-medium text-[var(--admin-ink)]/78">Meaning Section</label>
+ <label htmlFor="meaning-section" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Meaning Section</label>
  <textarea id="meaning-section"
  value={story("meaning")}
  onChange={(e) => updateStory("meaning", e.target.value)}
@@ -1772,7 +1772,7 @@ export default function AdminSettings() {
  </div>
 
  <div className="space-y-2">
- <label htmlFor="philosophy-section" className="text-sm font-medium text-[var(--admin-ink)]/78">Philosophy Section</label>
+ <label htmlFor="philosophy-section" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Philosophy Section</label>
  <textarea id="philosophy-section"
  value={story("philosophy")}
  onChange={(e) => updateStory("philosophy", e.target.value)}
@@ -1784,7 +1784,7 @@ export default function AdminSettings() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
- <label htmlFor="footer-tagline" className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Tagline</label>
+ <label htmlFor="footer-tagline" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Footer Tagline</label>
  <input id="footer-tagline"
  value={story("tagline")}
  onChange={(e) => updateStory("tagline", e.target.value)}
@@ -1793,7 +1793,7 @@ export default function AdminSettings() {
  />
  </div>
  <div className="space-y-2">
- <label htmlFor="footer-company-name" className="text-sm font-medium text-[var(--admin-ink)]/78">Footer Company Name</label>
+ <label htmlFor="footer-company-name" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Footer Company Name</label>
  <input id="footer-company-name"
  value={story("footer_name")}
  onChange={(e) => updateStory("footer_name", e.target.value)}
@@ -1840,11 +1840,11 @@ export default function AdminSettings() {
 
   {/* Sticky save bar - appears whenever there are unsaved changes */}
  {isDirty && (
-  <div className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur">
+  <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--admin-ink)]/10 bg-[var(--admin-surface)]/95 backdrop-blur md:left-64">
  <div className="max-w-4xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-2.5 min-w-0">
  <span className="w-2 h-2 rounded-full bg-[var(--tint-amber-fg)] shrink-0 animate-pulse" aria-hidden="true" />
- <p className="text-xs font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">Unsaved changes</p>
+ <p className="text-xs font-bold text-[var(--tint-amber-fg)]">Unsaved changes</p>
  </div>
  <p className="hidden sm:block text-xs text-[var(--tint-amber-fg)]">Edits go live after you save.</p>
  <div className="flex items-center gap-2 shrink-0">

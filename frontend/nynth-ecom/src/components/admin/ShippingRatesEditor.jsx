@@ -281,7 +281,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                     {saving ? "Saving..." : "Save Rates"}
                 </button>
             </div>
-            <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mb-6 leading-relaxed">
+            <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
                 Edit one location with its pen (press Enter to confirm). Or fill a whole zone at once with "Set all". Edits stage below - hit <span className="text-[var(--admin-ink)]">Save Rates</span> to publish them to checkout.
             </p>
 

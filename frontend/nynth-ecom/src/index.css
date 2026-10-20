@@ -572,6 +572,16 @@
   color: var(--admin-ink);
   color-scheme: var(--admin-color-scheme);
 }
+
+/* A form control carries an intrinsic minimum width, so a long value in an
+   input would push its grid column wider than the phone and the whole page
+   would scroll sideways. On a settings form the control has to be allowed
+   to shrink to the space it is given. */
+.admin-settings-form input,
+.admin-settings-form select,
+.admin-settings-form textarea {
+  min-width: 0;
+}
 .admin-app input::placeholder,
 .admin-app select::placeholder,
 .admin-app textarea::placeholder {
