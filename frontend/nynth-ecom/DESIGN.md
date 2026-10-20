@@ -128,3 +128,72 @@ stays light. Tokens live in `src/index.css`.
   explicitly. No other Radix portal components exist.
 - Elevation is light-touch: subtle inset white top-light + soft drop on cards; **no** colored
   shadows, no `grayscale` filters on avatars.
+
+---
+
+# Admin Design System - one language for the back office
+
+The admin was a mess because two mistakes were made at once. The utility classes in
+`index.css` were written with hardcoded ink values, so they only ever looked right on the
+dark theme. And most pages ignored those utilities and hand rolled their own class strings,
+with 4 to 27 different button shapes per page. The visible result was a page that looked
+like it came from four different products.
+
+**The admin is light-mode first.** Newman asked for it (17 Oct 2026): "I'm more of a light mode
+person, I usually have struggles with reading this dark mode." So the light theme is the
+default and the ink theme is the alternate, and both are the same system with the tokens
+moved. A black toolbar on a paper page is not a hybrid, it is a leftover.
+
+## The rules
+
+1. **No hardcoded colour in the admin.** Every surface is a token. A hardcoded white is white
+   on white on the paper theme, and the panel silently does not exist. Use
+   `bg-[var(--admin-ink)]/[0.0X]` for a tint of the ink, never `bg-white/[0.05]`.
+2. **The tint family is the only status palette.** `--tint-{emerald,amber,sky,rose,violet,slate}-{bg,fg,line}`
+   flip with the theme. A raw Tailwind value such as `text-slate-300` is a dark theme value
+   and is unreadable on paper.
+3. **One radius scale.** 12px (`rounded-xl`) for a card, a modal, a panel. 8px (`rounded-lg`)
+   for a button, an input, an icon button. 4px (`rounded`) for a small text chip or a badge.
+   Full (`rounded-full`) for a switch, a dot, an avatar. Nothing sharp, nothing at 2, 6, 16
+   or 24px.
+4. **One type ramp.** 40px page title, 18px section title, 14px group heading, 13px field
+   label, 12px description, 11px hint, 10px micro label. The caps are the brand voice and
+   they stay on labels, buttons, tabs and chips. They are never on a sentence. A description
+   is prose, so it is 12px regular sentence case.
+5. **One spacing rhythm.** 32px card to card, 20px group to group inside a card, 12px group
+   heading to its controls, 8px label to its control, 4px control to the hint under it. One
+   value doing every job is what makes a page read as a flat list of equal weight boxes.
+
+## The primitives
+
+`src/components/admin/` holds the shared pieces. A page should not be able to invent a
+button.
+
+| Component | What it is |
+|---|---|
+| `AdminButton` | primary, secondary, ghost, danger. The hover, active, focus, disabled and loading states are decided once. |
+| `AdminCard` | default, inset, dashed, plain. A card is 12px and a hairline. |
+| `AdminBadge` | a status chip, from the tint family plus the ink variant. |
+| `AdminInput` | text, search, textarea, select. The placeholder follows the theme. |
+| `AdminModal` | the scrim, the panel, the title block and the close button. Escape closes it. |
+| `PageHeader` | eyebrow, title, description and the actions slot. |
+| `StatCard` | a label, a number and a tinted icon chip. |
+| `Toggle` | the one switch, a 44 by 24 pill. |
+
+`src/components/ui/` is the storefront's system. It renders correctly inside the admin
+because it reads the semantic tokens, but the admin's own primitives are what the admin
+pages use.
+
+## The utilities
+
+`index.css` still carries the admin wide classes, and they are token driven now:
+`.admin-toolbar`, `.admin-control`, `.admin-table`, `.segmented-control`, `.admin-paper`,
+`.skeleton`, `.focus-ring`. A class that is hardcoded to ink does not belong in there.
+
+## The guard
+
+`src/utils/adminSystem.test.js` is a ratchet. The pages that have been through the system
+are held to the rules above. The ones that have not are on a list in the test, and that list
+is only allowed to get shorter. A new hardcoded value cannot be introduced anywhere, and a
+page cannot quietly leave the list.
+

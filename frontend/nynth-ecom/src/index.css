@@ -227,6 +227,14 @@
   --admin-line: rgb(255 255 255 / 0.1);
   --admin-line-2: rgb(255 255 255 / 0.14);
 
+  /* Chrome surface. The toolbar, the table header and the segmented control
+     sit one step above a panel, so they read as chrome and not as content. */
+  --admin-surface-2: oklch(0.14 0 0);
+  /* Interactive fills. A hover is a tint of the ink, never a hardcoded white,
+     so it survives the switch to the paper theme. */
+  --admin-hover: oklch(1 0 0 / 0.06);
+  --admin-active: oklch(1 0 0 / 0.1);
+
   /* Native widget rendering. The ink admin wants dark form controls, the
      paper admin wants light ones. */
   --admin-color-scheme: dark;
@@ -316,6 +324,13 @@
   --admin-accent-hover: #262626;
   --admin-line: rgb(0 0 0 / 0.1);
   --admin-line-2: rgb(0 0 0 / 0.16);
+
+  /* Chrome surface on paper. The toolbar, the table header and the segmented
+     control sit one step below the white card, so they read as chrome. */
+  --admin-surface-2: oklch(0.96 0.002 95);
+  /* Interactive fills, tinted from the ink so they are correct on paper. */
+  --admin-hover: oklch(0.145 0 0 / 0.05);
+  --admin-active: oklch(0.145 0 0 / 0.09);
 
   /* Light widgets on paper. */
   --admin-color-scheme: light;
@@ -455,9 +470,9 @@
 .admin-app .skeleton {
   background: linear-gradient(
     90deg,
-    oklch(0.14 0 0) 25%,
-    oklch(0.18 0 0) 50%,
-    oklch(0.14 0 0) 75%
+    color-mix(in oklab, var(--admin-ink) 8%, var(--admin-surface)) 25%,
+    color-mix(in oklab, var(--admin-ink) 14%, var(--admin-surface)) 50%,
+    color-mix(in oklab, var(--admin-ink) 8%, var(--admin-surface)) 75%
   );
 }
 
@@ -482,8 +497,8 @@
   gap: 2px;
   padding: 3px;
   border-radius: 0.75rem;
-  border: 1px solid oklch(1 0 0 / 0.08);
-  background: oklch(0.12 0 0);
+  border: 1px solid var(--admin-line);
+  background: var(--admin-surface-2);
 }
 .segmented-control__item {
   display: inline-flex;
@@ -494,16 +509,16 @@
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: oklch(0.6 0.005 90);
+  color: var(--muted-foreground);
   transition: color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .segmented-control__item:hover {
-  color: oklch(0.93 0.005 90);
+  color: var(--admin-ink);
 }
 .segmented-control__item--active {
-  background: oklch(0.93 0.005 90);
-  color: oklch(0.17 0.002 85);
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.5), 0 1px 2px oklch(0 0 0 / 0.5);
+  background: var(--admin-accent);
+  color: var(--admin-on-ink);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.2);
 }
 
 /* Admin surfaces */
@@ -522,17 +537,17 @@
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 0.75rem;
-  border: 1px solid oklch(1 0 0 / 0.08);
-  background: oklch(0.12 0 0);
+  border: 1px solid var(--admin-line);
+  background: var(--admin-surface-2);
   box-shadow: var(--shadow-card);
 }
 .admin-control {
   border-radius: 0.5rem;
-  border: 1px solid oklch(1 0 0 / 0.16);
-  background: oklch(0.11 0 0);
+  border: 1px solid var(--admin-line-2);
+  background: var(--admin-surface);
   font-size: 0.875rem;
   padding: 0.5rem 0.75rem;
-  color: oklch(0.93 0.005 90);
+  color: var(--admin-ink);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .admin-control::placeholder {
@@ -540,30 +555,30 @@
 }
 .admin-control:focus {
   outline: none;
-  border-color: oklch(0.75 0.01 90);
-  box-shadow: 0 0 0 3px oklch(0.75 0.01 90 / 0.18);
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 18%, transparent);
 }
 
 /* Table polish */
 .admin-table thead tr {
-  border-bottom: 1px solid oklch(1 0 0 / 0.1);
-  background: oklch(0.12 0 0);
+  border-bottom: 1px solid var(--admin-line);
+  background: var(--admin-surface-2);
 }
 .admin-table tbody tr {
   transition: background-color 0.15s ease;
-  border-bottom: 1px solid oklch(1 0 0 / 0.06);
+  border-bottom: 1px solid var(--admin-line);
 }
 .admin-table tbody tr:last-child {
   border-bottom: none;
 }
 .admin-table tbody tr:hover {
-  background-color: oklch(0.14 0 0);
+  background-color: var(--admin-hover);
 }
 
 /* Browser surfaces inside admin */
 .admin-app ::selection {
-  background-color: oklch(0.93 0.005 90);
-  color: oklch(0.145 0 0);
+  background-color: var(--admin-accent);
+  color: var(--admin-on-ink);
 }
 .admin-app input,
 .admin-app select,

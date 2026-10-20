@@ -14,32 +14,28 @@ import {
  ShoppingBag,
  TrendingDown
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
+import AdminButton from "../../components/admin/AdminButton";
+import AdminCard from "../../components/admin/AdminCard";
+import AdminBadge from "../../components/admin/AdminBadge";
+import { AdminInput } from "../../components/admin/AdminInput";
+import StatCard from "../../components/admin/StatCard";
 import { useCountUp } from "../../lib/motion";
 import toast from "react-hot-toast";
 
+// The four sources are statuses, so they use the status palette. They were
+// raw Tailwind values before, which is why the newsletter badge was light
+// grey on light grey and could not be read on the paper admin.
 const SOURCE_CONFIG = {
- waitlist: { label: "Waitlist", className: "bg-[var(--admin-accent)] text-[var(--admin-on-ink)] border-[var(--admin-ink)]/25" },
- newsletter: { label: "Newsletter", className: "bg-slate-500/[0.18] text-slate-300 border-slate-500/30" },
- abandoned: { label: "Abandoned", className: "bg-amber-500/[0.14] text-amber-300 border-amber-500/25" },
- customers: { label: "Customer", className: "bg-emerald-500/[0.14] text-emerald-300 border-emerald-500/25" },
+ waitlist: { label: "Waitlist", variant: "ink" },
+ newsletter: { label: "Newsletter", variant: "slate" },
+ abandoned: { label: "Abandoned", variant: "amber" },
+ customers: { label: "Customer", variant: "emerald" },
 };
 
 const SourceBadge = ({ source }) => {
  const config = SOURCE_CONFIG[source] || SOURCE_CONFIG.newsletter;
- return (
- <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${config.className}`}>
- {config.label}
- </span>
- );
+ return <AdminBadge variant={config.variant}>{config.label}</AdminBadge>;
 };
-
-const StatIcon = ({ icon: Icon, className }) => (
- <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${className}`}>
- <Icon size={17} strokeWidth={2} />
- </div>
-);
 
 const Subscribers = () => {
  const { can: canAny } = useAuth();
@@ -219,54 +215,22 @@ const Subscribers = () => {
  <AdminLayout title="Subscribers">
  {/* Summary strip */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
- <Card hover className="border-[var(--admin-ink)]/10">
- <CardContent className="p-4">
- <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Total Audience</span>
- <StatIcon icon={Users} className="bg-slate-500/[0.18] text-slate-300" />
- </div>
- <h3 className="text-xl font-bold text-[var(--admin-ink)]"><span ref={totalRef}>0</span></h3>
- </CardContent>
- </Card>
- <Card hover className="border-[var(--admin-ink)]/10">
- <CardContent className="p-4">
- <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Waitlist Signups</span>
- <StatIcon icon={UserPlus} className="bg-violet-500/[0.14] text-violet-300" />
- </div>
- <h3 className="text-xl font-bold text-[var(--admin-ink)]"><span ref={waitlistRef}>0</span></h3>
- </CardContent>
- </Card>
- <Card hover className="border-[var(--admin-ink)]/10">
- <CardContent className="p-4">
- <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Customers</span>
- <StatIcon icon={ShoppingBag} className="bg-emerald-500/[0.14] text-emerald-300" />
- </div>
- <h3 className="text-xl font-bold text-[var(--admin-ink)]"><span ref={customersRef}>0</span></h3>
- </CardContent>
- </Card>
- <Card hover className="border-[var(--admin-ink)]/10">
- <CardContent className="p-4">
- <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Abandoned Checkouts</span>
- <StatIcon icon={TrendingDown} className="bg-amber-500/[0.14] text-amber-300" />
- </div>
- <h3 className="text-xl font-bold text-[var(--admin-ink)]"><span ref={abandonedRef}>0</span></h3>
- </CardContent>
- </Card>
+ <StatCard label="Total Audience" value={<span ref={totalRef}>0</span>} icon={Users} tint="slate" />
+ <StatCard label="Waitlist Signups" value={<span ref={waitlistRef}>0</span>} icon={UserPlus} tint="violet" />
+ <StatCard label="Customers" value={<span ref={customersRef}>0</span>} icon={ShoppingBag} tint="emerald" />
+ <StatCard label="Abandoned Checkouts" value={<span ref={abandonedRef}>0</span>} icon={TrendingDown} tint="amber" />
  </div>
 
  {/* Toolbar: search + segmented filters + actions */}
  <div className="admin-toolbar mb-6">
- <div className="relative flex-1 min-w-[200px]">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-ink)]/42" size={16} />
- <input
+ <div className="flex-1 min-w-[200px]">
+ <AdminInput
  type="text"
+ icon={Search}
  placeholder="Search emails..."
+ aria-label="Search subscribers"
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-2 bg-[var(--admin-surface)] border border-[var(--admin-ink)]/14 rounded-lg focus-ring text-sm placeholder:text-[var(--admin-ink)]/42"
  />
  </div>
 
@@ -283,23 +247,24 @@ const Subscribers = () => {
  </div>
 
  <div className="flex items-center gap-2">
- <Button
- variant="outline"
+ <AdminButton
+ variant="secondary"
+ size="sm"
  onClick={toggleSelectAll}
- className="text-[10px] tracking-widest font-bold uppercase h-9 px-4"
  >
  {selectedEmails.size === filteredSubscribers.length && filteredSubscribers.length > 0 ? "Deselect All" : "Select All"}
- </Button>
+ </AdminButton>
 
  {/* Send Email Button */}
  {canEmailSubscribers && selectedEmails.size > 0 && (
- <Button
+ <AdminButton
+ size="sm"
+ icon={Send}
  onClick={() => setShowEmailModal(true)}
- className="text-[10px] tracking-widest font-bold uppercase h-9 px-4 shrink-0 transition-all animate-fadeIn"
+ className="shrink-0 animate-fadeIn"
  >
- <Send size={14} className="mr-2" />
  Email {selectedEmails.size}
- </Button>
+ </AdminButton>
  )}
  </div>
  </div>
@@ -307,14 +272,14 @@ const Subscribers = () => {
  {loading ? (
  <div className="flex items-center justify-center h-64">
  <div className="text-center">
- <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--admin-ink)]/18 border-t-white/18 mx-auto mb-4"></div>
+ <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--admin-ink)]/18 border-t-[var(--admin-ink)]/35 mx-auto mb-4"></div>
  <p className="text-[var(--admin-ink)]/55 text-sm">Loading subscribers...</p>
  </div>
  </div>
  ) : filteredSubscribers.length === 0 ? (
- <Card className="border-[var(--admin-ink)]/10">
- <CardContent className="flex flex-col items-center justify-center py-16">
- <div className="w-16 h-16 rounded-2xl bg-white/[0.09] flex items-center justify-center mb-4">
+ <AdminCard>
+ <div className="flex flex-col items-center justify-center py-16">
+ <div className="w-16 h-16 rounded-xl bg-[var(--admin-ink)]/[0.06] flex items-center justify-center mb-4">
  <Users className="h-8 w-8 text-[var(--admin-ink)]/35" />
  </div>
  <h3 className="text-lg font-medium mb-2">
@@ -323,24 +288,21 @@ const Subscribers = () => {
  <p className="text-[var(--admin-ink)]/55 text-sm">
  {activeFilter === 'abandoned' ? 'Abandoned checkouts with an email will appear here.' : activeFilter === 'customers' ? 'Successful purchases will appear here.' : 'Signups from the website will appear here.'}
  </p>
- </CardContent>
- </Card>
+ </div>
+ </AdminCard>
  ) : (
- <Card className="border-[var(--admin-ink)]/10 overflow-hidden">
- <CardHeader className="border-b border-[var(--admin-ink)]/10">
- <div className="flex items-center justify-between">
- <CardTitle className="text-base">
+ <AdminCard className="overflow-hidden">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--admin-ink)]/10">
+ <h3 className="text-base font-semibold">
  {activeFilter === 'all' ? 'All Subscribers' : activeFilter === 'abandoned' ? 'Abandoned Checkouts' : activeFilter === 'customers' ? 'Customers' : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) + ' Signups'}
- <span className="ml-2 px-2 py-0.5 bg-white/[0.11] text-[var(--admin-ink)]/55 text-[10px] rounded-lg font-sans tracking-normal">
+ <span className="ml-2 px-2 py-0.5 bg-[var(--admin-ink)]/[0.06] text-[var(--admin-ink)]/60 text-[10px] rounded font-sans tracking-normal">
  {filteredSubscribers.length}
  </span>
- </CardTitle>
-
+ </h3>
  </div>
- </CardHeader>
- <CardContent className="p-0">
+ <div>
  {/* Mobile Card View */}
- <div className="sm:hidden divide-y divide-white/[0.08]">
+ <div className="sm:hidden divide-y divide-[var(--admin-ink)]/10">
  {filteredSubscribers.map((sub) => (
  <div key={sub.id} className="p-4 bg-[var(--admin-surface)] flex flex-col gap-3">
  <div className="flex items-start justify-between gap-2">
@@ -365,7 +327,7 @@ const Subscribers = () => {
  </div>
  <div className="flex items-center justify-between text-[10px]">
  <div className="flex items-center gap-1.5">
- <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-white/[0.18]'}`}></div>
+ <div className={`w-1.5 h-1.5 rounded-full ${sub.status === 'active' ? 'bg-[var(--tint-emerald-fg)]' : 'bg-[var(--admin-ink)]/25'}`}></div>
  <span className="text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">{sub.status || 'active'}</span>
  </div>
   <span className="text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest">
@@ -380,7 +342,7 @@ const Subscribers = () => {
  <div className="hidden sm:block overflow-x-auto">
  <table className="w-full admin-table">
  <thead>
- <tr className="bg-white/[0.05]">
+ <tr>
  <th className="px-4 py-4 text-left text-[10px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-widest w-10">
  <button onClick={toggleSelectAll} className="focus-ring rounded" aria-label="Select all">
  {selectedEmails.size === filteredSubscribers.length && filteredSubscribers.length > 0 ? (
@@ -398,7 +360,7 @@ const Subscribers = () => {
  </thead>
  <tbody className="divide-y divide-[var(--admin-ink)]/10 bg-[var(--admin-surface)]">
  {filteredSubscribers.map((sub) => (
- <tr key={sub.id} className="transition-colors group hover:bg-white/[0.05]">
+ <tr key={sub.id} className="group">
  <td className="px-4 py-4 whitespace-nowrap">
  <button onClick={() => toggleEmail(sub.email)} className="focus-ring rounded" aria-label="Toggle select">
  {selectedEmails.has(sub.email) ? (
@@ -410,7 +372,7 @@ const Subscribers = () => {
  </td>
  <td className="px-4 py-4 whitespace-nowrap">
  <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-lg bg-white/[0.09] flex items-center justify-center text-[var(--admin-ink)]/42 group-hover:bg-black/70 group-hover:text-white transition-all">
+ <div className="w-8 h-8 rounded-lg bg-[var(--admin-ink)]/[0.06] flex items-center justify-center text-[var(--admin-ink)]/42 group-hover:bg-[var(--admin-hover)] transition-colors">
  <Mail size={14} />
  </div>
  <span className="text-sm font-medium text-[var(--admin-ink)] font-inter">{sub.email}</span>
@@ -421,7 +383,7 @@ const Subscribers = () => {
  </td>
  <td className="px-6 py-4 whitespace-nowrap">
  <div className="flex items-center gap-2">
- <div className={`w-1.5 h-1.5 rounded-lg ${sub.status === 'active' ? 'bg-emerald-500' : 'bg-white/[0.18]'}`}></div>
+ <div className={`w-1.5 h-1.5 rounded-full ${sub.status === 'active' ? 'bg-[var(--tint-emerald-fg)]' : 'bg-[var(--admin-ink)]/25'}`}></div>
  <span className="text-xs text-[var(--admin-ink)]/65 capitalize">{sub.status || 'active'}</span>
  </div>
  </td>
@@ -433,14 +395,14 @@ const Subscribers = () => {
  </tbody>
  </table>
  </div>
- </CardContent>
- </Card>
+ </div>
+ </AdminCard>
  )}
 
  {/* Email Modal */}
  {showEmailModal && (
 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-<div className="bg-[var(--admin-surface)] rounded-2xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-[var(--admin-ink)]/10 my-auto">
+<div className="bg-[var(--admin-surface)] rounded-xl shadow-raised max-w-lg w-full max-h-[90vh] overflow-y-auto border border-[var(--admin-ink)]/10 my-auto">
  <div className="flex items-center justify-between p-6 border-b border-[var(--admin-ink)]/10">
  <div>
  <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">BCC Campaign</p>
@@ -448,15 +410,15 @@ const Subscribers = () => {
  </div>
  <button
  onClick={() => setShowEmailModal(false)}
- className="focus-ring p-2 hover:bg-white/[0.09] rounded-lg text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring p-2 hover:bg-[var(--admin-hover)] rounded-lg text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] transition-colors"
  >
  <X size={20} />
  </button>
  </div>
  <div className="p-6 space-y-4">
- <div className="flex items-center gap-3 bg-emerald-500/[0.14] border border-emerald-500/25 rounded-xl px-4 py-3">
- <Mail size={16} className="text-emerald-300 shrink-0" />
- <div className="text-sm text-emerald-200">
+ <div className="flex items-center gap-3 bg-[var(--tint-emerald-bg)] border border-[var(--tint-emerald-line)] rounded-lg px-4 py-3">
+ <Mail size={16} className="text-[var(--tint-emerald-fg)] shrink-0" />
+ <div className="text-sm text-[var(--tint-emerald-fg)]">
  <span className="font-bold">{selectedEmails.size}</span> recipient{selectedEmails.size !== 1 ? 's' : ''} selected
  </div>
  </div>
@@ -464,20 +426,22 @@ const Subscribers = () => {
  Click the button below to open your email client with all recipients added as BCC. You'll compose and send the email yourself.
  </p>
  <div className="flex gap-3 pt-2">
- <Button
- variant="outline"
+ <AdminButton
+ variant="secondary"
+ size="block"
  onClick={() => setShowEmailModal(false)}
  className="flex-1"
  >
  Cancel
- </Button>
- <Button
+ </AdminButton>
+ <AdminButton
+ size="block"
+ icon={Mail}
  onClick={handleSendEmail}
- className="flex-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] hover:bg-[var(--admin-accent-hover)]"
+ className="flex-1"
  >
- <Mail size={14} className="mr-2" />
  Open Email
- </Button>
+ </AdminButton>
  </div>
  </div>
  </div>
