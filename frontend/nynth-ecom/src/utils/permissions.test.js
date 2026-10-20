@@ -13,6 +13,7 @@ import {
   effectivePermissions,
   rolePermissionKeys,
   roleMeta,
+  togglePermissionOverride,
 } from "./permissions";
 
 const sql = readFileSync(
@@ -143,5 +144,51 @@ describe("page permissions", () => {
     for (const role of ROLES) {
       expect(rolePermissionKeys(role.key)).not.toContain("staff.manage");
     }
+  });
+});
+
+describe("togglePermissionOverride", () => {
+  it("turns a default permission off and back on", () => {
+    const off = togglePermissionOverride("vice_admin", {}, "store.orders.view");
+    expect(off["store.orders.view"]).toBe(false);
+    expect(effectivePermissions("vice_admin", off)["store.orders.view"]).toBeUndefined();
+
+    const on = togglePermissionOverride("vice_admin", off, "store.orders.view");
+    expect(on["store.orders.view"]).toBeUndefined();
+    expect(effectivePermissions("vice_admin", on)["store.orders.view"]).toBe(true);
+  });
+
+  it("grants a permission the role does not have by default", () => {
+    const on = togglePermissionOverride("vice_admin", {}, "store.settings.manage");
+    expect(on["store.settings.manage"]).toBe(true);
+    expect(effectivePermissions("vice_admin", on)["store.settings.manage"]).toBe(true);
+
+    const off = togglePermissionOverride("vice_admin", on, "store.settings.manage");
+    expect(off["store.settings.manage"]).toBeUndefined();
+  });
+
+  it("leaves the other overrides alone", () => {
+    const base = { "store.settings.manage": true, "store.orders.manage": false };
+    const next = togglePermissionOverride("vice_admin", base, "store.orders.view");
+    expect(next["store.settings.manage"]).toBe(true);
+    expect(next["store.orders.manage"]).toBe(false);
+  });
+
+  it("flips exactly one click, for every role and every permission", () => {
+    // The reported bug: clicking a permission that matched the role default
+    // deleted the override and wrote the current value back, so the checkbox
+    // never moved. One click must always change the effective value.
+    for (const role of ROLES.map((r) => r.key)) {
+      for (const key of ALL_PERMISSION_KEYS) {
+        const before = effectivePermissions(role, {})[key] === true;
+        const next = togglePermissionOverride(role, {}, key);
+        const after = effectivePermissions(role, next)[key] === true;
+        expect(after, `${role} ${key}`).toBe(!before);
+      }
+    }
+  });
+
+  it("ignores a key that is not in the catalogue", () => {
+    expect(togglePermissionOverride("vice_admin", {}, "nope.nope")).toEqual({});
   });
 });

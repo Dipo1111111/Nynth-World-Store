@@ -14,7 +14,13 @@ import {
   assignEventOrganizer,
 } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
-import { PERMISSION_GROUPS, ROLES, roleMeta, effectivePermissions } from "../../utils/permissions";
+import {
+  PERMISSION_GROUPS,
+  ROLES,
+  roleMeta,
+  effectivePermissions,
+  togglePermissionOverride,
+} from "../../utils/permissions";
 import { formatEventDate } from "../../utils/tickets";
 import { Loader2, Plus, X, Users, ShieldCheck, Trash2, Edit2, UserX, UserCheck, KeyRound } from "lucide-react";
 import toast from "react-hot-toast";
@@ -120,14 +126,7 @@ export default function StaffAccess() {
   // a role's defaults from being silently frozen by an old override.
   const effective = effectivePermissions(form.role, form.overrides);
   const togglePermission = (key) => {
-    const on = effective[key] === true;
-    const isDefault = roleDefaults.includes(key) === on;
-    setForm((f) => {
-      const overrides = { ...f.overrides };
-      if (isDefault) delete overrides[key];
-      else overrides[key] = on;
-      return { ...f, overrides };
-    });
+    setForm((f) => ({ ...f, overrides: togglePermissionOverride(f.role, f.overrides, key) }));
   };
 
   const changeRole = (role) => {
@@ -397,7 +396,7 @@ export default function StaffAccess() {
                             <span className="block text-[12px] text-[var(--admin-ink)]/85 leading-snug">
                               {p.label}
                             </span>
-                            {!isDefault && (
+                            {on !== isDefault && (
                               <span className="block text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]/80 mt-1">
                                 your change
                               </span>

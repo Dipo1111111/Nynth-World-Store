@@ -56,7 +56,13 @@ Last updated: 2026-10-20 09:40 (Africa/Lagos)
 - `AdminDashboard.jsx:280`: a ticket-only account is sent to `/admin/events` instead of an empty store overview. `AdminLayout` hides the Dashboard entry that would bounce.
 - `AuthContext.jsx:129`: `hasStoreWorkspace`, defined once and used by both the nav and the landing redirect.
 - `Events.jsx:121`: the empty state now says who assigns events.
-- Tests: `authRedirect.test.js` (7), `staffEntry.test.jsx` (8).
+- Tests: `authRedirect.test.js` (7), `staffEntry.test.jsx` (9), `permissions.test.js` toggle matrix.
+- Permission toggles on Staff and Access did nothing at all. The local arithmetic compared
+  `roleDefaults.includes(key) === on` and then wrote the current value back, so every click
+  on a permission that matched its role default was a no-op. Moved the flip into
+  `togglePermissionOverride()` in `src/utils/permissions.js`, where one click always changes the
+  effective value, and the stored override is only the difference from the default. Tests cover
+  every role and every permission key.
 
 ## Decisions made
 
@@ -77,7 +83,7 @@ Last updated: 2026-10-20 09:40 (Africa/Lagos)
 
 ## Current state
 
-- Gates all green: `npm run lint` clean, 327 vitest, 27 deno edge, `npm run build`, `node scripts/verify-dist.mjs`, `npx impeccable detect --json` returns `[]`.
+- Gates all green: `npm run lint` clean, 333 vitest, 27 deno edge, `npm run build`, `node scripts/verify-dist.mjs`, `npx impeccable detect --json` returns `[]`.
 - Nothing is committed and nothing is pushed. The consistency pass and the staff panel fix are both in the working tree, because Dipo did not say push. Standing rule is still no commit or push without an explicit instruction.
 - Known gap after the staff fix: a Ticketing Admin cannot browse a list of buyers or attendees. `/admin/orders` requires `store.orders.view`, and the Events page only shows counts. The brief promises attendee details, so a ticket attendee list is the next ticket-side build.
 - Not yet looked at in a real browser. The next pass should load the admin in both themes on desktop and mobile before shipping.

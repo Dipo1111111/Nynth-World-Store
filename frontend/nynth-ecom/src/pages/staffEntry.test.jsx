@@ -53,6 +53,14 @@ describe("ticket roles are scoped, not stuck", () => {
     expect(read("pages/admin/StaffAccess.jsx")).toContain("No events assigned yet");
   });
 
+  it("wires the permission toggles to the tested helper", () => {
+    const staffAccess = read("pages/admin/StaffAccess.jsx");
+    expect(staffAccess).toContain("togglePermissionOverride");
+    // The old local arithmetic swallowed the click whenever the permission
+    // matched its role default, which was most of them.
+    expect(staffAccess).not.toContain("roleDefaults.includes(key) === on");
+  });
+
   it("sends a ticket-only account to its workspace instead of an empty overview", () => {
     const dashboard = read("pages/admin/AdminDashboard.jsx");
     expect(dashboard).toContain("hasStoreWorkspace");

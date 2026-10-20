@@ -146,6 +146,24 @@ export function effectivePermissions(role, overrides = {}) {
   return out;
 }
 
+// The permission editor's one move.
+//
+// A click always flips the current value, and the stored override is only the
+// difference from the role default. The first version of this compared
+// `roleDefaults.includes(key) === on` and then wrote the CURRENT value back,
+// so every click on a permission that matched its default was a no-op. That is
+// why nothing on the Staff page ticked.
+export function togglePermissionOverride(role, overrides, key) {
+  if (!ALL_PERMISSION_KEYS.includes(key)) return { ...(overrides ?? {}) };
+  const current = effectivePermissions(role, overrides)[key] === true;
+  const next = !current;
+  const defaults = roleDefaults(role);
+  const out = { ...(overrides ?? {}) };
+  if (next === Boolean(defaults[key])) delete out[key];
+  else out[key] = next;
+  return out;
+}
+
 export function can(permissions, key) {
   if (!key) return false;
   return permissions?.[key] === true;
