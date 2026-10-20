@@ -268,7 +268,7 @@ const AbandonedCheckouts = () => {
  <div className="flex items-center gap-2">
  <span className="font-bold text-xs uppercase tracking-tight block truncate">#{order.id.slice(0, 8)}</span>
  {hasTickets && (
- <span className="bg-[var(--admin-page)] text-white text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+ <span className="bg-[var(--admin-page)] text-white text-[10px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
  )}
  </div>
  <p className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest mt-0.5 truncate">
@@ -305,7 +305,7 @@ const AbandonedCheckouts = () => {
  </div>
  <div className="flex-1 min-w-0">
  <p className="font-bold text-[11px] truncate uppercase">{item.name || item.title}</p>
- <p className="text-[9px] text-[var(--admin-ink)]/55 mt-1 uppercase tracking-widest font-bold">
+ <p className="text-[10px] text-[var(--admin-ink)]/55 mt-1 uppercase tracking-widest font-bold">
  {item.category === "tickets" ? (
  <span className="inline-flex items-center gap-1">
  <Ticket size={10} className="shrink-0" />
@@ -372,7 +372,7 @@ const AbandonedCheckouts = () => {
  </div>
 
  {/* Desktop Table View */}
- <div className="hidden md:block overflow-x-auto">
+ <div className="admin-panel rounded-xl hidden md:block overflow-x-auto">
  <table className="w-full admin-table">
  <thead>
  <tr className="bg-[var(--admin-ink)]/[0.05] border-b border-[var(--admin-ink)]/10">
@@ -403,7 +403,7 @@ const AbandonedCheckouts = () => {
  <div className="flex items-center gap-2">
  <span className="font-mono text-xs md:text-sm font-medium">#{order.id.slice(0, 8)}</span>
  {hasTickets && (
- <span className="bg-[var(--admin-page)] text-white text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+ <span className="bg-[var(--admin-page)] text-white text-[10px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
  )}
  </div>
  </td>

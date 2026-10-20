@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
-import AdminButton from "../../components/admin/AdminButton";
+import AdminButton, { adminButtonClass } from "../../components/admin/AdminButton";
+import PageHeader from "../../components/admin/PageHeader";
 import { fetchProducts, getAllOrders, updateProduct, fetchEventTickets } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { summarizeEvents, summarizeTotals } from "../../utils/eventStats";
@@ -86,9 +87,7 @@ export default function Events() {
   return (
     <AdminLayout title="Events">
       <div className="max-w-5xl">
-        <p className="text-sm text-[var(--admin-ink)]/55 mb-6">
-          Every event you are allowed to see. Dates, venue, and prices are edited in Products; this page runs the show.
-        </p>
+        <PageHeader description="Every event you are allowed to see. Dates, venue, and prices are edited in Products; this page runs the show." className="mb-6" />
 
         {!loading && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
@@ -98,15 +97,15 @@ export default function Events() {
               canSeeRevenue ? ["REVENUE", `₦${totals.revenue.toLocaleString()}`] : ["CODES ISSUED", String(tickets.length)],
               ["CHECKED IN", `${totals.checkedIn}/${totals.codes}`],
             ].map(([label, value]) => (
-              <div key={label} className="border border-[var(--admin-ink)]/10 rounded-xl bg-[var(--admin-ink)]/[0.03] px-5 py-4">
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">{label}</p>
+              <div key={label} className="admin-panel rounded-xl admin-panel-inset px-5 py-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">{label}</p>
                 <p className="text-xl font-extrabold tracking-tight tabular-nums">{value}</p>
               </div>
             ))}
           </div>
         )}
         {!loading && (
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-8">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-8">
             Live orders only - test purchases never count here
           </p>
         )}
@@ -114,10 +113,12 @@ export default function Events() {
         {loading && <p className="text-sm text-[var(--admin-ink)]/50 tracking-widest uppercase font-bold">Loading events</p>}
 
         {!loading && summaries.length === 0 && (
-          <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-10 text-center">
+          <div className="admin-panel admin-panel-dashed rounded-xl p-10 text-center">
             <Ticket size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
             <p className="text-sm text-[var(--admin-ink)]/65 mb-2">
-              {isAdmin ? "No events yet. Create one as a Tickets product and it lands here." : "No events are assigned to you yet."}
+              {isAdmin
+                ? "No events yet. Create one as a Tickets product and it lands here."
+                : "No events are assigned to you yet. The founder assigns them in Staff and Access."}
             </p>
             {isAdmin && (
               <Link
@@ -135,7 +136,7 @@ export default function Events() {
             const filled = s.capacity ? Math.round((s.sold / s.capacity) * 10) : 0;
             const inScope = isAdmin || canAccessEvents(s.id);
             return (
-              <div key={s.id} className="border border-[var(--admin-ink)]/10 rounded-xl bg-[var(--admin-ink)]/[0.03] p-6">
+              <div key={s.id} className="admin-panel rounded-xl p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="min-w-0">
                     <h2 className="text-base font-extrabold tracking-tight uppercase truncate">{s.title}</h2>
@@ -149,7 +150,7 @@ export default function Events() {
                       </p>
                     )}
                   </div>
-                  <span className={`shrink-0 text-[8px] px-2 py-1 rounded-lg font-bold uppercase tracking-wider border ${STATUS_CHIP[s.status]}`}>
+                  <span className={`shrink-0 text-[10px] px-2 py-1 rounded-lg font-bold uppercase tracking-wider border ${STATUS_CHIP[s.status]}`}>
                     {STATUS_LABEL[s.status]}
                   </span>
                 </div>
@@ -162,7 +163,7 @@ export default function Events() {
                     canSeeRevenue ? ["₦", s.revenue.toLocaleString()] : ["CODES", String(issuedByEvent[s.id] ?? 0)],
                   ].map(([label, value]) => (
                     <div key={label}>
-                      <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1">{label}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1">{label}</p>
                       <p className="text-sm font-extrabold tabular-nums">{value}</p>
                     </div>
                   ))}
@@ -175,52 +176,44 @@ export default function Events() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-5">
                     Open capacity - {s.sold} sold so far
                   </p>
                 )}
 
                 {!canSeeRevenue && (
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-4 flex items-center gap-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-4 flex items-center gap-1.5">
                     <Lock size={10} /> Revenue is not part of your access
                   </p>
                 )}
                 {!canVerify && (
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-4 flex items-center gap-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/35 mb-4 flex items-center gap-1.5">
                     <Lock size={10} /> Door verification is not part of your access
                   </p>
                 )}
 
                 <div className="flex flex-wrap gap-2">
                   {canEdit && inScope && (
-                    <button
+                    <AdminButton
+                      variant="secondary"
+                      size="sm"
+                      icon={s.isPublic ? EyeOff : Eye}
+                      loading={toggling === s.id}
                       onClick={() => toggleVisibility(s)}
-                      disabled={toggling === s.id}
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors disabled:opacity-40 focus-ring"
                     >
-                      {s.isPublic ? <EyeOff size={12} /> : <Eye size={12} />}
-                      {toggling === s.id ? "Saving" : s.isPublic ? "Hide" : "Show"}
-                    </button>
+                      {s.isPublic ? "Hide" : "Show"}
+                    </AdminButton>
                   )}
-                  <Link
-                    to={`/product/${s.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors focus-ring"
-                  >
+                  <Link to={`/product/${s.id}`} className={adminButtonClass({ variant: "secondary", size: "sm" })}>
                     View <ArrowUpRight size={12} />
                   </Link>
                   {canVerify && inScope && (
-                    <Link
-                      to="/admin/check-in"
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors focus-ring"
-                    >
+                    <Link to="/admin/check-in" className={adminButtonClass({ variant: "secondary", size: "sm" })}>
                       <TicketCheck size={12} /> Check-in
                     </Link>
                   )}
                   {canEdit && inScope && (
-                    <Link
-                      to="/admin/products"
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[9px] font-bold uppercase tracking-widest hover:opacity-90 transition-all focus-ring"
-                    >
+                    <Link to="/admin/products" className={adminButtonClass({ variant: "primary", size: "sm" })}>
                       Edit details
                     </Link>
                   )}

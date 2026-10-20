@@ -5,27 +5,18 @@ import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { postAuthTarget } from "../utils/authRedirect";
 
 export default function Signup() {
     const [loading, setLoading] = useState(false);
-    const { loginWithGoogle, currentUser } = useAuth();
+    const { loginWithGoogle, currentUser, isStaff, accessLoading, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const getRedirectTarget = () => {
-        const from = location.state?.from?.pathname;
-        if (from && !from.startsWith("/login") && !from.startsWith("/signup") && !from.startsWith("/admin")) {
-            return from;
-        }
-        return "/shop";
-    };
-
     useEffect(() => {
-        if (currentUser) {
-            navigate(getRedirectTarget(), { replace: true });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser, navigate, location]);
+        if (!currentUser || authLoading || accessLoading) return;
+        navigate(postAuthTarget({ from: location.state?.from?.pathname, isStaff }), { replace: true });
+    }, [currentUser, authLoading, accessLoading, isStaff, navigate, location]);
 
     if (currentUser) {
         return (
@@ -61,7 +52,6 @@ export default function Signup() {
                                     } else {
                                         toast.success("Welcome back");
                                     }
-                                    navigate(getRedirectTarget(), { replace: true });
                                 } catch (error) {
                                     setLoading(false);
                                     if (error.code !== "auth/popup-closed-by-user" && error.code !== "auth/cancelled-popup-request") {
@@ -84,7 +74,7 @@ export default function Signup() {
                         <p className="text-center text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase mt-8">
                             OR{" "}
                             <button
-                                onClick={() => navigate(getRedirectTarget(), { replace: true })}
+                                onClick={() => navigate(postAuthTarget({ from: location.state?.from?.pathname, isStaff: false }))}
                                 className="text-black hover:underline underline-offset-4"
                             >
                                 Continue as Guest

@@ -27,7 +27,7 @@ const ENTRY_CHIP = {
 
 const Chip = ({ map, value, children }) => (
   <span
-    className={`text-[9px] px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider border ${map[value] ?? ENTRY_CHIP.unused}`}
+    className={`text-[10px] px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider border ${map[value] ?? ENTRY_CHIP.unused}`}
   >
     {children ?? value}
   </span>
@@ -129,16 +129,16 @@ const CheckIn = () => {
     const t = result?.ticket;
     const statuses = t && (
         <div className="grid grid-cols-3 gap-2 mb-5">
-            <div className="px-3 py-2.5 rounded-lg bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10">
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Payment</p>
+            <div className="admin-panel admin-panel-inset px-3 py-2.5 rounded-lg">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Payment</p>
                 <Chip map={PAYMENT_CHIP} value={t.payment_status ?? "pending"} />
             </div>
-            <div className="px-3 py-2.5 rounded-lg bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10">
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Ticket</p>
+            <div className="admin-panel admin-panel-inset px-3 py-2.5 rounded-lg">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Ticket</p>
                 <Chip map={TICKET_CHIP} value={t.ticket_status ?? "valid"} />
             </div>
-            <div className="px-3 py-2.5 rounded-lg bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10">
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Entry</p>
+            <div className="admin-panel admin-panel-inset px-3 py-2.5 rounded-lg">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1.5">Entry</p>
                 <Chip map={ENTRY_CHIP} value={t.entry_status ?? "unused"}>
                     {t.entry_status === "used" ? "USED" : "NOT YET USED"}
                 </Chip>
@@ -180,7 +180,7 @@ const CheckIn = () => {
                 </form>
 
                 {!result && (
-                    <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-10 text-center">
+                    <div className="admin-panel admin-panel-dashed rounded-xl p-10 text-center">
                         <Ticket size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
                         <p className="text-sm text-[var(--admin-ink)]/45">No code checked yet. Results land here.</p>
                     </div>

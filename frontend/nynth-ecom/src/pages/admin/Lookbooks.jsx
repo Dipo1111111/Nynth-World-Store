@@ -118,7 +118,6 @@ export default function AdminLookbooks() {
  <AdminLayout title="Lookbook Management">
  <PageHeader
  eyebrow="Editorial Archive"
- title="Gallery"
  description="Manage your editorial imagery."
  actions={(
  <>

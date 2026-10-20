@@ -8,6 +8,8 @@ const TOKENS = [
   "admin-chart-amber",
   "admin-chart-violet",
   "admin-chart-sky",
+  "admin-chart-rose",
+  "admin-chart-slate",
   "admin-chart-grid",
 ];
 

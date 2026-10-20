@@ -3,11 +3,12 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import { subscribeOrders, subscribePresence, getAllOrders } from "../../api/firebaseFunctions";
 import { useAuth } from "../../context/AuthContext";
 import { useSettings } from "../../context/SettingsContext";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
-import { Badge } from "../../components/ui/badge";
+import PageHeader from "../../components/admin/PageHeader";
 import AdminPWAPrompt from "../../components/admin/AdminPWAPrompt";
 import RevenueValue from "../../components/admin/RevenueValue";
+import { useAdminTheme } from "../../hooks/useAdminTheme";
 import { useStaggerReveal } from "../../lib/motion";
 import toast from "react-hot-toast";
 import {
@@ -15,7 +16,7 @@ import {
     Title, Tooltip, Legend, ArcElement, Filler,
 } from 'chart.js';
 import { Doughnut } from "react-chartjs-2";
-import { doughnutOptions } from "../../lib/charts";
+import { chartPalette, doughnutOptions, withAlpha } from "../../lib/charts";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, Filler);
 
@@ -48,11 +49,6 @@ const calculateGrowth = (current, prev) => {
     return ((current - prev) / prev) * 100;
 };
 
-const ADMIN_STATUS_COLORS = {
-    processing: '#d97706', pending: '#f59e0b', confirmed: '#0284c7',
-    packaging: '#2563eb', shipped: '#7c3aed', delivered: '#059669',
-    failed: '#e11d48', cancelled: '#64748b',
-};
 const STATUS_LABELS = {
     processing: 'Processing', pending: 'Pending', confirmed: 'Confirmed',
     packaging: 'Packaging', shipped: 'Shipped', delivered: 'Delivered',
@@ -89,7 +85,7 @@ const SegmentedFilter = ({ options, value, onChange }) => (
 
 const DashboardSkeleton = () => (
     <div className="space-y-5 md:space-y-6">
-        <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-6 md:p-8">
+        <div className="admin-panel rounded-xl p-6 md:p-8">
             <div className="skeleton h-4 w-32 mb-4" />
             <div className="skeleton h-14 w-48 mb-4" />
             <div className="flex gap-8">
@@ -97,16 +93,16 @@ const DashboardSkeleton = () => (
             </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
-            <div className="lg:col-span-7 border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
+            <div className="lg:col-span-7 admin-panel rounded-xl p-5">
                 <div className="skeleton h-5 w-36 mb-4" />
                 {[0, 1, 2, 3].map(i => <div key={i} className="skeleton h-10 w-full mb-3" />)}
             </div>
             <div className="lg:col-span-5 flex flex-col gap-4 md:gap-5">
-                <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
+                <div className="admin-panel rounded-xl p-5">
                     <div className="skeleton h-5 w-32 mb-4" />
                     <div className="skeleton h-48 w-full" />
                 </div>
-                <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
+                <div className="admin-panel rounded-xl p-5">
                     <div className="skeleton h-5 w-32 mb-4" />
                     {[0, 1, 2].map(i => <div key={i} className="skeleton h-8 w-full mb-3" />)}
                 </div>
@@ -116,9 +112,27 @@ const DashboardSkeleton = () => (
 );
 
 const AdminDashboard = () => {
-    const { isAdmin, can } = useAuth();
+    const { isAdmin, can, hasStoreWorkspace } = useAuth();
     const canSeeFinance = can("store.finance.view");
     const { settings } = useSettings();
+    const { theme } = useAdminTheme();
+
+    // Chart colours come from the admin chart tokens, never a hex in the page.
+    // Eight statuses, seven usable tokens: the second hue in a family is the
+    // same token at lower alpha, which stays distinct without adding a colour.
+    // Re-read when the admin theme flips: the chart tokens live on .admin-app.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const palette = useMemo(() => chartPalette(), [theme]);
+    const statusColors = useMemo(() => ({
+        processing: palette["admin-chart-amber"],
+        pending: withAlpha(palette["admin-chart-amber"], "0.55"),
+        confirmed: palette["admin-chart-sky"],
+        packaging: palette["admin-chart-violet"],
+        shipped: withAlpha(palette["admin-chart-sky"], "0.55"),
+        delivered: palette["admin-chart-money"],
+        failed: palette["admin-chart-rose"],
+        cancelled: palette["admin-chart-slate"],
+    }), [palette]);
     const [orders, setOrders] = useState(null);
     const [loading, setLoading] = useState(true);
     const [globalFilter, setGlobalFilter] = useState("all");
@@ -241,7 +255,7 @@ const AdminDashboard = () => {
         labels: statusLabels.length ? statusLabels : ['No data'],
         datasets: [{
             data: statusLabels.length ? Object.keys(dashboardData.statusBreakdown).map(s => dashboardData.statusBreakdown[s]) : [1],
-            backgroundColor: statusLabels.length ? Object.keys(dashboardData.statusBreakdown).map(s => ADMIN_STATUS_COLORS[s] || '#9ca3af') : ['#e5e7eb'],
+            backgroundColor: statusLabels.length ? Object.keys(dashboardData.statusBreakdown).map(s => statusColors[s] || palette["admin-chart-slate"]) : [withAlpha(palette["admin-chart-slate"], "0.4")],
             borderWidth: 0, borderColor: 'transparent', borderRadius: 6, spacing: 2, hoverOffset: 4,
         }],
     };
@@ -254,28 +268,31 @@ const AdminDashboard = () => {
     };
 
     const filterOptions = [
-        { id: 'all', label: 'All', dot: 'bg-[var(--admin-accent)]' },
+        { id: 'all', label: 'All', dot: 'bg-[var(--admin-ink)]' },
         { id: 'pending', label: 'Pending', dot: 'bg-[var(--tint-amber-fg)]' },
         { id: 'paid', label: 'Paid', dot: 'bg-[var(--tint-emerald-fg)]' },
         { id: 'delivered', label: 'Delivered', dot: 'bg-[var(--tint-violet-fg)]' },
     ];
     const periodLabel = globalFilter === 'today' ? 'Today' : globalFilter === 'yesterday' ? 'Yesterday' : globalFilter === '7d' ? 'Last 7 days' : globalFilter === '30d' ? 'Last 30 days' : 'All time';
 
+    // A ticket-only account has no store numbers to look at. Send them to the
+    // page their role actually uses instead of an empty overview.
+    if (!hasStoreWorkspace) {
+        return <Navigate to={can("ticketing.events.view") ? "/admin/events" : "/admin/check-in"} replace />;
+    }
+
     return (
-        <AdminLayout>
+        <AdminLayout title="Overview">
             <AdminPWAPrompt />
-            <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <div className="flex items-center gap-3 mb-1.5">
-                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-[-0.02em] text-[var(--admin-ink)]">Overview</h1>
-                        <Badge variant={isAdmin ? "success" : "warning"}>{isAdmin ? "Verified Admin" : "Standard Role"}</Badge>
-                    </div>
-                    <p className="text-sm text-[var(--admin-ink)]/55">{periodLabel}. Real-time performance and the paid ledger.</p>
-                </div>
-                <select value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} className="admin-control pl-3 pr-8 cursor-pointer">
-                    <option value="today">Today</option><option value="yesterday">Yesterday</option><option value="7d">Last 7 days</option><option value="30d">Last 30 days</option><option value="all">All time</option>
-                </select>
-            </header>
+            <PageHeader
+                eyebrow={isAdmin ? "Verified Admin" : "Standard Role"}
+                description={`${periodLabel}. Real-time performance and the paid ledger.`}
+                actions={
+                    <select value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} className="admin-control pl-3 pr-8 cursor-pointer">
+                        <option value="today">Today</option><option value="yesterday">Yesterday</option><option value="7d">Last 7 days</option><option value="30d">Last 30 days</option><option value="all">All time</option>
+                    </select>
+                }
+            />
 
             {/* Commander: segmented filter + live chip */}
             <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -290,7 +307,7 @@ const AdminDashboard = () => {
                     {/* Lead metric - editorial block. Hidden without store.finance.view:
                         a Vice Admin oversees operations but never sees company money. */}
                     {canSeeFinance && (
-                    <section className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-6 md:p-8">
+                    <section className="admin-panel rounded-xl admin-panel-raised p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/45 mb-1">Net sales</p>
@@ -323,7 +340,7 @@ const AdminDashboard = () => {
                     )}
 
                     {!canSeeFinance && (
-                        <section className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-6 md:p-8">
+                        <section className="admin-panel rounded-xl p-6 md:p-8">
                             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/45 mb-2">
                                 Company financials
                             </p>
@@ -336,7 +353,7 @@ const AdminDashboard = () => {
                     {/* Dense editorial row */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
                         {/* Recent orders - 7 cols */}
-                        <div className="lg:col-span-7 border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl overflow-hidden">
+                        <div className="lg:col-span-7 admin-panel rounded-xl overflow-hidden">
                             <div className="px-5 py-4 border-b border-[var(--admin-ink)]/[0.06] flex items-center justify-between">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60">Recent orders</h2>
                                 <Link to="/admin/orders" className="text-[10px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)]">View all</Link>
@@ -360,7 +377,7 @@ const AdminDashboard = () => {
 
                         {/* Right column */}
                         <div className="lg:col-span-5 flex flex-col gap-4 md:gap-5">
-                            <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
+                            <div className="admin-panel rounded-xl p-5">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60 mb-3">Fulfillment</h2>
                                 {Object.values(dashboardData.statusBreakdown).reduce((a, b) => a + b, 0) === 0 ? (
                                     <div className="text-center text-sm text-[var(--admin-ink)]/55 py-8">No data for this period.</div>
@@ -374,7 +391,7 @@ const AdminDashboard = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="border border-[var(--admin-ink)]/10 bg-[var(--admin-surface)] rounded-xl p-5">
+                            <div className="admin-panel rounded-xl p-5">
                                 <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--admin-ink)]/60 mb-3">Top products</h2>
                                 {dashboardData.topProducts.length === 0 ? (
                                     <div className="text-center text-sm text-[var(--admin-ink)]/55 py-8">No product sales in this period.</div>

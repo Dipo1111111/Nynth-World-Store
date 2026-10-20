@@ -186,3 +186,123 @@ describe("the utility layer follows the theme", () => {
     expect(css).toContain("--admin-active:");
   });
 });
+
+describe("the pages reuse, they do not reinvent", () => {
+  const pageFiles = readdirSync(adminDir).filter((f) => f.endsWith(".jsx") && !f.endsWith(".test.jsx"));
+
+  it("no page hand-rolls its own primary button", () => {
+    // The accent fill is what a primary action looks like. If a page paints
+    // one itself, it has invented a second button style, which is exactly
+    // what the shared AdminButton exists to stop.
+    for (const file of pageFiles) {
+      const text = stripComments(read(`src/pages/admin/${file}`));
+      const offenders = [];
+      for (const match of text.matchAll(/<button[\s\S]*?>/g)) {
+        if (/bg-\[var\(--admin-accent\)\]/.test(match[0])) {
+          offenders.push(match[0].slice(0, 90));
+        }
+      }
+      expect(offenders, file).toEqual([]);
+    }
+  });
+
+  it("no page has a raw colour literal", () => {
+    for (const file of pageFiles) {
+      const text = stripComments(read(`src/pages/admin/${file}`));
+      const hex = text.match(/#[0-9a-f]{3,8}\b/gi) ?? [];
+      const oklch = text.match(/oklch\(/g) ?? [];
+      expect(hex, `${file} hex`).toEqual([]);
+      expect(oklch, `${file} oklch`).toEqual([]);
+    }
+  });
+
+  it("every page that has an action uses the shared button", () => {
+    for (const file of pageFiles) {
+      const text = stripComments(read(`src/pages/admin/${file}`));
+      const hasButton = /<button/.test(text);
+      const usesAdminButton = /<AdminButton/.test(text);
+      if (hasButton && !usesAdminButton) {
+        // A page may legitimately have a segmented control or a status dot.
+        // It may not hand-roll a filled action button, so the check looks at
+        // the button markup rather than the whole file.
+        const offenders = [];
+        for (const match of text.matchAll(/<button[\s\S]*?>/g)) {
+          if (/bg-\[var\(--admin-accent\)\]|bg-\[var\(--tint-\w+-fg\)\]/.test(match[0])) {
+            offenders.push(match[0].slice(0, 90));
+          }
+        }
+        expect(offenders, `${file} has a button but no AdminButton`).toEqual([]);
+      }
+    }
+  });
+});
+
+describe("one surface material, one title, one type ramp", () => {
+  const css = read("src/index.css");
+  const pages = readdirSync(adminDir)
+    .filter((f) => f.endsWith(".jsx") && !f.endsWith(".test.jsx"))
+    .map((f) => `src/pages/admin/${f}`);
+  const components = readdirSync(componentDir)
+    .filter((f) => f.endsWith(".jsx") && !f.endsWith(".test.jsx"))
+    .map((f) => `src/components/admin/${f}`);
+  const all = [...pages, ...components];
+
+  it("defines the panel material once, in the token layer", () => {
+    for (const token of [
+      ".admin-panel {",
+      ".admin-panel-raised",
+      ".admin-panel-inset",
+      ".admin-panel-dashed",
+      "--admin-glass-tint:",
+      "--admin-glass-line:",
+    ]) {
+      expect(css, token).toContain(token);
+    }
+  });
+
+  it("the card is the material, not its own fill", () => {
+    const card = stripComments(read("src/components/admin/AdminCard.jsx"));
+    expect(card).toContain("admin-panel");
+    expect(card).not.toMatch(/bg-\[var\(--admin-surface\)\]/);
+  });
+
+  it("no page paints its own solid panel", () => {
+    // A modal is a focus surface and stays solid, and the Products modal is
+    // the same thing inline. Everything else that is a 12px panel is glass.
+    const exempt = new Set([
+      "src/components/admin/AdminModal.jsx",
+      "src/pages/admin/Products.jsx",
+    ]);
+    for (const file of all) {
+      if (exempt.has(file)) continue;
+      const text = stripComments(read(file));
+      const classes = [...text.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)].map(
+        (m) => m[1] ?? m[2] ?? ""
+      );
+      const solidPanels = classes.filter(
+        (c) => /rounded-xl/.test(c) && /bg-\[var\(--admin-surface\)\](?!\/)/.test(c)
+      );
+      expect(solidPanels, file).toEqual([]);
+    }
+  });
+
+  it("keeps the type ramp at 10px and up", () => {
+    // 8px and 9px labels were the tell that a page had not been through the
+    // system. The ramp's floor is the 10px micro label.
+    for (const file of all) {
+      const text = stripComments(read(file));
+      expect(text.match(/text-\[(8|9)px\]/g) ?? [], file).toEqual([]);
+    }
+  });
+
+  it("has one page title, and it belongs to the layout", () => {
+    const header = stripComments(read("src/components/admin/PageHeader.jsx"));
+    expect(header).not.toMatch(/\btitle\b/);
+    for (const file of pages) {
+      const text = stripComments(read(file));
+      const blocks = [...text.matchAll(/<PageHeader\b[\s\S]*?\/>/g)].map((m) => m[0]);
+      const withTitle = blocks.filter((b) => /\btitle=/.test(b));
+      expect(withTitle, file).toEqual([]);
+    }
+  });
+});

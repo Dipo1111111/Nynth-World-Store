@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import AdminButton from "../../components/admin/AdminButton";
+import PageHeader from "../../components/admin/PageHeader";
 import { fetchSettings, updateSettings, mergeSubscriberDuplicates, uploadImage } from "../../api/firebaseFunctions";
 import toast from "react-hot-toast";
 import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Truck, Upload, ImageIcon, X, Trash2, Plus, Ruler, Package as PackageIcon, Megaphone, Percent, BookOpen, RotateCcw, ArrowUp, ArrowDown, LayoutList, FileText, EyeOff, Sun, Moon } from "lucide-react";
@@ -378,19 +380,19 @@ export default function AdminSettings() {
  return (
  <AdminLayout title="Settings">
   <form onSubmit={handleSubmit} className="admin-settings-form max-w-4xl space-y-8">
-  <header className="flex flex-wrap items-center justify-between gap-3">
-  <p className="text-sm text-[var(--admin-ink)]/55">Storefront configuration. Changes stay staged until you save.</p>
-  {isDirty && (
-  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">
-  <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-amber-fg)] animate-pulse" aria-hidden="true" />
-  Unsaved changes
-  </span>
-  )}
-  </header>
+  <PageHeader
+   description="Storefront configuration. Changes stay staged until you save."
+   actions={isDirty ? (
+   <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]">
+   <span className="w-1.5 h-1.5 rounded-full bg-[var(--tint-amber-fg)] animate-pulse" aria-hidden="true" />
+   Unsaved changes
+   </span>
+   ) : null}
+  />
 
   {/* APPEARANCE - first thing on the page, because reading comfort is the
   first thing anyone notices. Newman asked for this at the very top. */}
-  <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+  <div className="admin-panel rounded-xl p-6">
   <SectionTitle icon={theme === "light" ? Sun : Moon} title="Appearance" />
   <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.04] rounded-lg border border-[var(--admin-ink)]/10">
   <div className="min-w-0">
@@ -441,7 +443,7 @@ export default function AdminSettings() {
 
   {/* General Settings */}
   {activeTab === "store" && (
-  <div id="set-store" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-store" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={Globe} title="General Configuration" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -470,7 +472,7 @@ export default function AdminSettings() {
 
  {/* Shop Page Layout */}
   {activeTab === "shop" && (
- <div id="set-shop" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+ <div id="set-shop" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={LayoutList} title="Shop Page Layout" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Control the category tabs and the bold tickets band on the shop page. Changes stay staged until you save.
@@ -482,7 +484,7 @@ export default function AdminSettings() {
  <button
  type="button"
  onClick={() => setSettings(prev => ({ ...prev, shop_category_order: [...DEFAULT_CATEGORY_ORDER] }))}
- className="focus-ring flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  <RotateCcw size={11} /> Restore Default
  </button>
@@ -609,7 +611,7 @@ export default function AdminSettings() {
 
  {/* PRODUCT VARIANT OPTIONS */}
   {activeTab === "product" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={PackageIcon} title="Product Variant Options" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Manage the preset options available when creating or editing products. Separate items with commas.
@@ -643,7 +645,7 @@ export default function AdminSettings() {
 
   {/* PRODUCT PAGE COPY */}
   {activeTab === "product" && (
-  <div id="set-product" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-product" className="admin-panel rounded-xl p-6 scroll-mt-28">
     <SectionTitle icon={FileText} title="Product Page Copy" />
     <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
       The SHIPPING &amp; RETURNS panel shown on every product page. Any single product can override this in Products &gt; Edit &gt; Product page note. The 7-day return badge has been removed from product pages.
@@ -718,7 +720,7 @@ export default function AdminSettings() {
 
   {/* LANDING SPLIT */}
   {activeTab === "landing" && (
-  <div id="set-landing" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-landing" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={ImageIcon} title="Landing Page Split" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  The front page is two boxes. One for the store, one for tickets. Drop an image on either and it goes live the moment you save.
@@ -753,7 +755,7 @@ export default function AdminSettings() {
  </button>
  </>
  ) : (
- <div className="w-full h-full flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 bg-[var(--admin-ink)]/[0.03]">
+ <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35 bg-[var(--admin-ink)]/[0.03]">
  No image
  </div>
  )}
@@ -783,7 +785,7 @@ export default function AdminSettings() {
 
   {/* REVENUE PRIVACY */}
   {activeTab === "revenue" && (
-  <div id="set-revenue" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-revenue" className="admin-panel rounded-xl p-6 scroll-mt-28">
     <SectionTitle icon={EyeOff} title="Revenue Privacy" />
     <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
       Controls the Net sales figure at the top of the admin dashboard. Hidden figures show as ****.*** until you click the eye.
@@ -828,7 +830,7 @@ export default function AdminSettings() {
 
   {/* LOCK PAGE CONFIGURATION */}
   {activeTab === "lock" && (
-  <div id="set-lock" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-lock" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={MapPin} title="Lock Page Configuration" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Control the content and access for the pre-launch/maintenance page.
@@ -940,7 +942,7 @@ export default function AdminSettings() {
 
  {/* Contact Information */}
   {activeTab === "store" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Mail} title="Contact Information" />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="space-y-2">
@@ -1002,7 +1004,7 @@ export default function AdminSettings() {
 
  {/* Social Media */}
   {activeTab === "store" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Share2} title="Social Media Links" />
  <div className="grid grid-cols-1 gap-6">
  <div className="space-y-2">
@@ -1051,7 +1053,7 @@ export default function AdminSettings() {
 
  {/* Google Analytics Settings */}
   {activeTab === "store" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Globe} title="Google Analytics 4 (Data API)" />
  <div className="space-y-4">
  <div className="space-y-2">
@@ -1074,13 +1076,13 @@ export default function AdminSettings() {
 
  {/* Brand Assets Section */}
   {activeTab === "store" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={ImageIcon} title="Brand Hero Assets" />
  <div className="space-y-4">
  <div className="flex justify-between items-center bg-[var(--admin-ink)]/[0.05] p-3 rounded-lg border border-[var(--admin-ink)]/10">
  <span className="text-[10px] font-bold text-[var(--admin-ink)] uppercase tracking-widest leading-none">Currently Active Banner</span>
  {!settings.hero_banner && (
- <span className="text-[9px] font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest bg-[var(--admin-surface)] px-2 py-1 rounded border border-[var(--admin-ink)]/[0.06]">Default System Asset</span>
+ <span className="text-[10px] font-bold text-[var(--admin-ink)]/55 uppercase tracking-widest bg-[var(--admin-surface)] px-2 py-1 rounded border border-[var(--admin-ink)]/[0.06]">Default System Asset</span>
  )}
  </div>
  <div className="flex flex-col gap-4">
@@ -1122,7 +1124,7 @@ export default function AdminSettings() {
 
  {/* Banner Hover Color */}
   {activeTab === "store" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Megaphone} title="Banner Hover Style" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-4 leading-relaxed">
  Color of the SHOP NOW button when hovered on the hero banner. Selecting a style only stages it -
@@ -1163,7 +1165,7 @@ export default function AdminSettings() {
 
   {/* Shipping Settings */}
   {activeTab === "shipping" && (
-  <div id="set-shipping" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-shipping" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={Truck} title="Shipping Configuration" />
  <div className="max-w-xs space-y-2 mb-6">
  <label htmlFor="shipping_fee" className="text-[13px] font-medium text-[var(--admin-ink)]/85">Default Shipping Fee ({settings.currency_symbol})</label>
@@ -1180,7 +1182,7 @@ export default function AdminSettings() {
 
  {/* Free Delivery Discount */}
   {activeTab === "shipping" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Percent} title="Free Delivery Discount" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Offer free delivery when an order meets a minimum amount. Toggle on/off and set the threshold.
@@ -1239,7 +1241,7 @@ export default function AdminSettings() {
 
  {/* Shipping Location Toggles */}
   {activeTab === "shipping" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Truck} title="Shipping Locations" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Toggle delivery locations on or off. Disabled locations will not appear in checkout.
@@ -1260,7 +1262,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, lagos: allDisabled ? [] : allLagos }
  }));
  }}
- className="focus-ring text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(LAGOS_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.lagos || {})].every(a => (settings.disabled_locations?.lagos || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1310,7 +1312,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, abuja: allDisabled ? [] : allAbuja }
  }));
  }}
- className="focus-ring text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(ABUJA_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.abuja || {})].every(a => (settings.disabled_locations?.abuja || []).includes(a)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1360,7 +1362,7 @@ export default function AdminSettings() {
  disabled_locations: { ...prev.disabled_locations, interstate: allDisabled ? [] : allStates }
  }));
  }}
- className="focus-ring text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
+ className="focus-ring text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] transition-colors"
  >
  {[...Object.keys(INTERSTATE_SHIPPING_DATA), ...Object.keys(settings.custom_shipping_locations?.interstate || {})].every(s => (settings.disabled_locations?.interstate || []).includes(s)) ? 'ENABLE ALL' : 'DISABLE ALL'}
  </button>
@@ -1399,7 +1401,7 @@ export default function AdminSettings() {
 
   {/* Announcement Bar */}
   {activeTab === "announce" && (
-  <div id="set-announce" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-announce" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={Megaphone} title="Announcement Bar" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  A black bar at the very top of the site. Use it for launch countdowns, happy launch day messages, or store-wide announcements.
@@ -1435,7 +1437,7 @@ export default function AdminSettings() {
 
  {/* Promotional Marquee */}
   {activeTab === "announce" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={Megaphone} title="Promotional Marquee" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  A scrolling banner that appears above the hero image on Shop and Home pages.
@@ -1471,7 +1473,7 @@ export default function AdminSettings() {
 
   {/* Email Section Settings */}
   {activeTab === "cleanup" && (
-  <div id="set-cleanup" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--tint-rose-line)] shadow-card scroll-mt-28">
+  <div id="set-cleanup" className="admin-panel rounded-xl ring-1 ring-[var(--tint-rose-line)] p-6 scroll-mt-28">
  <SectionTitle icon={Mail} title="Email Section Settings" />
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1481,14 +1483,9 @@ export default function AdminSettings() {
  Merge duplicate subscriber entries to maintain a clean mailing list.
  </p>
  </div>
- <button
- type="button"
- onClick={handleMerge}
- disabled={isMerging}
- className="focus-ring px-6 py-2 bg-[var(--tint-rose-fg)]/[0.14] text-[var(--tint-rose-fg)] border border-[var(--tint-rose-line)] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 shrink-0"
- >
+ <AdminButton variant="danger" onClick={handleMerge} loading={isMerging} className="shrink-0">
  {isMerging ? "Cleaning..." : "Clean Duplicates"}
- </button>
+ </AdminButton>
  </div>
  </div>
  </div>
@@ -1496,7 +1493,7 @@ export default function AdminSettings() {
 
   {/* Size Chart Settings */}
   {activeTab === "content" && (
-  <div id="set-content" className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card scroll-mt-28">
+  <div id="set-content" className="admin-panel rounded-xl p-6 scroll-mt-28">
  <SectionTitle icon={Ruler} title="Size Chart Configuration" />
  <div className="space-y-5">
   <div className="flex items-center justify-between gap-4 p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10">
@@ -1634,7 +1631,7 @@ export default function AdminSettings() {
 
  {/* Our Story Editor */}
   {activeTab === "content" && (
- <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+ <div className="admin-panel rounded-xl p-6">
  <SectionTitle icon={BookOpen} title="Our Story" />
  <p className="text-xs text-[var(--admin-ink)]/55 mb-6 leading-relaxed">
  Edit the content shown on the /our-story page. Fields are pre-filled with the current content -
@@ -1811,18 +1808,9 @@ export default function AdminSettings() {
   </div>
  {/* Submit */}
  <div className={`flex justify-end pt-4 ${isDirty ? "pb-24" : ""}`}>
- <button
- type="submit"
- disabled={saving || !isDirty}
- className="flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-8 py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-card focus-ring"
- >
- {saving ? (
- <Loader2 className="animate-spin" size={20} />
- ) : (
- <Save size={20} />
- )}
+ <AdminButton type="submit" icon={Save} loading={saving} disabled={saving || !isDirty}>
  {saving ? "Saving Changes..." : "Save All Settings"}
- </button>
+ </AdminButton>
  </div>
   </form>
 
@@ -1848,24 +1836,18 @@ export default function AdminSettings() {
  </div>
  <p className="hidden sm:block text-xs text-[var(--tint-amber-fg)]">Edits go live after you save.</p>
  <div className="flex items-center gap-2 shrink-0">
- <button
- type="button"
+ <AdminButton
+ variant="ghost"
+ icon={RotateCcw}
  onClick={handleDiscard}
  disabled={saving}
- className="focus-ring flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)] px-3 py-2 rounded-lg hover:bg-[var(--tint-amber-fg)]/25 transition-colors disabled:opacity-50"
+ className="text-[var(--tint-amber-fg)]"
  >
- <RotateCcw size={13} />
  Discard
- </button>
- <button
- type="button"
- onClick={handleSubmit}
- disabled={saving}
- className="flex items-center gap-2 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-70 transition-all shadow-card focus-ring"
- >
- {saving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+ </AdminButton>
+ <AdminButton type="button" size="sm" icon={Save} onClick={handleSubmit} loading={saving}>
  {saving ? "Saving..." : "Save All Settings"}
- </button>
+ </AdminButton>
  </div>
  </div>
  </div>

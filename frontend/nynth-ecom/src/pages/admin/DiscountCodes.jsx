@@ -3,6 +3,7 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import PageHeader from "../../components/admin/PageHeader";
 import AdminModal from "../../components/admin/AdminModal";
 import AdminButton from "../../components/admin/AdminButton";
+import Toggle from "../../components/admin/Toggle";
 import {
  fetchDiscountCodes,
  addDiscountCode,
@@ -212,9 +213,9 @@ export default function DiscountCodes() {
  {codes.map((code) => (
  <div
  key={code.id}
- className={`bg-[var(--admin-surface)] p-4 rounded-xl border ${
- isExpired(code) ? "border-[var(--tint-rose-line)] opacity-60" : "border-[var(--admin-ink)]/10"
- } shadow-card`}
+ className={`admin-panel p-4 ${
+ isExpired(code) ? "ring-1 ring-[var(--tint-rose-line)] opacity-60" : ""
+ }`}
  >
  <div className="flex items-start justify-between mb-3">
  <div>
@@ -233,15 +234,15 @@ export default function DiscountCodes() {
  </span>
  )}
  {isExpired(code) ? (
- <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tint-rose-fg)] bg-[var(--tint-rose-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-rose-line)]">
+ <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--tint-rose-fg)] bg-[var(--tint-rose-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-rose-line)]">
  Expired
  </span>
  ) : code.isActive ? (
- <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tint-emerald-fg)] bg-[var(--tint-emerald-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-emerald-line)]">
+ <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--tint-emerald-fg)] bg-[var(--tint-emerald-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-emerald-line)]">
  Active
  </span>
  ) : (
- <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 bg-[var(--tint-slate-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-slate-line)]">
+ <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--admin-ink)]/55 bg-[var(--tint-slate-bg)] px-2 py-0.5 rounded-lg border border-[var(--tint-slate-line)]">
  Inactive
  </span>
  )}
@@ -289,7 +290,7 @@ export default function DiscountCodes() {
  </div>
 
  {/* Desktop Table */}
- <div className="hidden md:block bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card overflow-hidden">
+ <div className="hidden md:block admin-panel rounded-xl overflow-hidden">
  <table className="w-full admin-table">
  <thead>
  <tr className="border-b border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05]">
@@ -354,15 +355,15 @@ export default function DiscountCodes() {
  </td>
  <td className="px-6 py-4">
  {isExpired(code) ? (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border border-[var(--tint-rose-line)]">
+ <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border border-[var(--tint-rose-line)]">
  Expired
  </span>
  ) : code.isActive ? (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border border-[var(--tint-emerald-line)]">
+ <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border border-[var(--tint-emerald-line)]">
  Active
  </span>
  ) : (
- <span className="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border border-[var(--tint-slate-line)]">
+ <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-[var(--tint-slate-bg)] text-[var(--tint-slate-fg)] border border-[var(--tint-slate-line)]">
  Inactive
  </span>
  )}
@@ -396,7 +397,7 @@ export default function DiscountCodes() {
  >
  <Trash2 size={16} />
  </button>
- </div> : <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35">View only</span>}
+ </div> : <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/35">View only</span>}
  </td>
  </tr>
  ))}
@@ -489,24 +490,13 @@ export default function DiscountCodes() {
  <div className="flex items-center justify-between py-3 px-4 bg-[var(--admin-ink)]/[0.05] rounded-xl border border-[var(--admin-ink)]/10">
  <div>
  <span className="text-sm font-medium text-[var(--admin-ink)] block">Active</span>
- <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Code available at checkout</span>
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Code available at checkout</span>
  </div>
- <button
- type="button"
- onClick={() =>
- setForm({ ...form, isActive: !form.isActive })
- }
- aria-label="Toggle active"
- className={`focus-ring p-0.5 rounded-lg transition-colors ${
- form.isActive ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-ink)]/[0.18]"
- }`}
- >
- <div
- className={`w-5 h-5 rounded-lg bg-[var(--admin-surface)] shadow transition-transform ${
- form.isActive ? "translate-x-5" : "translate-x-0"
- }`}
+ <Toggle
+ checked={form.isActive}
+ onChange={(next) => setForm({ ...form, isActive: next })}
+ label="Code available at checkout"
  />
- </button>
  </div>
 
  {/* Actions */}
@@ -518,14 +508,13 @@ export default function DiscountCodes() {
  >
  Cancel
  </button>
- <button
+ <AdminButton
  type="submit"
- disabled={isSubmitting}
- className="focus-ring flex-1 py-3 text-sm font-bold bg-[var(--admin-accent)] text-[var(--admin-on-ink)] rounded-lg hover:bg-[var(--admin-accent-hover)] shadow-card transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+ loading={isSubmitting}
+ className="flex-1"
  >
- {isSubmitting && <Loader2 size={14} className="animate-spin" />}
  {editingId ? "Save Changes" : "Create Code"}
- </button>
+ </AdminButton>
  </div>
  </form>
  </AdminModal>

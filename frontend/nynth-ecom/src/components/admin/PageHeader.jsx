@@ -1,15 +1,16 @@
-// The one admin page header.
+// The one admin page intro.
 //
-// Five pages were writing the same three lines: an eyebrow, a title and a
-// line of description, each one a different size and a different shade of
-// grey. The eyebrow was the one thing on the page that was set in 10px
-// capitals, which is the voice for a label and not for a page.
+// The page title belongs to AdminLayout, which renders it once at the top of
+// every admin page. This component carries the rest of the intro: an optional
+// eyebrow, the one description line, and the page actions. It used to render
+// its own title too, which is how Lookbooks ended up with two headings of two
+// different sizes on one screen.
 //
-// The actions slot holds the page's own buttons, so the header and the
-// actions sit on one line on a wide screen and stack on a narrow one.
+// The actions slot holds the page's own buttons, so the intro and the actions
+// sit on one line on a wide screen and stack on a narrow one.
 import React from "react";
 
-export default function PageHeader({ eyebrow, title, description, actions, className = "" }) {
+export default function PageHeader({ eyebrow, description, actions, className = "" }) {
   return (
     <div className={`mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4 ${className}`}>
       <div className="min-w-0">
@@ -18,9 +19,8 @@ export default function PageHeader({ eyebrow, title, description, actions, class
             {eyebrow}
           </p>
         )}
-        {title && <h2 className="text-2xl font-bold text-[var(--admin-ink)]">{title}</h2>}
         {description && (
-          <p className="text-sm text-[var(--admin-ink)]/55 mt-1 leading-relaxed max-w-[68ch]">
+          <p className="text-xs text-[var(--admin-ink)]/55 mt-1 leading-relaxed max-w-[68ch]">
             {description}
           </p>
         )}

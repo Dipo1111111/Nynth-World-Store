@@ -60,7 +60,7 @@ describe("one radius language", () => {
   });
 
   it("keeps the cards and the controls one step apart", () => {
-    expect(settings).toContain("p-6 rounded-xl");
+    expect(settings).toContain("admin-panel rounded-xl");
     expect(settings).toContain("rounded-lg");
   });
 });

@@ -26,7 +26,7 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : 1, position: 'relative' };
 
  return (
- <div ref={setNodeRef} style={style} className={`bg-[var(--admin-surface)] p-4 rounded-xl border ${isDragging ? "border-[var(--admin-ink)]/25 shadow-card opacity-80" : "border-[var(--admin-ink)]/10 shadow-card"} flex flex-col gap-3 group transition-all`}>
+ <div ref={setNodeRef} style={style} className={`admin-panel p-4 ${isDragging ? "ring-2 ring-[var(--admin-glass-line-strong)] opacity-80" : ""} flex flex-col gap-3 group transition-all`}>
  <div className="flex gap-4">
  <div className="w-20 h-20 bg-[var(--admin-ink)]/[0.07] rounded-lg overflow-hidden flex-shrink-0 border border-[var(--admin-ink)]/10">
  {(product.images?.[0] || product.imageUrl) ? (
@@ -43,7 +43,7 @@ const SortableMobileCard = ({ product, handleEdit, handleDelete, handleTogglePub
  <div className="flex items-center justify-between mt-2">
  <span className="font-bold text-sm">₦{product.price?.toLocaleString()}</span>
  <div className="flex items-center gap-1">
- <span className={`px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider border ${
+ <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
  product.stockQuantity <= 0 ? "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]" :
  product.stockQuantity <= 5 ? "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]" :
  "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]"
@@ -95,7 +95,7 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  </div>
  <div>
  <span className="font-bold text-[var(--admin-ink)] text-sm uppercase tracking-tight block">{product.title || product.name}</span>
- <span className="text-[9px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
+ <span className="text-[10px] text-[var(--admin-ink)]/42 font-bold uppercase tracking-widest">ID: {product.id.slice(0, 8)}</span>
  </div>
  </div>
  </td>
@@ -103,7 +103,7 @@ const SortableDesktopRow = ({ product, handleEdit, handleDelete, handleTogglePub
  <td className="p-4 font-bold text-sm">₦{product.price?.toLocaleString()}</td>
  <td className="p-4">
  <div className="flex flex-col gap-1">
- <span className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider w-fit border ${
+ <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider w-fit border ${
  product.stockQuantity <= 0 ? "bg-[var(--tint-rose-bg)] text-[var(--tint-rose-fg)] border-[var(--tint-rose-line)]" :
  product.stockQuantity <= 5 ? "bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] border-[var(--tint-amber-line)]" :
  "bg-[var(--tint-emerald-bg)] text-[var(--tint-emerald-fg)] border-[var(--tint-emerald-line)]"
@@ -528,9 +528,9 @@ export default function AdminProducts() {
  )}
  />
 
- <div className="bg-transparent sm:bg-[var(--admin-surface)] sm:rounded-xl sm:border sm:border-[var(--admin-ink)]/10 sm:shadow-card overflow-hidden">
+ <div className="admin-panel rounded-xl overflow-hidden">
  {loading ? (
- <div className="p-12 flex justify-center bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10">
+ <div className="admin-panel rounded-xl p-12 flex justify-center">
  <Loader2 className="animate-spin text-white/25" size={32} />
  </div>
  ) : (
@@ -544,7 +544,7 @@ export default function AdminProducts() {
  <SortableMobileCard key={product.id} product={product} handleEdit={handleEdit} handleDelete={handleDelete} handleTogglePublic={handleTogglePublic} canEdit={canManageProduct(product)} />
  ))}
  {products.length === 0 && (
- <div className="text-center py-20 bg-[var(--admin-surface)] rounded-xl border border-dashed border-[var(--admin-ink)]/22">
+ <div className="admin-panel rounded-xl admin-panel-dashed text-center py-20">
  <div className="w-12 h-12 mx-auto rounded-xl bg-[var(--admin-ink)]/[0.09] flex items-center justify-center mb-3">
  <Package className="h-6 w-6 text-[var(--admin-ink)]/35" />
  </div>
@@ -823,7 +823,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-xl w-full m
  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">Inventory per Size</label>
  <div className="flex items-center gap-3">
  <div className="flex items-center gap-2 border-r border-[var(--admin-ink)]/10 pr-3">
- <span className="text-[9px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-tighter">Bulk Update:</span>
+ <span className="text-[10px] font-bold text-[var(--admin-ink)]/42 uppercase tracking-tighter">Bulk Update:</span>
  <div className="flex">
  <input
  id="bulk-stock-input"
@@ -841,7 +841,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-xl w-full m
  toast.success("Applied to all sizes");
  }
  }}
- className="focus-ring px-2 py-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[8px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
+ className="focus-ring px-2 py-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[10px] font-bold uppercase rounded-r hover:opacity-90 transition-opacity"
  >
  Set All
  </button>
@@ -852,7 +852,7 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-xl w-full m
  onClick={() => {
  if(confirm("Zero out all stock for this product?")) bulkUpdateStock(0);
  }}
- className="focus-ring text-[9px] font-bold text-[var(--tint-rose-fg)] hover:text-[var(--tint-rose-fg)] uppercase tracking-tighter transition-colors"
+ className="focus-ring text-[10px] font-bold text-[var(--tint-rose-fg)] hover:text-[var(--tint-rose-fg)] uppercase tracking-tighter transition-colors"
  >
  Clear All
  </button>
@@ -902,12 +902,12 @@ className="bg-[var(--admin-surface)] text-[var(--admin-ink)] rounded-xl w-full m
  <div className="w-28 h-28 rounded-xl border border-[var(--admin-ink)]/14 overflow-hidden relative shadow-card">
  <img src={img} className="w-full h-full object-cover" />
  {idx === 0 && (
- <div className="absolute top-1 left-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider z-10 pointer-events-none">
+ <div className="absolute top-1 left-1 bg-[var(--admin-accent)] text-[var(--admin-on-ink)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider z-10 pointer-events-none">
  Primary
  </div>
  )}
  {formData.modelImage === img && (
- <div className="absolute bottom-1 left-1 bg-[var(--tint-amber-fg)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider z-10 pointer-events-none">
+ <div className="absolute bottom-1 left-1 bg-[var(--tint-amber-fg)] text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider z-10 pointer-events-none">
  Model
  </div>
  )}

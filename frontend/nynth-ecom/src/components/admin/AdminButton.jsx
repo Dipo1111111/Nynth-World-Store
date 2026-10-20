@@ -30,6 +30,14 @@ const SIZES = {
   block: "w-full h-11 px-4 text-[10px] tracking-[0.18em]",
 };
 
+// A link that has to behave like a button (a route action) uses the same
+// classes as AdminButton, so the page does not invent a second button shape.
+export function adminButtonClass({ variant = "primary", size = "md", className = "" } = {}) {
+  return `inline-flex items-center justify-center gap-2 rounded-lg font-bold uppercase transition-all duration-150 focus-ring active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:cursor-not-allowed ${
+    VARIANTS[variant] ?? VARIANTS.primary
+  } ${SIZES[size] ?? SIZES.md} ${className}`;
+}
+
 export default function AdminButton({
   variant = "primary",
   size = "md",
@@ -46,9 +54,7 @@ export default function AdminButton({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg font-bold uppercase transition-all duration-150 focus-ring active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:cursor-not-allowed ${
-        VARIANTS[variant] ?? VARIANTS.primary
-      } ${SIZES[size] ?? SIZES.md} ${className}`}
+      className={adminButtonClass({ variant, size, className })}
       {...rest}
     >
       {loading ? (

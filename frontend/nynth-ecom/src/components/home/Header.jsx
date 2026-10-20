@@ -27,7 +27,7 @@ export default function Header() {
 
   // All hooks declared BEFORE any useEffect
   const { totalItems, isCartOpen, setIsCartOpen } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, isStaff } = useAuth();
   const { settings, liveCollection } = useSettings();
   const location = useLocation();
   const navigate = useNavigate();
@@ -193,6 +193,15 @@ export default function Header() {
 
             {/* Right: Icons (Far Right) */}
             <div className="flex-1 flex items-center justify-end gap-1 md:gap-3">
+              {isStaff && (
+                <Link
+                  to="/admin"
+                  className="hidden md:block px-2 py-1.5 text-[10px] tracking-[0.22em] font-bold uppercase text-black hover:opacity-50 transition-opacity"
+                >
+                  Dashboard
+                </Link>
+              )}
+
               <Link
                 to={currentUser ? "/account" : "/signup"}
                 className="p-1.5 hover:opacity-50 transition-opacity hidden md:flex"
@@ -264,6 +273,11 @@ export default function Header() {
                 <Link to={currentUser ? "/account" : "/signup"} onClick={() => setIsMenuOpen(false)} className="block text-[11px] tracking-[0.3em] font-bold uppercase text-black">
                   {currentUser ? "Account" : "Sign Up"}
                 </Link>
+                {isStaff && (
+                  <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="block text-[11px] tracking-[0.3em] font-bold uppercase text-black">
+                    Dashboard
+                  </Link>
+                )}
               </div>
             </div>
           </div>

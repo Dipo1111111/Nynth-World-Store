@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import PageHeader from "../../components/admin/PageHeader";
 import { fetchEventFinance, getAllOrders } from "../../api/firebaseFunctions";
 import { Loader2, Wallet, Landmark, Percent, Undo2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -7,10 +8,10 @@ import toast from "react-hot-toast";
 const naira = (v) => `\u20A6${Number(v ?? 0).toLocaleString()}`;
 
 const Stat = ({ label, value, note, icon: Icon }) => (
-  <div className="border border-[var(--admin-ink)]/10 rounded-xl bg-[var(--admin-ink)]/[0.03] px-5 py-4">
+  <div className="admin-panel rounded-xl admin-panel-inset px-5 py-4">
     <div className="flex items-center gap-1.5 mb-1.5">
       {Icon && <Icon size={11} className="text-[var(--admin-ink)]/35" />}
-      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42">{label}</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42">{label}</p>
     </div>
     <p className="text-xl font-extrabold tracking-tight tabular-nums">{value}</p>
     {note && <p className="text-[10px] text-[var(--admin-ink)]/40 mt-1">{note}</p>}
@@ -63,15 +64,11 @@ export default function TicketPlatform() {
   return (
     <AdminLayout title="Ticket Platform">
       <div className="max-w-6xl">
-        <p className="text-sm text-[var(--admin-ink)]/55 mb-8 max-w-2xl">
-          Ticket money is tracked separately from the clothing business. What an organizer sells is
-          not NYNTH income: only the commission is. Everything below is live traffic, Paystack test
-          orders excluded.
-        </p>
+        <PageHeader description="Ticket money is tracked separately from the clothing business. What an organizer sells is not NYNTH income: only the commission is. Everything below is live traffic, Paystack test orders excluded." />
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="animate-spin text-white/25" size={28} />
+            <Loader2 className="animate-spin text-[var(--admin-ink)]/25" size={28} />
           </div>
         ) : (
           <>
@@ -89,7 +86,7 @@ export default function TicketPlatform() {
             </div>
 
             {finance.length === 0 ? (
-              <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-12 text-center">
+              <div className="admin-panel admin-panel-dashed rounded-xl p-12 text-center">
                 <Wallet size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
                 <p className="text-sm text-[var(--admin-ink)]/65">
                   No live ticket sales yet. Figures appear the moment a real ticket is paid for.
@@ -101,7 +98,7 @@ export default function TicketPlatform() {
                   By event
                 </p>
                 {/* Desktop */}
-                <div className="hidden md:block bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card overflow-x-auto">
+                <div className="hidden md:block admin-panel rounded-xl overflow-x-auto">
                   <table className="w-full admin-table">
                     <thead>
                       <tr className="border-b border-[var(--admin-ink)]/10 bg-[var(--admin-ink)]/[0.05]">
@@ -138,7 +135,7 @@ export default function TicketPlatform() {
                 {/* Mobile */}
                 <div className="md:hidden space-y-3">
                   {finance.map((f) => (
-                    <div key={f.event_id} className="bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 p-5">
+                    <div key={f.event_id} className="admin-panel rounded-xl p-5">
                       <p className="text-sm font-bold uppercase mb-3">{f.event_title || f.event_id}</p>
                       <div className="grid grid-cols-2 gap-3">
                         {[
@@ -148,7 +145,7 @@ export default function TicketPlatform() {
                           ["NYNTH cut", naira(f.nynth_commission)],
                         ].map(([l, v]) => (
                           <div key={l}>
-                            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1">{l}</p>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--admin-ink)]/42 mb-1">{l}</p>
                             <p className="text-sm font-extrabold tabular-nums">{v}</p>
                           </div>
                         ))}

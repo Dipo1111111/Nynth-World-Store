@@ -67,7 +67,7 @@ const allowedFor = (item, can) => {
 
 export default function AdminLayout({ children, title }) {
     const location = useLocation();
-    const { logout, can, isAdmin, access } = useAuth();
+    const { logout, can, isAdmin, access, hasStoreWorkspace } = useAuth();
     const { theme, toggle } = useAdminTheme();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -87,7 +87,9 @@ export default function AdminLayout({ children, title }) {
 
     const groups = NAV_GROUPS.map((group) => ({
         ...group,
-        items: group.items.filter((item) => allowedFor(item, can)),
+        items: group.items.filter(
+            (item) => allowedFor(item, can) && !(item.href === "/admin" && !hasStoreWorkspace)
+        ),
     })).filter((group) => group.items.length > 0);
 
     const isActive = (path) => {
@@ -126,7 +128,7 @@ export default function AdminLayout({ children, title }) {
                 ) : (
                     <Moon size={14} className="shrink-0" />
                 )}
-                <span className="hidden sm:inline text-[9px] font-bold uppercase tracking-[0.2em]">
+                <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.2em]">
                     {theme === "light" ? "Light" : "Dark"}
                 </span>
             </button>
@@ -144,7 +146,7 @@ export default function AdminLayout({ children, title }) {
                 <div className="px-6 pt-7 pb-6 flex items-center justify-between">
                     <Link to="/admin" className="flex items-center gap-3 group">
                         <Logo size="sm" />
-                        <span className="text-[9px] font-bold tracking-[0.4em] text-[var(--admin-ink)]/70 group-hover:text-[var(--admin-ink)] transition-colors">
+                        <span className="text-[10px] font-bold tracking-[0.4em] text-[var(--admin-ink)]/70 group-hover:text-[var(--admin-ink)] transition-colors">
                             ADMIN
                         </span>
                     </Link>
@@ -162,7 +164,7 @@ export default function AdminLayout({ children, title }) {
                 <nav className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto">
                     {groups.map((group) => (
                         <div key={group.label}>
-                            <p className="px-3 mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/30">
+                            <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--admin-ink)]/30">
                                 {group.label}
                             </p>
                             <div className="space-y-0.5">
@@ -239,7 +241,7 @@ export default function AdminLayout({ children, title }) {
                 <header className="sticky top-0 z-30 md:hidden flex items-center justify-between px-4 py-3 pr-16 bg-[var(--admin-page)] text-[var(--admin-ink)] shadow-card">
                     <Link to="/admin" className="flex items-center gap-2">
                         <Logo size="sm" className="h-5" />
-                        <span className="text-[8px] font-bold tracking-[0.3em] text-[var(--admin-ink)]/70">ADMIN</span>
+                        <span className="text-[10px] font-bold tracking-[0.3em] text-[var(--admin-ink)]/70">ADMIN</span>
                     </Link>
                     <button
                         onClick={toggleMobileMenu}

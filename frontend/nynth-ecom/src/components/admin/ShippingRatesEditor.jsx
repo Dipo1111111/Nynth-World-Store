@@ -260,13 +260,13 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
     ];
 
     return (
-        <div className="bg-[var(--admin-surface)] p-6 rounded-xl border border-[var(--admin-ink)]/10 shadow-card">
+        <div className="admin-panel rounded-xl p-6">
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                     <Truck size={18} className="text-[var(--admin-ink)]/42" />
                     <h3 className="font-bold text-lg">Shipping Rates</h3>
                     {dirty && (
-                        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)] bg-[var(--tint-amber-fg)]/[0.14] px-2 py-0.5 rounded">
+                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)] bg-[var(--tint-amber-fg)]/[0.14] px-2 py-0.5 rounded">
                             <span className="w-1.5 h-1.5 rounded-lg bg-[var(--tint-amber-fg)]" /> Unsaved
                         </span>
                     )}
@@ -299,12 +299,12 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                         <div className="flex items-center gap-2">
                                             <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">{group.name}</span>
                                             {group.price != null && (
-                                                <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] px-2 py-0.5 rounded">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] px-2 py-0.5 rounded">
                                                     base {currencySymbol}{group.price.toLocaleString()}
                                                 </span>
                                             )}
                                             {editedCount > 0 && (
-                                                <span className="text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-ink)] text-[var(--admin-surface)] px-2 py-0.5 rounded">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-ink)] text-[var(--admin-surface)] px-2 py-0.5 rounded">
                                                     {editedCount} edited
                                                 </span>
                                             )}
@@ -317,7 +317,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                         type="button"
                                                         onClick={() => setZoneDisabled(region, group.areas, !allOff)}
                                                         title={allOff ? "Enable this whole zone at checkout" : "Disable this whole zone at checkout (prices kept)"}
-                                                        className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring transition-opacity hover:opacity-80 ${allOff ? "bg-[var(--tint-emerald-fg)] text-white" : "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/78"}`}
+                                                        className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring transition-opacity hover:opacity-80 ${allOff ? "bg-[var(--tint-emerald-fg)] text-white" : "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/78"}`}
                                                     >
                                                         <Power size={12} /> {allOff ? "Enable zone" : "Disable zone"}
                                                     </button>
@@ -327,11 +327,11 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 type="button"
                                                 onClick={() => { setAdding(adding === `${region}:${group.id}` ? null : `${region}:${group.id}`); setNewLoc({ name: "", price: "", speed: "" }); }}
                                                 title="Add a new location to this zone"
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
+                                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
                                             >
                                                 <Plus size={12} /> Add location
                                             </button>
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Set all to</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Set all to</span>
                                             <span className="text-[var(--admin-ink)]/42 text-xs font-bold">{currencySymbol}</span>
                                             <input
                                                 type="text"
@@ -346,7 +346,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 onClick={() => applyBulk(region, group, bulk[bulkKey])}
                                                 disabled={(bulk[bulkKey] ?? "").toString().trim() === ""}
                                                 title="Fill every area in this zone with one price"
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                                             >
                                                 <Check size={12} /> Set all
                                             </button>
@@ -378,7 +378,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                         </button>
                                                         <span className={`truncate ${off ? "text-[var(--admin-ink)]/35 line-through" : "text-[var(--admin-ink)]/78"}`}>{area}</span>
                                                         {customDef && (
-                                                            <span className="shrink-0 text-[8px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
+                                                            <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
                                                         )}
                                                     </span>
                                                     <span className="flex items-center gap-0.5 shrink-0">
@@ -409,7 +409,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                     {adding === `${region}:${group.id}` && (
                                         <div className="mt-3 flex flex-wrap items-end gap-2 border-t border-dashed border-[var(--admin-ink)]/22 pt-3">
                                             <label className="flex flex-col gap-1">
-                                                <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Location name</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Location name</span>
                                                 <input
                                                     type="text"
                                                     value={newLoc.name}
@@ -419,7 +419,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 />
                                             </label>
                                             <label className="flex flex-col gap-1">
-                                                <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Price ({currencySymbol})</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Price ({currencySymbol})</span>
                                                 <input
                                                     type="text"
                                                     inputMode="decimal"
@@ -432,14 +432,14 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             <button
                                                 type="button"
                                                 onClick={() => addCustomLocation(region, [...group.areas, ...Object.keys(settings.custom_shipping_locations?.[region] || {})])}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded-lg focus-ring hover:opacity-80 transition-opacity"
+                                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded-lg focus-ring hover:opacity-80 transition-opacity"
                                             >
                                                 <Check size={12} /> Add
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(null)}
-                                                className="focus-ring flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
+                                                className="focus-ring flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
                                             >
                                                 <X size={12} /> Cancel
                                             </button>
@@ -464,11 +464,11 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--admin-ink)]">{group.name}</span>
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] px-2 py-0.5 rounded">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 bg-[var(--admin-ink)]/[0.05] px-2 py-0.5 rounded">
                                             base {currencySymbol}{group.price.toLocaleString()}
                                         </span>
                                         {editedCount > 0 && (
-                                            <span className="text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-ink)] text-[var(--admin-surface)] px-2 py-0.5 rounded">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-ink)] text-[var(--admin-surface)] px-2 py-0.5 rounded">
                                                 {editedCount} edited
                                             </span>
                                         )}
@@ -481,7 +481,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     type="button"
                                                     onClick={() => setZoneDisabled("interstate", group.states, !allOff)}
                                                     title={allOff ? "Enable this whole region at checkout" : "Disable this whole region at checkout (prices kept)"}
-                                                    className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring transition-opacity hover:opacity-80 ${allOff ? "bg-[var(--tint-emerald-fg)] text-white" : "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/78"}`}
+                                                    className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring transition-opacity hover:opacity-80 ${allOff ? "bg-[var(--tint-emerald-fg)] text-white" : "bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)]/78"}`}
                                                 >
                                                     <Power size={12} /> {allOff ? "Enable region" : "Disable region"}
                                                 </button>
@@ -491,11 +491,11 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             type="button"
                                             onClick={() => { setAdding(adding === `interstate:${group.id}` ? null : `interstate:${group.id}`); setNewLoc({ name: "", price: "", speed: "" }); }}
                                             title="Add a new state to this region"
-                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
+                                            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg focus-ring border border-dashed border-[var(--admin-ink)]/32 text-[var(--admin-ink)]/65 hover:border-[var(--admin-ink)]/60 hover:text-[var(--admin-ink)] transition-colors"
                                         >
                                             <Plus size={12} /> Add location
                                         </button>
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Set all to</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Set all to</span>
                                         <span className="text-[var(--admin-ink)]/42 text-xs font-bold">{currencySymbol}</span>
                                         <input
                                             type="text"
@@ -510,7 +510,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             onClick={() => applyBulkInterstate(null, group, bulk[bulkKey])}
                                             disabled={(bulk[bulkKey] ?? "").toString().trim() === ""}
                                             title="Fill every state in this region with one price"
-                                            className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                                            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-1.5 rounded-lg focus-ring hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                                         >
                                             <Check size={12} /> Set all
                                         </button>
@@ -543,7 +543,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     <span className={`truncate ${off ? "text-[var(--admin-ink)]/35 line-through" : "text-[var(--admin-ink)]/78"}`}>{state}</span>
                                                     {customDef && (
                                                         <>
-                                                            <span className="shrink-0 text-[8px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
+                                                            <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
                                                             <button
                                                                 type="button"
                                                                 title={`Delete custom location ${state}`}
@@ -557,7 +557,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 </span>
                                                 <div className="flex items-center gap-3 shrink-0">
                                                     <span className="flex items-center gap-1">
-                                                        <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Home</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Home</span>
                                                         <PriceChip
                                                             editingKey={editing === `interstate:${state}:home` ? `interstate:${state}:home` : null}
                                                             value={eff.home}
@@ -568,7 +568,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                         />
                                                     </span>
                                                     <span className="flex items-center gap-1">
-                                                        <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Park</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Park</span>
                                                         <PriceChip
                                                             editingKey={editing === `interstate:${state}:park` ? `interstate:${state}:park` : null}
                                                             value={eff.park}
@@ -586,7 +586,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                     {adding === `interstate:${group.id}` && (
                                         <div className="mt-3 flex flex-wrap items-end gap-2 border-t border-dashed border-[var(--admin-ink)]/22 pt-3">
                                             <label className="flex flex-col gap-1">
-                                                <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">State name</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">State name</span>
                                                 <input
                                                     type="text"
                                                     value={newLoc.name}
@@ -596,7 +596,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                 />
                                             </label>
                                             <label className="flex flex-col gap-1">
-                                                <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Price ({currencySymbol})</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">Price ({currencySymbol})</span>
                                                 <input
                                                     type="text"
                                                     inputMode="decimal"
@@ -609,14 +609,14 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                             <button
                                                 type="button"
                                                 onClick={() => addCustomLocation("interstate", [...group.states, ...customInterstate], true)}
-                                                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded-lg focus-ring hover:opacity-80 transition-opacity"
+                                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-3 py-2 rounded-lg focus-ring hover:opacity-80 transition-opacity"
                                             >
                                                 <Check size={12} /> Add
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(null)}
-                                                className="focus-ring flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
+                                                className="focus-ring flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 hover:text-[var(--admin-ink)] px-2 py-2 transition-colors"
                                             >
                                                 <X size={12} /> Cancel
                                             </button>
@@ -640,7 +640,7 @@ export default function ShippingRatesEditor({ settings, setSettings, currencySym
                                                     <Power size={11} />
                                                 </button>
                                                 <span className={`truncate ${off ? "text-[var(--admin-ink)]/35 line-through" : "text-[var(--admin-ink)]/78"}`}>{state}</span>
-                                                <span className="shrink-0 text-[8px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
+                                                <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-[var(--admin-accent)] text-[var(--admin-on-ink)] px-1.5 py-0.5 rounded">Custom</span>
                                                 <button type="button" title={`Delete ${state}`} onClick={() => deleteCustomLocation("interstate", state)} className="focus-ring shrink-0 text-[var(--admin-ink)]/35 hover:text-[var(--tint-rose-fg)] transition-colors">
                                                     <Trash2 size={12} />
                                                 </button>

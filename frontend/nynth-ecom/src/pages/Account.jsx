@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { Badge } from "../components/ui/badge";
 
 export default function Account() {
-    const { currentUser, logout, isAdmin } = useAuth();
+    const { currentUser, logout, isAdmin, isStaff } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -71,11 +71,11 @@ export default function Account() {
                                     <h2 className="text-[16px] tracking-widest font-bold uppercase mb-2">{currentUser.displayName || "User"}</h2>
                                     <p className="text-[11px] tracking-wider text-gray-400 uppercase font-bold break-all">{currentUser.email}</p>
 
-                                    {isAdmin && (
+                                    {isStaff && (
                                         <div className="mt-4">
                                             <Link to="/admin" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-black text-[8px] tracking-[0.2em] font-bold uppercase bg-black text-white shadow-card hover:bg-white hover:text-black transition-all focus-ring">
                                                 <ShieldCheck size={12} />
-                                                Admin
+                                                {isAdmin ? "Admin" : "Staff"}
                                             </Link>
                                         </div>
                                     )}
@@ -102,11 +102,15 @@ export default function Account() {
 
                         {/* Main Content / Orders */}
                         <div className="lg:col-span-9 space-y-12">
-                            {isAdmin && (
+                            {isStaff && (
                                 <div className="border border-black p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                                     <div className="space-y-2">
-                                        <h3 className="text-[14px] tracking-[0.2em] font-bold uppercase">Control Panel</h3>
-                                        <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold">Comprehensive store management.</p>
+                                        <h3 className="text-[14px] tracking-[0.2em] font-bold uppercase">
+                                            {isAdmin ? "Control Panel" : "Workspace"}
+                                        </h3>
+                                        <p className="text-[11px] text-gray-400 tracking-wider uppercase font-bold">
+                                            {isAdmin ? "Comprehensive store management." : "Your assigned duties, in one place."}
+                                        </p>
                                     </div>
                                     <Link to="/admin" className="w-full md:w-auto bg-black text-white px-10 py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:opacity-90 transition-all text-center">
                                         Enter Dashboard

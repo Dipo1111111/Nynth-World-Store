@@ -340,7 +340,7 @@ const Subscribers = () => {
  </div>
 
  {/* Desktop Table View */}
- <div className="hidden sm:block overflow-x-auto">
+ <div className="admin-panel rounded-xl hidden sm:block overflow-x-auto">
  <table className="w-full admin-table">
  <thead>
  <tr>

@@ -183,6 +183,8 @@
   --admin-chart-amber: oklch(0.78 0.16 75);
   --admin-chart-violet: oklch(0.62 0.16 280);
   --admin-chart-sky: oklch(0.65 0.15 240);
+  --admin-chart-rose: oklch(0.58 0.2 15);
+  --admin-chart-slate: oklch(0.55 0.02 260);
   --admin-chart-grid: oklch(0.922 0 0);
 
   /* Semantic tint chips - light world (storefront defaults) */
@@ -235,6 +237,18 @@
   --admin-hover: oklch(1 0 0 / 0.06);
   --admin-active: oklch(1 0 0 / 0.1);
 
+  /* Glass. The back office is one translucent material, not a solid card per
+     page. Depth is tint strength and shadow, never a different surface. */
+  --admin-glass-tint: color-mix(in oklab, var(--admin-ink) 4%, transparent);
+  --admin-glass-tint-strong: color-mix(in oklab, var(--admin-ink) 6.5%, transparent);
+  --admin-glass-tint-inset: color-mix(in oklab, var(--admin-ink) 2.5%, transparent);
+  --admin-glass-line: color-mix(in oklab, var(--admin-ink) 12%, transparent);
+  --admin-glass-line-strong: color-mix(in oklab, var(--admin-ink) 18%, transparent);
+  --admin-glass-line-dashed: color-mix(in oklab, var(--admin-ink) 22%, transparent);
+  --admin-glass-highlight: inset 0 1px 0 oklch(1 0 0 / 0.05);
+  --admin-glass-shadow: 0 10px 30px -18px oklch(0 0 0 / 0.7);
+  --admin-glass-blur: 14px;
+
   /* Native widget rendering. The ink admin wants dark form controls, the
      paper admin wants light ones. */
   --admin-color-scheme: dark;
@@ -279,6 +293,8 @@
   --admin-chart-amber: oklch(0.85 0.15 85);
   --admin-chart-violet: oklch(0.8 0.18 285);
   --admin-chart-sky: oklch(0.78 0.14 240);
+  --admin-chart-rose: oklch(0.8 0.15 15);
+  --admin-chart-slate: oklch(0.72 0.02 260);
   --admin-chart-grid: oklch(0.3 0.002 85);
 
   --shadow-card: inset 0 1px 0 oklch(1 0 0 / 0.05),
@@ -332,6 +348,18 @@
   --admin-hover: oklch(0.145 0 0 / 0.05);
   --admin-active: oklch(0.145 0 0 / 0.09);
 
+  /* Glass on paper. A lower tint than ink because dark on white carries
+     further, and a real top highlight because paper has no backlight. */
+  --admin-glass-tint: color-mix(in oklab, var(--admin-ink) 3.5%, transparent);
+  --admin-glass-tint-strong: color-mix(in oklab, var(--admin-ink) 5%, transparent);
+  --admin-glass-tint-inset: color-mix(in oklab, var(--admin-ink) 2%, transparent);
+  --admin-glass-line: color-mix(in oklab, var(--admin-ink) 10%, transparent);
+  --admin-glass-line-strong: color-mix(in oklab, var(--admin-ink) 16%, transparent);
+  --admin-glass-line-dashed: color-mix(in oklab, var(--admin-ink) 20%, transparent);
+  --admin-glass-highlight: inset 0 1px 0 oklch(1 0 0 / 0.55);
+  --admin-glass-shadow: 0 1px 2px oklch(0.145 0 0 / 0.04), 0 12px 30px -20px oklch(0.145 0 0 / 0.35);
+  --admin-glass-blur: 14px;
+
   /* Light widgets on paper. */
   --admin-color-scheme: light;
   /* Dark placeholder. The ink value was white on white in this theme, which
@@ -375,6 +403,8 @@
   --admin-chart-amber: oklch(0.6 0.14 75);
   --admin-chart-violet: oklch(0.52 0.17 280);
   --admin-chart-sky: oklch(0.55 0.15 240);
+  --admin-chart-rose: oklch(0.55 0.19 15);
+  --admin-chart-slate: oklch(0.5 0.02 260);
   --admin-chart-grid: oklch(0.9 0 0);
 
   --shadow-card: 0 1px 2px 0 oklch(0 0 0 / 0.05), 0 1px 3px 1px oklch(0 0 0 / 0.04);
@@ -522,11 +552,84 @@
 }
 
 /* Admin surfaces */
+/* The page carries a very low contrast wash so the glass above it has
+   something to blur. It is the material, not decoration: on a flat fill the
+   translucent panels read as grey boxes. */
 .admin-paper {
   background-color: var(--paper);
+  background-image:
+    radial-gradient(
+      1100px 620px at 12% -8%,
+      color-mix(in oklab, var(--admin-ink) 5%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 520px at 96% 2%,
+      color-mix(in oklab, var(--admin-ink) 3.5%, transparent),
+      transparent 58%
+    );
+}
+@media (min-width: 768px) {
+  .admin-paper {
+    background-attachment: fixed;
+  }
 }
 .admin-paper-warm {
   background-color: var(--paper-warm);
+}
+
+/* The one panel material. Three depths, no fourth surface.
+   raised  the lead block on a page
+   base    every ordinary card, shell and group
+   inset   a group inside a card, a stat tile
+   dashed  the empty state, same material with a dashed hairline */
+.admin-panel {
+  border: 1px solid var(--admin-glass-line);
+  background: var(--admin-glass-tint);
+  box-shadow: var(--admin-glass-highlight);
+  -webkit-backdrop-filter: blur(var(--admin-glass-blur)) saturate(1.06);
+  backdrop-filter: blur(var(--admin-glass-blur)) saturate(1.06);
+}
+.admin-panel-raised {
+  background: var(--admin-glass-tint-strong);
+  border-color: var(--admin-glass-line-strong);
+  box-shadow: var(--admin-glass-highlight), var(--admin-glass-shadow);
+}
+.admin-panel-inset {
+  background: var(--admin-glass-tint-inset);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.admin-panel-dashed {
+  background: var(--admin-glass-tint);
+  border-style: dashed;
+  border-color: var(--admin-glass-line-dashed);
+  box-shadow: none;
+}
+.admin-panel-hover {
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.admin-panel-hover:hover {
+  background: var(--admin-glass-tint-strong);
+  border-color: var(--admin-glass-line-strong);
+  transform: translateY(-1px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-panel-hover:hover {
+    transform: none;
+  }
+}
+/* A browser without backdrop-filter gets the same tint without the blur, so
+   the panel still exists instead of turning into a hole. */
+@supports not (backdrop-filter: blur(1px)) {
+  .admin-panel {
+    background: var(--admin-glass-tint-strong);
+  }
 }
 
 /* Toolbar / control row on admin pages */

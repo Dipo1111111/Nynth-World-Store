@@ -14,6 +14,16 @@ export function useAuth() { return useContext(AuthContext); }
 
 const EMPTY_ACCESS = { is_admin: false, role: null, permissions: {}, event_ids: [] };
 
+// The pages that make up the store side of the back office. A person with
+// none of these (a ticket admin, a door steward) has no useful dashboard,
+// so they land on their ticketing workspace instead of an empty overview.
+const STORE_WORKSPACE_PERMISSIONS = [
+  "store.products.view",
+  "store.orders.view",
+  "store.carts.view",
+  "store.subscribers.view",
+];
+
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -113,6 +123,11 @@ export function AuthProvider({ children }) {
   // Anyone the platform has given a job: the founder, or a person with at
   // least one permission. Customers stay out of /admin entirely.
   const isStaff = Boolean(isAdmin) || Object.values(permissions ?? {}).some(Boolean);
+  // True when this person has a store page to look at. Used to decide the
+  // admin landing page and the nav, so a ticket-only account is not dropped
+  // into a dashboard that has nothing on it.
+  const hasStoreWorkspace = Boolean(isAdmin) || STORE_WORKSPACE_PERMISSIONS.some((key) => can(key));
+
   const canAccessEvents = (eventId) =>
     isAdmin || (Array.isArray(access?.event_ids) && access.event_ids.includes(eventId));
 
@@ -138,6 +153,7 @@ export function AuthProvider({ children }) {
         can,
         isStaff,
         canAccessEvents,
+        hasStoreWorkspace,
         canManageProduct,
         refreshAccess: loadAccess,
         signup,

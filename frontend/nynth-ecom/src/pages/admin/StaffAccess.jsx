@@ -39,6 +39,9 @@ const STATUS_LABEL = { invited: "Invited", active: "Active", suspended: "Suspend
 
 // Anything with a ticketing role can be made the director of a ticket section.
 const canDirect = (role) => role === "ticket_organizer" || role === "ticket_admin";
+// Any role whose access is narrowed to specific events, the door staff
+// included. They cannot verify a ticket for an event they are not on.
+const isScoped = (role) => Boolean(roleMeta(role)?.scopedByEvent);
 
 // One person, one row: who they are, what they can do, which events they see.
 export default function StaffAccess() {
@@ -136,7 +139,7 @@ export default function StaffAccess() {
       if (value === nextDefaults.includes(key)) continue;
       overrides[key] = value;
     }
-    setForm((f) => ({ ...f, role: nextRole, overrides, eventIds: canDirect(nextRole) ? f.eventIds : [] }));
+    setForm((f) => ({ ...f, role: nextRole, overrides, eventIds: isScoped(nextRole) ? f.eventIds : [] }));
   };
 
   const toggleEvent = (eventId) => {
@@ -162,7 +165,7 @@ export default function StaffAccess() {
         department: form.department,
         role: form.role,
         permissions: form.overrides,
-        eventIds: canDirect(form.role) ? form.eventIds : [],
+        eventIds: isScoped(form.role) ? form.eventIds : [],
         notes: form.notes,
         invitedBy: currentUser?.email ?? null,
       };
@@ -177,6 +180,12 @@ export default function StaffAccess() {
           return;
         }
         toast.success("Added. They get access the moment they log in with that email.");
+      }
+      if (isScoped(form.role) && form.eventIds.length === 0) {
+        toast("No events assigned yet. They will see an empty events page until you assign one.", {
+          icon: "!",
+          duration: 6000,
+        });
       }
       closeForm();
       await load();
@@ -230,7 +239,7 @@ export default function StaffAccess() {
       />
 
         {/* ADD / EDIT */}
-        <form onSubmit={submit} className="bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card p-6 mb-8">
+        <form onSubmit={submit} className="admin-panel rounded-xl p-6 mb-8">
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--admin-ink)]">
               {editingId ? `Editing ${form.email || "person"}` : "Add new person"}
@@ -303,10 +312,10 @@ export default function StaffAccess() {
           </div>
 
           {/* EVENT SCOPING */}
-          {canDirect(form.role) && (
+          {isScoped(form.role) && (
             <div className="mb-6 pt-6 border-t border-[var(--admin-ink)]/10">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42 mb-1">
-                Events they may manage
+                Assigned events
               </p>
               <p className="text-[10px] text-[var(--admin-ink)]/42 mb-4 leading-relaxed">
                 Scoped at the database level. Swapping an event id in the URL gets them nothing.
@@ -389,7 +398,7 @@ export default function StaffAccess() {
                               {p.label}
                             </span>
                             {!isDefault && (
-                              <span className="block text-[9px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]/80 mt-1">
+                              <span className="block text-[10px] font-bold uppercase tracking-widest text-[var(--tint-amber-fg)]/80 mt-1">
                                 your change
                               </span>
                             )}
@@ -430,7 +439,7 @@ export default function StaffAccess() {
             <Loader2 className="animate-spin text-white/25" size={28} />
           </div>
         ) : staff.length === 0 ? (
-          <div className="border border-dashed border-[var(--admin-ink)]/15 rounded-xl p-12 text-center">
+          <div className="admin-panel admin-panel-dashed rounded-xl p-12 text-center">
             <Users size={28} className="mx-auto mb-3 text-[var(--admin-ink)]/25" />
             <p className="text-sm text-[var(--admin-ink)]/65 mb-6">
               Nobody yet. Add your first Vice Admin or Ticket Organizer above.
@@ -451,7 +460,7 @@ export default function StaffAccess() {
                 effectivePermissions(person.role, person.permissions)
               ).filter(Boolean).length;
               return (
-                <div key={person.id} className="bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card p-5">
+                <div key={person.id} className="admin-panel rounded-xl p-5">
                   <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1.5">
@@ -459,22 +468,22 @@ export default function StaffAccess() {
                           {person.fullName || person.email}
                         </p>
                         <span
-                          className={`text-[8px] px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider border ${STATUS_CHIP[person.status]}`}
+                          className={`text-[10px] px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider border ${STATUS_CHIP[person.status]}`}
                         >
                           {STATUS_LABEL[person.status]}
                         </span>
                       </div>
                       <p className="text-[11px] text-[var(--admin-ink)]/50 truncate">{person.email}</p>
                       <div className="flex items-center gap-2 flex-wrap mt-3">
-                        <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/70 border border-[var(--admin-ink)]/10">
+                        <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/70 border border-[var(--admin-ink)]/10">
                           {roleMeta(person.role)?.label ?? person.role}
                         </span>
                         {person.department && (
-                          <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
+                          <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
                             {person.department}
                           </span>
                         )}
-                        <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
+                        <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[var(--admin-ink)]/[0.07] text-[var(--admin-ink)]/55 border border-[var(--admin-ink)]/10">
                           {granted} permission{granted === 1 ? "" : "s"}
                         </span>
                       </div>
@@ -486,7 +495,7 @@ export default function StaffAccess() {
                             .join(", ")}
                         </p>
                       )}
-                      {person.eventIds?.length === 0 && canDirect(person.role) && (
+                      {person.eventIds?.length === 0 && isScoped(person.role) && (
                         <p className="text-[10px] text-[var(--tint-amber-fg)]/70 mt-3">
                           No events assigned yet, so they can see no tickets.
                         </p>
@@ -496,7 +505,7 @@ export default function StaffAccess() {
                       <button
                         type="button"
                         onClick={() => openEdit(person)}
-                        className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors"
+                        className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors"
                       >
                         <Edit2 size={12} /> Edit
                       </button>
@@ -504,7 +513,7 @@ export default function StaffAccess() {
                         <button
                           type="button"
                           onClick={() => setStatus(person, "active", `${person.email} has access again`)}
-                          className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--tint-emerald-line)] bg-[var(--tint-emerald-fg)]/[0.08] text-[var(--tint-emerald-fg)] text-[9px] font-bold uppercase tracking-widest hover:bg-[var(--tint-emerald-bg)] transition-colors"
+                          className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--tint-emerald-line)] bg-[var(--tint-emerald-fg)]/[0.08] text-[var(--tint-emerald-fg)] text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--tint-emerald-bg)] transition-colors"
                         >
                           <UserCheck size={12} /> Restore
                         </button>
@@ -512,7 +521,7 @@ export default function StaffAccess() {
                         <button
                           type="button"
                           onClick={() => setStatus(person, "suspended", `${person.email} can no longer sign in to admin`)}
-                          className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors"
+                          className="focus-ring inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--admin-ink)]/15 text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/75 hover:text-[var(--admin-ink)] transition-colors"
                         >
                           <UserX size={12} /> Revoke
                         </button>
@@ -555,7 +564,7 @@ export default function StaffAccess() {
                 const rate = Number(ev.commissionRate ?? 0);
                 const money = financeByEvent[ev.id];
                 return (
-                  <div key={ev.id} className="bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-ink)]/10 shadow-card p-5">
+                  <div key={ev.id} className="admin-panel rounded-xl p-5">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-bold text-[var(--admin-ink)] uppercase truncate">
@@ -581,7 +590,7 @@ export default function StaffAccess() {
                           ))}
                         </select>
                         <label className="flex items-center gap-2">
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/42">
                             Commission
                           </span>
                           <input

@@ -20,10 +20,12 @@ const ROUTES = [
 ];
 
 describe("admin lazy routes stay importable", () => {
+    // The dashboard pulls chart.js and the motion lib, so a cold import can
+    // pass five seconds when the rest of the suite is running in parallel.
     it.each(ROUTES)("%s resolves to a valid page component", async (_name, modPath) => {
         const mod = await import(modPath);
         expect(typeof mod.default, "page should default-export its component").toBe("function");
-    });
+    }, 20000);
 
     it("every lazy route in App.jsx points at a file that exists", () => {
         const appSrc = readFileSync(path.join(srcRoot, "App.jsx"), "utf8");

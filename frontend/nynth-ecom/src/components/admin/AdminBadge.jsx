@@ -28,7 +28,7 @@ const VARIANTS = {
 export default function AdminBadge({ variant = "neutral", className = "", children, ...rest }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest whitespace-nowrap ${
+      className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${
         VARIANTS[variant] ?? VARIANTS.neutral
       } ${className}`}
       {...rest}

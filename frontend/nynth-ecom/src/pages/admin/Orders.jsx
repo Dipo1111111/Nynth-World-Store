@@ -65,11 +65,11 @@ const PaymentStatusBadge = ({ status }) => {
 };
 
 const TestBadge = () => (
-    <span className="bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">TEST</span>
+    <span className="bg-[var(--tint-amber-bg)] text-[var(--tint-amber-fg)] text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">TEST</span>
 );
 
 const ETicketBadge = () => (
-    <span className="bg-[var(--admin-ink)]/10 text-[var(--admin-ink)]/75 border border-[var(--admin-ink)]/10 text-[8px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
+    <span className="bg-[var(--admin-ink)]/10 text-[var(--admin-ink)]/75 border border-[var(--admin-ink)]/10 text-[10px] px-1.5 py-0.5 rounded-lg font-bold uppercase tracking-wider shrink-0">E-TICKET</span>
 );
 
 const PaymentStatusDropdown = ({ status, onStatusChange }) => {
@@ -543,7 +543,7 @@ const Orders = () => {
                                                                     {order.tickets.map((t, i) => (
                                                                         <div key={i} className="flex items-center justify-between gap-2 bg-[var(--admin-surface)] rounded-lg border border-[var(--admin-ink)]/10 px-3 py-2">
                                                                             <span className="font-mono text-[11px] font-bold tracking-wider">{t.code}</span>
-                                                                            <span className="text-[9px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest truncate ml-2">{t.title}</span>
+                                                                            <span className="text-[10px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest truncate ml-2">{t.title}</span>
                                                                         </div>
                                                                     ))}
                                                                 </div>
@@ -615,7 +615,7 @@ const Orders = () => {
                         </div>
 
                         {/* Desktop Ledger View */}
-                        <div className="hidden md:block overflow-x-auto">
+                        <div className="admin-panel rounded-xl hidden md:block overflow-x-auto">
                             <table className="w-full admin-table">
                                 <thead>
                                     <tr className="border-b border-[var(--admin-ink)]/10">

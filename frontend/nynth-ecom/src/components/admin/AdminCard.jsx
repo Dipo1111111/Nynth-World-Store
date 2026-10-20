@@ -3,18 +3,22 @@
 // Three levels and nothing else. Every page was inventing its own, with
 // rounded-2xl, rounded-3xl, plain divs, white fills and no border at all.
 //
-//   default  a panel, a hairline and the card shadow
-//   inset    a group inside a panel, a tint of the ink and no shadow
+// The surface itself lives in index.css as `.admin-panel`, so a hand-rolled
+// panel and this component are the same material. If a page needs a surface
+// it uses one of these levels, never its own fill.
+//
+//   default  an ordinary card, shell or group
+//   raised   the lead block on a page, one per page at most
+//   inset    a group inside a card, a stat tile
+//   dashed   the empty state
 //   plain    a group with no surface of its own
 import React from "react";
 
 const LEVELS = {
-  default:
-    "bg-[var(--admin-surface)] border border-[var(--admin-ink)]/10 shadow-card",
-  inset: "bg-[var(--admin-ink)]/[0.04] border border-[var(--admin-ink)]/10",
-  // An empty state. The dashed edge says there is something to put here.
-  dashed:
-    "bg-[var(--admin-surface)] border border-dashed border-[var(--admin-ink)]/22 shadow-card",
+  default: "admin-panel",
+  raised: "admin-panel admin-panel-raised",
+  inset: "admin-panel admin-panel-inset",
+  dashed: "admin-panel admin-panel-dashed",
   plain: "bg-transparent border border-transparent",
 };
 
@@ -36,9 +40,7 @@ export default function AdminCard({
   return (
     <div
       className={`rounded-xl ${LEVELS[level] ?? LEVELS.default} ${PADDING[padding] ?? ""} ${
-        hover
-          ? "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-card-hover"
-          : ""
+        hover ? "admin-panel-hover" : ""
       } ${className}`}
       {...rest}
     >

@@ -5,27 +5,21 @@ import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { postAuthTarget } from "../utils/authRedirect";
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
-    const { currentUser, loginWithGoogle, loading: authLoading } = useAuth();
+    const { currentUser, loginWithGoogle, loading: authLoading, isStaff, accessLoading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const getRedirectTarget = () => {
-        const from = location.state?.from?.pathname;
-        if (from && !from.startsWith("/login") && !from.startsWith("/signup") && !from.startsWith("/admin")) {
-            return from;
-        }
-        return "/shop";
-    };
-
+    // Wait for the permission layer before choosing a destination. A staff
+    // member is only known to be staff after access resolves, and sending them
+    // to /shop first is exactly the bug this fixes.
     useEffect(() => {
-        if (currentUser && !authLoading) {
-            navigate(getRedirectTarget(), { replace: true });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser, authLoading, navigate, location]);
+        if (!currentUser || authLoading || accessLoading) return;
+        navigate(postAuthTarget({ from: location.state?.from?.pathname, isStaff }), { replace: true });
+    }, [currentUser, authLoading, accessLoading, isStaff, navigate, location]);
 
     if (currentUser) {
         return (
@@ -61,7 +55,6 @@ export default function Login() {
                                     } else {
                                         toast.success("Welcome back");
                                     }
-                                    navigate(getRedirectTarget(), { replace: true });
                                 } catch (error) {
                                     setLoading(false);
                                     if (error.code !== "auth/popup-closed-by-user" && error.code !== "auth/cancelled-popup-request") {
