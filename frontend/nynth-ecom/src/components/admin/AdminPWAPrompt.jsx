@@ -69,7 +69,7 @@ const AdminPWAPrompt = () => {
                 </button>
 
                 <div className="flex gap-4 items-start mb-6">
-                    <div className="p-3 bg-white/[0.08] rounded-lg shrink-0">
+                    <div className="p-3 bg-[var(--admin-ink)]/[0.08] rounded-lg shrink-0">
                         <Smartphone size={22} />
                     </div>
                     <div>
@@ -97,7 +97,7 @@ const AdminPWAPrompt = () => {
                             Install App
                         </button>
                     ) : (
-                        <div className="space-y-4 bg-white/[0.06] p-4 rounded-lg border border-[var(--admin-ink)]/10">
+                        <div className="space-y-4 bg-[var(--admin-ink)]/[0.06] p-4 rounded-lg border border-[var(--admin-ink)]/10">
                             <p className="text-sm font-medium flex items-center gap-2">
                                 To install on iPhone:
                             </p>

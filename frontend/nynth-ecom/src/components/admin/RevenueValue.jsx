@@ -44,7 +44,7 @@ export default function RevenueValue({ amount, display, symbol = "\u20A6", class
                     role="img"
                     aria-label="Manually set figure"
                     title={`Manually set figure. Ledger total: ${formatNaira(resolved.ledger, symbol)}`}
-                    className="mb-2 inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-rose-500 shadow-[0_0_0_3px_rgba(244,63,94,0.18)]"
+                    className="mb-2 inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--tint-rose-fg)] shadow-[0_0_0_3px_rgba(244,63,94,0.18)]"
                 />
             )}
 
@@ -53,7 +53,7 @@ export default function RevenueValue({ amount, display, symbol = "\u20A6", class
                 onClick={() => setRevealChoice(!revealed)}
                 aria-label={revealed ? "Hide revenue figure" : "Reveal revenue figure"}
                 aria-pressed={revealed}
-                className="focus-ring mb-2 inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--admin-ink)]/45 transition-colors hover:bg-white/[0.08] hover:text-[var(--admin-ink)]"
+                className="focus-ring mb-2 inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--admin-ink)]/45 transition-colors hover:bg-[var(--admin-ink)]/[0.08] hover:text-[var(--admin-ink)]"
             >
                 {revealed ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>

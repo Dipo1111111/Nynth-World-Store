@@ -41,6 +41,10 @@ const MIGRATED = [
   "src/pages/admin/Subscribers.jsx",
   "src/pages/admin/TicketPlatform.jsx",
   "src/components/admin/ShippingRatesEditor.jsx",
+  "src/components/admin/AdminLayout.jsx",
+  "src/components/admin/AdminPWAPrompt.jsx",
+  "src/components/admin/RevenueValue.jsx",
+  "src/components/admin/StatusDropdown.jsx",
   "src/components/admin/Toggle.jsx",
   "src/components/admin/AdminButton.jsx",
   "src/components/admin/AdminBadge.jsx",
@@ -101,18 +105,25 @@ describe("the migrated admin holds the system", () => {
 });
 
 describe("the ratchet only goes one way", () => {
-  const onDisk = readdirSync(adminDir)
-    .filter((f) => f.endsWith(".jsx") && !f.endsWith(".test.jsx"))
-    .map((f) => `src/pages/admin/${f}`);
+  const onDisk = [
+    ...readdirSync(adminDir)
+      .filter((f) => f.endsWith(".jsx") && !f.endsWith(".test.jsx"))
+      .map((f) => `src/pages/admin/${f}`),
+    ...readdirSync(componentDir)
+      .filter((f) => f.endsWith(".jsx") && !f.endsWith(".test.jsx"))
+      .map((f) => `src/components/admin/${f}`),
+  ];
 
-  it("lists every admin page that is not migrated yet", () => {
-    // A page that is neither migrated nor pending would escape the ratchet.
+  it("lists every admin file that is not migrated yet", () => {
+    // A file that is neither migrated nor pending would escape the ratchet.
+    // This is the gap that let the sidebar and the status dropdown keep
+    // their hardcoded white for three rounds.
     const known = new Set([...MIGRATED, ...PENDING]);
     const untracked = onDisk.filter((f) => !known.has(f));
     expect(untracked).toEqual([]);
   });
 
-  it("has no page on both lists", () => {
+  it("has no file on both lists", () => {
     const overlap = PENDING.filter((f) => MIGRATED.includes(f));
     expect(overlap).toEqual([]);
   });

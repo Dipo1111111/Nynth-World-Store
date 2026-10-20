@@ -135,7 +135,7 @@ export default function AdminLayout({ children, title }) {
             <aside
                 className={`
                     w-64 bg-[var(--admin-page)] text-[var(--admin-ink)] fixed inset-y-0 left-0 z-40 flex flex-col
-                    border-r border-white/[0.07]
+                    border-r border-[var(--admin-ink)]/[0.07]
                     transition-transform duration-300 ease-out md:translate-x-0
                     ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
                 `}
@@ -176,7 +176,7 @@ export default function AdminLayout({ children, title }) {
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ease-out ${
                                                 active
                                                     ? "bg-[var(--admin-surface)] text-[var(--admin-ink)] shadow-card"
-                                                    : "text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.14] hover:translate-x-0.5"
+                                                    : "text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-hover)] hover:translate-x-0.5"
                                             }`}
                                         >
                                             <item.icon
@@ -195,7 +195,7 @@ export default function AdminLayout({ children, title }) {
 
                 {/* Footer */}
                 <div className="px-4 pb-5 pt-3 border-t border-[var(--admin-ink)]/10">
-                    <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-lg bg-white/[0.06]">
+                    <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-lg bg-[var(--admin-ink)]/[0.06]">
                         <div className="w-8 h-8 rounded-full bg-[var(--admin-ink)]/15 flex items-center justify-center text-[11px] font-bold tracking-wider shrink-0">
                             {initials}
                         </div>
@@ -208,14 +208,14 @@ export default function AdminLayout({ children, title }) {
                     </div>
                     <Link
                         to="/"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.14] transition-all duration-150"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-hover)] transition-all duration-150"
                     >
                         <Home size={16} strokeWidth={1.8} />
                         View Store
                     </Link>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-white/[0.14] transition-all duration-150"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--admin-ink)]/55 hover:text-[var(--admin-ink)] hover:bg-[var(--admin-hover)] transition-all duration-150"
                     >
                         <LogOut size={16} strokeWidth={1.8} />
                         Sign Out

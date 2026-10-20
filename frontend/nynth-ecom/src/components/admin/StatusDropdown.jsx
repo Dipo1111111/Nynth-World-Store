@@ -16,7 +16,7 @@ const STATUS_CONFIG = {
     },
     confirmed: {
         label: 'Confirmed - Ready',
-        className: 'bg-white/[0.12] text-[var(--admin-ink)] border-[var(--admin-ink)]/20'
+        className: 'bg-[var(--admin-ink)]/[0.12] text-[var(--admin-ink)] border-[var(--admin-ink)]/20'
     },
     packaging: {
         label: 'In Packaging',
