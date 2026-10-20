@@ -164,6 +164,30 @@ moved. A black toolbar on a paper page is not a hybrid, it is a leftover.
    heading to its controls, 8px label to its control, 4px control to the hint under it. One
    value doing every job is what makes a page read as a flat list of equal weight boxes.
 
+## The material
+
+The back office is one glass plane sitting on a washed page. Every panel is the same
+translucent material: a tint of the ink over the page, a hairline, a soft blur, and a top
+highlight. Nothing gets its own surface. A panel is never a solid fill and never a different
+material, because that is how thirteen tabs start to read as two different products.
+
+Depth is the only thing that changes, and it comes from three levels:
+
+| Level | Use it for | Material |
+|---|---|---|
+| `admin-panel-raised` | the one lead block on a page, the finance hero, a modal-sized panel | stronger tint, soft drop shadow, the top highlight |
+| `admin-panel` | every ordinary card, table shell, form group | 3.5% ink tint, hairline, blur, top highlight |
+| `admin-panel-inset` | a group inside a card, a stat tile, a row of small facts | 2% tint, no blur, no shadow |
+
+Dashed (`admin-panel-dashed`) is the empty state. `admin-panel-hover` adds the one lift.
+
+The page behind the glass carries a very low contrast wash, two ink-tinted radial gradients at
+5% and 3.5%, so the blur has something to sit on instead of a flat fill. That wash is the
+reason the material reads as glass rather than as a grey box.
+
+Solid surfaces are reserved for things you read through, not at: inputs, table header chrome,
+dropdowns, modals and product thumbnails. A solid panel in a content position is drift.
+
 ## The primitives
 
 `src/components/admin/` holds the shared pieces. A page should not be able to invent a

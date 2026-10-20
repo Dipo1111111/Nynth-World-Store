@@ -26,6 +26,10 @@ Last updated: 2026-10-17 17:50 (Africa/Lagos)
 
 ## Hard rules (do not break)
 
+- **Never write a new button, card, badge, input, modal, switch, chip or status colour.** The admin has one of each and they live in `src/components/admin/`: `AdminButton`, `AdminCard`, `AdminBadge`, `AdminInput`, `AdminModal`, `PageHeader`, `StatCard`, `Toggle`. Reach for those before anything else. A new one is only written when the founder asks for it by name, and it goes in that same folder with the same props API so the next page can use it too.
+- **Never hardcode a style into a component.** No raw colour, no raw radius, no raw pixel value in a `className`. Every value comes from a token (`--admin-*`, `--tint-*`) or from a utility class that already exists. If a page needs a value that does not exist yet, add it to `src/index.css` as a reusable token or class first, then use it. The storefront follows the same rule with its own tokens.
+- **A value that appears twice is a token.** A value that appears once may stay inline only when it is content and not a style, a name, a price, a date.
+- **The theme owns the colour.** A hardcoded white is white on white on the paper admin and the panel silently disappears. A raw Tailwind palette value such as `text-slate-300` is a dark theme value and is unreadable on paper. Both fail `src/utils/adminSystem.test.js`, which is the enforcement and not a suggestion.
 - No em dashes anywhere, in copy, code, or commits.
 - No `style={{}}` in new code except dnd-kit in Products.jsx.
 - No new npm dependencies without asking.
