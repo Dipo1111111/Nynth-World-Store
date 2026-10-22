@@ -61,6 +61,35 @@ as $$
       "ticketing.orders.view": true,
       "ticketing.attendees.view": true
     }'::jsonb
+    when 'store_manager' then '{
+      "store.products.view": true,
+      "store.products.manage": true,
+      "store.orders.view": true,
+      "store.orders.manage": true,
+      "store.carts.view": true,
+      "store.customers.view": true,
+      "store.customers.email": true,
+      "store.subscribers.view": true,
+      "store.subscribers.email": true,
+      "store.subscribers.manage": true,
+      "store.discounts.view": true,
+      "store.discounts.manage": true,
+      "store.lookbooks.view": true,
+      "store.lookbooks.manage": true,
+      "ticketing.events.view": true
+    }'::jsonb
+    when 'marketer' then '{
+      "store.products.view": true,
+      "store.discounts.view": true,
+      "store.lookbooks.view": true,
+      "ticketing.events.view": true
+    }'::jsonb
+    when 'developer' then '{
+      "store.products.view": true,
+      "store.products.manage": true,
+      "store.orders.view": true,
+      "ticketing.events.view": true
+    }'::jsonb
     when 'ticket_organizer' then '{
       "ticketing.events.view": true,
       "ticketing.events.edit": true,

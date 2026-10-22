@@ -20,6 +20,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import StatusDropdown from "../../components/admin/StatusDropdown";
 import { useAuth } from "../../context/AuthContext";
+import { useSettings } from "../../context/SettingsContext";
+import RevenueValue from "../../components/admin/RevenueValue";
+import { REVENUE_MASK } from "../../utils/revenueDisplay";
 import {
     Select,
     SelectContent,
@@ -103,7 +106,15 @@ const SECTION_LABEL = "text-[11px] font-bold uppercase tracking-[0.18em] text-[v
 const Orders = () => {
     // Reading orders is one permission, changing them is another.
     const { can: canAny } = useAuth();
+    const canSeeFinance = canAny("store.finance.view");
     const canManageOrders = canAny("store.orders.manage");
+    const { settings } = useSettings();
+    const moneySymbol = settings?.currency_symbol || "\u20A6";
+    // Money follows the same rule as the dashboard: only the founder sees it.
+    // A staff account gets the mask, never the figure, even line by line.
+    const money = (value) => canSeeFinance
+        ? `${moneySymbol}${(value || 0).toLocaleString()}`
+        : `${moneySymbol}${REVENUE_MASK}`;
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -255,7 +266,6 @@ const Orders = () => {
         paidOrders: liveOrders.filter(o => o.payment_status === 'paid' || o.payment_status === 'success').length,
     };
 
-    const revenueRef = useCountUp(summary.totalRevenue);
     const ordersRef = useCountUp(summary.totalOrders);
     const unpaidRef = useCountUp(summary.unpaidOrders);
     const paidRef = useCountUp(summary.paidOrders);
@@ -296,16 +306,15 @@ const Orders = () => {
     return (
         <AdminLayout title="Orders">
             {/* Ledger matter - one dominant number, ruled secondary counts, no icon chips */}
+            {canSeeFinance && (
             <div className="mb-10">
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                     <div className="min-w-0">
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl md:text-3xl text-[var(--admin-ink)]/55 font-semibold leading-none">₦</span>
-                            <span
-                                ref={revenueRef}
-                                className="text-[40px] md:text-[56px] leading-none font-extrabold tracking-[-0.03em] tabular-nums text-[var(--admin-ink)]"
-                            >0</span>
-                        </div>
+                        <RevenueValue
+                            amount={summary.totalRevenue}
+                            display={settings?.revenue_display}
+                            symbol={moneySymbol}
+                        />
                         <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[var(--admin-ink)]/42">
                             Net revenue · paid · live orders
                         </p>
@@ -328,6 +337,14 @@ const Orders = () => {
                     </div>
                 </div>
             </div>
+            )}
+            {!canSeeFinance && (
+                <div className="mb-10">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[var(--admin-ink)]/42">
+                        Not part of your access. Revenue stays with the founder.
+                    </p>
+                </div>
+            )}
 
             {/* Commander row - segmented scope, search, selects, export */}
             <div className="mb-8">
@@ -380,10 +397,12 @@ const Orders = () => {
                                 <option key={m} value={m}>{getMonthName(m)}</option>
                             ))}
                         </select>
-                        <Button variant="outline" className="gap-2 shrink-0 h-9" onClick={downloadCSV}>
-                            <Download size={15} />
-                            <span className="hidden sm:inline">Export CSV</span>
-                        </Button>
+                        {canSeeFinance && (
+                            <Button variant="outline" className="gap-2 shrink-0 h-9" onClick={downloadCSV}>
+                                <Download size={15} />
+                                <span className="hidden sm:inline">Export CSV</span>
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -481,7 +500,7 @@ const Orders = () => {
                                                 </div>
                                             </div>
                                             <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
-                                                <span className="font-bold text-sm leading-none mt-1 tabular-nums">₦{order.total?.toLocaleString()}</span>
+                                                <span className="font-bold text-sm leading-none mt-1 tabular-nums">{money(order.total)}</span>
                                                 <div className="[&_button]:h-8 [&_button]:min-w-0 [&_button]:px-3 [&_button]:text-[11px] flex justify-end">
                                                     {canManageOrders ? (
                                                         <StatusDropdown
@@ -527,7 +546,7 @@ const Orders = () => {
                                                                         <p className="text-[10px] text-[var(--admin-ink)]/55 font-medium mt-1">Qty: {item.quantity}</p>
                                                                     </div>
                                                                     <div className="text-right pt-1 flex flex-col justify-between">
-                                                                        <p className="font-medium text-sm tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                                                        <p className="font-medium text-sm tabular-nums">{money(item.price * item.quantity)}</p>
                                                                     </div>
                                                                 </div>
                                                             ))}
@@ -593,15 +612,15 @@ const Orders = () => {
                                                             <div className="p-4 bg-[var(--admin-ink)]/[0.05] rounded-lg border border-[var(--admin-ink)]/10 space-y-3">
                                                                 <div className="flex justify-between text-[11px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">
                                                                     <span>Subtotal</span>
-                                                                    <span className="text-right tabular-nums font-medium">₦{order.subtotal?.toLocaleString()}</span>
+                                                                    <span className="text-right tabular-nums font-medium">{money(order.subtotal)}</span>
                                                                 </div>
                                                                 <div className="flex justify-between text-[11px] text-[var(--admin-ink)]/55 font-bold uppercase tracking-widest">
                                                                     <span>Shipping</span>
-                                                                    <span className="text-right tabular-nums font-medium">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                    <span className="text-right tabular-nums font-medium">{money(order.shippingFee || order.shipping_fee)}</span>
                                                                 </div>
                                                                 <div className="flex justify-between items-baseline font-bold pt-3 border-t border-[var(--admin-ink)]/14">
                                                                     <span className="text-[11px] uppercase tracking-widest">Total</span>
-                                                                    <span className="text-right text-lg font-extrabold tabular-nums tracking-tight">₦{order.total?.toLocaleString()}</span>
+                                                                    <span className="text-right text-lg font-extrabold tabular-nums tracking-tight">{money(order.total)}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -680,7 +699,7 @@ const Orders = () => {
                                                             : 'N/A'}
                                                     </td>
                                                     <td className="px-4 md:px-6 py-4 whitespace-nowrap text-right font-bold tabular-nums text-sm md:text-base tracking-tight">
-                                                        ₦{order.total?.toLocaleString()}
+                                                        {money(order.total)}
                                                     </td>
                                                 </tr>
 
@@ -716,7 +735,7 @@ const Orders = () => {
                                                                                     <p className="text-xs text-[var(--admin-ink)]/55">Qty: {item.quantity}</p>
                                                                                 </div>
                                                                                 <div className="text-right">
-                                                                                    <p className="font-medium text-sm tabular-nums">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                                                                    <p className="font-medium text-sm tabular-nums">{money(item.price * item.quantity)}</p>
                                                                                 </div>
                                                                             </div>
                                                                         ))}
@@ -823,15 +842,15 @@ const Orders = () => {
                                                                             <div className="space-y-2 pt-3 border-t border-[var(--admin-ink)]/[0.06]">
                                                                                 <div className="flex justify-between text-xs text-[var(--admin-ink)]/55">
                                                                                     <span>Subtotal</span>
-                                                                                    <span className="tabular-nums">₦{order.subtotal?.toLocaleString()}</span>
+                                                                                    <span className="tabular-nums">{money(order.subtotal)}</span>
                                                                                 </div>
                                                                                 <div className="flex justify-between text-xs text-[var(--admin-ink)]/55">
                                                                                     <span>Shipping</span>
-                                                                                    <span className="tabular-nums">₦{(order.shippingFee || order.shipping_fee)?.toLocaleString()}</span>
+                                                                                    <span className="tabular-nums">{money(order.shippingFee || order.shipping_fee)}</span>
                                                                                 </div>
                                                                                 <div className="flex justify-between items-baseline pt-3 border-t border-[var(--admin-ink)]/14">
                                                                                     <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--admin-ink)]/80">Total</span>
-                                                                                    <span className="text-right text-xl font-extrabold tabular-nums tracking-tight text-[var(--admin-ink)]">₦{order.total?.toLocaleString()}</span>
+                                                                                    <span className="text-right text-xl font-extrabold tabular-nums tracking-tight text-[var(--admin-ink)]">{money(order.total)}</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
